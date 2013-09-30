@@ -1,0 +1,26 @@
+ .contact a:hover {@include scale(1.3);
+									 color: rgba(50, 40, 241,.95);
+							     }	
+
+$breakpoint-xs: 26.222em;
+$breakpoint-sm: 27em;
+$breakpoint-m: 38em;
+$breakpoint-lg: 48em;
+
+
+
+@media (min-width: 12em) {
+
+			
+			}
+ 
+@media (min-width: 20em) {
+						}
+
+@media (min-width: 30em) {
+			  	  
+					}
+
+@media (min-width: 48em) {
+			
+			}
