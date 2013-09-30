@@ -1,0 +1,123 @@
+//////////////////////////////
+// Imports
+//////////////////////////////
+@import "compass";
+@import "compass/reset";
+@import "compass/css3";
+@import "color-schemer";
+@import "breakpoint";
+@import "state";
+@import "fonts";
+@import "colors";
+
+* {@include box-sizing('border-box');
+	 }
+    
+body {margin: 0 auto;
+			width: 100%;
+			max-width: 1024px;
+			//font-size: 100%;
+			//line-height: 1.6875em;
+			}
+
+h1 {@extend .hs;
+		text-shadow: $text-shadow;
+		color: white;
+		font-family: source-sans-pro, helvetica, serif;
+		font-size:135%;
+		}
+
+h2,h3 {@extend .hs;
+		text-transform: uppercase;
+		text-shadow: $text-shadow;
+		color: rgba(0,0,0,.7);
+		}
+
+p {font-family: source-sans-pro, helvetica, serif;}
+
+header {@include clearfix;
+				background-color: $primary; 
+				//rgba(44, 62, 80,1.0);
+				padding-top: 1.687em;
+				padding-bottom: 1.687em;
+				text-align: center;
+				text-transform: uppercase;
+					ul{list-style: none;}
+					a {color: rgba(255, 255, 255, .875);
+						 text-decoration: none;
+						 font-family: source-sans-pro;
+						 line-height: 1.3em;}
+					h3,p{color: white;}
+
+					@include breakpoint ($breakpoint-xs){
+											padding-top: 0em;
+											padding-bottom: 0em;
+											h1{float: left;
+													
+													padding-left: 1em;
+													padding-right: 1em;
+													padding-top: 2em;
+													padding-bottom: 2.02em;
+													background-color: $quadrary;}
+											li{float: right;
+												 padding-left: 1em;
+												 padding-right: 1em;
+												 padding-top: 2em;
+												 padding-bottom: 2em;
+												 background-color: #ffe140;
+												 font-size: 130%;}
+											li:first-child{background-color: $tertiary;
+											
+											}	 
+											}
+							
+					
+				}
+
+footer {@extend header;
+				padding-top: .8435em;
+				padding-bottom: .8435em;
+				margin-top: .5em;}
+
+.hs {font-family: source-sans-pro, helvetica, serif;
+		 text-align: center;
+		 }
+
+.card {@include single-box-shadow;
+			 background-color: $secondary;
+			 //rgba(255, 200, 25, .48);
+			 -webkit-box-shadow: .1px .2px 2px 0px #34495e;
+			 box-shadow: .1px .2px 2px 0px #34495e;
+			 margin: .4em auto;
+			 padding-bottom: 1.687em;
+			 padding-top: 1.687em;
+			 }
+
+.work {@extend .card;
+				h2{padding-bottom: .8435em;}
+			 }
+
+.tweets {@extend .card;
+				 }
+
+#twitter-widget-0 {display: block;
+									 margin: 0 auto;
+									 }
+
+.contact {@extend .card;
+					@include clearfix;
+							nav{text-align: center;}
+							li {list-style: none;
+									display: inline-block;
+									padding: 1em;
+									//float:left;}
+							 a {font-size: 2.55em;
+							 		text-align: center;
+							 		text-decoration: none;
+						 		  color: rgba(255, 151, 0, .79); //$tertiary;  padding: 1.8435em;
+						 		  -webkit-transition: all 0.2s ease-out;
+				     				 -moz-transition: all 0.2s ease-out;  
+				       				 -o-transition: all 0.2s ease-out;  
+				          				transition: all 0.2s ease-out;}
+          }      
+          }   
