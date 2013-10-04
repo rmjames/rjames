@@ -1,9 +1,3 @@
-
-//$primary: #2c3e50;
-//$secondary: #f39c12;
-//$tertiary: rgba(255, 200, 25, .48);
-//$quadrary: #e67e22;
-
 // Primary color
 $cs-primary           : #2c3e50; //rgba(44, 62, 80,1.0); //rgba(136, 240, 241, .5);
 
@@ -21,3 +15,6 @@ $primary: cs-primary();
 $secondary: lighten(cs-secondary(), 17%); // too light, darkening this up a bit.
 $tertiary: cs-tertiary();
 $quadrary: cs-quadrary();
+
+$color-h2: rgba(0,10,150,.6);
+$color-a-transition: rgba(33, 20, 155,.82);
