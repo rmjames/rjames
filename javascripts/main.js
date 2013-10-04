@@ -1,5 +1,1 @@
-$('#work').on('click',function(){
-$('#slider').nivoSlider();
-});
-
-
+$('li#btn').on('click', function(){$('#work').slideToggle('ease');})
