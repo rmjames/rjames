@@ -13,9 +13,14 @@
   -webkit-font-smoothing: antialiased;
 }
 
-body {font-family: source-sans-pro, helvetica, serif;
+html {
+      font-family: source-sans-pro, helvetica, serif;
 			font-weight: 300;
 			font-size: 100%;
-			line-height: 1.687em;}
+			line-height: 1.618em;
+          @media (min-width:$bp-sm){
+            font-size: 130.7%;
+            }
+  }
 
 $text-shadow: .2px .2px .05px #000;
