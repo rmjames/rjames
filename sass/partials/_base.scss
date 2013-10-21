@@ -9,94 +9,115 @@
 @import "fonts";
 @import "colors";
 
-* {@include box-sizing('border-box');
+* {
+	@include box-sizing('border-box');
  }
     
-body {margin: 0 auto;
+body {
+			margin: 0 auto;
 			width: 100%;
 			max-width: 1024px;
 	}
 
-h1 {text-shadow: $text-shadow;
+h1 {
+		text-shadow: $text-shadow;
 		color: white;
-		font-size:131%;
+		font-size:160%;
 }
 
-h2 {text-transform: uppercase;
+h2 {
+		text-transform: uppercase;
 		text-align: center;
 		text-shadow: $text-shadow;
 		color: $color-h2;
 		padding: .8435em 0em.8435em 0em;
-		font-size: 175%;
+		font-size: 180%;
 } 
 
-header {@include clearfix;
+header {
+				@include clearfix;
 				background-color: $primary; 
-				padding-top: 1.687em;
-				padding-bottom: 1.687em;
+				padding-top: 1.618em;
+				padding-bottom: 1.618em;
 				text-align: center;
 				text-transform: uppercase;
 					li{list-style: none;}
 					a {color: rgba(255, 255, 255, .875);
 						 text-decoration: none;
-						 line-height: 1.3em;}
+						 -webkit-transform: scale(1.8);  
+								     -moz-transform: scale(1.8);   
+								      -ms-transform: scale(1.8);   
+								       -o-transform: scale(1.8);   
+								          transform: scale(1.8);
+}
 					
-@media (min-width: $breakpoint-xs){
+@media (min-width: $bp-xs ){
 				padding-top: 0em;
 				padding-bottom: 0em;
+				
 					  li{float: right;
 							 padding: 2em 1em 2em 1em;
 							 background-color: #ffe140;
 							 @include single-box-shadow;
-							 font-size: 160%;}
+							 }
 					  li:first-child{float: left;
 						 	 background-color: $quadrary;}
 					  li:last-child{background-color: $tertiary;}	 
 	}
 }
 
-footer {@extend header;
-				padding-top: .8435em;
-				padding-bottom: .8435em;
-	}
+footer {
+				@extend header;
+				padding-top: .809em;
+				padding-bottom: .809em;
+}
 
-.card {@include single-box-shadow;
+.main {
 			 background-color: $secondary;
-			 padding: 1.687em 0em 1.687em 0em;
+}
+
+.card {
+			 padding: 1.618em 0em 1.618em 0em;
 			 -webkit-box-shadow: .1px .2px 2px 0px #34495e;
 			 				 box-shadow: .1px .2px 2px 0px #34495e;
  }
 
-.work {@extend .card;
-			 li {text-align: center;
+.work {
+			 @extend .card;
+			 	li {text-align: center;
 			     list-style: none;}
- 				a {text-decoration: none;}
+ 				a {text-decoration: none;
+ 									 padding: .5em;}
  }
 
-.tweets {@extend .card;
+.tweets {
+				 @extend .card;
  }
 
-#twitter-widget-0 {display: block;
-									 margin: 0 auto;
- }
+#twitter-widget-0 {
+			display: block;
+			margin: 0 auto;
+ }	
 
-.contact {@extend .card;
-					@include clearfix;
-							nav{text-align: center;}
-							li {list-style: none;
-									display: inline-block;
-									padding: 1em;}
-							 a {font-size: 2.6em;
-							 		text-decoration: none;
-						 		  color: rgba(255, 151, 0, .79);
-						 		  padding: 1.8435em;}
+.contact {
+			@extend .card;
+				@include clearfix;
+					nav{text-align: center;}
+					li {list-style: none;
+							display: inline-block;
+							padding: 1em;}
+					 a {font-size: 2.6em;
+					 		text-decoration: none;
+				 		  color: rgba(255, 151, 0, .79);
+				 		  padding: 1.8435em;
+				 		  -webkit-transition: all 0.2s ease-out;
+	 							 -moz-transition: all 0.2s ease-out;  
+		 						 	 -o-transition: all 0.2s ease-out;  
+			  							transition: all 0.2s ease-out;
+			  }
 
-@media (min-width: $breakpoint-xs){
-    a {font-size: 3.3em;
-			 padding: 2em .6em 2em .6em;}
-
--webkit-transition: all 0.2s ease-out;
-	 -moz-transition: all 0.2s ease-out;  
-		 -o-transition: all 0.2s ease-out;  
-			  transition: all 0.2s ease-out;}
+@media (min-width: $bp-xs){
+    a {
+			 padding: 2em .4em 2em .4em;}
+	}
 }
