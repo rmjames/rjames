@@ -32,12 +32,11 @@ $color-main-background: #fefff9;
 			float: left;
 			padding-left: 5%;
 			text-decoration: none;	
-				a {
-					text-decoration: none;
+				a {text-decoration: none;
 					color: white;}
 			}
 
-header {
+.header {
 				@include clearfix;
 				margin: 0 auto;
 				background-color: $color-header; 
@@ -48,16 +47,22 @@ header {
 				
 .nav-hdr {
 					//@include clearfix;
+					@extend .transition;
+					@extend .txt-shad;
 					line-height: 1.8em;;
 					font-size: 124%;
 							a {text-decoration: none;
 								 display: block;
 								 color: rgba(255,255,255, .975);}
 							li {padding-left: 5%;
-									text-transform: uppercase;}
+									text-transform: uppercase;
+										&:hover {@extend .transition;
+					 									color: $color-a-transition;
+      										  opacity: .875;}
+      						}
 							li:first-child {background-color: lighten($color-header, 37%);}
 							li:last-child {background-color: lighten($color-header, 23%);}
-					@extend .transition;
+					 
 }
 															
 .nav-top {
@@ -75,6 +80,7 @@ header {
 
 footer {
 				@extend header;
+				@extend .txt-shad;
 				color: white;
 						nav {opacity: .4;}
 				}
@@ -106,7 +112,7 @@ footer {
       										 opacity: .9;}
       		  }
  				a {text-decoration: none;
- 					 padding: .1em 4em .1em 4em;}
+ 					 padding: .1em 3.3em .1em 3.3em;}
 			}
 
 .twts {
@@ -127,6 +133,7 @@ footer {
 						 	 text-decoration: none;
 					 		 color: rgba(255, 151, 0, .79);
 					 		 padding: .325em;
+					 		 margin: .12em;
 					 		 @extend .transition;}
 				}		  
 
@@ -143,3 +150,7 @@ footer {
 																		@extend .transition;
 																		color: $color-a-transition;
 																		}
+
+.txt-shad {
+					text-shadow: $text-shadow;
+}																		
