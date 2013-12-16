@@ -1,16 +1,18 @@
-@import "colors";
-
-.contact a:hover, a:hover {
-									-webkit-transition: all 0.2s ease-out;
-										 -moz-transition: all 0.2s ease-out;  
-											 -o-transition: all 0.2s ease-out;  
-												  transition: all 0.2s ease-out;
-									color: $color-a-transition;
-	 }
-
-$bp-xs: 25em;
-$bp-sm: 27em;
-$bp-m: 35em;
-$bp-lg: 48em;
-$bp-xl: 70em;
 .gn {display: none;}
+
+.transition {
+						 -webkit-transition: all 0.9s ease-out;
+							  -moz-transition: all 0.9s ease-out;  
+								  -o-transition: all 0.9s ease-out;  
+							       transition: all 0.9s ease-out;
+										  }
+
+.contact a:hover, .nav-hdr a:hover {
+																		@extend .transition;
+																		color: $color-a-transition;
+}
+
+.logo a {
+	text-decoration: none;
+	color: white;
+}
