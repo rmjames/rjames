@@ -17,10 +17,34 @@ html {
       font-family: source-sans-pro, helvetica, serif;
 			font-weight: 300;
 			font-size: 100%;
-			line-height: 1.618em;
-          @media (min-width:$bp-sm){
-            font-size: 130.7%;
+			line-height: 1.5em;
+          @media (min-width:$bp-xs){
+            font-size: 115%;
             }
+
+          @media (min-width:$bp-sm){
+            font-size: 130%;
+            }   
+
+          @media (min-width:$bp-m){
+            font-size: 145%;
+            }
+
+          @media (min-width:$bp-lg){
+            font-size: 170%;
+            }
+
+          @media (min-width:$bp-xl){
+            font-size: 185%;
+            }
+
   }
 
-$text-shadow: .2px .2px .05px #000;
+h1 {
+    color: white;
+    font-size:150%;
+    text-transform: uppercase;
+    text-align: center;
+    text-decoration: none;
+    text-shadow: $text-shadow;
+}
