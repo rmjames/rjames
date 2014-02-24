@@ -1,0 +1,272 @@
+/* Imports */
+
+@import "compass";
+@import "compass/reset";
+@import "compass/css3";
+@import "compass/utilities";
+
+/* Varibles */
+
+$text-shadow: .9px .9px .9px rgba(149, 165, 166,1.0);
+$text-shadow-toggle-hover: 1.1px 1.1px 9.1px rgba(241, 250, 19,1.0);
+
+$bp-xs: 15.573em;
+$bp-sm: 27em;
+$bp-m: 35em;
+$bp-lg: 48em;
+$bp-xl: 70em;
+
+$color-h2: rgba(0,10,150,.6);
+$color-a-transition: rgba(255, 24, 0,.77);
+$color-work: rgba(20,134,242,.91);
+$color-header: #2c3e50;
+$color-main-background: #D3E0E0;
+
+/* Layout */
+
+$gutter_width: 3.5%;
+$columns: 12;
+$column_width: 5.125%;
+$grid_width: ((($column_width+($gutter_width))*$columns)-$gutter_width);
+ 
+ %g-1 {
+  width: 100%;
+  padding-left: .5em;
+  padding-right: .5em;
+}
+
+%g-1-3 {
+  width: 33%;
+}
+
+%g-2-3 {
+  width: 66.7%;
+}
+
+%g-1-4 {
+  width: 24.5%;
+  }  
+
+%g-2-4 {
+  width: 49.5%;
+}  
+
+%g-3-4 {
+  width: 74.5%;
+}
+
+%g-last {
+  padding: .5em; 
+}
+
+/* Fonts */
+
+@font-face {
+  font-family:'icomoon';src:url("fonts/icomoon.eot");src:url("fonts/icomoon.eot?#iefix") format("embedded-opentype"),url("fonts/icomoon.woff") format("woff"),url("fonts/icomoon.ttf") format("truetype"),url("fonts/icomoon.svg#icomoon") format("svg");font-weight:normal;font-style:normal;
+}
+
+[data-icon]:before {
+  font-family: 'icomoon';
+  content: attr(data-icon);
+  speak: none;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+}
+
+html {
+    font-family: georgia, helvetica, serif; //source-sans-pro
+    font-weight: 300;
+    font-size: 100%;
+    line-height: 1.5em;
+  }
+
+h1 {
+    color: white;
+    font-size: 1.6em;
+    text-transform: uppercase;
+    text-shadow: $text-shadow;
+}
+
+h2 {
+    text-align:center;
+    color: red;
+    line-height: 3.8em;
+    font-size: 1.6em;
+    text-transform: uppercase;
+    text-shadow: $text-shadow;
+}
+
+h3 {
+    text-align:center;
+    color: rgba(250,10,10,.9);
+    line-height: 2.8;
+    font-size: 1.1em;
+    text-transform: uppercase;
+    text-shadow: $text-shadow;
+}
+
+/* Base */
+
+* {@include box-sizing('border-box');}
+
+img {max-width: 100%;
+    height: auto;
+}
+
+.gn {display: none;}
+
+.main {
+    margin: 0 auto;
+    background-color: $color-main-background;
+}
+
+.logo{
+    float: left;
+        a {text-decoration: none;
+           color: white;}
+}
+
+.header {
+    @include clearfix;
+    line-height: 1.15em;
+    background-color: $color-header; 
+    padding: 4% 3% 4% 3% ;
+    text-transform: uppercase;
+    text-align: center;
+}       
+        
+.nav-top {
+    @extend .txt-shad;
+    line-height: 2.5;
+    font-size: 124%;
+        a {text-decoration: none;
+           display: block;
+           color: rgba(255,255,255, .975);}
+        li {padding-left: 5%;
+            text-transform: uppercase;
+                &:hover {@extend %transition;
+                         color: $color-a-transition;
+                         opacity: .85;}
+               }
+        li:first-child {background-color: lighten($color-header, 43%);}
+        li:nth-child(2){background-color: lighten($color-header, 33%);}
+        li:nth-child(n+3){background-color: lighten($color-header, 23%);}
+        li:last-child {background-color: lighten($color-header, 13%);}
+}
+                                                    
+.nav-hdr {
+     a {color: rgba(255, 255, 255, .975);
+        text-decoration: none;}
+}
+                    
+.nav-toggle {
+    float: right;
+    text-shadow: $text-shadow;
+    font-size: 1.6em;
+        &:before {
+            content:'≡';}
+        &:hover {
+            text-shadow: $text-shadow-toggle-hover;}
+}
+
+footer {
+    @extend .header;
+    @extend .txt-shad;
+    padding: .9em 0em .9em 0em;
+    color: white;
+    @include clearfix;
+        nav {opacity: .8;}
+}
+
+section {
+     height: 27em;
+        p {
+           text-align: center;
+           margin: 1em;}       
+}
+.work {
+    @extend %transition;
+    background-color: rgba(150,150,100, .5);
+        li {text-align: center;
+            list-style: none;
+            margin: 0 auto;
+            padding: .3em 0em .3em 0em;
+            width: 60%;
+            -webkit-box-shadow: 6px 8px 1px -1px #c9c9c9; 
+                    box-shadow: 6px 8px 1px -1px #c9c9c9;
+                     &:hover {@include scale(1.029);}
+            }
+          a {text-decoration: none;
+             padding: .1em 3.3em .1em 3.3em;}
+}
+
+.about {
+    background-image: url("../images/city.jpg");
+    background-size: cover;
+    opacity: .6;
+}  
+
+#services {background-color: lighten($color-main-background, 11%);}
+
+#work {background-color: lighten($color-main-background, 3%);}
+
+#contact {background-color: lighten($color-main-background, 10%);}
+
+#contact nav {
+    margin: 0 auto;
+    ul {padding-top: 4em;}
+    li {display: inline;
+        margin: .3em;
+        padding-top: .575em;
+          }
+      a {@extend %transition;
+          font-size: 2.1em;
+           text-decoration: none;
+           $text-shadow: .9px .9px .9px rgba(188, 221, 240, .8);
+           color: rgba(150, 150, 150, 1);
+           padding: .25em;
+           }
+  }       
+
+ %transition {
+     -webkit-transition: all 0.7s ease-out;
+          -moz-transition: all 0.7s ease-out;  
+              -o-transition: all 0.7s ease-out;  
+               transition: all 0.7s ease-out;
+               }
+
+.nav-top a:hover, .contact a:hover{
+      color: $color-a-transition;
+      }
+
+.txt-shad {
+      text-shadow: $text-shadow;
+}
+
+@media (min-width:$bp-xs){
+    html {
+        font-size: 90%;}
+  }
+
+@media (min-width:$bp-sm){
+    html {
+        font-size: 110%;}
+  } 
+
+@media (min-width:$bp-m){
+    html{
+        font-size: 120%;}
+  }
+
+@media (min-width:$bp-lg){
+    html{
+        font-size: 130%;}
+  }
+
+@media (min-width:$bp-xl){
+    html{
+        font-size: 140%;}
+  }
