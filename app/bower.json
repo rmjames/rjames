@@ -16,6 +16,7 @@
   ],
   "dependencies": {
     "breakpoint": "~4.6.4",
-    "scrollReveal.js": "~0.0.2"
+    "scrollReveal.js": "~0.0.2",
+    "susy": "~1.0.9"
   }
 }
