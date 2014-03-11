@@ -1,20 +1,24 @@
-/* Imports */
+/********** Imports **********/
 
 @import "compass";
 @import "compass/reset";
 @import "compass/css3";
 @import "compass/utilities";
 
-/* Varibles */
+/********** Varibles **********/
 
 $text-shadow: .9px .9px .9px rgba(149, 165, 166,1.0);
 $text-shadow-toggle-hover: 1.1px 1.1px 9.1px rgba(241, 250, 19,1.0);
 
-$bp-xs: 15.573em;
-$bp-sm: 27em;
-$bp-m: 35em;
-$bp-lg: 48em;
-$bp-xl: 70em;
+$xs: 15.573em;
+$sm: 20em;
+$m: 30em;
+$lg: 48em;
+$xl: 64em;
+$xxl: 70em;
+
+$breakpoints: $xs $sm $lg $xl $xxl; 
+
 
 $color-h2: rgba(0,10,150,.6);
 $color-a-transition: rgba(255, 24, 0,.77);
@@ -22,7 +26,21 @@ $color-work: rgba(20,134,242,.91);
 $color-header: #2c3e50;
 $color-main-background: #D3E0E0;
 
-/* Layout */
+/********* Mixins *********/
+
+
+@mixin mq($size) {
+  @each $name, $breakpoint in $breakpoints {
+    @if ($name == $size) {
+      @media (max-width: $breakpoint) {
+        @content;
+      }
+    }
+  }
+}
+
+
+/********** Layout **********/
 
 $gutter_width: 3.5%;
 $columns: 12;
@@ -30,7 +48,7 @@ $column_width: 5.125%;
 $grid_width: ((($column_width+($gutter_width))*$columns)-$gutter_width);
  
  %g-1 {
-  width: 100%;
+  width: auto;
   padding-left: .5em;
   padding-right: .5em;
 }
@@ -40,26 +58,28 @@ $grid_width: ((($column_width+($gutter_width))*$columns)-$gutter_width);
 }
 
 %g-2-3 {
-  width: 66.7%;
+  width: 66%;
 }
 
 %g-1-4 {
-  width: 24.5%;
+  width: 25%;
   }  
 
 %g-2-4 {
-  width: 49.5%;
+  width: 50%;
 }  
 
 %g-3-4 {
-  width: 74.5%;
+  width: 75%;
 }
 
 %g-last {
   padding: .5em; 
 }
 
-/* Fonts */
+/********** Fonts **********/
+
+@import url(http://fonts.googleapis.com/css?family=Open+Sans+Condensed:300);
 
 @font-face {
   font-family:'icomoon';src:url("fonts/icomoon.eot");src:url("fonts/icomoon.eot?#iefix") format("embedded-opentype"),url("fonts/icomoon.woff") format("woff"),url("fonts/icomoon.ttf") format("truetype"),url("fonts/icomoon.svg#icomoon") format("svg");font-weight:normal;font-style:normal;
@@ -77,7 +97,7 @@ $grid_width: ((($column_width+($gutter_width))*$columns)-$gutter_width);
 }
 
 html {
-    font-family: georgia, helvetica, serif; //source-sans-pro
+    font-family: 'Open Sans Condensed', georgia, helvetica, serif; 
     font-weight: 300;
     font-size: 100%;
     line-height: 1.5em;
@@ -108,12 +128,71 @@ h3 {
     text-shadow: $text-shadow;
 }
 
-/* Base */
+/********** Transitions/Animations **********/
+
+ %transition {transition: all 0.7s ease-out;}
+
+ @keyframes line {
+    0%{ transform: scale(1);}
+    25%{ transform: scale(1.1);}
+    50%{ transform: scale(1);}
+    75%{ transform: scale(1.1);}
+    100%{ transform: scale(1);}
+}
+
+/********** Base **********/
 
 * {@include box-sizing('border-box');}
 
-img {max-width: 100%;
+img {
+    max-width: 100%;
     height: auto;
+}
+
+header {
+    @include clearfix;
+    background-color: $color-header; 
+    padding: 3% 1.5% 3% 1.8% ;
+    text-transform: uppercase;
+    text-align: center;
+}       
+
+footer {
+    @extend header;
+    @extend .txt-shad;
+    padding: .9em 0em .9em 0em;
+    color: white;
+    @include clearfix;
+        nav {
+            margin: 0 auto;
+            opacity: .8;
+                ul {padding: 1em;}
+                li {display: inline;
+                    margin: .3em;
+                    //padding-top: .575em;
+                    }
+        a {@extend %transition;
+          font-size: 2.1em;
+          text-decoration: none;
+          $text-shadow: .9px .9px .9px rgba(188, 221, 240, .8);
+          color: rgba(150, 150, 150, 1);
+          padding: .4em;
+          }
+    }  
+}
+
+section {
+     height: 33em;
+        p {
+           text-align: center;
+           margin: 1em;}       
+}
+
+article {
+     height: 13em;
+        p {
+           text-align: center;
+           margin-top: 1em;}       
 }
 
 .gn {display: none;}
@@ -123,20 +202,43 @@ img {max-width: 100%;
     background-color: $color-main-background;
 }
 
+.line {
+    display: block;
+    text-decoration: none;
+    text-transform: uppercase;
+    color: red;
+    font-size: 1.3em;
+    padding: .5em;
+    margin-top: 5em;
+    animation-name: line;
+    animation-duration: 8s;
+    animation-iteration-count: infinite; 
+}
+
+.design {
+  background-image: url("../images/design.jpg");  
+  background-size: cover;
+  opacity: .6;
+}
+/*
+.calc {
+   background-image: url("../images/calc.jpg");
+   background-size: cover;
+}
+
+.sched {
+    background-image: url("../images/sched.jpg");
+    background-size: cover;
+}
+*/
+
 .logo{
     float: left;
         a {text-decoration: none;
            color: white;}
 }
 
-.header {
-    @include clearfix;
-    line-height: 1.15em;
-    background-color: $color-header; 
-    padding: 4% 3% 4% 3% ;
-    text-transform: uppercase;
-    text-align: center;
-}       
+
         
 .nav-top {
     @extend .txt-shad;
@@ -145,7 +247,7 @@ img {max-width: 100%;
         a {text-decoration: none;
            display: block;
            color: rgba(255,255,255, .975);}
-        li {padding-left: 5%;
+        li {padding-left: 2%;
             text-transform: uppercase;
                 &:hover {@extend %transition;
                          color: $color-a-transition;
@@ -155,6 +257,13 @@ img {max-width: 100%;
         li:nth-child(2){background-color: lighten($color-header, 33%);}
         li:nth-child(n+3){background-color: lighten($color-header, 23%);}
         li:last-child {background-color: lighten($color-header, 13%);}
+
+        @include mq(l) {
+            li{
+              display: inline;
+            }
+
+        }
 }
                                                     
 .nav-hdr {
@@ -166,41 +275,42 @@ img {max-width: 100%;
     float: right;
     text-shadow: $text-shadow;
     font-size: 1.6em;
+    padding: .2em;
+    transition: ease .5s;
         &:before {
             content:'≡';}
         &:hover {
             text-shadow: $text-shadow-toggle-hover;}
+        &:active{
+            transform: rotate(90deg);
+            }
+
+        @include mq(m){
+            display: hidden;
+        }
 }
 
-footer {
-    @extend .header;
-    @extend .txt-shad;
-    padding: .9em 0em .9em 0em;
-    color: white;
-    @include clearfix;
-        nav {opacity: .8;}
-}
-
-section {
-     height: 27em;
-        p {
-           text-align: center;
-           margin: 1em;}       
-}
 .work {
     @extend %transition;
     background-color: rgba(150,150,100, .5);
-        li {text-align: center;
+        li {
+            @extend .txt-shad;
+            text-align: center;
+            text-transform: uppercase;
             list-style: none;
-            margin: 0 auto;
-            padding: .3em 0em .3em 0em;
+            line-height: 2em;
+            font-size: 140%;
+
+            margin:  auto;
+            padding: 1em 0em 1em 0em;
             width: 60%;
-            -webkit-box-shadow: 6px 8px 1px -1px #c9c9c9; 
-                    box-shadow: 6px 8px 1px -1px #c9c9c9;
-                     &:hover {@include scale(1.029);}
+            height: 1em;
+            text-shadow: $text-shadow;
+                 &:before,  {
+                    content:'∿';}
             }
           a {text-decoration: none;
-             padding: .1em 3.3em .1em 3.3em;}
+             padding: .3em;}
 }
 
 .about {
@@ -208,35 +318,6 @@ section {
     background-size: cover;
     opacity: .6;
 }  
-
-#services {background-color: lighten($color-main-background, 11%);}
-
-#work {background-color: lighten($color-main-background, 3%);}
-
-#contact {background-color: lighten($color-main-background, 10%);}
-
-#contact nav {
-    margin: 0 auto;
-    ul {padding-top: 4em;}
-    li {display: inline;
-        margin: .3em;
-        padding-top: .575em;
-          }
-      a {@extend %transition;
-          font-size: 2.1em;
-           text-decoration: none;
-           $text-shadow: .9px .9px .9px rgba(188, 221, 240, .8);
-           color: rgba(150, 150, 150, 1);
-           padding: .25em;
-           }
-  }       
-
- %transition {
-     -webkit-transition: all 0.7s ease-out;
-          -moz-transition: all 0.7s ease-out;  
-              -o-transition: all 0.7s ease-out;  
-               transition: all 0.7s ease-out;
-               }
 
 .nav-top a:hover, .contact a:hover{
       color: $color-a-transition;
@@ -246,27 +327,36 @@ section {
       text-shadow: $text-shadow;
 }
 
-@media (min-width:$bp-xs){
+#services {background-color: lighten($color-main-background, 11%);}
+
+#work {background-color: lighten($color-main-background, 3%);}
+
+#contact {
+    background-color: lighten($color-main-background, 10%);
+    margin: 0 auto;
+}
+
+@media (min-width:$xs){
     html {
         font-size: 90%;}
   }
 
-@media (min-width:$bp-sm){
+@media (min-width:$sm){
     html {
         font-size: 110%;}
   } 
 
-@media (min-width:$bp-m){
+@media (min-width:$m){
     html{
         font-size: 120%;}
   }
 
-@media (min-width:$bp-lg){
+@media (min-width:$lg){
     html{
         font-size: 130%;}
   }
 
-@media (min-width:$bp-xl){
+@media (min-width:$xl){
     html{
         font-size: 140%;}
   }
