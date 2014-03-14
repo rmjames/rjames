@@ -10,15 +10,12 @@
 $text-shadow: .9px .9px .9px rgba(149, 165, 166,1.0);
 $text-shadow-toggle-hover: 1.1px 1.1px 9.1px rgba(241, 250, 19,1.0);
 
-$xs: 15.573em;
-$sm: 20em;
-$m: 30em;
-$lg: 48em;
-$xl: 64em;
-$xxl: 70em;
-
-$breakpoints: $xs $sm $lg $xl $xxl; 
-
+$bp-xs: 15.75em;
+$bp-sm: 20em;
+$bp-m: 30em;
+$bp-lg: 47.5em;
+$bp-xl: 62em;
+$bp-xxl: 70em;
 
 $color-h2: rgba(0,10,150,.6);
 $color-a-transition: rgba(255, 24, 0,.77);
@@ -28,18 +25,23 @@ $color-main-background: #D3E0E0;
 
 /********* Mixins *********/
 
-
 @mixin mq($size) {
-  @each $name, $breakpoint in $breakpoints {
-    @if ($name == $size) {
-      @media (max-width: $breakpoint) {
-        @content;
-      }
-    }
+  @if $size == xs {
+    @media screen and (min-width: $bp-xs) {@content}}
+  @else if $size == sm {
+    @media screen and (min-width: $bp-sm) {@content}}
+  @else if $size == m {
+    @media screen and (min-width: $bp-m) {@content}}
+  @else if $size == ml {
+    @media screen and (min-width: $bp-xs) and (max-width: $bp-lg) {@content}}  
+  @else if $size == lg {
+    @media screen and (min-width: $bp-lg) {@content}}
+  @else if $size == xl {
+    @media screen and (min-width: $bp-xl) {@content}}
+  @else if $size == xxl {
+    @media screen and (min-width: $bp-xxl) {@content}}
   }
-}
-
-
+  
 /********** Layout **********/
 
 $gutter_width: 3.5%;
@@ -113,6 +115,7 @@ h1 {
 h2 {
     text-align:center;
     color: red;
+    letter-spacing: .206em;
     line-height: 3.8em;
     font-size: 1.6em;
     text-transform: uppercase;
@@ -174,7 +177,7 @@ footer {
         a {@extend %transition;
           font-size: 2.1em;
           text-decoration: none;
-          $text-shadow: .9px .9px .9px rgba(188, 221, 240, .8);
+          $text-shadow: .9px .9px .9px rgba(188, 221, 240, .8) !global;
           color: rgba(150, 150, 150, 1);
           padding: .4em;
           }
@@ -199,6 +202,7 @@ article {
 
 .main {
     margin: 0 auto;
+    maxwidth: 80em;
     background-color: $color-main-background;
 }
 
@@ -234,6 +238,7 @@ article {
 
 .logo{
     float: left;
+    letter-spacing: .309em;
         a {text-decoration: none;
            color: white;}
 }
@@ -249,7 +254,10 @@ article {
            color: rgba(255,255,255, .975);}
         li {padding-left: 2%;
             text-transform: uppercase;
-                &:hover {@extend %transition;
+            letter-spacing: .103em;
+            
+                      
+                    &:hover {@extend %transition;
                          color: $color-a-transition;
                          opacity: .85;}
                }
@@ -258,13 +266,8 @@ article {
         li:nth-child(n+3){background-color: lighten($color-header, 23%);}
         li:last-child {background-color: lighten($color-header, 13%);}
 
-        @include mq(l) {
-            li{
-              display: inline;
-            }
-
         }
-}
+
                                                     
 .nav-hdr {
      a {color: rgba(255, 255, 255, .975);
@@ -284,10 +287,6 @@ article {
         &:active{
             transform: rotate(90deg);
             }
-
-        @include mq(m){
-            display: hidden;
-        }
 }
 
 .work {
@@ -304,10 +303,9 @@ article {
             margin:  auto;
             padding: 1em 0em 1em 0em;
             width: 60%;
-            height: 1em;
-            text-shadow: $text-shadow;
-                 &:before,  {
-                    content:'∿';}
+            height: 1em;           text-shadow: $text-shadow;
+                // &:before,  {
+                  //  content:'∿';}
             }
           a {text-decoration: none;
              padding: .3em;}
@@ -336,27 +334,51 @@ article {
     margin: 0 auto;
 }
 
-@media (min-width:$xs){
-    html {
-        font-size: 90%;}
-  }
+.toTop>a:before {
+  content: '↑';
+  font-size: 2em;
+  font-weight: 700;
+  color: #0D2030;;
+  position: fixed;
+  bottom: 1em;
+  right: .6em; 
+  padding: .25em;
+  //line-height: 1em;
+  z-index: 10;
+  text-shadow: 0.9px 0.9px 0.9px rgba(228, 114, 37, 0.8);;
+  @extend %transition;
+    &:hover{color: saturate(#47b3bd, 91%);}
+}
 
-@media (min-width:$sm){
-    html {
-        font-size: 110%;}
-  } 
+@include mq(xs) {
+    html {font-size: 90%;}
+}
 
-@media (min-width:$m){
-    html{
-        font-size: 120%;}
-  }
+@include mq(s) {
+    html {font-size: 110%;}
+} 
 
-@media (min-width:$lg){
-    html{
-        font-size: 130%;}
-  }
+@include mq(m) {
+    html{font-size: 120%;}
+}
 
-@media (min-width:$xl){
-    html{
-        font-size: 140%;}
-  }
+@include mq(ml) {
+  .nav-top {display: none;}
+}
+
+@include mq(lg) {
+    html{font-size: 130%;}
+    .nav-top {
+        li{text-align: center;
+          letter-spacing: .206em;
+          float: left;
+          width: 25%;}
+    }
+    .nav-toggle {display: none;}
+    .logo {float:none;
+            letter-spacing: .618em;}
+}
+
+@include mq(xl) {
+    html{font-size: 140%;}
+}
