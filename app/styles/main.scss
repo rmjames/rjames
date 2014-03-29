@@ -103,8 +103,8 @@ html {
     font-weight: 300;
     font-size: 100%;
     line-height: 1.5em;
-  }
-
+    letter-spacing: .05em;
+}                                                           
 h1 {
     color: white;
     font-size: 1.6em;
@@ -125,6 +125,7 @@ h2 {
 h3 {
     text-align:center;
     color: rgba(250,10,10,.9);
+    letter-spacing: .103em;
     line-height: 2.8;
     font-size: 1.1em;
     text-transform: uppercase;
@@ -163,7 +164,7 @@ header {
 footer {
     @extend header;
     @extend .txt-shad;
-    padding: .9em 0em .9em 0em;
+    padding: .9em 0 .9em 0;
     color: white;
     @include clearfix;
         nav {
@@ -219,10 +220,12 @@ article {
     animation-iteration-count: infinite; 
 }
 
-.design {
-  background-image: url("../images/design.jpg");  
-  background-size: cover;
-  opacity: .6;
+.design div{
+  //background-image: url("../images/design.jpg");  
+  //background-size: cover;
+  //opacity: .6;
+  width: 95%;
+  margin: auto;
 }
 /*
 .calc {
