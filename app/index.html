@@ -16,6 +16,7 @@
         <!-- endbower -->
         <!-- endbuild -->
         <!-- build:css(.tmp) styles/main.css -->
+        <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
         <link rel="stylesheet" href="styles/main.css">
         <!-- endbuild -->
         <script src="bower_components/modernizr/modernizr.js"></script>
@@ -46,23 +47,24 @@
             <h2>Services</h2>
                 <article class="design">
                     <h3>front end development</h3>
-                    <div><img src="images/design.jpg"></div>
-                    <p>I engineer designs that are performant and scalable.</p>
+                    <div><i class="fa fa-code fa-5x"></i></div>
+                    <p>I make designs that are performant and scalable.</p>
                 </article>
         </section>    
         <section id="work" class="work ">
             <h2>work</h2>
                 <div id="work">
-                    <li class="calc"><a href="http://cdpn.io/mcgte">calculator</a></li>
-                    <li class="sched"><a href="http://dev-toolkit.herokuapp.com/">scheduler</a></li>
+                    <li class="calc" ><a href="http://cdpn.io/mcgte"> calculator</a></li>
+                    <li class="sched"><a href="http://dev-toolkit.herokuapp.com/"> schedule</a></li>
                 </div>
         </section> 
         <section id="contact">
-            <h2>contact</h2>
-                <p>
-                  For any inqueries please
-                  <a class='line' href="mailto:rma.james@gmail.com">drop a line</a>
-                </p>
+            <h2 data-scroll-reveal>contact</h2>
+                <p>For any inqueries please drop a line</p>
+                  <button class='button'>
+                      <a href="mailto:rma.james@gmail.com">contact</a>
+                </button>
+               
         </section>
         <div class="toTop"><a href="#top"></a></div>
     <footer>
@@ -80,12 +82,13 @@
         <!-- bower:js -->
         <script src="bower_components/jquery/jquery.js"></script>
         <script src="bower_components/scrollReveal.js/scrollReveal.js"></script>
-        <script src="bower_components/iscroll/build/iscroll.js"></script>
-
         <!-- endbower -->
         <!-- endbuild -->
 
         <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
+        <script>
+            window.scrollReveal = new scrollReveal();
+        </script>
         <script>
             (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
             function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;

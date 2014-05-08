@@ -1,0 +1,199 @@
+/********** Base **********/
+
+* {@include box-sizing('border-box');}
+
+img {
+    //max-width: 100%;
+    //height: auto;
+}
+
+header {
+    @include clearfix;
+    background-color: $color-header; 
+    padding: 3% 1.5% 3% 1.8% ;
+    text-transform: uppercase;
+    text-align: center;
+}       
+
+footer {
+    @extend header;
+    @extend .txt-shad;
+    padding: .9em 0 .9em 0;
+    color: white;
+    @include clearfix;
+        nav {
+            margin: 0 auto;
+            opacity: .8;
+                ul {padding: 1em;}
+                li {display: inline;
+                    margin: .3em;
+                    //padding-top: .575em;
+                    }
+        a {@extend %transition;
+          font-size: 2.1em;
+          text-decoration: none;
+          $text-shadow: .9px .9px .9px rgba(188, 221, 240, .8) !global;
+          color: rgba(150, 150, 150, 1);
+          padding: .4em;
+          }
+    }  
+}
+
+section {
+     height: 33em;
+        p {
+           text-align: center;
+           margin: 1em;}       
+}
+
+article {
+     height: 13em;
+        p {
+           text-align: center;
+            margin: auto;
+            line-height: 1.5em;
+            font-size: 1.6em;
+            @extend %g-5-12}       
+}
+
+.gn {display: none;}
+
+.main {
+    margin: 0 auto;
+    width: 100%;
+    maxwidth: 80em;
+    background-color: $color-main-background;
+}
+
+.button {;
+    margin-left: calc(100%/2 - 6em);
+    margin-top: 8em;
+        @extend %button;
+        a {
+        text-decoration: none;
+        text-transform: uppercase;
+        color: red;
+        font-size: 2.1em;}
+}   
+    
+
+.design div{
+  width: 95%;
+  margin-left: calc(100%/2 - 3em);
+  margin-top: 2em;
+  margin-bottom: 2em;
+  text-shadow: 0.9px 0.9px 0.9px rgba(228, 114, 37, 0.8);
+}
+
+.logo{
+    float: left;
+    letter-spacing: .309em;
+        a {text-decoration: none;
+           color: white;}
+}
+        
+.nav-top {
+    @extend .txt-shad;
+    line-height: 2.5;
+    font-size: 124%;
+        a {text-decoration: none;
+           display: block;
+           color: rgba(255,255,255, .975);}
+        li {padding-left: 2%;
+            text-transform: uppercase;
+            letter-spacing: .103em;            
+                    &:hover {@extend %transition;
+                         color: $color-a-transition;
+                         opacity: .85;}
+               }
+        li:first-child {background-color: lighten($color-header, 43%);}
+        li:nth-child(2){background-color: lighten($color-header, 33%);}
+        li:nth-child(n+3){background-color: lighten($color-header, 23%);}
+        li:last-child {background-color: lighten($color-header, 13%);}
+}
+                                                  
+.nav-hdr {
+     a {color: rgba(255, 255, 255, .975);
+        text-decoration: none;}
+}
+                    
+.nav-toggle {
+    float: right;
+    text-shadow: $text-shadow;
+    font-size: 1.6em;
+    padding: .2em;
+    transition: ease .5s;
+        &:before {
+            content:'≡';}
+        &:hover {
+            text-shadow: $text-shadow-toggle-hover;}
+        &:active{
+            transform: rotate(90deg);}
+}
+
+.work {
+    @extend %transition;
+    background: url(../images/keyboard.jpg);
+    background-size: cover;
+    font-face: 'Droid Sans', helvetica;
+    opacity: .1;
+       li {
+          @extend .txt-shad;
+          text-align: center;
+          text-transform: uppercase;
+          list-style: none;
+          line-height: 2em;
+          font-size: 140%;
+          margin:  auto;
+          padding: 1em 0em 1em 0em;
+          width: 60%;
+          height: 1em;           
+          text-shadow: $text-shadow;}
+        a {text-decoration: none;
+           padding: .3em;}
+}
+
+.about {
+    background: url("../images/city.jpg") ;
+    background-size: cover;
+    opacity: .6;
+}  
+
+.nav-top a:hover, .contact a:hover{
+      color: $color-a-transition;
+      }
+
+.txt-shad {
+      text-shadow: $text-shadow;
+}
+
+.toTop>a:before {
+    background-color: rgba(240, 240, 245,.75);
+    border: 1px solid rgba(0,0,0,.2);
+    border-radius: 2px;
+    bottom: 0;
+    colo1: #0D2030;
+    content: '↑';
+    font-size: 2.25em;
+    padding: .4em;
+    position: fixed;
+    right: 0; 
+    text-shadow: 0.9px 0.9px 0.9px rgba(228, 114, 37, 0.8);
+    z-index: 1;
+    @extend %transition;
+       &:hover{color: saturate(#47b3bd, 91%);}
+}
+
+#services {
+  background-color: lighten($color-main-background, 11%);
+}
+
+#work {
+  
+  //lighten($color-main-background, 3%);
+}
+
+#contact {
+    background-color: lighten($color-main-background, 10%);
+    margin: 0 auto;
+}
