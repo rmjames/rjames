@@ -2,11 +2,6 @@
 
 * {@include box-sizing('border-box');}
 
-img {
-    //max-width: 100%;
-    //height: auto;
-}
-
 header {
     @include clearfix;
     background-color: $color-header; 
@@ -26,9 +21,7 @@ footer {
             opacity: .8;
                 ul {padding: 1em;}
                 li {display: inline;
-                    margin: .3em;
-                    //padding-top: .575em;
-                    }
+                    margin: .3em;}
         a {@extend %transition;
           font-size: 2.1em;
           text-decoration: none;
@@ -49,11 +42,11 @@ section {
 article {
      height: 13em;
         p {
-           text-align: center;
-            margin: auto;
-            line-height: 1.5em;
-            font-size: 1.6em;
-            @extend %g-5-12}       
+           @extend %g-5-12;
+           font-size: 1.25em;
+           line-height: 1.5em;
+           margin: auto;
+           text-align: center;}      
 }
 
 .gn {display: none;}
@@ -61,12 +54,12 @@ article {
 .main {
     margin: 0 auto;
     width: 100%;
-    maxwidth: 80em;
+    max-width: 80em;
     background-color: $color-main-background;
 }
 
 .button {;
-    margin-left: calc(100%/2 - 6em);
+    margin-left: calc(100%/2 - 5em);
     margin-top: 8em;
         @extend %button;
         a {
@@ -78,16 +71,17 @@ article {
     
 
 .design div{
-  width: 95%;
-  margin-left: calc(100%/2 - 3em);
-  margin-top: 2em;
-  margin-bottom: 2em;
-  text-shadow: 0.9px 0.9px 0.9px rgba(228, 114, 37, 0.8);
+    margin-bottom: 2em;
+    margin-left: calc(100%/2 - 3em);
+    margin-top: 2em;
+    text-shadow: 0.9px 0.9px 0.9px rgba(
+    170, 0, 0, .8);
+    //228, 114, 37, 0.8);
 }
 
 .logo{
     float: left;
-    letter-spacing: .309em;
+    letter-spacing: .47em;
         a {text-decoration: none;
            color: white;}
 }
@@ -101,11 +95,11 @@ article {
            color: rgba(255,255,255, .975);}
         li {padding-left: 2%;
             text-transform: uppercase;
-            letter-spacing: .103em;            
-                    &:hover {@extend %transition;
+            letter-spacing: .47em;
+                &:hover {@extend %transition;
                          color: $color-a-transition;
                          opacity: .85;}
-               }
+            }
         li:first-child {background-color: lighten($color-header, 43%);}
         li:nth-child(2){background-color: lighten($color-header, 33%);}
         li:nth-child(n+3){background-color: lighten($color-header, 23%);}
@@ -156,44 +150,57 @@ article {
 .about {
     background: url("../images/city.jpg") ;
     background-size: cover;
-    opacity: .6;
+    //opacity: .2;
 }  
 
-.nav-top a:hover, .contact a:hover{
-      color: $color-a-transition;
-      }
-
-.txt-shad {
-      text-shadow: $text-shadow;
+.about-2 {
+    background: white;
+    position: relative;
+    top: 0;
+    left: 0;
+    opacity: .1;
+    z-index: 1;
 }
+
+.about-3 {
+    position: relative;
+    top: 0;
+    left: 0;
+    opacity: 1;
+    z-index: 2;
+}
+
+.nav-top a:hover, .contact a:hover{color: $color-a-transition;}
+
+.txt-shad {text-shadow: $text-shadow;}
 
 .toTop>a:before {
     background-color: rgba(240, 240, 245,.75);
-    border: 1px solid rgba(0,0,0,.2);
+    border: 1px solid rgba(0,0,0,.375);
     border-radius: 2px;
-    bottom: 0;
+    bottom: .4em;
     colo1: #0D2030;
     content: '↑';
     font-size: 2.25em;
     padding: .4em;
     position: fixed;
-    right: 0; 
+    right: .4em; 
     text-shadow: 0.9px 0.9px 0.9px rgba(228, 114, 37, 0.8);
     z-index: 1;
     @extend %transition;
        &:hover{color: saturate(#47b3bd, 91%);}
 }
 
-#services {
-  background-color: lighten($color-main-background, 11%);
+.service {
+  width: 100%;
+    h2, div {
+      width: 80%;}
+    p {
+      width: 60%;
+    }
 }
 
-#work {
-  
-  //lighten($color-main-background, 3%);
-}
 
-#contact {
-    background-color: lighten($color-main-background, 10%);
-    margin: 0 auto;
-}
+#services {background-color: lighten($color-main-background, 11%);}
+
+#contact {background-color: lighten($color-main-background, 10%);}

@@ -1,6 +1,6 @@
 /********** Fonts **********/
 
-@import url(http://fonts.googleapis.com/css?family=Open+Sans+Condensed:300);
+@import url(http://fonts.googleapis.com/css?family=Open+Sans+Condensed:300,400,600);
 
 @import url(http://fonts.googleapis.com/css?family=Droid+Sans:400,700);
 
@@ -20,7 +20,7 @@
 }
 
 html {
-    font-family: 'Open Sans Condensed', georgia, helvetica, serif; 
+    font-family: 'Open Sans Condensed', helvetica, georgia, serif; 
     font-weight: 300;
     font-size: 100%;
     line-height: 1.5em;
@@ -29,6 +29,7 @@ html {
 h1 {
     color: white;
     font-size: 1.6em;
+    font-weight: 00;
     text-transform: uppercase;
     text-shadow: $text-shadow;
 }
@@ -38,7 +39,8 @@ h2 {
     color: red;
     letter-spacing: .206em;
     line-height: 3.8em;
-    font-size: 1.6em;
+    font-size: 2.6em;
+    font-weight: 500;
     text-transform: uppercase;
     text-shadow: $text-shadow;
 }
@@ -46,9 +48,9 @@ h2 {
 h3 {
     text-align:center;
     color: rgba(250,10,10,.9);
-    letter-spacing: .103em;
-    line-height: 2.8;
-    font-size: 1.1em;
+    letter-spacing: .0103em;
+    line-height: 2.8em;
+    font-size: 1.5em;
     text-transform: uppercase;
     text-shadow: $text-shadow;
 }
