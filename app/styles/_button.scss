@@ -1,16 +1,15 @@
 %button {
-  @include box-sizing('border-box');
   -webkit-touch-callout: none;
   background-clip: padding-box;
-  border: 0;
-  border-radius: 0.1em;
+  border: 1px solid rgba(21,21,21,.35) ;
+  border-radius: 0.2em;
   cursor: pointer;
   display: inline-block;
-  font: 100%/2.3 "Open Sans", helvetica;
+  font: 80%/2.3 'Open Sans Condensed';
   letter-spacing: -1px;
-  //margin: 0;
-  padding: 0 1em;
+  padding: .5em 1.8em;
   position: relative;
   text-align: center;
   text-decoration: none !important;
+  text-shadow: $text-shadow;
 }
