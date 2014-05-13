@@ -33,20 +33,25 @@ footer {
 }
 
 section {
-     height: 33em;
-        p {
-           text-align: center;
-           margin: 1em;}       
+    height: 25em;
+    text-align: center;
+    vertical-align: middle;
+    box-shadow: 0 1px 1px rgba(0,0,0,0.2);
 }
 
-article {
-     height: 13em;
-        p {
-           @extend %g-5-12;
-           font-size: 1.25em;
-           line-height: 1.5em;
-           margin: auto;
-           text-align: center;}      
+.service {
+      p {
+         @extend %g-6-12;
+         font-size: 1.2em;
+         line-height: 1.5em;
+         margin: auto;
+         text-align: center;}
+}
+
+.design div{
+    margin: 1em 0;
+    text-shadow: 0.9px 0.9px 0.9px rgba(
+    170, 0, 0, .8);
 }
 
 .gn {display: none;}
@@ -58,27 +63,16 @@ article {
     background-color: $color-main-background;
 }
 
-.button {;
-    margin-left: calc(100%/2 - 5em);
-    margin-top: 8em;
+.button {
         @extend %button;
-        a {
-        text-decoration: none;
-        text-transform: uppercase;
-        color: red;
-        font-size: 2.1em;}
+        margin-top: 8em;
+          a {
+            text-decoration: none;
+            text-transform: uppercase;
+            color: red;
+            font-size: 2.1em;}
 }   
     
-
-.design div{
-    margin-bottom: 2em;
-    margin-left: calc(100%/2 - 3em);
-    margin-top: 2em;
-    text-shadow: 0.9px 0.9px 0.9px rgba(
-    170, 0, 0, .8);
-    //228, 114, 37, 0.8);
-}
-
 .logo{
     float: left;
     letter-spacing: .47em;
@@ -121,54 +115,48 @@ article {
             content:'≡';}
         &:hover {
             text-shadow: $text-shadow-toggle-hover;}
-        &:active{
-            transform: rotate(90deg);}
 }
 
 .work {
-    @extend %transition;
-    background: url(../images/keyboard.jpg);
-    background-size: cover;
-    font-face: 'Droid Sans', helvetica;
-    opacity: .1;
+    background-color: darken($color-work, 36%);
+       ul {display: inline-block;}
        li {
-          @extend .txt-shad;
+          @extend %transition;
+          @extend %card;
+          list-style: none;
+          margin:  auto;
+          text-shadow: $text-shadow;
           text-align: center;
           text-transform: uppercase;
-          list-style: none;
-          line-height: 2em;
-          font-size: 140%;
-          margin:  auto;
-          padding: 1em 0em 1em 0em;
-          width: 60%;
-          height: 1em;           
-          text-shadow: $text-shadow;}
-        a {text-decoration: none;
-           padding: .3em;}
+             a {
+                @extend .txt-shad;
+                @extend %transition;
+                vertical-align: middle;
+                line-height: 6em;
+                font-size: 1.1em;
+                padding: 1.3em;
+                text-decoration: none;
+                color: white;
+                    &:hover {color: $color-a-transition;}
+                }
+          }
 }
+
+.card, %card {
+    background: rgba(200, 200, 200, .7);
+    box-shadow: .5px 1.5px 1px .5px rgba(255, 255, 255, 1);
+    height: 6em;
+    margin: 1.2em;
+    text-shadow: $text-shadow;
+    width: 10em;
+ }
+
 
 .about {
     background: url("../images/city.jpg") ;
     background-size: cover;
-    //opacity: .2;
+    opacity: .6;
 }  
-
-.about-2 {
-    background: white;
-    position: relative;
-    top: 0;
-    left: 0;
-    opacity: .1;
-    z-index: 1;
-}
-
-.about-3 {
-    position: relative;
-    top: 0;
-    left: 0;
-    opacity: 1;
-    z-index: 2;
-}
 
 .nav-top a:hover, .contact a:hover{color: $color-a-transition;}
 
@@ -190,16 +178,6 @@ article {
     @extend %transition;
        &:hover{color: saturate(#47b3bd, 91%);}
 }
-
-.service {
-  width: 100%;
-    h2, div {
-      width: 80%;}
-    p {
-      width: 60%;
-    }
-}
-
 
 #services {background-color: lighten($color-main-background, 11%);}
 
