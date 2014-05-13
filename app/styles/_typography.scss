@@ -2,7 +2,7 @@
 
 @import url(http://fonts.googleapis.com/css?family=Open+Sans+Condensed:300,400,600);
 
-@import url(http://fonts.googleapis.com/css?family=Droid+Sans:400,700);
+@import url(http://fonts.googleapis.com/css?family=Lato:900italic);
 
 @font-face {
   font-family:'icomoon';src:url("fonts/icomoon.eot");src:url("fonts/icomoon.eot?#iefix") format("embedded-opentype"),url("fonts/icomoon.woff") format("woff"),url("fonts/icomoon.ttf") format("truetype"),url("fonts/icomoon.svg#icomoon") format("svg");font-weight:normal;font-style:normal;
@@ -20,7 +20,7 @@
 }
 
 html {
-    font-family: 'Open Sans Condensed', helvetica, georgia, serif; 
+    font-family: 'Open Sans Condensed', georgia, helvetica, serif; 
     font-weight: 300;
     font-size: 100%;
     line-height: 1.5em;
@@ -38,9 +38,8 @@ h2 {
     text-align:center;
     color: red;
     letter-spacing: .206em;
-    line-height: 3.8em;
+    line-height: 2.8em;
     font-size: 2.6em;
-    font-weight: 500;
     text-transform: uppercase;
     text-shadow: $text-shadow;
 }
@@ -49,7 +48,7 @@ h3 {
     text-align:center;
     color: rgba(250,10,10,.9);
     letter-spacing: .0103em;
-    line-height: 2.8em;
+    //line-height: 2.8em;
     font-size: 1.5em;
     text-transform: uppercase;
     text-shadow: $text-shadow;
