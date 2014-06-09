@@ -58,7 +58,7 @@ footer {
                 &:hover {@extend %transition;
                          color: $color-a-transition;
                          opacity: .85;}
-                // @include mq(m) {
+                // @include mq(ml) {
                 //     display: none;}
                 @include mq(lg) {
                     text-align: center;
@@ -168,12 +168,12 @@ footer {
 .toTop>a:before {
     background-color: rgba(240, 240, 245,.75);
     border: 1px solid rgba(0,0,0,.375);
-    border-radius: 3px;
+    border-radius: 10%;//3px;
     bottom: .4em;
     colo1: #0D2030;
     content: '↑';
     font-size: 2.3em;
-    padding: 0.1em 0.3em 0.4em 0.3em;
+    padding: .01em .2em .25em .2em; //0.1em 0.3em 0.4em 0.3em;
     position: fixed;
     right: .3em; 
     text-shadow: 0.9px 0.9px 0.9px rgba(228, 114, 37, 0.8);
@@ -189,4 +189,8 @@ footer {
 
 .cf:after {
     clear: both;
+}
+
+@include mq(ml) {
+  .nav-top {display: none;}
 }
