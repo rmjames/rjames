@@ -1,8 +1,5 @@
 <!doctype html>
-<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
-<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
-<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -19,12 +16,8 @@
         <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
         <link rel="stylesheet" href="styles/main.css">
         <!-- endbuild -->
-        <script src="bower_components/modernizr/modernizr.js"></script>
     </head>
     <body>
-        <!--[if lt IE 10]>
-            <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
-        <![endif]-->
     <div class="main">
         <nav id="top">
             <ul class="nav-top">
@@ -40,16 +33,20 @@
                 <a href="#" class="nav-toggle"></a>
             </nav>
         </header>
-        <section id="about" class='about'></section>
+        <section id="skyline" class='section'></section>
+        <section id='about' class='section'>
+            <article class='section-info'>
+                <h2>robert james</h2>
+            </article> 
+        </section>
         <section id="services">
             <h2>Services</h2>
-                <article class="design service">
+                <article class="section-info">
                     <h3>front end development</h3>
-                    <div><i class="fa fa-code fa-5x"></i></div>
-                    <p>I make designs that are performant and scalable.</p>
+                    <div><i class="fa fa-code fa-4x"></i></div>
                 </article>
         </section>    
-        <section id="work" class="work ">
+        <section id="work" class="work section">
             <h2>work</h2>
                 <ul>
                     <li><a href="http://cdpn.io/mcgte">calculator</a></li>
@@ -57,13 +54,14 @@
                 </ul>
 
         </section> 
-        <section id="contact">
-            <h2 data-scroll-reveal>contact</h2>
-                <p>For any inqueries </p>
-                  <button class='button'>
-                      <a href="mailto:rma.james@gmail.com">drop a line</a>
-                </button>
-               
+        <section id="contact" class='section'>
+            <article class='section-info'>
+                <h2 data-scroll-reveal>contact</h2>
+                    <p>For any inqueries </p>
+                      <button class='button'>
+                          <a href="mailto:rma.james@gmail.com">drop a line</a>
+                    </button>
+            </article>   
         </section>
         <div class="toTop"><a href="#top"></a></div>
     <footer>
