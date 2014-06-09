@@ -1,145 +1,149 @@
-/********** Base **********/
-
 * {@include box-sizing('border-box');}
+
+a {
+  color: #020912;
+  text-decoration: none;
+}
 
 header {
     @include clearfix;
-    background-color: $color-header; 
-    padding: 3% 1.5% 3% 1.8% ;
+    @extend .txt-shad;
+    background-color: rgba(240, 240, 240, .8); 
+    padding: 2.9%;
     text-transform: uppercase;
     text-align: center;
 }       
 
 footer {
     @extend header;
-    @extend .txt-shad;
     padding: .9em 0 .9em 0;
-    color: white;
     @include clearfix;
-        nav {
-            margin: 0 auto;
-            opacity: .8;
+        nav {margin: 0 auto;
                 ul {padding: 1em;}
                 li {display: inline;
-                    margin: .3em;}
+                    margin: .2em;
+                    @include mq(m) {
+                        margin: 0 5%;}
+                    @include mq(l) {
+                        margin: 0 7%;}
+                  }
         a {@extend %transition;
+          color: rgba(18, 24, 61, .9);
           font-size: 2.1em;
-          text-decoration: none;
           $text-shadow: .9px .9px .9px rgba(188, 221, 240, .8) !global;
-          color: rgba(150, 150, 150, 1);
-          padding: .4em;
+          padding: .5em;
+            @include mq(m) {
+              font-size: 2.3em;}
+            @include mq(lg) {
+              font-size: 2.5em;}
           }
     }  
 }
-
-section {
-    height: 25em;
-    text-align: center;
-    vertical-align: middle;
-    box-shadow: 0 1px 1px rgba(0,0,0,0.2);
-}
-
-.service {
-      p {
-         @extend %g-6-12;
-         font-size: 1.2em;
-         line-height: 1.5em;
-         margin: auto;
-         text-align: center;}
-}
-
-.design div{
-    margin: 1em 0;
-    text-shadow: 0.9px 0.9px 0.9px rgba(
-    170, 0, 0, .8);
-}
-
-.gn {display: none;}
 
 .main {
     margin: 0 auto;
     width: 100%;
     max-width: 80em;
-    background-color: $color-main-background;
 }
 
-.button {
-        @extend %button;
-        margin-top: 8em;
-          a {
-            text-decoration: none;
-            text-transform: uppercase;
-            color: red;
-            font-size: 2.1em;}
-}   
-    
-.logo{
-    float: left;
-    letter-spacing: .47em;
-        a {text-decoration: none;
-           color: white;}
-}
-        
 .nav-top {
     @extend .txt-shad;
     line-height: 2.5;
     font-size: 124%;
-        a {text-decoration: none;
-           display: block;
+        a {display: block;
            color: rgba(255,255,255, .975);}
-        li {padding-left: 2%;
+        li {padding-left: 4.5%;
             text-transform: uppercase;
-            letter-spacing: .47em;
+            letter-spacing: .23em;//.47em;
                 &:hover {@extend %transition;
                          color: $color-a-transition;
                          opacity: .85;}
-            }
+                // @include mq(ml) {
+                //     display: none;}
+                @include mq(lg) {
+                    text-align: center;
+                    letter-spacing: .206em;
+                    float: left;
+                    width: 25%;}
+             }
         li:first-child {background-color: lighten($color-header, 43%);}
         li:nth-child(2){background-color: lighten($color-header, 33%);}
         li:nth-child(n+3){background-color: lighten($color-header, 23%);}
         li:last-child {background-color: lighten($color-header, 13%);}
 }
-                                                  
-.nav-hdr {
-     a {color: rgba(255, 255, 255, .975);
-        text-decoration: none;}
-}
-                    
+                   
 .nav-toggle {
     float: right;
     text-shadow: $text-shadow;
-    font-size: 1.6em;
-    padding: .2em;
+    font-size: 2.2em;
+    padding: .2em .1em;
     transition: ease .5s;
-        &:before {
-            content:'≡';}
-        &:hover {
-            text-shadow: $text-shadow-toggle-hover;}
+        &:before {content:'≡';}
+        //&:hover {
+          //  text-shadow: $text-shadow-toggle-hover;}
+        @include mq(lg) {
+            display: none;}
 }
 
+.logo{
+    float: left;
+    letter-spacing: .23em;//.41em;
+    padding: .25em;
+      @include mq(lg) {
+        float: none;
+        letter-spacing: .618em;}
+}
+ 
+.section {
+    height: 34em;
+    text-align: center;
+}
+
+.section-info {
+  line-height: 1.5;
+  padding: 8em .93em;
+  position: relative;
+  text-align: center;
+  vertical-align: middle;
+  z-index: 2;
+}
+
+.gn {display: none;}
+
+.button {
+        @extend %button;
+        margin-top: 8em;
+          a {text-decoration: none;
+            text-transform: uppercase;
+            color: red;
+            font-size: 2.1em;}
+}   
+
 .work {
-    background-color: darken($color-work, 36%);
-       ul {display: inline-block;}
+       
        li {
-          @extend %transition;
-          @extend %card;
-          list-style: none;
-          margin:  auto;
-          text-shadow: $text-shadow;
-          text-align: center;
+          //@extend %transition;
+          //@extend ;
+            background: #ccc;
+            border: 1px solid black;
+          height: 16em;
+          //width: 100%;
+          //list-style: none;
+            margin: .1em;
+          //text-shadow: $text-shadow;
+          //text-align: center;
           text-transform: uppercase;
-             a {
-                @extend .txt-shad;
+             a {@extend .txt-shad;
                 @extend %transition;
-                vertical-align: middle;
-                line-height: 6em;
+                //vertical-align: middle;
+                //line-height: 6em;
                 font-size: 1.1em;
                 padding: 1.3em;
-                text-decoration: none;
-                color: white;
+                //color: white;
                     &:hover {color: $color-a-transition;}
                 }
           }
+          
 }
 
 .card, %card {
@@ -147,12 +151,11 @@ section {
     box-shadow: .5px 1.5px 1px .5px rgba(255, 255, 255, 1);
     height: 6em;
     margin: 1.2em;
-    text-shadow: $text-shadow;
-    width: 10em;
+    //text-shadow: $text-shadow;
+    //width: 10em;
  }
 
-
-.about {
+#skyline {
     background: url("../images/city.jpg") ;
     background-size: cover;
     opacity: .6;
@@ -165,20 +168,29 @@ section {
 .toTop>a:before {
     background-color: rgba(240, 240, 245,.75);
     border: 1px solid rgba(0,0,0,.375);
-    border-radius: 2px;
+    border-radius: 10%;//3px;
     bottom: .4em;
     colo1: #0D2030;
     content: '↑';
-    font-size: 2.25em;
-    padding: .4em;
+    font-size: 2.3em;
+    padding: .01em .2em .25em .2em; //0.1em 0.3em 0.4em 0.3em;
     position: fixed;
-    right: .4em; 
+    right: .3em; 
     text-shadow: 0.9px 0.9px 0.9px rgba(228, 114, 37, 0.8);
-    z-index: 1;
-    @extend %transition;
-       &:hover{color: saturate(#47b3bd, 91%);}
+    transform: rotate(45%);
+    //z-index: 1;
 }
 
-#services {background-color: lighten($color-main-background, 11%);}
+.cf:before,
+.cf:after {
+    content: " "; 
+    display: table; 
+}
 
-#contact {background-color: lighten($color-main-background, 10%);}
+.cf:after {
+    clear: both;
+}
+
+@include mq(ml) {
+  .nav-top {display: none;}
+}

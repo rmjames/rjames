@@ -25,6 +25,18 @@ html {
     font-size: 100%;
     line-height: 1.5em;
     letter-spacing: .05em;
+      @include mq(xs) {
+        font-size: 90%;}
+      @include mq(s) {
+          font-size: 110%;}
+      @include mq(m) {
+          font-size: 120%;}
+      @include mq(ml) {
+          font-size: 130%;}
+      @include mq(lg) {
+          font-size: 140%;}
+      @include mq(xl) {
+          font-size: 150%;}
 }                                                           
 h1 {
     color: white;
@@ -37,9 +49,9 @@ h1 {
 h2 {
     text-align:center;
     color: red;
-    letter-spacing: .206em;
+    letter-spacing: .103em;//.206em;
     line-height: 2.8em;
-    font-size: 2.6em;
+    font-size: 2.25em;//2.6em;
     text-transform: uppercase;
     text-shadow: $text-shadow;
 }
