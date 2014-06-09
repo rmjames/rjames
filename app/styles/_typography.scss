@@ -25,23 +25,15 @@ html {
     font-size: 100%;
     line-height: 1.5em;
     letter-spacing: .05em;
-      @include mq(xs) {
-        font-size: 90%;}
-      @include mq(s) {
-          font-size: 110%;}
-      @include mq(m) {
-          font-size: 120%;}
-      @include mq(ml) {
-          font-size: 130%;}
-      @include mq(lg) {
-          font-size: 140%;}
-      @include mq(xl) {
-          font-size: 150%;}
+      @include mq(xs) {font-size: 90%;}
+      @include mq(s) {font-size: 110%;}
+      @include mq(m) {font-size: 120%;}
+      @include mq(ml) {font-size: 130%;}
+      @include mq(lg) {font-size: 140%;}
+      @include mq(xl) {font-size: 150%;}
 }                                                           
 h1 {
-    color: white;
-    font-size: 1.6em;
-    font-weight: 00;
+    font-size: 1.7em;
     text-transform: uppercase;
     text-shadow: $text-shadow;
 }
