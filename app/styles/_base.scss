@@ -58,8 +58,6 @@ footer {
                 &:hover {@extend %transition;
                          color: $color-a-transition;
                          opacity: .85;}
-                // @include mq(ml) {
-                //     display: none;}
                 @include mq(lg) {
                     text-align: center;
                     letter-spacing: .206em;
@@ -79,15 +77,13 @@ footer {
     padding: .2em .1em;
     transition: ease .5s;
         &:before {content:'≡';}
-        //&:hover {
-          //  text-shadow: $text-shadow-toggle-hover;}
         @include mq(lg) {
             display: none;}
 }
 
 .logo{
     float: left;
-    letter-spacing: .23em;//.41em;
+    letter-spacing: .23em;
     padding: .25em;
       @include mq(lg) {
         float: none;
@@ -108,7 +104,15 @@ footer {
   z-index: 2;
 }
 
-.gn {display: none;}
+.section-portfolio {
+  background: url(../images/agsquare.png);
+  padding: .93em;
+  position: relative;
+  text-align: center;
+  vertical-align: middle;
+  width: 100%;
+  z-index: 2;
+}
 
 .button {
         @extend %button;
@@ -120,40 +124,45 @@ footer {
 }   
 
 .work {
-       
+       ul {margin : auto;}
        li {
-          //@extend %transition;
-          //@extend ;
-            background: #ccc;
-            border: 1px solid black;
-          height: 16em;
-          //width: 100%;
-          //list-style: none;
-            margin: .1em;
-          //text-shadow: $text-shadow;
-          //text-align: center;
+          @extend %transition;
+          @extend %card;
+          margin: .5em;
+          text-shadow: $text-shadow;
           text-transform: uppercase;
+          &:first-child {background: url(../images/calc.jpg);
+              background-size: 100% 100%;
+              background-repeat: no-repeat;
+              opacity: .9;
+          }
+          &:last-child {background: url(../images/sched.jpg);
+              background-size: cover;
+              // margin-right: calc(5
+                // 0% - 2em;)
+          }
+          @include mq(m) {
+              display: inline-block;
+              //float: right;
+              margin-right: calc(50% - 2em);              
+          }
              a {@extend .txt-shad;
                 @extend %transition;
-                //vertical-align: middle;
-                //line-height: 6em;
+                vertical-align: middle;
+                line-height: 7em;
                 font-size: 1.1em;
                 padding: 1.3em;
-                //color: white;
                     &:hover {color: $color-a-transition;}
                 }
           }
-          
 }
 
 .card, %card {
     background: rgba(200, 200, 200, .7);
-    box-shadow: .5px 1.5px 1px .5px rgba(255, 255, 255, 1);
-    height: 6em;
+    box-shadow: .8px 1.5px 1px .9px rgba(25, 25, 25, .9);
+    height: 9em;
     margin: 1.2em;
-    //text-shadow: $text-shadow;
-    //width: 10em;
- }
+}
 
 #skyline {
     background: url("../images/city.jpg") ;
@@ -168,17 +177,17 @@ footer {
 .toTop>a:before {
     background-color: rgba(240, 240, 245,.75);
     border: 1px solid rgba(0,0,0,.375);
-    border-radius: 10%;//3px;
+    border-radius: 10%;
     bottom: .4em;
     colo1: #0D2030;
     content: '↑';
     font-size: 2.3em;
-    padding: .01em .2em .25em .2em; //0.1em 0.3em 0.4em 0.3em;
+    padding: .01em .2em .25em .2em;
     position: fixed;
     right: .3em; 
     text-shadow: 0.9px 0.9px 0.9px rgba(228, 114, 37, 0.8);
     transform: rotate(45%);
-    //z-index: 1;
+    z-index: 3;
 }
 
 .cf:before,
@@ -192,5 +201,5 @@ footer {
 }
 
 @include mq(ml) {
-  .nav-top {display: none;}
+    .nav-top {display: none;}
 }
