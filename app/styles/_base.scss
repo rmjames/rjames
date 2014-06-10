@@ -83,7 +83,7 @@ footer {
 
 .logo{
     float: left;
-    letter-spacing: .23em;//.41em;
+    letter-spacing: .23em;
     padding: .25em;
       @include mq(lg) {
         float: none;
@@ -124,37 +124,28 @@ footer {
 }   
 
 .work {
-       ul {
-            @include mq(m) {
-              // float: right;
-              display: inline-block;
-              width: 50%;
-          }
-
-       }
+       ul {margin : auto;}
        li {
           @extend %transition;
           @extend %card;
-          // border: 1px solid black;
-          // height: 9em;
           margin: .5em;
           text-shadow: $text-shadow;
           text-transform: uppercase;
-
           &:first-child {background: url(../images/calc.jpg);
               background-size: 100% 100%;
-              background-positin: center;
               background-repeat: no-repeat;
               opacity: .9;
           }
           &:last-child {background: url(../images/sched.jpg);
               background-size: cover;
+              // margin-right: calc(5
+                // 0% - 2em;)
           }
-          // @include mq(m) {
-          //     // float: right;
-          //     display: inline-block;
-          //     width: 50%;
-          // }
+          @include mq(m) {
+              display: inline-block;
+              //float: right;
+              margin-right: calc(50% - 2em);              
+          }
              a {@extend .txt-shad;
                 @extend %transition;
                 vertical-align: middle;
