@@ -1,0 +1,29 @@
+!!!
+html
+  head
+    meta(charset="utf-8")
+    meta(http-equiv="X-UA-Compatible" content="IE=edge")
+    meta(name="" content="")
+    meta(name="viewport" content="width=device-width, initial-scale=1")
+    title="Robert James"
+    link(rel="stylesheet" href="styles/main.css")
+  body
+    header
+      h1.top-headline robert james   
+      .logo
+      nav.nav
+        ul
+          li: a(href="#about") About
+          li: a(href="#services") Services
+          li: a(href="#work") Work
+          li: a(href="#contact") Contact
+    
+    !=yield
+    
+     footer
+      ul
+        li: a.icon-github(href="http://www.linkedin.com/in/robertmajames/") linkedin
+        li: a(data-icon="$" href="https://twitter.com/bkrjames") twitter
+        li: a(data-icon="#" href="https://www.github.com/rmjames") github
+        p © Robert James 2014 
+    

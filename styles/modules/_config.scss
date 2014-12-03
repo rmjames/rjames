@@ -1,0 +1,22 @@
+$text-shadow: .9px .9px .9px rgba(149, 165, 166,1.0);
+$text-shadow-toggle-hover: 1.1px 1.1px 9.1px rgba(241, 250, 19,1.0);
+
+//Media Querie variables
+$bp-xs: 15.75em;
+$bp-sm: 20em;
+$bp-m: 30em;
+$bp-lg: 47.5em;
+$bp-xl: 62em;
+$bp-xxl: 70em;
+
+//Color Variables
+$color-h2: rgba(0,10,150,.6);
+$color-a-transition: rgba(255, 24, 0,.77);
+$color-work: rgba(20,134,242,.91);
+$color-header: #2c3e50;
+$color-top_headine: #badcef;
+$color-main-background: #D3E0E0;
+
+//Modular Scale
+$ms-base: .5em;
+$ms-ratio: $golden;
