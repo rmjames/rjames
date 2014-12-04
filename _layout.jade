@@ -6,7 +6,7 @@ html
     meta(name="" content="")
     meta(name="viewport" content="width=device-width, initial-scale=1")
     title="Robert James"
-    link(rel="stylesheet" href="styles/main.css")
+    link(rel="stylesheet" href="main.css")
   body
     header
       h1.top-headline robert james   
@@ -17,13 +17,14 @@ html
           li: a(href="#services") Services
           li: a(href="#work") Work
           li: a(href="#contact") Contact
+          li: a(href="blog.jade") Blog
     
     !=yield
     
      footer
       ul
-        li: a.icon-github(href="http://www.linkedin.com/in/robertmajames/") linkedin
-        li: a(data-icon="$" href="https://twitter.com/bkrjames") twitter
-        li: a(data-icon="#" href="https://www.github.com/rmjames") github
-        p © Robert James 2014 
+        li: a.icon-github(href="http://www.linkedin.com/in/robertmajames/")
+        li: a.icon-twitter(data-icon="$" href="https://twitter.com/bkrjames")
+        li: a.icon-linkedin(data-icon="#" href="https://www.github.com/rmjames")
+      p © Robert James 2014 
     

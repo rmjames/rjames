@@ -1,9 +1,9 @@
-@import "modular-scale/_modular-scale.scss";
-@import 'modules/_config';
-@import 'modules/_reset';
-@import 'modules/_function-mixin.scss';
-@import 'modules/_animation-transition.scss';
-@import '_typography';
+@import 'styles/modular-scale/_modular-scale.scss';
+@import 'styles/modules/_config';
+@import 'styles/modules/_reset';
+@import 'styles/modules/_function-mixin.scss';
+@import 'styles/modules/_animation-transition.scss';
+@import 'styles/_typography';
 //import '_h5bp';
 //@import 'modules/_button.scss';
 
@@ -19,7 +19,7 @@ body {
   position: relative;
   font-family: 'Roboto Condensed', Helvetica, Arial, sans-serif;
   font-weight: 300;
-  font-size: 1rem;
+  font-size: 100%;
   box-sizing: border-box;
   min-height: 100%;
   margin: 0 auto;
@@ -31,9 +31,10 @@ body {
 
 .top-headline {
   background: lighten($color-header, 70%);
+  padding: .6em .2em;
   text-align: center;
   line-height: 3rem;
-  font-size: ms(3);//1.2rem;
+  font-size: ms(2.1);//1.2rem;
   @debug ms-list(-2 , 5, .5rem, $ms-ratio);
 }
 
@@ -43,12 +44,12 @@ body {
   background: url('../images/city.jpg') fixed;
   background-size: cover; 
   background-position: 50% 40%;
-  filter: opacity(80%);
+  //filter: opacity(80%);
   perspective: 200rem; 
 }
 
 .nav {
-  @extend .txt-shad !optional;
+  //@extend .txt-shad !optional;
       ul {
         display: flex;
         flex-flow: wrap;
@@ -56,13 +57,13 @@ body {
       li {
         text-transform: uppercase;
         letter-spacing: .23rem;//.47em;
-        flex: 1 0 6rem;
+        flex: 1 0 6.5rem;
         margin: .045rem;
         padding: 0 1.8rem;
         text-align: center;
         line-height: 3rem;
           &:hover {
-            @extend %transition;
+            //@extend %transition;
             color: $color-a-transition;
             opacity: .85;}
       }
@@ -71,9 +72,10 @@ body {
         color: rgba(255,255,255, .975);
         text-decoration: none;}
       li:first-child {background-color: lighten($color-header, 43%);}
-      li:nth-child(2){background-color: lighten($color-header, 33%);}
-      li:nth-child(n+3){background-color: lighten($color-header, 23%);}
-      li:last-child {background-color: lighten($color-header, 13%);}
+      li:nth-child(2){background-color: lighten($color-header, 35%);}
+      li:nth-child(n+3){background-color: lighten($color-header, 28%);}
+      li:nth-child(n+4){background-color: lighten($color-header, 20%);}
+      li:last-child {background-color: lighten($color-header, 12%);}
 }
 
 main {min-height: initial;}
@@ -138,20 +140,25 @@ footer {
         //align-items: center;
         list-style: none;}
       li {
-          flex: 0 1 auto;
+          flex: 0 1 6.5em;
           margin: .05rem;
           text-align: center;
           line-height: 3rem;
-              &:hover {@extend %transition;
-                       color: $color-a-transition;
-                       opacity: .85;}
+             
          }                
         a {
-          @extend %transition;
+          //@extend %transition;
+          display: block;
           color: rgba(18, 24, 61, .9);
-          font-size: 2.1rem;
-          $text-shadow: .9px .9px .9px rgba(188, 221, 240, .8) !global;
-          padding: .5rem;}
+          font-size: 2.4rem;
+          $text-shadow: .9px .9px .9px rgba(188, 221, 240, .8);
+          text-decoration: none;
+          padding: .5rem;
+               &:hover {
+                       @extend %transition;
+                       color: $color-a-transition;
+                       opacity: .85;}
+        }
 }
 
 @font-face {
