@@ -1,30 +1,11 @@
 !!!
 html
-  head
-    meta(charset="utf-8")
-    meta(http-equiv="X-UA-Compatible" content="IE=edge")
-    meta(name="" content="")
-    meta(name="viewport" content="width=device-width, initial-scale=1")
-    title="Robert James"
-    link(rel="stylesheet" href="main.css")
-  body
-    header
-      h1.top-headline robert james   
-      .logo
-      nav.nav
-        ul
-          li: a(href="#about") About
-          li: a(href="#services") Services
-          li: a(href="#work") Work
-          li: a(href="#contact") Contact
-          li: a(href="blog.jade") Blog
-    
-    !=yield
-    
-     footer
-      ul
-        li: a.icon-github(href="http://www.linkedin.com/in/robertmajames/")
-        li: a.icon-twitter(data-icon="$" href="https://twitter.com/bkrjames")
-        li: a.icon-linkedin(data-icon="#" href="https://www.github.com/rmjames")
-      p © Robert James 2014 
+  != partial("includes/_head")
+body
+  != partial("/includes/_header")
+  != yield
+  != partial("/includes/_footer")  
+  != partial("/includes/_scripts")  
+
+
     

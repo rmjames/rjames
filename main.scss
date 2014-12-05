@@ -36,6 +36,10 @@ body {
   line-height: 3rem;
   font-size: ms(2.1);//1.2rem;
   @debug ms-list(-2 , 5, .5rem, $ms-ratio);
+    a {
+      text-decoration: none;
+      color: #020912;
+    }
 }
 
 .logo {
@@ -63,9 +67,9 @@ body {
         text-align: center;
         line-height: 3rem;
           &:hover {
-            //@extend %transition;
+            @extend %transition;
             color: $color-a-transition;
-            opacity: .85;}
+            opacity: .9;}
       }
       a {
         display: block;
