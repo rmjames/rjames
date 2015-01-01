@@ -30,7 +30,7 @@ gulp.task('serve', function () {
     gulp.watch(["*.jade"], function () {
       reload();
     });
-  })
+  });
 });
 
 /**

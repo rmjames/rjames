@@ -1,11 +1,10 @@
-@import 'styles/modular-scale/_modular-scale.scss';
-@import 'styles/modules/_config';
-@import 'styles/modules/_reset';
-@import 'styles/modules/_function-mixin.scss';
-@import 'styles/modules/_animation-transition.scss';
-@import 'styles/_typography';
-//import '_h5bp';
-//@import 'modules/_button.scss';
+ @import 'styles/modules/config';
+ @import 'styles/modules/reset';
+ @import 'styles/modules/function-mixin.scss';
+ @import 'styles/modules/animation-transition.scss';
+ @import 'styles/typography';
+ @import 'styles/modules/header.scss';
+ @import 'styles/modules/footer.scss';
 
 html,
 body {
@@ -25,62 +24,10 @@ body {
   margin: 0 auto;
   overflow-y: scroll;
   line-height: 1.4;
-  letter-spacing: .1rem;
-  color: #020912;
+  letter-spacing: .1em;
+  color: $color-text;
 }
 
-.top-headline {
-  background: lighten($color-header, 70%);
-  padding: .6em .2em;
-  text-align: center;
-  line-height: 3rem;
-  font-size: ms(2.1);//1.2rem;
-  @debug ms-list(-2 , 5, .5rem, $ms-ratio);
-    a {
-      text-decoration: none;
-      color: #020912;
-    }
-}
-
-.logo {
-  text-align: center;
-  height: 41vh;
-  background: url('../images/city.jpg') fixed;
-  background-size: cover; 
-  background-position: 50% 40%;
-  //filter: opacity(80%);
-  perspective: 200rem; 
-}
-
-.nav {
-  //@extend .txt-shad !optional;
-      ul {
-        display: flex;
-        flex-flow: wrap;
-        list-style: none;}
-      li {
-        text-transform: uppercase;
-        letter-spacing: .23rem;//.47em;
-        flex: 1 0 6.5rem;
-        margin: .045rem;
-        padding: 0 1.8rem;
-        text-align: center;
-        line-height: 3rem;
-          &:hover {
-            @extend %transition;
-            color: $color-a-transition;
-            opacity: .9;}
-      }
-      a {
-        display: block;
-        color: rgba(255,255,255, .975);
-        text-decoration: none;}
-      li:first-child {background-color: lighten($color-header, 43%);}
-      li:nth-child(2){background-color: lighten($color-header, 35%);}
-      li:nth-child(n+3){background-color: lighten($color-header, 28%);}
-      li:nth-child(n+4){background-color: lighten($color-header, 20%);}
-      li:last-child {background-color: lighten($color-header, 12%);}
-}
 
 main {min-height: initial;}
 
@@ -98,7 +45,7 @@ section, #work {
       list-style: none;
       padding: 2rem;}
     p {
-      font: 1.1rem/1.6rem;
+      font-size: 1.1em;
       padding: 4.5rem;
     }  
 }
@@ -114,9 +61,9 @@ section, #work {
         background-size: cover;
         background-position: 50% 50%;
         box-shadow: 4px 4px 3px rgba(40,40,40,.5);
-        margin: 1rem;
-        height: 14rem;
-        width: 14rem;
+        margin: 1em;
+        height: 13em;
+        width: 13em;
         text-align: center;
         //flex: 1 0 13em;
           &:nth-child(1) {
@@ -133,58 +80,3 @@ section, #work {
       a {display: block;}
 }
 
-footer {
-  background: $color-header;
-  text-align: center;
-  padding: .3rem 0;
-      ul {
-        display: flex;
-        flex-flow: wrap;
-        justify-content: space-around;
-        //align-items: center;
-        list-style: none;}
-      li {
-          flex: 0 1 6.5em;
-          margin: .05rem;
-          text-align: center;
-          line-height: 3rem;
-             
-         }                
-        a {
-          //@extend %transition;
-          display: block;
-          color: rgba(18, 24, 61, .9);
-          font-size: 2.4rem;
-          $text-shadow: .9px .9px .9px rgba(188, 221, 240, .8);
-          text-decoration: none;
-          padding: .5rem;
-               &:hover {
-                       @extend %transition;
-                       color: $color-a-transition;
-                       opacity: .85;}
-        }
-}
-
-@font-face {
-  font-family: 'Roboto Condensed';
-  font-style: normal;
-  font-weight: 300;
-  src: url(/fonts/RobotoCondensed-Light.eot);
-  src: local('Roboto Condensed Light'), local('RobotoCondensed-Light'), url(/fonts/RobotoCondensed-Light.eot) format('embedded-opentype'), url(/fonts/RobotoCondensed-Light.woff) format('woff');
-}
-
-@font-face {
-  font-family: 'Roboto Condensed';
-  font-style: normal;
-  font-weight: 400;
-  src: url(/fonts/RobotoCondensed-Regular.eot);
-  src: local('Roboto Condensed Regular'), local('RobotoCondensed-Regular'), url(/fonts/RobotoCondensed-Regular.eot) format('embedded-opentype'), url(/fonts/RobotoCondensed-Regular.woff) format('woff');
-}
-
-@font-face {
-  font-family: 'Roboto Condensed';
-  font-style: normal;
-  font-weight: 700;
-  src: url(/fonts/RobotoCondensed-Bold.eot);
-  src: local('Roboto Condensed Regular'), local('RobotoCondensed-Bold'), url(/fonts/RobotoCondensed-Bold.eot) format('embedded-opentype'), url(/fonts/RobotoCondensed-Bold.woff) format('woff');
-}
