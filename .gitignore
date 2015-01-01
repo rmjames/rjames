@@ -4,3 +4,9 @@ log/*.log
 tmp/**
 node_modules/
 .sass-cache
+node_modules
+dist
+.tmp
+.sass-cache
+app/bower_components
+test/bower_components

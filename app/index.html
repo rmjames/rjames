@@ -1,0 +1,104 @@
+<!doctype html>
+
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>mySite</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width">
+        <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+        <!-- build:css styles/vendor.css -->
+        <!-- bower:css -->
+
+        <!-- endbower -->
+        <!-- endbuild -->
+        <!-- build:css(.tmp) styles/main.css -->
+        <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+        <link rel="stylesheet" href="styles/main.css">
+        <!-- endbuild -->
+    </head>
+    <body>
+    <div class="main">
+        <nav id="top">
+            <ul class="nav-top">
+                <li><a href="#about">about</a></li>
+                <li><a href="#services">services</a></li>
+                <li><a href="#work">work</a></li>
+                <li><a href="#contact">contact</a></li>
+            </ul>
+        </nav>        
+        <header class="cf">
+            <h1 class="logo"><a href="http://robertjames.cc/">ROBERT JAMES</a></h1>
+            <nav class="nav-hdr">
+                <a href="#" class="nav-toggle"></a>
+            </nav>
+        </header>
+        <section id="skyline" class='section'></section>
+        <section id='about' class='section'>
+            <article class='section-info'>
+                <h2>robert james</h2>
+            </article> 
+        </section>
+        <section id="services">
+            <h2>Services</h2>
+                <article class="section-info">
+                    <h3>front end development</h3>
+                    <div><i class="fa fa-code fa-4x"></i></div>
+                </article>
+        </section>    
+        <section id="work" class=" section">
+            <h2>work</h2>
+                <article class="section-portfolio">
+                    <ul class="cf work">
+                        <li><a href="http://cdpn.io/mcgte">calculator</a></li>
+                        <li><a href="http://dev-toolkit.herokuapp.com/">schedule</a></li>
+                    </ul>
+                </article>
+
+        </section> 
+        <section id="contact" class='section'>
+            <article class='section-info'>
+                <h2 data-scroll-reveal>contact</h2>
+                    <p>For any inqueries </p>
+                      <button class='button'>
+                          <a href="mailto:rma.james@gmail.com">drop a line</a>
+                    </button>
+            </article>   
+        </section>
+        <div class="toTop"><a href="#top"></a></div>
+    <footer>
+        <nav class="contact">
+            <ul>
+                <li><a data-icon="%" href="http://www.linkedin.com/in/robertmajames/"></a></li>
+                <li><a data-icon="$" href="https://twitter.com/bkrjames"></a></li>
+                <li><a data-icon="#" href="https://www.github.com/rmjames"></a></li>
+            </ul>
+        </nav>
+        <p>© Robert James 2014</p> 
+     </footer>
+       </div><!--main-->
+        <!-- build:js scripts/vendor.js -->
+        <!-- bower:js -->
+        <script src="bower_components/jquery/jquery.js"></script>
+        <script src="bower_components/scrollReveal.js/scrollReveal.js"></script>
+        <!-- endbower -->
+        <!-- endbuild -->
+
+        <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
+        <script>
+            window.scrollReveal = new scrollReveal();
+        </script>
+        <script>
+            (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
+            function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
+            e=o.createElement(i);r=o.getElementsByTagName(i)[0];
+            e.src='//www.google-analytics.com/analytics.js';
+            r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
+            ga('create','UA-XXXXX-X');ga('send','pageview');
+        </script>
+
+        <!-- build:js({app,.tmp}) scripts/main.js -->
+        <script src="scripts/main.js"></script>
+        <!-- endbuild -->
+    </body>
+</html>
