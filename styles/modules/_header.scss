@@ -18,38 +18,42 @@
   text-align: center;
   height: 71vh;
   background: url('../images/city.jpg') fixed;
-  background-size: cover; 
+  background-size: cover;
   background-position: 50% 40%;
-  //filter: opacity(80%);
-  perspective: 200em; 
+  perspective: 200em;
 }
 
 .nav {
-  //@extend .txt-shad !optional;
-      ul {
-        display: flex;
-        flex-flow: wrap;
-        list-style: none;}
-      li {
-        text-transform: uppercase;
-        letter-spacing: .23em;//.47em;
-        flex: 1 0 6.5em;
-        margin: .045em;
-        padding: 0 1.8em;
-        text-align: center;
-        line-height: 3em;}
-      a {
-        display: block;
-        color: rgba(255,255,255, .975);
-        text-decoration: none;
-          &:hover {
-                   @extend %transition;
-                   color: $color-a-transition;
-                   opacity: .9;}
+
+  ul {
+  display: flex;
+  flex-flow: wrap;
+  justify-content: center;
+  list-style: none;
+  }
+  li {
+    text-transform: uppercase;
+    letter-spacing: .23em;
+    flex: 1 0 6.6em;
+    margin: .045em;
+    padding: 0 1.8em;
+    text-align: center;
+    line-height: 3em;
+  }
+  a {
+    display: block;
+    color: rgba(255,255,255, .975);
+    text-decoration: none;
+      &:hover {
+        @extend %transition;
+        color: $color-a-transition;
+        opacity: .9;
       }
-      li:first-child {background-color: lighten($color-header, 43%);}
-      li:nth-child(2){background-color: lighten($color-header, 35%);}
-      li:nth-child(n+3){background-color: lighten($color-header, 28%);}
-      li:nth-child(n+4){background-color: lighten($color-header, 20%);}
-      li:last-child {background-color: lighten($color-header, 12%);}
+  }
+
+  li:first-child { background-color: lighten($color-header, 43%); }
+  li:nth-child(2) { background-color: lighten($color-header, 35%); }
+  li:nth-child(n+3) { background-color: lighten($color-header, 28%); }
+  li:nth-child(n+4) { background-color: lighten($color-header, 20%); }
+  li:last-child { background-color: lighten($color-header, 12%); }
 }

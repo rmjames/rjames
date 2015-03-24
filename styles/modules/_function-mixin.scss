@@ -1,3 +1,11 @@
+@mixin center {
+  position: absolute;
+  top: 50%;
+  right: 50%;
+  transform: translate(50%,50%);
+  }
+
+
 @function grid($col, $has-gutter: false) {
 	@if $has-gutter {
 		@return calc(((100% / #{$columns}) * #{$cols}) - #{$gutter});
@@ -16,7 +24,7 @@
   @else if $size == m {
     @media screen and (min-width: $bp-m) {@content}}
   @else if $size == ml {
-    @media screen and (min-width: $bp-xs - 3em) and (max-width: $bp-lg) {@content}}  
+    @media screen and (min-width: $bp-xs - 3em) and (max-width: $bp-lg) {@content}}
   @else if $size == lg {
     @media screen and (min-width: $bp-lg) {@content}}
   @else if $size == xl {
