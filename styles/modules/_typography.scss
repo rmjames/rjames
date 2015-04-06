@@ -23,7 +23,6 @@
 }
 
 //Iconfonts
-
 @font-face {
   font-family: 'icomoon';
   src:url('fonts/icomoon.eot?4g38uz');
@@ -44,7 +43,7 @@
   text-transform: none;
   line-height: 1;
 
-  /* Better Font Rendering =========== */
+  // Better Font Rendering
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -60,22 +59,24 @@
 }
 
 
-//Headings
-
-h1, h2, h3 {
-    text-align:center;
-    color: rgba(250,10,10,.9);
-    letter-spacing: .103em;//.206em;
-    line-height: 4.2em;
-    font-size: ms(4);//2.25em;//2.6em;
-    text-transform: uppercase;
-    text-shadow: $text-shadow;
+// Headings
+h1,
+h2,
+h3 {
+  text-align:center;
+  color: rgb(251, 124, 53);
+  letter-spacing: .103em;
+  line-height: 4.2em;
+  text-transform: uppercase;
+  text-shadow: $text-shadow;
 }
 
-h1 {font-size: ms(3);
-    line-height: 2.8em;
+h1 {
+  font-size: 2.6;
+  line-height: 2.8em;
 }
 
-h3 {font-size: ms(2);
-    line-height: 2.8em;
+h3 {
+  font-size: 1.4;
+  line-height: 2.8em;
 }

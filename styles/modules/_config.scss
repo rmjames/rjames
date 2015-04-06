@@ -1,5 +1,22 @@
-$text-shadow: .9px .9px .9px rgba(149, 165, 166,1.0);
-$text-shadow-toggle-hover: 1.1px 1.1px 9.1px rgba(241, 250, 19,1.0);
+//Color Variables
+$primary: rgb(44, 62, 80);
+$secondary: rgb(208, 219, 229);
+$tertiary: rgb(248, 80, 9);
+
+$color-h2: rgba(0,10,150,.6);
+$color-a-transition: rgba(255, 24, 0,.77);
+$color-work: rgba(20,134,242,.91);
+$color-header: #2c3e50;
+$color-top_headine: #badcef;
+$color-main-background: #D3E0E0;
+$color-text: hsl(0,20%,20%);
+$text-shadow: .9px .9px 3px rgba(149, 165, 166,1.0);
+$text-shadow-toggle-hover:1.1px 1.1px 9.1px rgba(241, 250, 19,1.0);
+
+$link: rgb(251, 124, 53)git;
+$link-active: $link;
+$link-hover: $link;
+$link-visited: $link;
 
 //Media Querie variables
 $bp-xs: 15.75em;
@@ -8,12 +25,3 @@ $bp-m: 30em;
 $bp-lg: 47.5em;
 $bp-xl: 62em;
 $bp-xxl: 70em;
-
-//Color Variables
-$color-h2: rgba(0,10,150,.6);
-$color-a-transition: rgba(255, 24, 0,.77);
-$color-work: rgba(20,134,242,.91);
-$color-header: #2c3e50;
-$color-top_headine: #badcef;
-$color-main-background: #D3E0E0;
-$color-text: #020912;
