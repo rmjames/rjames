@@ -1,0 +1,27 @@
+.services {
+  position: relative;
+    .services-module {
+      height: 70vh;
+      background: lighten($color-header, 64%);
+      text-shadow: $text-shadow;
+      position: relative;
+        &:before {
+          @include center;
+          content: 'Define';
+        }
+        &:nth-child(2) {
+          background: lighten($color-header, 60%);;
+            &:before {
+              @include center;
+              content: 'Design';
+            }
+        }
+        &:nth-child(3) {
+          background: lighten($color-header, 56%);;
+            &:before {
+              @include center;
+              content: 'Refine';
+            }
+        }
+    }
+}

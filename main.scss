@@ -1,28 +1,28 @@
- @import 'styles/modules/config';
- @import 'styles/modules/reset';
- @import 'styles/modules/function-mixin.scss';
- @import 'styles/modules/animation-transition.scss';
- @import 'styles/typography';
- @import 'styles/modules/header.scss';
- @import 'styles/modules/footer.scss';
+@import 'styles/modules/config';
+@import 'styles/modules/reset';
+@import 'styles/modules/function-mixin.scss';
+@import 'styles/modules/animation-transition.scss';
+@import 'styles/modules/typography';
+@import 'styles/components/header.scss';
+@import 'styles/components/footer.scss';
+@import 'styles/components/services.scss';
+@import 'styles/components/button.scss';
+@import 'styles/components/contact.scss';
+@import 'styles/components/work.scss';
 
-*,
-*:after,
-*:before { box-sizing: border-box; }
-
-html,
-body {
+html {
+  border-box: box-sizing;
   width: 100%;
   height: 100%;
 }
 
+*, *:after, *:before { box-sizing: inherit; }
+
 body {
-  //background: url("../images/greyzz.png") fixed;
   position: relative;
   font-family: 'Roboto Condensed', Helvetica, Arial, sans-serif;
   font-weight: 300;
   font-size: 100%;
-  box-sizing: border-box;
   min-height: 100%;
   margin: 0 auto;
   line-height: 1.4;
@@ -30,93 +30,23 @@ body {
   color: $color-text;
 }
 
-main { min-height: initial; }
+img { vertical-align: middle; }
+
+fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+
+textarea { resize: vertical; }
 
 .about {
   background: lighten($color-header, 68%);
-  height: 60vh;
+  height: 70vh;
   position: relative;
   text-shadow: $text-shadow;
     &:before {
       @include center;
-      content: 'Web Designer | Developer';
+      content: 'Web Developer';
     }
-}
-
-.services {
-  display: flex;
-  flex-direction: column;
-  padding: .1em;
-  position: relative;
-    .services-module {
-      height: 60vh;
-      background: lighten($color-header, 64%);
-      text-shadow: $text-shadow;
-      position: relative;
-        &:before {
-          @include center;
-          content: 'Define';
-        }
-        &:nth-child(2) {
-          background: lighten($color-header, 60%);;
-            &:before {
-              @include center;
-              content: 'Design';
-            }
-        }
-        &:nth-child(3) {
-          background: lighten($color-header, 56%);;
-            &:before {
-              @include center;
-              content: 'Refine';
-            }
-        }
-    }
-}
-
-.work {
-  display: flex;
-  flex-flow: wrap;
-  justify-content: space-around;
-  align-items: center;
-  height: 100vh;
-  margin-bottom: .1rem;
-  background: url("../images/greyzz.png") fixed;
-    li {
-      list-style: none;
-      padding: 2rem;
-    }
-    p {
-      font-size: 1.1em;
-      padding: 4.5rem;
-    }
-}
-
-.portfolio-item {
-  background-size: cover;
-  background-position: 50% 50%;
-  box-shadow: 4px 4px 3px rgba(40,40,40,.5);
-  margin: 1em;
-  height: 13em;
-  //width: 13em;
-  text-align: center;
-  transform: skew(-3deg);
-  flex: 0 1 14em;
-    &:nth-child(1) {
-      background: url("../images/calc.jpg");
-      background-size: cover;
-      background-position: 50% 50%;
-    }
-    &:nth-child(2) {
-      background: url("../images/sched.jpg");
-      background-size: cover;
-      background-position: 50% 50%;
-    }
-    a { display: block; }
-}
-
-.contact {
-  height: 60vh;
-  text-shadow: $text-shadow;
-
 }
