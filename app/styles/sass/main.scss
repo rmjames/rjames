@@ -131,9 +131,8 @@ p:first-letter {
 }
 
 .footer-menu--item a.linkedIn:hover {
-fill: #0070a8;
--webkit-filter: drop-shadow(1px 1px 1px #777);
-        filter: drop-shadow(1px 1px 1px #777);
+  fill: #0070a8;
+  filter: drop-shadow(1px 1px 1px #777);
 }
 .footer-menu--item a.github:hover {
   fill: #333333;
