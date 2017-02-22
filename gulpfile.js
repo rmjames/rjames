@@ -4,48 +4,51 @@ const gulp       = require('gulp'),
     postcss      = require('gulp-postcss'),
     sourcemaps   = require('gulp-sourcemaps'),
     autoprefixer = require('autoprefixer'),
-    babel        = require('gulp-babel');
+    babel        = require('gulp-babel'),
+    minifyCSS    = require('gulp-csso'),
+    htmlmin      = require('gulp-htmlmin'),
+    uglify       = require('gulp-uglify');
 
 const path = {
     sass: 'app/styles/sass/*.scss',
-    js : 'app/scripts/es6/*.js'
+    js: 'app/scripts/babel/*.js',
+    html: 'app/*.html'
 }
 
-gulp.task('serve', ['sass', 'js'], () => {
-
+gulp.task('serve', [ 'sass', 'js', 'html' ], () => {
     browserSync.init({ server: './app' })
-
+    
     gulp.watch(path.sass, ['sass']);
-    gulp.watch('app/*.html', ['html']).on('change', browserSync.reload);
+    gulp.watch('path.html', ['html']).on('change', browserSync.reload);
 })
 
-gulp.task('js', done => {
+gulp.task('js', () => {
     return gulp.src(path.js)
         .pipe(babel())
-        .pipe(gulp.dest('app/scripts'));
-        browserSync.reload()
-        done()
-
+        .pipe(uglify())
+        .pipe(gulp.dest('app/dist/js'));
 })
 
-// gulp.task('js-watch',['js'], done => {
-//     browserSync.reload
-//     done()
-// })
+gulp.task('js-watch', ['js'], done => {
+    browserSync.reload()
+    done()
+})
 
 gulp.task('sass', () => {
     return gulp.src(path.sass)
         .pipe(sourcemaps.init())
         .pipe(postcss([ autoprefixer() ]))
         .pipe(sass())
+        .pipe(minifyCSS())
         .pipe(sourcemaps.write('.'))
-        .pipe(gulp.dest('app/styles'))
+        .pipe(gulp.dest('app/dist/css'))
         .pipe(browserSync.stream())
 })
 
 gulp.task('html', () => {
-    return gulp.src('/app/*html')
-        .pipe(gulp.dest('/app'))
+    return gulp.src('path.html')
+        .pipe(htmlmin({collapseWhitespace: true}))
+        .pipe(gulp.dest('dist'))
 })
 
 gulp.task('default', ['serve'])
