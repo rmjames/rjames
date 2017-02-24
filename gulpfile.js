@@ -7,31 +7,25 @@ const gulp       = require('gulp'),
     babel        = require('gulp-babel'),
     minifyCSS    = require('gulp-csso'),
     htmlmin      = require('gulp-htmlmin'),
-    uglify       = require('gulp-uglify');
+    uglify       = require('gulp-uglify')
 
 const path = {
-    sass: 'app/styles/sass/*.scss',
-    js: 'app/scripts/babel/*.js',
-    html: 'app/*.html'
+    sass: 'app/styles/sass/**/*.scss',
+    js: 'app/scripts/babel/**/*.js',
+    html: 'app/**/*.html'
 }
 
-gulp.task('serve', [ 'sass', 'js', 'html' ], () => {
+gulp.task('serve', [ 'html', 'sass', 'js' ], () => {
     browserSync.init({ server: './app' })
-    
-    gulp.watch(path.sass, ['sass']);
+    gulp.watch(path.sass, ['sass'])
+    gulp.watch(path.js, ['js-watch'])
     gulp.watch('path.html', ['html']).on('change', browserSync.reload);
 })
 
-gulp.task('js', () => {
-    return gulp.src(path.js)
-        .pipe(babel())
-        .pipe(uglify())
-        .pipe(gulp.dest('app/dist/js'));
-})
-
-gulp.task('js-watch', ['js'], done => {
-    browserSync.reload()
-    done()
+gulp.task('html', () => {
+    return gulp.src('path.html')
+        .pipe(htmlmin({collapseWhitespace: true}))
+        .pipe(gulp.dest('app/dist/index.html'))
 })
 
 gulp.task('sass', () => {
@@ -45,10 +39,16 @@ gulp.task('sass', () => {
         .pipe(browserSync.stream())
 })
 
-gulp.task('html', () => {
-    return gulp.src('path.html')
-        .pipe(htmlmin({collapseWhitespace: true}))
-        .pipe(gulp.dest('dist'))
+gulp.task('js', () => {
+    return gulp.src(path.js)
+        .pipe(babel())
+        .pipe(uglify())
+        .pipe(gulp.dest('app/dist/js'));
+})
+
+gulp.task('js-watch', ['js'], done => {
+    browserSync.reload()
+    done()
 })
 
 gulp.task('default', ['serve'])
