@@ -1,1 +1,0 @@
-"use strict";var test=function(){return console.log("test")};test();
