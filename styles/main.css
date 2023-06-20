@@ -81,6 +81,7 @@ h1 {
   color: var(--black-1);
   -webkit-text-stroke-color: var(--text-color);
   -webkit-text-stroke-width: .125vmin;
+  padding-block: calc(var(--xxs) + 1vmin);
 }
 
 ul {
@@ -91,7 +92,6 @@ ul {
 main {
   grid-column: 2/-2; 
   grid-row: 2; 
-  padding-block: calc(var(--s) + 1vmin);
 }
 
 .icon-set {display: none}
@@ -200,14 +200,8 @@ main {
 .background-mid { background: var(--color-brand); }
 
 .styleguide {
-    grid-column: 2;
-    grid-row: 2;
-}
-
-.styleguide {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
+  grid-column: 2;
+  grid-row: 2;
   gap: .5rem;
   padding: var(--s);  
 }
@@ -215,7 +209,6 @@ main {
 .styleguide article { inline-size: max(20vw, 8rem); }
 .styleguide h3 { padding-left: var(--s); }
 .txt-shadow { text-shadow: 0px 0px 2px hsl(var(--hue),11%,calc(var(--light) + 15%)); }
-
 .motion { display: flex; }
 
 .motion-item {
