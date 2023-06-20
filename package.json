@@ -1,0 +1,14 @@
+{
+  "name": "rjames",
+  "version": "1.0.0",
+  "description": "Redesign for 2023",
+  "main": "sw.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "browser-sync": "^2.29.3"
+  }
+}

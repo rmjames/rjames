@@ -89,7 +89,7 @@ ul {
 }
 
 main {
-  grid-column: 2; 
+  grid-column: 2/-2; 
   grid-row: 2; 
   padding-block: calc(var(--s) + 1vmin);
 }
@@ -129,7 +129,7 @@ main {
 .about-item {
   padding-block-start: var(--m);
   width: min(80ch, 52vmin);
-  font-size: min(1rem + 2.5vmin, 2.25rem);
+  font-size: min(1rem + 1.5vmin, 2.5rem);
 }
 
 .footer-menu { 
@@ -141,7 +141,7 @@ main {
 }
     
 .footer-menu ul { 
-  display: flex;   
+  display: flex;  
   flex-wrap: wrap;
   gap: 1.25vmin;
 }
@@ -179,12 +179,96 @@ main {
 .copryright {
   margin-left: auto;
   align-self: center;
-  font-size: min(1.5vmin,.75rem);
+  font-size: min(.25rem + 1vmin,.75rem);
+}
+
+.asset {
+  --space: 5rem;
+  --deg: 50%;
+  --font-size: 1rem;
+  block-size: var(--space);
+  inline-size: var(--space);
+  border-radius: var(--deg);
+  margin-bottom: var(--m);
+  font-size: var(--font-size);
+  outline: var(--xs) solid var(--asset-theme);
+  outline-offset: -.625rem;
+}
+
+.font { font-size: var(--font-size); } 
+.txt-cntr { text-align: center; margin-bottom: calc(var(--xxl) * 2); }
+.background-mid { background: var(--color-brand); }
+
+.styleguide {
+    grid-column: 2;
+    grid-row: 2;
+}
+
+.styleguide {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: .5rem;
+  padding: var(--s);  
+}
+
+.styleguide article { inline-size: max(20vw, 8rem); }
+.styleguide h3 { padding-left: var(--s); }
+.txt-shadow { text-shadow: 0px 0px 2px hsl(var(--hue),11%,calc(var(--light) + 15%)); }
+
+.motion { display: flex; }
+
+.motion-item {
+  --iteration: infinite;
+  --background: 
+  --delay: 1;
+  --timing: steps(jump-both);
+  align-self: center;
+  margin-top: var(--s);
+  animation-play-state: running;
+}
+
+.button-state {
+  background-color: green;
+  border: none;
+  font: inherit;
+  cursor: pointer;
+  outline: inherit;
+  margin-left: auto; 
+  font-weight: 550;
+  padding: var(--m);
+  mask-image: url(https://assets.codepen.io/37861/ic_play_circle_outline_48px.svg);
+  mask-repeat: no-repeat;
+  mask-position: center center;
+  mask-size: contain;
+}
+
+.button-state-active { 
+  background-color: red;
+  mask-image: url(https://assets.codepen.io/37861/ic_stop_48px.svg);  
+}
+
+.pause {
+  --iteration: initial;
+  --background: initial;
+}
+
+.pause:is(:active,:focus) { color: var(--orange-1); }
+
+.open { 
+  animation: 
+    .66s ease-in forwards show, 
+    .33s ease-in forwards enter;
 }
 
 @keyframes rotate { to {transform: rotate(90deg)} }
 @keyframes fade-out { to {opacity: 0} }
 @keyframes slide { to { h1 {grid-column: 1; grid-row:1} } }
+
+@keyframes enter {
+  from { transform: translate(var(--from,45vw), 100vh); }
+  to { transform: translate(var(--to,45vw), 40vh); }
+}
 
 @media (max-width:760px) {.icon-text{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}}
 
