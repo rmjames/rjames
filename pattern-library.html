@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-51900523-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-51900523-1');
+    </script>
+    <meta charset="UTF-8"/>
+    <meta name="color-scheme" content="dark light"/>
+    <meta name="theme-color" content="#212121" media="(prefers-color-scheme: dark)"/>
+    <meta name="theme-color" content="#dee1e3" media="(prefers-color-scheme: light)" />
+    <meta name="viewport" content="width=device-width"/>
+    <meta name="disabled-adaptations" content="watch"/>
+    <meta name="Description" content="Robert James - A UX Engineer based out of Brooklyn, looking to design and build digital experiences and products"/>
+    <title>Robert James</title>
+    <meta property="og:title" content="Robert James"/>
+    <meta property="og:type" content="website"/>
+    <meta property="og:url" content="http:robertjames.nyc"/>
+    <meta property="og:image" content="https://assets.codepen.io/37861/rj-whole.png"/>
+    <meta property="og:locale" content="us_EN"/>
+    <meta property="og:site_name" content="Robert James"/>
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:image:alt" content="Robert James"/>
+    <link rel="preload" href="styles/main.css" as="style">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@324;586;624;861&display=swap" as="style">
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@324;586;624;861&display=swap">
+    <link rel="icon" type="image/svg+xml" href="images/icon.svg">
+    <link rel="apple-touch-icon" href="/images/icon-ios.svg">
+    <link rel="icon" type="image/png" href="/favicon-144.png" sizes="144x144">
+    <link rel="icon" type="image/png" href="/favicon-512.png" sizes="512x512">
+    <link rel="icon" type="image/png" href="/favicon-192.png" sizes="192x192">
+    <link rel="manifest" href="manifest.json">
+  </head>
+  <body>
+    <h1 class='txt-cntr'>Pattern Library</h1>
+    <section class='styleguide'>
+      <article>
+        <h2>Text colors</h2>
+        <div class='asset' style='--asset-theme: var(--white-1)'></div>
+        <div class='asset' style='--asset-theme: var(--color-brand)'></div>
+      </article>
+      <article> 
+        <h2>Link colors</h2>
+        <div class='asset' style='--asset-theme: var(--orange-3)'></div>
+      </article>
+      <article>
+        <h2>Icon colors</h2>
+        <div class='asset' style='--asset-theme: var(--blue-1)'></div>
+        <div class='asset' style='--asset-theme: var(--black-4)'></div>
+        <div class='asset' style='--asset-theme: var(--blue-4)'></div>
+        <div class='asset' style='--asset-theme: hsl(13.9, 95.2%, 67.1%)'></div>
+      </article>
+      <article>
+        <h2>Spacers</h2>
+        <div class='asset background-mid' style='--space: var(--xxs);--deg: 2px'></div>
+        <div class='asset background-mid' style='--space: var(--xs);--deg: 2px'></div>
+        <div class='asset background-mid' style='--space: var(--s);--deg: 2px'></div>
+        <div class='asset background-mid' style='--space: var(--m);--deg: 2px'></div>
+        <div class='asset background-mid' style='--space: var(--l);--deg: 2px'></div>
+        <div class='asset background-mid' style='--space: var(--xl);--deg: 2px'></div>
+        <div class='asset background-mid' style='--space: var(--xxl);--deg: 2px'></div>
+      </article>
+      <article>
+        <h2>Font</h2>
+        <div class='font' style='--font-size: var(--s)'>Inter</div> 
+        <div class='font' style='--font-size: var(--m)'>Inter</div> 
+        <div class='font' style='--font-size: var(--l)'>Inter</div> 
+        <div class='font' style='--font-size: var(--xl)'>Inter</div> 
+        <div class='font' style='--font-size: var(--xxl)'>Inter</div> 
+        <div class='font' style='--font-size: var(--xxxl)'>Inter</div> 
+        <div class='font' style='--font-size: calc(var(--xxl) * 2)'>Inter</div> 
+      </article>
+      <article> 
+        <h2>Motion</h2>
+        <section class='motion'> 
+          <div class='asset motion-item background-mid onEnter' style='--space: var(--xl);--deg: 2px'></div>
+          <button class='button-state'></button>
+        </section>
+      </article>
+    </section>
+    <script async type="module" async src='/scripts/index.js'></script> 
+  </body>
+</html>
