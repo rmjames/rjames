@@ -1,5 +1,4 @@
 dev:
-	npx postcss styles/*.css --use autoprefixer --replace --verbose -w
 	browser-sync start --server --files "styles/*.css"
 
 postprocess:
