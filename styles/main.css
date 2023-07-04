@@ -84,12 +84,7 @@ a:where(:hover,:focus,:focus-visible,:active) {filter:drop-shadow(1px 1px 1px va
 
 h1 { 
   container-type: inline-size;
-  font-size: clamp(1.25rem, 1rem + 2.25cqi, 4rem);
-  font-weight: 900;
-  letter-spacing: .16cqi;
-  line-height: max(1rem, 1.25rem + 4cqi);
-  container-type: inline-size;
-  font-size: clamp(1.25rem, 1rem + 2.25cqi, 4rem);
+  font-size: clamp(calc(.125rem + 1cqi), .6rem + 2.5cqi, 3rem);
   font-weight: 900;
   letter-spacing: .16cqi;
   line-height: max(1rem, 1.25rem + 4cqi);
@@ -290,10 +285,6 @@ main {
   container-type: inline-size;
 }
 
-#about { 
-  container-type: inline-size;
-}
-
 @keyframes rotate { to {transform: rotate(90deg)} }
 @keyframes fade-out { to {opacity: 0} }
 @keyframes slide { to { h1 {grid-column: 1; grid-row:1} } }
@@ -325,13 +316,6 @@ main {
 @supports (color:color(display-p3 1 1 1)) and (prefers-color-scheme:dark) { 
     .footer-menu--item a {--text-shadow:color(display-p3 0.873 0.883 0.889)}
 }
-
-@container (inline-size > 1240px) {
-  .about-item { 
-    width: clamp(16cqi, 80ch, 545px);
-  }
-}
-
 
 @container (inline-size > 1240px) {
   .about-item { 
