@@ -136,7 +136,7 @@ main {
 
 .about-item {
   -webkit-padding-before: var(--m);
-          padding-block-start: var(--m);
+     padding-block-start: var(--m);
   width: clamp(24cqi, 80ch, 48cqi);
   line-height: clamp(.5rem, 1.25rem + 2.2cqi, 2.65rem);
   font-size: min(.75rem + 2cqi, 1.75rem);
