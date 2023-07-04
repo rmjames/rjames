@@ -67,6 +67,7 @@ body {
   font-family: var(--font-stack);
   font-size: var(--font-base);
   line-height: 1.25;
+  line-height: 1.25;
   -webkit-font-smoothing: antialiased;
   -webkit-text-size-adjust: auto;
   -moz-text-size-adjust: auto;
@@ -75,6 +76,7 @@ body {
   padding-inline: calc(var(--l) + 1.2vmin);
   padding-block: calc(var(--s) + 1vmin);
   min-block-size: 100vh;
+  min-block-size: 100dvh;
   min-block-size: 100dvh;
 }
 
@@ -86,14 +88,22 @@ h1 {
   font-weight: 900;
   letter-spacing: .16cqi;
   line-height: max(1rem, 1.25rem + 4cqi);
+  container-type: inline-size;
+  font-size: clamp(1.25rem, 1rem + 2.25cqi, 4rem);
+  font-weight: 900;
+  letter-spacing: .16cqi;
+  line-height: max(1rem, 1.25rem + 4cqi);
   text-transform: uppercase;
   -webkit-text-stroke-color: var(--text-color);
+  -webkit-text-stroke-width: .24cqi;
+  padding-block: calc(var(--xxs) + 1cqi);  
   -webkit-text-stroke-width: .24cqi;
   padding-block: calc(var(--xxs) + 1cqi);  
 }
 
 ul {
   list-style: none;
+  padding-left: 0;
   padding-left: 0;
 }
 
@@ -137,6 +147,10 @@ main {
 .about-item {
   -webkit-padding-before: var(--m);
      padding-block-start: var(--m);
+  width: clamp(24cqi, 80ch, 48cqi);
+  line-height: clamp(.5rem, 1.25rem + 2.2cqi, 2.65rem);
+  font-size: min(.75rem + 2cqi, 1.75rem);
+          padding-block-start: var(--m);
   width: clamp(24cqi, 80ch, 48cqi);
   line-height: clamp(.5rem, 1.25rem + 2.2cqi, 2.65rem);
   font-size: min(.75rem + 2cqi, 1.75rem);
@@ -276,6 +290,10 @@ main {
   container-type: inline-size;
 }
 
+#about { 
+  container-type: inline-size;
+}
+
 @keyframes rotate { to {transform: rotate(90deg)} }
 @keyframes fade-out { to {opacity: 0} }
 @keyframes slide { to { h1 {grid-column: 1; grid-row:1} } }
@@ -307,6 +325,13 @@ main {
 @supports (color:color(display-p3 1 1 1)) and (prefers-color-scheme:dark) { 
     .footer-menu--item a {--text-shadow:color(display-p3 0.873 0.883 0.889)}
 }
+
+@container (inline-size > 1240px) {
+  .about-item { 
+    width: clamp(16cqi, 80ch, 545px);
+  }
+}
+
 
 @container (inline-size > 1240px) {
   .about-item { 
