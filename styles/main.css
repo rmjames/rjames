@@ -67,6 +67,7 @@ body {
   font-family: var(--font-stack);
   font-size: var(--font-base);
   line-height: 1.25;
+  line-height: 1.25;
   -webkit-font-smoothing: antialiased;
   -webkit-text-size-adjust: auto;
   -moz-text-size-adjust: auto;
@@ -76,13 +77,14 @@ body {
   padding-block: calc(var(--s) + 1vmin);
   min-block-size: 100vh;
   min-block-size: 100dvh;
+  min-block-size: 100dvh;
 }
 
 a:where(:hover,:focus,:focus-visible,:active) {filter:drop-shadow(1px 1px 1px var(--orange-1))}
 
 h1 { 
   container-type: inline-size;
-  font-size: clamp(1.25rem, 1rem + 2.25cqi, 4rem);
+  font-size: clamp(calc(.125rem + 1cqi), .6rem + 2.5cqi, 3rem);
   font-weight: 900;
   letter-spacing: .16cqi;
   line-height: max(1rem, 1.25rem + 4cqi);
@@ -90,10 +92,13 @@ h1 {
   -webkit-text-stroke-color: var(--text-color);
   -webkit-text-stroke-width: .24cqi;
   padding-block: calc(var(--xxs) + 1cqi);  
+  -webkit-text-stroke-width: .24cqi;
+  padding-block: calc(var(--xxs) + 1cqi);  
 }
 
 ul {
   list-style: none;
+  padding-left: 0;
   padding-left: 0;
 }
 
@@ -137,6 +142,10 @@ main {
 .about-item {
   -webkit-padding-before: var(--m);
      padding-block-start: var(--m);
+  width: clamp(24cqi, 80ch, 48cqi);
+  line-height: clamp(.5rem, 1.25rem + 2.2cqi, 2.65rem);
+  font-size: min(.75rem + 2cqi, 1.75rem);
+          padding-block-start: var(--m);
   width: clamp(24cqi, 80ch, 48cqi);
   line-height: clamp(.5rem, 1.25rem + 2.2cqi, 2.65rem);
   font-size: min(.75rem + 2cqi, 1.75rem);
