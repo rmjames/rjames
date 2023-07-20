@@ -77,14 +77,16 @@ body {
   padding-block: calc(var(--s) + 1vmin);
   min-block-size: 100vh;
   min-block-size: 100dvh;
-  min-block-size: 100dvh;
 }
 
 a:where(:hover,:focus,:focus-visible,:active) {filter:drop-shadow(1px 1px 1px var(--orange-1))}
 
 h1 { 
+  --_min: 1.25rem;
+  --_max: 5rem;
+  --_modifier: 2.5cqi;
   container-type: inline-size;
-  font-size: clamp(calc(.125rem + 1cqi), .6rem + 2.5cqi, 3rem);
+  font-size: clamp(var(--_min), var(--_min) + var(--_modifier), var(--_max));
   font-weight: 900;
   letter-spacing: .16cqi;
   line-height: max(1rem, 1.25rem + 4cqi);
@@ -140,15 +142,15 @@ main {
 }
 
 .about-item {
+  --_min: .75rem;
+  --_max: 1.5rem;
+  --_modifier: 2cqi; 
   -webkit-padding-before: var(--m);
      padding-block-start: var(--m);
-  width: clamp(24cqi, 80ch, 48cqi);
+  width: clamp(16cqi, 60ch, 36cqi);
+  font-size: clamp(var(--_min), var(--_min) + var(--_modifier), var(--_max));
   line-height: clamp(.5rem, 1.25rem + 2.2cqi, 2.65rem);
-  font-size: min(.75rem + 2cqi, 1.75rem);
-          padding-block-start: var(--m);
-  width: clamp(24cqi, 80ch, 48cqi);
-  line-height: clamp(.5rem, 1.25rem + 2.2cqi, 2.65rem);
-  font-size: min(.75rem + 2cqi, 1.75rem);
+  padding-block-start: var(--m);
 }
 
 .footer-menu { 
@@ -315,10 +317,4 @@ main {
 
 @supports (color:color(display-p3 1 1 1)) and (prefers-color-scheme:dark) { 
     .footer-menu--item a {--text-shadow:color(display-p3 0.873 0.883 0.889)}
-}
-
-@container (inline-size > 1240px) {
-  .about-item { 
-    width: clamp(16cqi, 80ch, 545px);
-  }
 }
