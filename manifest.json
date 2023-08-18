@@ -28,7 +28,7 @@
         {
           "name": "Pattern Library",
           "description": "Styleguide for portfolio",
-          "url": "https://robertjames.nyc/pattern-library.html"
+          "url": "./pattern-library.html"
         }
     ],
     "share_target": {
@@ -36,7 +36,7 @@
     "params": {
         "title": "Robert James",
         "text": "Portfolio of Robert James",
-        "url": "https://www.robertjames.nyc/"
+        "url": "./"
         }
     },
     "theme_color": "#212121",

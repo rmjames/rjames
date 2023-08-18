@@ -11,3 +11,5 @@ self.addEventListener("load", () => {
          .catch(err => console.log("registration failed :", err));
    }
 });
+
+console.log("This Portfolio is an open design");
