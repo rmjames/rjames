@@ -213,6 +213,7 @@ main {
 .icon-text:nth-of-type(3) { -webkit-margin-before: 0.2rem; margin-block-start: 0.2rem; }
 
 .copryright {
+  padding-block-end: var(--xs);
   margin-left: auto;
   font-size: min(.25rem + 1vmin,.75rem);
 }
