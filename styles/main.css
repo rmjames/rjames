@@ -58,7 +58,7 @@
 ::selection {
   background: hsl(var(--hue),8%,calc(var(--light) + 12%)); 
   color: #fff;
-  transition: color.3s,background.2s;
+  transition: color.3s, background.2s;
 }
 
 html, body { min-block-size: 100%; margin: 0; padding: 0; }
@@ -76,7 +76,7 @@ body {
   -webkit-text-size-adjust: auto;
   -moz-text-size-adjust: auto;
        -webkit-text-size-adjust: auto;
-  -webkit-text-stroke-width: 0.1vmin;
+  -webkit-text-stroke-width: 0.048vmin;
   font-optical-sizing: auto;
   padding-inline: calc(var(--l) + 1vmin);
   padding-block: calc(var(--s) + 1vmin);
