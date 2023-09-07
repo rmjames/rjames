@@ -58,10 +58,10 @@
 ::selection {
   background: hsl(var(--hue),8%,calc(var(--light) + 12%)); 
   color: #fff;
-  transition: color.3s,background.2s;
+  transition: color.3s, background.2s;
 }
 
-html, body { min-block-size: 100%; margin: 0; padding: 0; }
+html{ min-block-size: 100%; container-type: size; }
 
 body { 
   display: grid;
@@ -76,12 +76,13 @@ body {
   -webkit-text-size-adjust: auto;
   -moz-text-size-adjust: auto;
        -webkit-text-size-adjust: auto;
-  -webkit-text-stroke-width: 0.1vmin;
+  -webkit-text-stroke-width: 0.048vmin;
   font-optical-sizing: auto;
+  margin: 0; 
   padding-inline: calc(var(--l) + 1vmin);
   padding-block: calc(var(--s) + 1vmin);
   min-block-size: 100vh;
-  min-block-size: 100dvh;
+  min-block-size: 100dvh; 
 }
 
 a:where(:hover,:focus,:focus-visible,:active) { filter: drop-shadow(1px 1px 1px var(--orange-1)); }
@@ -115,12 +116,9 @@ main {
 .icon-set { display: none; } 
 
 .header { 
-  display: grid;
   grid-column: 1/24;
-  grid-row: 1;
   min-block-size: 15vh;
   text-align: center;
-  align-items: center;
 }
 
 .brand {
@@ -154,7 +152,7 @@ main {
   --_modifier: 2cqi; 
   -webkit-padding-before: var(--m);
      padding-block-start: var(--m);
-  inline-size: clamp(24cqi, 16rem + 2cqmin, 20rem);
+  inline-size: clamp(4rem, 5rem + 22cqi, 30rem);
   font-size: clamp(0.78rem, calc(0.51rem + 1.36vw), 1.56rem); 
   line-height: clamp(.5rem, 1.25rem + 2.2cqi, 2.65rem);
 }
