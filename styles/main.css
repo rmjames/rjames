@@ -61,7 +61,7 @@
   transition: color.3s, background.2s;
 }
 
-html{ min-block-size: 100%; container-type: size; }
+html, body { min-block-size: 100%; margin: 0; padding: 0; }
 
 body { 
   display: grid;
@@ -76,9 +76,8 @@ body {
   -webkit-text-size-adjust: auto;
   -moz-text-size-adjust: auto;
        -webkit-text-size-adjust: auto;
-  -webkit-text-stroke-width: 0.048vmin;
+  -webkit-text-stroke-width: 0.064vmin;
   font-optical-sizing: auto;
-  margin: 0; 
   padding-inline: calc(var(--l) + 1vmin);
   padding-block: calc(var(--s) + 1vmin);
   min-block-size: 100vh;
