@@ -177,7 +177,8 @@ header {
   align-items: baseline;
   justify-content: space-between;
   width: 100%;
-  min-block-size: 4rem;
+  min-block-size: 5rem;
+  scroll-snap-align: center;
 }
 
 nav ul {
@@ -211,11 +212,10 @@ main { margin: auto; }
   padding: 1rem;
 }
 
-:is(.cover, header, footer) { scroll-snap-align: start; }
+:is(.cover, footer) { scroll-snap-align: start; }
 
 :is(.about-item) { 
-  font-size: max(1rem, calc(1rem + 1cqi));
-  text-wrap: pretty;
+  font-size: max(1rem, calc(1rem + 2cqi));
   animation-name: enter;
   animation-timeline: view();
 }
