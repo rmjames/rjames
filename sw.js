@@ -4,6 +4,7 @@ const OFFLINE = 'offline.html';
 const assetsToCache = [
   '/index.html',
   '/styleguide.html',
+  '/work.html',
   '/styles/main.css',
   '/scripts/index.js',
   '/images/icon.svg',
