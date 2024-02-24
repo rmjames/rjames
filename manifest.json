@@ -29,7 +29,12 @@
           "name": "Pattern Library",
           "description": "Styleguide for portfolio",
           "url": "./pattern-library.html"
-        }
+        },
+        {
+          "name": "Work",
+          "description": "Page displaying past or current work",
+          "url": "./work.html"
+          }
     ],
     "share_target": {
     "action": "/index.html",
