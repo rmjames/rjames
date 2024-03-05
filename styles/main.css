@@ -249,11 +249,15 @@ main { margin: auto; }
 .footer-menu { 
   --recursive-wght: 200;
   display: flex; 
+  flex-wrap: wrap;
   margin-block-start: auto;
   font-size: clamp(1vmin,calc(var(--s) + var(--s)),.75rem);
     .copryright { 
-      margin-left: auto; 
       align-self: center;
+    }
+
+    @media (min-width: 432px) {
+      .copryright { margin-left: auto; }
     }
 }
 
