@@ -46,6 +46,8 @@
     },
     "theme_color": "#212121",
     "background_color": "#dee1e3",
+    "display_override": ["window-controls-overlay","minimal-ui"],
     "display": "standalone",
+    "id": "/",
     "start_url": "/"
 }
