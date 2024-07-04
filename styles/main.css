@@ -95,18 +95,18 @@ body > * + * {
   --sat:100%;
   --light:33%;
   --white-1:hsl(var(--hue), 8%, 88%);
-  --black-1:hsl(360, 0%, 0%);
-  --black-2:hsl(46% 94% 119%);
-  --black-3:hsl(200, 0%, 16%);
-  --black-4:hsl(0, 0%, 20%);
-  --black-5:hsl(0, 0%, 47%);
-  --blue-1:hsl(200, 100%, 32.9%);
-  --blue-2:hsl(201, 44%, 43%);
-  --blue-3:hsl(204, 100%, 51%);
-  --blue-4:hsl(203, 89.2%, 52.9%);
-  --orange-1:hsla(30, 60.7%, 58%, 0.66);
-  --orange-2:hsl(38.8, 100%, 50%);
-  --orange-3:hsl(13.9, 95.2%, 67.1%);
+  --black-1:hsl(360 0% 0%);
+  --black-2:hsl(46 94% 119%);
+  --black-3:hsl(200 0% 16%);
+  --black-4:hsl(0 0% 20%);
+  --black-5:hsl(0 0% 47%);
+  --blue-1:hsl(200 100% 32.9%);
+  --blue-2:hsl(201 44% 43%);
+  --blue-3:hsl(204 100% 51%);
+  --blue-4:hsl(203 89.2% 52.9%);
+  --orange-1:hsla(30 60.7% 58% / 0.66);
+  --orange-2:hsl(38.8 100% 50%);
+  --orange-3:hsl(13.9 95.2% 67.1%);
   --orange-4:#777;
   --color-brand:hsl(var(--hue) 11% calc(var(--light) + 15% ));
   --text-color:hsl(var(--hue) 8% 16%);
@@ -120,6 +120,25 @@ body > * + * {
   --recursive-MONO: 0;   /* Monospace    */
   --recursive-slnt: 0;   /* Upright      */
   --recursive-CRSV: 0.5;
+
+  @supports (color: rgb(from white r g b)) {
+    --white-1:lch(from hsl(var(--hue) 8%, 88%) l c h);
+    --black-1:lch(from hsl(360 0% 0%) l c h);
+    --black-2:lch(from hsl(46 94% 119%) l c h);
+    --black-3:lch(from hsl(200 0% 16%) l c h);
+    --black-4:lch(from hsl(0 0% 20%) l c h);
+    --black-5:lch(from hsl(0 0% 47%) l c h);
+    --blue-1:lch(from hsl(200 100% 32.9%) l c h);
+    --blue-2:lch(from hsl(201 44% 43%) l c h);
+    --blue-3:lch(from hsl(204 100% 51%) l c h);
+    --blue-4:lch(from hsl(203 89.2% 52.9%) l c h);
+    --orange-1:lch(from hsla(30 60.7% 58% / 0.66) l c h);
+    --orange-2:lch(from hsl(38.8 100% 50%) l c h);
+    --orange-3:lch(from hsl(13.9 95.2% 67.1%) l c h);
+    --orange-4:lch(from #777 l c h);
+    --color-brand:lch(from hsl(var(--hue) 11% calc(var(--light) + 15% )) l c h);
+    --text-color:lch(from hsl(var(--hue) 8% 16%) l c h);
+  }
 }
 
 *,
