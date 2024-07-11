@@ -45,7 +45,7 @@ h3, h4 {
 
 /* A elements that don't have a class get default styles */
 a:not([class]) {
-  -webkit-text-decoration-skip: ink;
+  -webkit-text-decoration-skip-ink: auto;
           text-decoration-skip-ink: auto;
   color: currentColor;
 }
@@ -91,53 +91,53 @@ body > * + * {
   --xxxl: 3rem;
   --f-base: 14px;
   --font-base: clamp(var(--f-base), calc(var(--f-base) + 1.92vmin), 1.5rem);
-  --hue:200;
-  --sat:100%;
-  --light:33%;
-  --white-1:hsl(var(--hue), 8%, 88%);
-  --black-1:hsl(360 0% 0%);
-  --black-2:hsl(46 94% 119%);
-  --black-3:hsl(200 0% 16%);
-  --black-4:hsl(0 0% 20%);
-  --black-5:hsl(0 0% 47%);
-  --blue-1:hsl(200 100% 32.9%);
-  --blue-2:hsl(201 44% 43%);
-  --blue-3:hsl(204 100% 51%);
-  --blue-4:hsl(203 89.2% 52.9%);
-  --orange-1:hsla(30 60.7% 58% / 0.66);
-  --orange-2:hsl(38.8 100% 50%);
-  --orange-3:hsl(13.9 95.2% 67.1%);
-  --orange-4:#777;
-  --color-brand:hsl(var(--hue) 11% calc(var(--light) + 15% ));
-  --text-color:hsl(var(--hue) 8% 16%);
-  --text-shadow:var(--orange-1);
-  --link-color:var(--blue-2);
-  --link-ease:cubic-bezier(0.2, 0.8, 0.2, 1);
-  --link-timing:444ms;
+  --white-1: hsl(200, 8%, 88%);
+  --black-1: hsl(360 0% 0%);
+  --black-2: hsl(46 94% 119%);
+  --black-3: hsl(200 0% 16%);
+  --black-4: hsl(0 0% 20%);
+  --black-5: hsl(0 0% 47%);
+  --gray: hsl(200,8%,45%);
+  --blue-1: hsl(200 100% 32.9%);
+  --blue-2: hsl(201 44% 43%);
+  --blue-3: hsl(204 100% 51%);
+  --blue-4: hsl(203 89.2% 52.9%);
+  --orange-1: hsla(30 60.7% 58% / 0.66);
+  --orange-2: hsl(38.8 100% 50%);
+  --orange-3: hsl(13.9 95.2% 67.1%);
+  --orange-4: #777;
+  --color-brand: hsl(200 11% 48%);
+  --text-color: hsl(200 8% 16%);
+  --text-shadow: var(--orange-1);
+  --link-color: var(--blue-2);
+  --link-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --link-timing: 444ms;
   --font-stack: "Recursive", system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Open-sans,"Droid Sans","Helvetica Neue",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
   --recursive-wght: 400;
   --recursive-CASL: 0;
   --recursive-MONO: 0;   /* Monospace    */
   --recursive-slnt: 0;   /* Upright      */
   --recursive-CRSV: 0.5;
+  --selection-color: var(--gray);
 
   @supports (color: rgb(from white r g b)) {
-    --white-1:lch(from hsl(var(--hue) 8%, 88%) l c h);
-    --black-1:lch(from hsl(360 0% 0%) l c h);
-    --black-2:lch(from hsl(46 94% 119%) l c h);
-    --black-3:lch(from hsl(200 0% 16%) l c h);
-    --black-4:lch(from hsl(0 0% 20%) l c h);
-    --black-5:lch(from hsl(0 0% 47%) l c h);
-    --blue-1:lch(from hsl(200 100% 32.9%) l c h);
-    --blue-2:lch(from hsl(201 44% 43%) l c h);
-    --blue-3:lch(from hsl(204 100% 51%) l c h);
-    --blue-4:lch(from hsl(203 89.2% 52.9%) l c h);
-    --orange-1:lch(from hsla(30 60.7% 58% / 0.66) l c h);
-    --orange-2:lch(from hsl(38.8 100% 50%) l c h);
-    --orange-3:lch(from hsl(13.9 95.2% 67.1%) l c h);
-    --orange-4:lch(from #777 l c h);
-    --color-brand:lch(from hsl(var(--hue) 11% calc(var(--light) + 15% )) l c h);
-    --text-color:lch(from hsl(var(--hue) 8% 16%) l c h);
+    --white-1: oklch(from hsl(200 8%, 88%) l c h);
+    --black-1: oklch(from hsl(360 0% 0%) l c h);
+    --black-2: oklch(from hsl(46 94% 119%) l c h);
+    --black-3: oklch(from hsl(200 0% 16%) l c h);
+    --black-4: oklch(from hsl(0 0% 20%) l c h);
+    --black-5: oklch(from hsl(0 0% 47%) l c h);
+    --gray: oklch(from hsl(200,8%,45%) l c h);
+    --blue-1: oklch(from hsl(200 100% 32.9%) l c h);
+    --blue-2: oklch(from hsl(201 44% 43%) l c h);
+    --blue-3: oklch(from hsl(204 100% 51%) l c h);
+    --blue-4: oklch(from hsl(203 89.2% 52.9%) l c h);
+    --orange-1: oklch(from hsla(30 60.7% 58% / 0.66) l c h);
+    --orange-2: oklch(from hsl(38.8 100% 50%) l c h);
+    --orange-3: oklch(from hsl(13.9 95.2% 67.1%) l c h);
+    --orange-4: oklch(from #777 l c h);
+    --color-brand: oklch(from hsl(200 11% 48%) l c h);
+    --text-color: oklch(from hsl(200 8% 16%) l c h);
   }
 }
 
@@ -161,10 +161,11 @@ body > * + * {
 }
 
 ::selection {
-  background: hsl(var(--hue),8%,calc(var(--light) + 12%)); 
+  background: var(--selection-color); 
   color: #fff;
   transition: color .3s, background .2s;
 }
+
 html {   
   scroll-behavior: smooth;
   scroll-snap-type: y mandatory;
@@ -203,7 +204,11 @@ header {
 nav ul {
   display: flex;
   align-items: center;  
-    a:hover { opacity: .64; }
+  transition: opacity .2s, font-weight .26s;
+    a:hover {
+      font-weight: 850;
+      opacity: .5; 
+    }
 }
 
 h1 {
@@ -243,6 +248,11 @@ main { margin: auto; }
   font-weight: 550;
   color: #6d7f88;
   color: lch(52 8.93 233.99);
+  transition: opacity .2s, font-weight .26s;
+  &:hover {
+    opacity: .5;
+    font-weight: 850; 
+  }
 }
 
 .link-contact {
@@ -271,12 +281,10 @@ main { margin: auto; }
   flex-wrap: wrap;
   margin-block-start: auto;
   font-size: clamp(1vmin,calc(var(--s) + var(--s)),.75rem);
-    .copryright { 
-      align-self: center;
-    }
+    .copryright { align-self: center; }
 
     @media (min-width: 432px) {
-      .copryright { margin-left: auto; }
+      .copyright { margin-left: auto; }
     }
 }
 
@@ -316,9 +324,9 @@ main { margin: auto; }
   fill: var(--black-4);
   filter: drop-shadow(1px 1px 1px var(--black-5));
 }
+
 .icon-text { margin-block-end: 0.1rem; }
 #icon-email {margin-block-start: .3rem;}
-
 #about { max-width: max(48ch, 64ch); }
 
 @keyframes enter {
@@ -335,6 +343,7 @@ main { margin: auto; }
   body, html {
     --text-color: var(--white-1);
     --text-shadow: hsl(0, 0%, 88%);
+    --text-shadow: oklch(from hsl(0, 0%, 88%) l c h);
     --bkgnd: var(--black-3)
   }
   :where(.footer-menu--item a, .link-contact, nav a) {
