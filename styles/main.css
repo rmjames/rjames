@@ -92,12 +92,14 @@ body > * + * {
   --f-base: 14px;
   --font-base: clamp(var(--f-base), calc(var(--f-base) + 1.92vmin), 1.5rem);
   --white-1: hsl(200, 8%, 88%);
+  --white-2: hsl(0, 0%, 88%);
   --black-1: hsl(360 0% 0%);
   --black-2: hsl(46 94% 119%);
   --black-3: hsl(200 0% 16%);
   --black-4: hsl(0 0% 20%);
   --black-5: hsl(0 0% 47%);
-  --gray: hsl(200,8%,45%);
+  --gray-1: hsl(200,8%,45%);
+  --gray-2: #6d7f88;
   --blue-1: hsl(200 100% 32.9%);
   --blue-2: hsl(201 44% 43%);
   --blue-3: hsl(204 100% 51%);
@@ -118,27 +120,29 @@ body > * + * {
   --recursive-MONO: 0;   /* Monospace    */
   --recursive-slnt: 0;   /* Upright      */
   --recursive-CRSV: 0.5;
-  --selection-color: var(--gray);
+  --selection-color: var(--gray-1);
 
-  @supports (color: rgb(from white r g b)) {
-    --white-1: oklch(from hsl(200 8%, 88%) l c h);
-    --black-1: oklch(from hsl(360 0% 0%) l c h);
-    --black-2: oklch(from hsl(46 94% 119%) l c h);
-    --black-3: oklch(from hsl(200 0% 16%) l c h);
-    --black-4: oklch(from hsl(0 0% 20%) l c h);
-    --black-5: oklch(from hsl(0 0% 47%) l c h);
-    --gray: oklch(from hsl(200,8%,45%) l c h);
-    --blue-1: oklch(from hsl(200 100% 32.9%) l c h);
-    --blue-2: oklch(from hsl(201 44% 43%) l c h);
-    --blue-3: oklch(from hsl(204 100% 51%) l c h);
-    --blue-4: oklch(from hsl(203 89.2% 52.9%) l c h);
-    --orange-1: oklch(from hsla(30 60.7% 58% / 0.66) l c h);
-    --orange-2: oklch(from hsl(38.8 100% 50%) l c h);
-    --orange-3: oklch(from hsl(13.9 95.2% 67.1%) l c h);
-    --orange-4: oklch(from #777 l c h);
-    --color-brand: oklch(from hsl(200 11% 48%) l c h);
-    --text-color: oklch(from hsl(200 8% 16%) l c h);
-  }
+    @supports (color: rgb(from white r g b)) {
+      --white-1: oklch(from hsl(200 8%, 88%) l c h);
+      --white-2: oklch(from hsl(0, 0%, 88%) l c h);
+      --black-1: oklch(from hsl(360 0% 0%) l c h);
+      --black-2: oklch(from hsl(46 94% 119%) l c h);
+      --black-3: oklch(from hsl(200 0% 16%) l c h);
+      --black-4: oklch(from hsl(0 0% 20%) l c h);
+      --black-5: oklch(from hsl(0 0% 47%) l c h);
+      --gray-1: oklch(from hsl(200,8%,45%) l c h);
+      --gray-2: oklch(from #6d7f88 l c h);
+      --blue-1: oklch(from hsl(200 100% 32.9%) l c h);
+      --blue-2: oklch(from hsl(201 44% 43%) l c h);
+      --blue-3: oklch(from hsl(204 100% 51%) l c h);
+      --blue-4: oklch(from hsl(203 89.2% 52.9%) l c h);
+      --orange-1: oklch(from hsla(30 60.7% 58% / 0.66) l c h);
+      --orange-2: oklch(from hsl(38.8 100% 50%) l c h);
+      --orange-3: oklch(from hsl(13.9 95.2% 67.1%) l c h);
+      --orange-4: oklch(from #777 l c h);
+      --color-brand: oklch(from hsl(200 11% 48%) l c h);
+      --text-color: oklch(from hsl(200 8% 16%) l c h);
+    }
 }
 
 *,
@@ -162,7 +166,7 @@ body > * + * {
 
 ::selection {
   background: var(--selection-color); 
-  color: #fff;
+  color: var(--white-1);
   transition: color .3s, background .2s;
 }
 
@@ -246,13 +250,12 @@ main { margin: auto; }
 
 .brand {
   font-weight: 550;
-  color: #6d7f88;
-  color: lch(52 8.93 233.99);
+  color: var(--gray-2);
   transition: opacity .2s, font-weight .26s;
-  &:hover {
-    opacity: .5;
-    font-weight: 850; 
-  }
+    &:hover {
+      opacity: .5;
+      font-weight: 850; 
+    }
 }
 
 .link-contact {
@@ -342,9 +345,8 @@ main { margin: auto; }
 @media (prefers-color-scheme: dark) {
   body, html {
     --text-color: var(--white-1);
-    --text-shadow: hsl(0, 0%, 88%);
-    --text-shadow: oklch(from hsl(0, 0%, 88%) l c h);
-    --bkgnd: var(--black-3)
+    --text-shadow: var(--white-2);
+    --bkgnd: var(--black-3);
   }
   :where(.footer-menu--item a, .link-contact, nav a) {
     color: var(--white-1)
