@@ -281,14 +281,11 @@ main { margin: auto; }
 .footer-menu { 
   --recursive-wght: 200;
   display: flex; 
+  justify-content: space-between;
   flex-wrap: wrap;
   margin-block-start: auto;
-  font-size: clamp(1vmin,calc(var(--s) + var(--s)),.75rem);
+  font-size: clamp(1vmin,calc(var(--s) + var(--s)), .75rem);
     .copryright { align-self: center; }
-
-    @media (min-width: 432px) {
-      .copyright { margin-left: auto; }
-    }
 }
 
 .footer-menu ul { 
