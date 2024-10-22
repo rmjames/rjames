@@ -179,6 +179,7 @@ body {
   display: flex;
   flex-direction: column;
   background: var(--bkgnd);
+  background: conic-gradient(from 40deg at -20% 0%, var(--black-1), var(--black-4), var(--black-1));
   color: var(--text-color);
   font-family: var(--font-stack);
   font-optical-sizing: auto;
@@ -186,7 +187,7 @@ body {
   -webkit-text-size-adjust: auto;
   -moz-text-size-adjust: auto;
   min-block-size: 100vh;
-  padding:0 4cqi;
+  padding: 0 4cqi;
   font-size: clamp(1rem,calc(1rem + .125cqi), 2rem);
 }
 
@@ -222,6 +223,7 @@ h1 {
   line-height: 1.1;
   text-transform: uppercase;
   transition: font-variation-settings .48s;
+  filter: drop-shadow(.5px .5px 1px var(--text-shadow));
     &:hover {
       --recursive-wght: 900;
       --recursive-CASL: 0.1;
@@ -232,6 +234,10 @@ h1 {
   width:1.25rem;
   height:1.25rem;
   margin-block-end: 0.3rem;
+}
+
+nav li > a {
+  filter: drop-shadow(.5px .5px 1px var(--text-shadow));
 }
 
 main { margin: auto; }
@@ -251,6 +257,15 @@ main { margin: auto; }
   font-size: max(var(--f-base), calc(1rem + 1cqi));
   animation-name: enter;
   animation-timeline: view();
+}
+
+/* header - drop shadow */
+:is(h1, .nav-item, .copyright ) {
+  filter: drop-shadow(
+    .5px .5px 1px var(--text-shadow),
+    .75px .75px 3px var(--text-shadow),
+    1.25px 1.25px 6px var(--text-shadow)
+  );
 }
 
 .brand {
