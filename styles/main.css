@@ -179,7 +179,7 @@ body {
   display: flex;
   flex-direction: column;
   background: var(--bkgnd);
-  background: var(--bkgnd) conic-gradient(from var(--gradient-angle) at 0% 64%, var(--bkgnd), var(--black-5), var(--bkgnd));
+  background: var(--bkgnd) conic-gradient(from var(--gradient-angle) at -0% 72%, var(--bkgnd), var(--black-4),var(--bkgnd));
   color: var(--text-color);
   font-family: var(--font-stack);
   font-optical-sizing: auto;
@@ -458,7 +458,7 @@ details {
 }
 
 @keyframes rotate-gradient {
-  to { --gradient-angle: 360deg; }
+  to { --gradient-angle: 270deg; }
 }
 
 @keyframes axis-x {
@@ -482,7 +482,7 @@ details {
 
 @property --gradient-angle {
   syntax: '<angle>';
-  initial-value: 40deg;
+  initial-value: 0deg;
   inherits: false;
 }
 
