@@ -179,7 +179,7 @@ body {
   display: flex;
   flex-direction: column;
   background: var(--bkgnd);
-  background: conic-gradient(from 40deg at -20% 0%, var(--black-1), var(--black-4), var(--black-1));
+  background: var(--bkgnd) conic-gradient(from var(--gradient-angle) at 0% 64%, var(--bkgnd), var(--black-5), var(--bkgnd));
   color: var(--text-color);
   font-family: var(--font-stack);
   font-optical-sizing: auto;
@@ -189,6 +189,13 @@ body {
   min-block-size: 100vh;
   padding: 0 4cqi;
   font-size: clamp(1rem,calc(1rem + .125cqi), 2rem);
+  animation: rotate-gradient linear, axis-x linear;
+  animation-timeline: scroll();
+  animation-range: 0 100vh;
+
+  @media (prefers-reduced-motion: no-preference) {
+    interpolate-size: allow-keywords;
+  }
 }
 
 ul {
@@ -251,16 +258,16 @@ main { margin: auto; }
   padding: 1rem;
 }
 
-:is(.cover, footer) { scroll-snap-align: start; }
+:where(.cover, footer) { scroll-snap-align: start; }
 
-:is(.about-item) { 
+:where(.about-item) { 
   font-size: max(var(--f-base), calc(1rem + 1cqi));
   animation-name: enter;
   animation-timeline: view();
 }
 
 /* header - drop shadow */
-:is(h1, .nav-item, .copyright ) {
+:where(h1, .nav-item, .copyright ) {
   filter: drop-shadow(
     .5px .5px 1px var(--text-shadow),
     .75px .75px 3px var(--text-shadow),
@@ -302,9 +309,10 @@ main { margin: auto; }
   --recursive-wght: 200;
   display: flex; 
   justify-content: space-between;
+  align-items: center;
   flex-wrap: wrap;
   margin-block-start: auto;
-  /* font-size: clamp(1vmin,calc(var(--s) + var(--s)), .75rem); */
+  font-size: clamp(1.1cqi,calc(var(--s) + 1.1cqi), var(--m));
     .copyright { align-self: center; }
 }
 
@@ -350,9 +358,111 @@ main { margin: auto; }
 #about { max-width: max(48ch, 64ch); }
 #icon-twitter {margin-block-end: .3rem;} 
 
+
+/*resume */
+.resume-container {
+	inline-size: clamp(32vmin, 36rem, 64vmin);
+}
+
+:where(#technical-skills-heading, #work-experience-heading, #education-heading, #certifications-heading, [aria-label="technical-skills"], date) {
+  visibility: hidden;
+}
+:where(.bio, .skills-container) {
+  display: none;
+}
+
+:where([aria-label="technical-skills"], [aria-label="work-experience"], [aria-label="education"], [aria-label="certifications"]) {
+  margin-block-end: 2.5rem;
+}
+
+:where(summary h3, date, .copyright) {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap; 
+}
+
+details {
+  margin-block-end: var(--xxl);
+  margin-inline-start: 1rem;
+
+  * { margin: 0; }
+  ul { padding-inline-start: 1rem; padding-block-start: var(--m); }
+  li { padding-block: .5rem; }
+
+  > summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    list-style: none; 
+    list-style-type: outside;
+    position: relative;
+    cursor: pointer;
+    transition: text-shadow 0.32s ease-in-out;
+  }
+
+  &[open] > summary:focus {
+    text-shadow: 2px 2px 5px var(--text-shadow);
+  }
+ }
+
+::details-content {
+  block-size: 0;
+  padding-left: 1.5rem;
+  opacity: 0;
+  overflow: clip; 
+  transition: 
+    block-size 0.32s ease-in-out,
+    content-visibility 0.32s ease-in-out allow-discrete,
+    opacity .64s,
+    text-shadow 0.32s ease-in-out;
+}
+
+[open]::details-content { 
+  block-size: auto; 
+  opacity: 1; 
+}
+
+.job-title {
+  display: flex;
+  justify-content: space-between;
+  font-style: italic;
+  font-weight: 550;
+  padding-block-start: var(--l);
+}
+
+@keyframes slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(.75rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(.75rem);
+  }
+} 
+
 @keyframes enter {
   from { opacity: 0; }
   to { opaity: 1; }
+}
+
+@keyframes rotate-gradient {
+  to { --gradient-angle: 360deg; }
+}
+
+@keyframes axis-x {
+  to { --axis-x: 2%; }
 }
 
 @media (max-width: 760px) {
@@ -370,4 +480,15 @@ main { margin: auto; }
   }
 }
 
+@property --gradient-angle {
+  syntax: '<angle>';
+  initial-value: 40deg;
+  inherits: false;
+}
+
+@property --axis-x {
+  syntax: '<percentage>';
+  initial-value: 10%;
+  inherits: false;
+}
 /*# sourceMappingURL=main.css.map */
