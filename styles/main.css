@@ -383,11 +383,11 @@ main { margin: auto; }
 
 details {
   margin-block-end: var(--xxl);
-  margin-inline-start: 1rem;
+  margin-inline-start: var(--m);
 
   * { margin: 0; }
-  ul { padding-inline-start: 1rem; padding-block-start: var(--m); }
-  li { padding-block: .5rem; }
+  ul { padding-inline-start: var(--m);  padding-block-start: var(--m); }
+  li { padding-block: var(--s); }
 
   > summary {
     display: flex;
@@ -403,7 +403,31 @@ details {
   &[open] > summary:focus {
     text-shadow: 2px 2px 5px var(--text-shadow);
   }
+
+  .job-title {
+    transition: opacity .32s var(--ease-3), translate .32s var(--ease-3);
+  }
  }
+
+.resume-container section {
+  @media (hover) and (prefers-reduced-motion: no-preference) {
+    & > details > summary {
+      transition: opacity .32s var(--ease-3), transform .32s var(--ease-3);
+    }
+    
+    &:has(:hover) > details > summary:not(:hover) {
+      opacity: .25;
+      transform: scale(.75), translate(.125rem, 0);
+      transition: opacity .32s var(--ease-3), transform .32s var(--ease-3);
+    }
+
+    &:has(:focus) > details > summary:not(:focus) {
+      opacity: .25;
+      transform: scale(.75), translate(.125rem, 0);
+      transition: opacity .32s var(--ease-3), transform .32s var(--ease-3);
+    }
+  }
+}
 
 ::details-content {
   block-size: 0;
