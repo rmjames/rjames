@@ -215,6 +215,7 @@ header {
 nav ul {
   display: flex;
   align-items: center;  
+  gap: 1cqi;
   transition: opacity .2s, font-weight .26s;
     a:hover {
       font-weight: 850;
