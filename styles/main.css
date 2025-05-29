@@ -216,6 +216,7 @@ nav ul {
   display: flex;
   align-items: center;  
   transition: opacity .2s, font-weight .26s;
+  gap: 1cqi;
     a:hover {
       font-weight: 850;
       opacity: .5; 
