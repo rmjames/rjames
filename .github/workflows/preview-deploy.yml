@@ -6,22 +6,27 @@ on:
     branches-ignore:
       - '2023' # Your main deployment branch
       - 'main'   # Or whatever your default/development branch is, if not for previews
+  workflow_dispatch: # Allows manual triggering
 
 jobs:
   build-and-deploy:
     name: Build and Deploy Preview
     runs-on: ubuntu-latest
     permissions:
-      contents: read  # To checkout the code
-      pages: write     # To deploy to GitHub Pages
-      id-token: write  # To authenticate with GitHub Pages
+      contents: read
+      pages: write
+      id-token: write
 
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }} # Sets the deployment URL in the GitHub UI
+      url: ${{ steps.deployment.outputs.page_url }}
 
     env:
-      REPOSITORY_NAME: ${{ github.event.repository.name }} # Get repository name
+      REPOSITORY_NAME: ${{ github.event.repository.name }}
+
+    outputs: # Define outputs for debugging purposes
+      BRANCH_NAME_RAW_OUT: ${{ steps.get_branch.outputs.branch_name_raw }}
+      BRANCH_NAME_SLUG_OUT: ${{ steps.get_branch.outputs.branch_name_slug }}
 
     steps:
       - name: Checkout repository
@@ -30,68 +35,74 @@ jobs:
       - name: Get branch name
         id: get_branch
         run: |
-          BRANCH_NAME_RAW=$(echo \"${GITHUB_REF#refs/heads/}\")
-          # Sanitize branch name for URL/directory use (replace slashes, etc.)
-          BRANCH_NAME_SLUG=$(echo \"$BRANCH_NAME_RAW\" | sed 's|/|-|g' | sed 's|[^a-zA-Z0-9_-]||g')
-          echo \"branch_name_raw=$BRANCH_NAME_RAW\" >> $GITHUB_OUTPUT
-          echo \"branch_name_slug=$BRANCH_NAME_SLUG\" >> $GITHUB_OUTPUT
+          BRANCH_NAME_RAW="${GITHUB_REF#refs/heads/}"
+          # Sanitize branch name for URL/directory use
+          BRANCH_NAME_SLUG=$(echo "$BRANCH_NAME_RAW" | sed 's|/|-|g' | sed 's|[^a-zA-Z0-9_-]||g')
+
+          echo "Raw branch name: $BRANCH_NAME_RAW"
+          echo "Slugified branch name: $BRANCH_NAME_SLUG"
+
+          echo "branch_name_raw=$BRANCH_NAME_RAW" >> $GITHUB_OUTPUT
+          echo "branch_name_slug=$BRANCH_NAME_SLUG" >> $GITHUB_OUTPUT
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18' # Or your preferred version
+          node-version: '18'
 
       - name: Install dependencies (postcss-cli & autoprefixer)
+        run: npm install -g postcss-cli autoprefixer
+
+      - name: Debug Branch Info
         run: |
-          # Consider creating a package.json and using npm install
-          npm install -g postcss-cli autoprefixer
+          echo "Branch Name Raw from output: ${{ steps.get_branch.outputs.branch_name_raw }}"
+          echo "Branch Name Slug from output: ${{ steps.get_branch.outputs.branch_name_slug }}"
 
       - name: Build the site for subdirectory deployment with base URL
         env:
-          BRANCH_SLUG: ${{ steps.get_branch.outputs.branch_name_slug }}
+          # Use the output from the get_branch step
+          BRANCH_SLUG_ENV: ${{ steps.get_branch.outputs.branch_name_slug }}
+          BRANCH_RAW_ENV: ${{ steps.get_branch.outputs.branch_name_raw }}
         run: |
-          echo "Deploying branch: ${{ steps.get_branch.outputs.branch_name_raw }} as slug: $BRANCH_SLUG"
+          # Re-check if empty and provide default if so (though GITHUB_OUTPUT should work)
+          CURRENT_BRANCH_SLUG=${BRANCH_SLUG_ENV:-unknown-branch-slug}
+          CURRENT_BRANCH_RAW=${BRANCH_RAW_ENV:-unknown-branch-raw}
 
-          TARGET_DIR="_site/$BRANCH_SLUG"
+          echo "Deploying branch: $CURRENT_BRANCH_RAW as slug: $CURRENT_BRANCH_SLUG"
+
+          TARGET_DIR="_site/$CURRENT_BRANCH_SLUG"
           mkdir -p "$TARGET_DIR"
 
-          # Define the base URL.
-          # Assumes your site is at https://<username>.github.io/<repository_name>/
-          BASE_URL="/${{ env.REPOSITORY_NAME }}/$BRANCH_SLUG/"
-          # If your site is at a custom domain root https://yourcustomdomain.com/, uncomment next line and comment one above
-          # BASE_URL="/$BRANCH_SLUG/"
+          BASE_URL="/${{ env.REPOSITORY_NAME }}/$CURRENT_BRANCH_SLUG/"
+          # If custom domain root, use: BASE_URL="/$CURRENT_BRANCH_SLUG/"
           echo "Using BASE_URL: $BASE_URL"
 
           TEMP_BUILD_DIR="_temp_build"
           mkdir -p "$TEMP_BUILD_DIR"
 
           echo "Copying source files to temporary build directory..."
-          # Adjust this list to accurately reflect ALL source files and directories needed for the build and final site
-          # This includes HTML, JS, image sources, CSS sources (e.g., styles/), and anything else.
-          # Ensure that directories expected by 'make postprocess' (like 'styles/') are copied.
+          # CRITICAL: Copy Makefile
+          cp Makefile "$TEMP_BUILD_DIR/"
+
+          # Adjust this list to accurately reflect ALL source files and directories
           cp index.html lab.html pattern-library.html resume.html work.html manifest.json sw.js "$TEMP_BUILD_DIR/"
           cp favicon_*.png "$TEMP_BUILD_DIR/"
-          # Copy directories; -T is useful if source is a dir and dest already exists, to copy contents
           cp -R styles "$TEMP_BUILD_DIR/styles"
           cp -R images "$TEMP_BUILD_DIR/images"
           cp -R scripts "$TEMP_BUILD_DIR/scripts"
-          # If your `make postprocess` uses files from `build/` as source, copy it too.
-          # If `build/` is purely an output of `make postprocess`, this might not be needed here.
-          # cp -R build "$TEMP_BUILD_DIR/build"
-
+          # If 'build/' directory contains source files for 'make postprocess', copy it.
+          # If 'build/' is purely an output of 'make postprocess', this specific line might not be needed here,
+          # as 'make postprocess' would create it inside TEMP_BUILD_DIR.
+          # cp -R build "$TEMP_BUILD_DIR/build" # Uncomment if build dir has sources for make
 
           echo "Running 'make postprocess' in temporary directory..."
-          # This assumes 'make postprocess' works on files within the CWD, e.g., modifies $TEMP_BUILD_DIR/styles/main.css
-          # or outputs to $TEMP_BUILD_DIR/build/main.css
           (cd "$TEMP_BUILD_DIR" && make postprocess)
 
           echo "Copying processed files from temporary to target directory..."
           # Copy all contents from TEMP_BUILD_DIR to TARGET_DIR
-          # This will include your HTML files, processed CSS, JS, images etc.
+          # This assumes 'make postprocess' outputs to locations within TEMP_BUILD_DIR (e.g., TEMP_BUILD_DIR/build or modifies TEMP_BUILD_DIR/styles)
+          # and these are the files you want in your final site structure under TARGET_DIR.
           cp -R "$TEMP_BUILD_DIR"/* "$TARGET_DIR/"
-          # If 'make postprocess' creates a 'build' dir inside TEMP_BUILD_DIR with the final CSS,
-          # and your HTML links to e.g. 'build/main.css', then this cp -R should be correct.
-          # If 'make postprocess' modifies 'styles/main.css' in place, that's also fine.
 
           echo "Injecting <base href='$BASE_URL'> into HTML files..."
           find "$TARGET_DIR" -maxdepth 1 -name '*.html' -print0 | while IFS= read -r -d $'\\0' file; do
