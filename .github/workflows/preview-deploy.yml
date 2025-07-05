@@ -1,0 +1,74 @@
+# .github/workflows/preview-deploy.yml
+name: Deploy Preview
+
+on:
+  push:
+    branches-ignore:
+      - '2023' # Your main deployment branch
+      - 'main'   # Or whatever your default/development branch is, if not for previews
+
+jobs:
+  build-and-deploy:
+    name: Build and Deploy Preview
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read  # To checkout the code
+      pages: write     # To deploy to GitHub Pages
+      id-token: write  # To authenticate with GitHub Pages
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }} # Sets the deployment URL in the GitHub UI
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18' # Or your preferred version, npx is part of Node.js
+
+      - name: Install dependencies (if any beyond npx for postcss)
+        run: |
+          # If you had a package.json with postcss-cli and autoprefixer as devDependencies:
+          # npm install
+          # For now, assuming npx will fetch them or they are globally available
+          # Or, to be explicit with npx for postcss and autoprefixer:
+          npm install -g postcss-cli autoprefixer
+          # (Consider adding these to package.json devDependencies for better project setup)
+
+      - name: Build the site
+        run: |
+          mkdir -p _site # Standard directory for GitHub Pages artifacts
+          # Run your build process, outputting to _site
+          make postprocess # This command processes CSS files in place.
+          # We need to copy all necessary files to the _site directory.
+          # Assuming your site consists of HTML files, the processed CSS, images, scripts, etc.
+          cp index.html _site/
+          cp lab.html _site/
+          cp pattern-library.html _site/
+          cp resume.html _site/
+          cp work.html _site/
+          cp manifest.json _site/
+          cp sw.js _site/
+          cp favicon_*.png _site/
+          cp -R styles _site/ # Copy the processed styles
+          cp -R images _site/
+          cp -R scripts _site/
+          cp -R build _site/ # If build/main.css is the final output and not styles/main.css
+          # Adjust the cp commands above based on your actual project structure and build output.
+          # Specifically, ensure that the CSS processed by `make postprocess` (likely in styles/ or build/)
+          # is correctly copied to _site/styles or _site/build.
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './_site' # Directory containing files to deploy
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
