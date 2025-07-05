@@ -1,5 +1,5 @@
 # .github/workflows/preview-deploy.yml
-name: Deploy Preview
+name: Deploy Preview with Base URL
 
 on:
   push:
@@ -20,46 +20,91 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }} # Sets the deployment URL in the GitHub UI
 
+    env:
+      REPOSITORY_NAME: ${{ github.event.repository.name }} # Get repository name
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Get branch name
+        id: get_branch
+        run: |
+          BRANCH_NAME_RAW=$(echo \"${GITHUB_REF#refs/heads/}\")
+          # Sanitize branch name for URL/directory use (replace slashes, etc.)
+          BRANCH_NAME_SLUG=$(echo \"$BRANCH_NAME_RAW\" | sed 's|/|-|g' | sed 's|[^a-zA-Z0-9_-]||g')
+          echo \"branch_name_raw=$BRANCH_NAME_RAW\" >> $GITHUB_OUTPUT
+          echo \"branch_name_slug=$BRANCH_NAME_SLUG\" >> $GITHUB_OUTPUT
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18' # Or your preferred version, npx is part of Node.js
+          node-version: '18' # Or your preferred version
 
-      - name: Install dependencies (if any beyond npx for postcss)
+      - name: Install dependencies (postcss-cli & autoprefixer)
         run: |
-          # If you had a package.json with postcss-cli and autoprefixer as devDependencies:
-          # npm install
-          # For now, assuming npx will fetch them or they are globally available
-          # Or, to be explicit with npx for postcss and autoprefixer:
+          # Consider creating a package.json and using npm install
           npm install -g postcss-cli autoprefixer
-          # (Consider adding these to package.json devDependencies for better project setup)
 
-      - name: Build the site
+      - name: Build the site for subdirectory deployment with base URL
+        env:
+          BRANCH_SLUG: ${{ steps.get_branch.outputs.branch_name_slug }}
         run: |
-          mkdir -p _site # Standard directory for GitHub Pages artifacts
-          # Run your build process, outputting to _site
-          make postprocess # This command processes CSS files in place.
-          # We need to copy all necessary files to the _site directory.
-          # Assuming your site consists of HTML files, the processed CSS, images, scripts, etc.
-          cp index.html _site/
-          cp lab.html _site/
-          cp pattern-library.html _site/
-          cp resume.html _site/
-          cp work.html _site/
-          cp manifest.json _site/
-          cp sw.js _site/
-          cp favicon_*.png _site/
-          cp -R styles _site/ # Copy the processed styles
-          cp -R images _site/
-          cp -R scripts _site/
-          cp -R build _site/ # If build/main.css is the final output and not styles/main.css
-          # Adjust the cp commands above based on your actual project structure and build output.
-          # Specifically, ensure that the CSS processed by `make postprocess` (likely in styles/ or build/)
-          # is correctly copied to _site/styles or _site/build.
+          echo "Deploying branch: ${{ steps.get_branch.outputs.branch_name_raw }} as slug: $BRANCH_SLUG"
+
+          TARGET_DIR="_site/$BRANCH_SLUG"
+          mkdir -p "$TARGET_DIR"
+
+          # Define the base URL.
+          # Assumes your site is at https://<username>.github.io/<repository_name>/
+          BASE_URL="/${{ env.REPOSITORY_NAME }}/$BRANCH_SLUG/"
+          # If your site is at a custom domain root https://yourcustomdomain.com/, uncomment next line and comment one above
+          # BASE_URL="/$BRANCH_SLUG/"
+          echo "Using BASE_URL: $BASE_URL"
+
+          TEMP_BUILD_DIR="_temp_build"
+          mkdir -p "$TEMP_BUILD_DIR"
+
+          echo "Copying source files to temporary build directory..."
+          # Adjust this list to accurately reflect ALL source files and directories needed for the build and final site
+          # This includes HTML, JS, image sources, CSS sources (e.g., styles/), and anything else.
+          # Ensure that directories expected by 'make postprocess' (like 'styles/') are copied.
+          cp index.html lab.html pattern-library.html resume.html work.html manifest.json sw.js "$TEMP_BUILD_DIR/"
+          cp favicon_*.png "$TEMP_BUILD_DIR/"
+          # Copy directories; -T is useful if source is a dir and dest already exists, to copy contents
+          cp -R styles "$TEMP_BUILD_DIR/styles"
+          cp -R images "$TEMP_BUILD_DIR/images"
+          cp -R scripts "$TEMP_BUILD_DIR/scripts"
+          # If your `make postprocess` uses files from `build/` as source, copy it too.
+          # If `build/` is purely an output of `make postprocess`, this might not be needed here.
+          # cp -R build "$TEMP_BUILD_DIR/build"
+
+
+          echo "Running 'make postprocess' in temporary directory..."
+          # This assumes 'make postprocess' works on files within the CWD, e.g., modifies $TEMP_BUILD_DIR/styles/main.css
+          # or outputs to $TEMP_BUILD_DIR/build/main.css
+          (cd "$TEMP_BUILD_DIR" && make postprocess)
+
+          echo "Copying processed files from temporary to target directory..."
+          # Copy all contents from TEMP_BUILD_DIR to TARGET_DIR
+          # This will include your HTML files, processed CSS, JS, images etc.
+          cp -R "$TEMP_BUILD_DIR"/* "$TARGET_DIR/"
+          # If 'make postprocess' creates a 'build' dir inside TEMP_BUILD_DIR with the final CSS,
+          # and your HTML links to e.g. 'build/main.css', then this cp -R should be correct.
+          # If 'make postprocess' modifies 'styles/main.css' in place, that's also fine.
+
+          echo "Injecting <base href='$BASE_URL'> into HTML files..."
+          find "$TARGET_DIR" -maxdepth 1 -name '*.html' -print0 | while IFS= read -r -d $'\\0' file; do
+            if grep -q '<head.*>' "$file"; then
+              sed -i "s|<head.*>|&<base href='$BASE_URL'>|" "$file"
+              echo "Injected base tag in $file"
+            else
+              echo "WARNING: No <head> tag found in $file. Cannot inject base tag."
+            fi
+          done
+
+          echo "Cleaning up temporary build directory..."
+          rm -rf "$TEMP_BUILD_DIR"
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
@@ -67,7 +112,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './_site' # Directory containing files to deploy
+          path: './_site'
 
       - name: Deploy to GitHub Pages
         id: deployment
