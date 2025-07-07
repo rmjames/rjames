@@ -23,6 +23,27 @@
   animation: fade-in .4s, move-up .36s;
 }
 
+/* Active navigation link style */
+nav ul li a.active {
+  border-bottom: 2px solid #fb805b; /* Orange color from email icon */
+  padding-bottom: 2px; /* Adjust as needed */
+}
+
+/* View transition for the active nav link border */
+::view-transition-old(active-nav-link),
+::view-transition-new(active-nav-link) {
+  animation-duration: 0.25s; /* Adjust timing as needed */
+  animation-timing-function: ease-in-out;
+}
+/* We only want to transition the border, so make the old and new text content invisible during transition */
+::view-transition-old(active-nav-link) {
+  /* No specific rules needed for the old state if default exit is fine */
+}
+::view-transition-new(active-nav-link) {
+  /* No specific rules needed for the new state if default entry is fine */
+}
+
+
 @keyframes link-click {
   0%, 100% {
     transform: scale(1);
