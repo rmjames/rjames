@@ -244,8 +244,35 @@ h1 {
   margin-block-end: 0.3rem;
 }
 
-nav li > a {
+header nav li a { /* Changed selector */
   filter: drop-shadow(.5px .5px 1px var(--text-shadow));
+  position: relative; /* For border positioning */
+  padding-bottom: 5px; /* Space for the border */
+}
+
+header nav li a::after { /* Changed selector */
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2px; /* Border thickness */
+  background-color: var(--orange-3); /* Changed to --orange-3 */
+  width: 0; /* Initial width */
+  transition: width 0.5s ease-in-out; /* Animation */
+}
+
+header nav li a.animate-border-in::after { /* Changed selector */
+  width: 100%;
+}
+
+header nav li a.animate-border-out::after { /* Changed selector */
+  width: 0%;
+}
+
+/* Helper class to instantaneously set border to full width */
+header nav li a.force-border-full::after { /* Changed selector */
+  width: 100%;
+  transition: none; /* No transition when applying this class */
 }
 
 main { margin: auto; }
