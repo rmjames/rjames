@@ -3,13 +3,15 @@ const OFFLINE = 'offline.html';
 
 const assetsToCache = [
   '/index.html',
-  '/styleguide.html',
   '/work.html',
+  '/resume.html',
+  '/lab.html',
   '/styles/main.css',
-  '/scripts/index.js',
+  '/styles/mpa.css',
+  '/scripts/nav-transitions.js',
   '/images/icon.svg',
-  '/images/icon-ios.svg',
-  '/sw.js'
+  '/images/favicon.svg',
+  '/manifest.json'
 ];
 
 self.addEventListener('install', event => {
