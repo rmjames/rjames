@@ -1,4 +1,73 @@
-<svg width="192" height="192" viewbox='0 0 192 192'>
+<!-- <svg width="192" height="192" viewbox='0 0 192 192'>
   <circle cx="96" cy="96" r="96" fill="hsl(0 0% 20%)"/>
   <circle cx="96" cy="96" r="48"  fill="hsl(0 0% 20%)" stroke='orange' stroke-width='8'/>
+</svg> -->
+
+
+
+<svg width="192" height="192" viewbox='0 0 192 192'>
+  <def>
+    <filter id="displacementFilter">
+      <feTurbulence
+        type="turbulence"
+        baseFrequency="0.105"
+        numOctaves="48"
+        result="turbulence"
+        stitchTiles='stich'
+        seed='48'/> 
+      <feDisplacementMap
+        in2="turbulence"
+        in="SourceGraphic"
+        scale="48"
+        xChannelSelector="R"
+        yChannelSelector="G" />
+      <feTurbulence
+        id='anim-turb'
+        type="turbulence"
+        baseFrequency="0.0195 0.195"
+        numOctaves="82"
+        result="turbulence"
+        seed='24'
+        stitchTiles='stich'/>   
+      <feDisplacementMap
+        in2="turbulence"
+        in="SourceGraphic"
+        id="anim-scale"
+        scale="48"
+        xChannelSelector="R"
+        yChannelSelector="G" />
+    </filter> 
+    
+    <animate 
+      xlink:href="#anim-scale"
+      id="anim-dialiate" 
+      attributeName="scale"
+      values="8;16;8"
+      dur="32s"
+      repeatCount='indefinite'
+      fill="freeze"
+    />
+
+    <animate 
+      xlink:href="#anim-turb"
+      id="anim-turb" 
+      attributeName="numOctaves"
+      values="4;8;4"
+      dur="32s"
+      repeatCount='indefinite'
+      fill="freeze"
+    />
+    
+    <animate 
+      xlink:href="#anim-turb"
+      id="anim-turb" 
+      attributeName="baseFrequency"
+      values="0.0195 0.196;.019 .048;0.0195 0.196"
+      dur="32s"
+      repeatCount="indefinite" 
+      fill="freeze"
+    />
+  </def>
+  <circle cx="64" cy="64" r="64" fill="hsl(0 0% 20%)" filter='url(#displacementFilter)'/>
+  <circle cx="64" cy="64" r="52" fill="hsl(0 0% 20%)" stroke='hsl(36 92% 52%)' stroke-width='4' filter='url(#displacementFilter)'/>
 </svg>
