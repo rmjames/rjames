@@ -506,7 +506,7 @@ details {
 
 @keyframes enter {
   from { opacity: 0; }
-  to { opaity: 1; }
+  to { opacity: 1; }
 }
 
 @keyframes rotate-gradient {
