@@ -26,15 +26,15 @@
     ],
     "shortcuts": [
         {
-          "name": "Pattern Library",
-          "description": "Styleguide for portfolio",
-          "url": "./pattern-library.html"
-        },
-        {
           "name": "Work",
           "description": "Page displaying past or current work",
           "url": "./work.html"
-          }
+        },
+        {
+          "name": "Resume",
+          "description": "Professional resume and experience",
+          "url": "./resume.html"
+        }
     ],
     "share_target": {
     "action": "/index.html",
