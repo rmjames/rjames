@@ -5,7 +5,7 @@ on:
   # Runs on pushes targeting the deploy branch and feature branches
   push:
     branches: 
-    - "2023"
+    - '2023'
     - 'feature/**'
     - 'feat/**'
     - 'hotfix/**'
@@ -13,7 +13,7 @@ on:
 
   pull_request:
     branches:
-    - "2023"
+    - '2023'
     - 'feature/**'
     - 'feat/**'
     - 'hotfix/**'
@@ -50,11 +50,13 @@ jobs:
         
       - name: Copy source files to build directory
         run: |
-          # Copy only necessary files
-          find . -maxdepth 1 -name "*.html" -o -name "*.css" -o -name "*.js" | xargs -I {} cp {} build/
-          # Copy asset directories if they exist
-          [ -d assets ] && cp -r assets build/ || true
-          [ -d images ] && cp -r images build/ || true
+          # Copy HTML, CSS, and JS files from all subdirectories
+          find . -name "*.html" -o -name "*.css" -o -name "*.js" | while read file; do
+            # Create directory structure in build
+            dir=$(dirname "$file" | sed 's|^\./||')
+            mkdir -p "build/$dir"
+            cp "$file" "build/$file"
+          done
 
       - name: Setup Node.js
         uses: actions/setup-node@5e21ff4d9bc1a8cf6de233a3057d20ec6b3fb69d # v4.0.3
@@ -98,31 +100,52 @@ jobs:
       - name: Enhanced validation
         run: |
           # Check that minified files exist, are not empty, and are valid
-          echo "Validating minified CSS files..."
-          for file in $(find build -name '*.min.css'); do
-            if [ ! -s "$file" ]; then
-              echo "Error: $file is empty"
-              exit 1
-            fi
-            # Basic CSS syntax validation
-            if ! grep -q '{' "$file" || ! grep -q '}' "$file"; then
-              echo "Warning: $file may not be valid CSS"
+          total_original_size=0
+          total_minified_size=0
+          
+          echo "Validating and measuring minified CSS files..."
+          for original in $(find build -name '*.css' -not -name '*.min.css'); do
+            minified="${original%.css}.min.css"
+            if [ -f "$minified" ]; then
+              if [ ! -s "$minified" ]; then
+                echo "Error: $minified is empty"
+                exit 1
+              fi
+              # Basic CSS syntax validation
+              if ! grep -q '{' "$minified" || ! grep -q '}' "$minified"; then
+                echo "Warning: $minified may not be valid CSS"
+              fi
+              # Size comparison
+              orig_size=$(wc -c < "$original")
+              min_size=$(wc -c < "$minified")
+              total_original_size=$((total_original_size + orig_size))
+              total_minified_size=$((total_minified_size + min_size))
+              echo "CSS: $original ($orig_size bytes) -> $minified ($min_size bytes)"
             fi
           done
           
-          echo "Validating minified JS files..."
-          for file in $(find build -name '*.min.js'); do
-            if [ ! -s "$file" ]; then
-              echo "Error: $file is empty"
-              exit 1
-            fi
-            # Basic JS validation - check for common syntax elements
-            if [ ! -s "$file" ] || ([ $(wc -c < "$file") -lt 10 ]); then
-              echo "Warning: $file appears to be too small or empty"
+          echo "Validating and measuring minified JS files..."
+          for original in $(find build -name '*.js' -not -name '*.min.js'); do
+            minified="${original%.js}.min.js"
+            if [ -f "$minified" ]; then
+              if [ ! -s "$minified" ]; then
+                echo "Error: $minified is empty"
+                exit 1
+              fi
+              # Basic JS validation
+              if [ $(wc -c < "$minified") -lt 10 ]; then
+                echo "Warning: $minified appears to be too small"
+              fi
+              # Size comparison
+              orig_size=$(wc -c < "$original")
+              min_size=$(wc -c < "$minified")
+              total_original_size=$((total_original_size + orig_size))
+              total_minified_size=$((total_minified_size + min_size))
+              echo "JS: $original ($orig_size bytes) -> $minified ($min_size bytes)"
             fi
           done
           
-          echo "Validating HTML files..."
+          echo "Validating HTML files and measuring size reduction..."
           for file in $(find build -name '*.html'); do
             if [ ! -s "$file" ]; then
               echo "Error: $file is empty"
@@ -132,7 +155,22 @@ jobs:
             if ! grep -q '<html' "$file" && ! grep -q '<!DOCTYPE' "$file"; then
               echo "Warning: $file may not be valid HTML"
             fi
+            # Note: HTML files are minified in place, so we show post-minification size
+            html_size=$(wc -c < "$file")
+            echo "HTML: $file ($html_size bytes after minification)"
           done
+          
+          # Calculate and display size reduction for CSS/JS
+          if [ $total_original_size -gt 0 ]; then
+            reduction=$((total_original_size - total_minified_size))
+            percentage=$((reduction * 100 / total_original_size))
+            echo "================================================"
+            echo "CSS/JS Size Reduction Summary:"
+            echo "Original size: $total_original_size bytes"
+            echo "Minified size: $total_minified_size bytes"
+            echo "Reduction: $reduction bytes ($percentage%)"
+            echo "================================================"
+          fi
           
           # Verify HTML files reference minified assets
           if find build -name '*.html' -exec grep -l '\.css\|\.js' {} \; | head -1 | xargs grep -q '\.min\.'; then
@@ -145,8 +183,11 @@ jobs:
 
       - name: Update HTML links to point to minified files
         run: |
-          # Update CSS and JS links in HTML files to point to minified versions
-          find build -name "*.html" -type f -exec sed -i 's/\.css/.min.css/g; s/\.js/.min.js/g' {} \;
+          # Update CSS and JS links in HTML files to point to minified versions (local files only)
+          find build -name '*.html' -type f -exec sed -i \
+            -e 's/\(<link[^>]*href="\)\([^"]*\.css\)\("/\)/\1\2.min\3/g' \
+            -e 's/\(<script[^>]*src="\)\([^"]*\.js\)\("/\)/\1\2.min\3/g' \
+            {} \;
         
       - name: Setup Pages
         uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5.0.0
