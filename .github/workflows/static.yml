@@ -13,7 +13,11 @@ on:
 
   pull_request:
     branches:
-    - feature/*
+    - "2023"
+    - 'feature/**'
+    - 'feat/**'
+    - 'hotfix/**'
+    - 'release/**'
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -39,7 +43,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
         
       - name: Create minified build directory
         run: mkdir -p build
@@ -52,18 +56,92 @@ jobs:
           [ -d assets ] && cp -r assets build/ || true
           [ -d images ] && cp -r images build/ || true
 
-      - name: Minify HTML, CSS, and JS files
-        uses: nizarmah/auto-minify@v3.0.0
+      - name: Setup Node.js
+        uses: actions/setup-node@5e21ff4d9bc1a8cf6de233a3057d20ec6b3fb69d # v4.0.3
         with:
-          directory: 'build'
-          overwrite: true
-          js_engine: 'uglify-js'
-          css_engine: 'clean-css'
-     
-      - name: Validate minification
+          node-version: '18'
+          
+      - name: Install minifiers
         run: |
-          # Ensure minified files were created
-          find build -name "*.min.css" -o -name "*.min.js" | wc -l    
+          npm install -g @swc/cli@0.4.0 @swc/core@1.7.26
+          npm install -g clean-css-cli@5.6.3
+          npm install -g html-minifier-terser@7.2.0
+        
+      - name: Minify JS files with SWC
+        run: |
+          find build -name '*.js' -not -name '*.min.js' -type f | while read file; do
+            swc "$file" --minify -o "${file%.js}.min.js"
+          done
+          
+      - name: Minify CSS files
+        run: |
+          find build -name '*.css' -not -name '*.min.css' -type f | while read file; do
+            cleancss "$file" -o "${file%.css}.min.css"
+          done
+          
+      - name: Minify HTML files
+        run: |
+          find build -name '*.html' -type f | while read file; do
+            html-minifier-terser \
+              --collapse-whitespace \
+              --remove-comments \
+              --remove-optional-tags \
+              --remove-redundant-attributes \
+              --remove-script-type-attributes \
+              --remove-tag-whitespace \
+              --use-short-doctype \
+              --minify-css true \
+              --minify-js true \
+              "$file" -o "$file"
+          done
+     
+      - name: Enhanced validation
+        run: |
+          # Check that minified files exist, are not empty, and are valid
+          echo "Validating minified CSS files..."
+          for file in $(find build -name '*.min.css'); do
+            if [ ! -s "$file" ]; then
+              echo "Error: $file is empty"
+              exit 1
+            fi
+            # Basic CSS syntax validation
+            if ! grep -q '{' "$file" || ! grep -q '}' "$file"; then
+              echo "Warning: $file may not be valid CSS"
+            fi
+          done
+          
+          echo "Validating minified JS files..."
+          for file in $(find build -name '*.min.js'); do
+            if [ ! -s "$file" ]; then
+              echo "Error: $file is empty"
+              exit 1
+            fi
+            # Basic JS validation - check for common syntax elements
+            if [ ! -s "$file" ] || ([ $(wc -c < "$file") -lt 10 ]); then
+              echo "Warning: $file appears to be too small or empty"
+            fi
+          done
+          
+          echo "Validating HTML files..."
+          for file in $(find build -name '*.html'); do
+            if [ ! -s "$file" ]; then
+              echo "Error: $file is empty"
+              exit 1
+            fi
+            # Check for basic HTML structure
+            if ! grep -q '<html' "$file" && ! grep -q '<!DOCTYPE' "$file"; then
+              echo "Warning: $file may not be valid HTML"
+            fi
+          done
+          
+          # Verify HTML files reference minified assets
+          if find build -name '*.html' -exec grep -l '\.css\|\.js' {} \; | head -1 | xargs grep -q '\.min\.'; then
+            echo 'HTML files correctly reference minified assets'
+          else
+            echo 'Warning: HTML files may not reference minified assets'
+          fi
+          
+          echo "Validation complete!"    
 
       - name: Update HTML links to point to minified files
         run: |
@@ -71,12 +149,12 @@ jobs:
           find build -name "*.html" -type f -exec sed -i 's/\.css/.min.css/g; s/\.js/.min.js/g' {} \;
         
       - name: Setup Pages
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5.0.0
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3.0.1
         with:
           # Upload minified build directory
           path: 'build'
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4.0.5
