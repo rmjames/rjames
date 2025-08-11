@@ -36,13 +36,33 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        
+      - name: Create minified build directory
+        run: mkdir -p build
+        
+      - name: Copy source files to build directory
+        run: cp -r . build/
+        
+      - name: Minify HTML, CSS, and JS files
+        uses: nizarmah/auto-minify@v3.0.0
+        with:
+          directory: 'build'
+          overwrite: true
+          js_engine: 'uglify-js'
+          css_engine: 'clean-css'
+          
+      - name: Update HTML links to point to minified files
+        run: |
+          # Update CSS and JS links in HTML files to point to minified versions
+          find build -name "*.html" -type f -exec sed -i 's/\.css/.min.css/g; s/\.js/.min.js/g' {} \;
+        
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # Upload entire repository
-          path: '.'
+          # Upload minified build directory
+          path: 'build'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
