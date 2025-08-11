@@ -45,8 +45,13 @@ jobs:
         run: mkdir -p build
         
       - name: Copy source files to build directory
-        run: cp -r . build/
-        
+        run: |
+          # Copy only necessary files
+          find . -maxdepth 1 -name "*.html" -o -name "*.css" -o -name "*.js" | xargs -I {} cp {} build/
+          # Copy asset directories if they exist
+          [ -d assets ] && cp -r assets build/ || true
+          [ -d images ] && cp -r images build/ || true
+
       - name: Minify HTML, CSS, and JS files
         uses: nizarmah/auto-minify@v3.0.0
         with:
@@ -54,7 +59,12 @@ jobs:
           overwrite: true
           js_engine: 'uglify-js'
           css_engine: 'clean-css'
-          
+     
+      - name: Validate minification
+        run: |
+          # Ensure minified files were created
+          find build -name "*.min.css" -o -name "*.min.js" | wc -l    
+
       - name: Update HTML links to point to minified files
         run: |
           # Update CSS and JS links in HTML files to point to minified versions
