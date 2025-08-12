@@ -42,28 +42,16 @@ jobs:
         
       - name: Copy source files to build directory
         run: |
-          # Verify source files exist before processing
-          if ! find . -name "*.html" -o -name "*.css" -o -name "*.js" | grep -q .; then
-            echo "Warning: No HTML, CSS, or JS files found to process"
-            exit 1
-          fi
-          
-          # Copy HTML, CSS, and JS files from all subdirectories
           find . -name "*.html" -o -name "*.css" -o -name "*.js" | while read file; do
-            # Skip files in excluded directories
             if echo "$file" | grep -E '(\./build/|\./node_modules/|\./\.git/)' >/dev/null; then
               continue
             fi
             
-            # Create directory structure in build
-            dir=$(dirname "$file" | sed 's|^\./||')
-            mkdir -p "build/$dir"
-            cp "$file" "build/$file"
-          done
-          
-          # Verify files were copied successfully
-          copied_count=$(find build -name "*.html" -o -name "*.css" -o -name "*.js" | wc -l)
-          echo "Successfully copied $copied_count files to build directory"
+            # Remove leading ./ and copy correctly
+            clean_path="${file#./}"
+            mkdir -p "build/$(dirname "$clean_path")"
+            cp "$file" "build/$clean_path"  # ✅ Fixed
+          done  
 
       - name: Setup Node.js
         uses: actions/setup-node@5e21ff4d9bc1a8cf6de233a3057d20ec6b3fb69d # v4.0.3
@@ -202,15 +190,17 @@ jobs:
           
           echo "Validation complete!"    
 
-      - name: Update HTML links to point to minified files
-        run: |
-          # Update CSS and JS links in HTML files to point to minified versions (local files only, exclude external URLs)
-          # Using patterns from minify-patterns.txt for maintainability
-          find build -name '*.html' -type f -exec sed -i \
-            -e 's/\(<link[^>]*href="\)\([^"]*[^/]\.css\)\("[^>]*>\)/\1\2.min\3/g' \
-            -e '/href="http/!s/\(<link[^>]*href="\)\([^"]*\.css\)\("/\)/\1\2.min\3/g' \
-            -e '/src="http/!s/\(<script[^>]*src="\)\([^"]*\.js\)\("/\)/\1\2.min\3/g' \
-            {} \;
+          - name: Update HTML links to point to minified files
+          run: |
+            # Fix CSS links - handle subdirectories correctly
+            find build -name '*.html' -type f -exec sed -i \
+              -e '/href="https\?:\/\//!s/\(href="[^"]*\)\.css"/\1.min.css"/g' \
+              {} \;
+            
+            # Fix JS links - handle subdirectories correctly  
+            find build -name '*.html' -type f -exec sed -i \
+              -e '/src="https\?:\/\//!s/\(src="[^"]*\)\.js"/\1.min.js"/g' \
+              {} \;
         
       - name: Setup Pages
         uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5.0.0
