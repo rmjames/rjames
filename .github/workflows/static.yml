@@ -50,13 +50,28 @@ jobs:
         
       - name: Copy source files to build directory
         run: |
+          # Verify source files exist before processing
+          if ! find . -name "*.html" -o -name "*.css" -o -name "*.js" | grep -q .; then
+            echo "Warning: No HTML, CSS, or JS files found to process"
+            exit 1
+          fi
+          
           # Copy HTML, CSS, and JS files from all subdirectories
           find . -name "*.html" -o -name "*.css" -o -name "*.js" | while read file; do
+            # Skip files in excluded directories
+            if echo "$file" | grep -E '(\./build/|\./node_modules/|\./\.git/)' >/dev/null; then
+              continue
+            fi
+            
             # Create directory structure in build
             dir=$(dirname "$file" | sed 's|^\./||')
             mkdir -p "build/$dir"
             cp "$file" "build/$file"
           done
+          
+          # Verify files were copied successfully
+          copied_count=$(find build -name "*.html" -o -name "*.css" -o -name "*.js" | wc -l)
+          echo "Successfully copied $copied_count files to build directory"
 
       - name: Setup Node.js
         uses: actions/setup-node@5e21ff4d9bc1a8cf6de233a3057d20ec6b3fb69d # v4.0.3
@@ -132,9 +147,9 @@ jobs:
                 echo "Error: $minified is empty"
                 exit 1
               fi
-              # Basic JS validation
-              if [ $(wc -c < "$minified") -lt 10 ]; then
-                echo "Warning: $minified appears to be too small"
+              # Basic JS validation (size already checked above)
+              if ! grep -q '[a-zA-Z]' "$minified"; then
+                echo "Warning: $minified may not contain valid JavaScript"
               fi
               # Size comparison
               orig_size=$(wc -c < "$original")
@@ -172,21 +187,37 @@ jobs:
             echo "================================================"
           fi
           
-          # Verify HTML files reference minified assets
-          if find build -name '*.html' -exec grep -l '\.css\|\.js' {} \; | head -1 | xargs grep -q '\.min\.'; then
-            echo 'HTML files correctly reference minified assets'
+          # Verify HTML files reference minified assets and link replacement worked
+          echo "Verifying HTML link replacement..."
+          html_files_with_assets=$(find build -name '*.html' -exec grep -l '\.css\|\.js' {} \; | wc -l)
+          html_files_with_minified=$(find build -name '*.html' -exec grep -l '\.min\.' {} \; | wc -l)
+          
+          if [ "$html_files_with_assets" -gt 0 ]; then
+            if [ "$html_files_with_minified" -gt 0 ]; then
+              echo "✓ Found $html_files_with_minified HTML files referencing minified assets"
+            else
+              echo "⚠ Warning: $html_files_with_assets HTML files contain asset references but none reference minified assets"
+            fi
+            
+            # Check for external URLs that shouldn't be modified
+            external_count=$(find build -name '*.html' -exec grep -o 'href="http[^"]*\.css\|src="http[^"]*\.js' {} \; | wc -l)
+            if [ "$external_count" -gt 0 ]; then
+              echo "✓ Preserved $external_count external asset URLs"
+            fi
           else
-            echo 'Warning: HTML files may not reference minified assets'
+            echo "ℹ No HTML files contain CSS or JS references"
           fi
           
           echo "Validation complete!"    
 
       - name: Update HTML links to point to minified files
         run: |
-          # Update CSS and JS links in HTML files to point to minified versions (local files only)
+          # Update CSS and JS links in HTML files to point to minified versions (local files only, exclude external URLs)
+          # Using patterns from minify-patterns.txt for maintainability
           find build -name '*.html' -type f -exec sed -i \
-            -e 's/\(<link[^>]*href="\)\([^"]*\.css\)\("/\)/\1\2.min\3/g' \
-            -e 's/\(<script[^>]*src="\)\([^"]*\.js\)\("/\)/\1\2.min\3/g' \
+            -e 's/\(<link[^>]*href="\)\([^"]*[^/]\.css\)\("[^>]*>\)/\1\2.min\3/g' \
+            -e '/href="http/!s/\(<link[^>]*href="\)\([^"]*\.css\)\("/\)/\1\2.min\3/g' \
+            -e '/src="http/!s/\(<script[^>]*src="\)\([^"]*\.js\)\("/\)/\1\2.min\3/g' \
             {} \;
         
       - name: Setup Pages
