@@ -91,7 +91,19 @@ jobs:
               --minify-js true \
               "$file" -o "$file"
           done
-     
+  
+      - name: Update HTML links to point to minified files
+        run: |
+          # Fix CSS links - handle subdirectories correctly
+          find build -name '*.html' -type f -exec sed -i \
+            -e '/href="https\?:\/\//!s/\(href="[^"]*\)\.css"/\1.min.css"/g' \
+            {} \;
+          
+          # Fix JS links - handle subdirectories correctly  
+          find build -name '*.html' -type f -exec sed -i \
+            -e '/src="https\?:\/\//!s/\(src="[^"]*\)\.js"/\1.min.js"/g' \
+            {} \;
+                
       - name: Enhanced validation
         run: |
           # Check that minified files exist, are not empty, and are valid
@@ -189,18 +201,6 @@ jobs:
           fi
           
           echo "Validation complete!"    
-
-          - name: Update HTML links to point to minified files
-          run: |
-            # Fix CSS links - handle subdirectories correctly
-            find build -name '*.html' -type f -exec sed -i \
-              -e '/href="https\?:\/\//!s/\(href="[^"]*\)\.css"/\1.min.css"/g' \
-              {} \;
-            
-            # Fix JS links - handle subdirectories correctly  
-            find build -name '*.html' -type f -exec sed -i \
-              -e '/src="https\?:\/\//!s/\(src="[^"]*\)\.js"/\1.min.js"/g' \
-              {} \;
         
       - name: Setup Pages
         uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5.0.0
