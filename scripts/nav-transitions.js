@@ -1,22 +1,22 @@
 // scripts/nav-transitions.js
+
+export const pagePaths = {
+  work: ['/work.html'],
+  resume: ['/resume.html']
+};
+
+export function getPageKey(path) {
+  for (const key in pagePaths) {
+    if (pagePaths[key].includes(path)) {
+      return key;
+    }
+  }
+  return null;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   const navLinks = document.querySelectorAll('header nav ul li a');
   const currentPath = window.location.pathname.endsWith('/') && window.location.pathname.length > 1 ? window.location.pathname.slice(0, -1) : window.location.pathname;
-
-  const pagePaths = {
-    home: ['', '/', '/index.html'], // Added '' for root path
-    work: ['/work.html'],
-    resume: ['/resume.html']
-  };
-
-  function getPageKey(path) {
-    for (const key in pagePaths) {
-      if (pagePaths[key].includes(path)) {
-        return key;
-      }
-    }
-    return null;
-  }
 
   const currentPageKey = getPageKey(currentPath);
 
@@ -62,20 +62,12 @@ document.addEventListener('DOMContentLoaded', () => {
       // Logic for border animation on the CLICKED link
       let animateOut = false;
 
-      // From Home to Work or Resume
-      if (currentPageKey === 'home' && (targetPageKey === 'work' || targetPageKey === 'resume')) {
-        link.classList.add('animate-border-in');
-      }
       // From Work to Resume
-      else if (currentPageKey === 'work' && targetPageKey === 'resume') {
+      if (currentPageKey === 'work' && targetPageKey === 'resume') {
         link.classList.add('animate-border-in');
       }
-      // From Resume to Work or Home
-      else if (currentPageKey === 'resume' && (targetPageKey === 'work' || targetPageKey === 'home')) {
-        animateOut = true;
-      }
-      // From Work to Home
-      else if (currentPageKey === 'work' && targetPageKey === 'home') {
+      // From Resume to Work
+      else if (currentPageKey === 'resume' && targetPageKey === 'work') {
         animateOut = true;
       }
 
