@@ -72,4 +72,44 @@ document.addEventListener('DOMContentLoaded', () => {
       gtag('event', 'click', eventData);
     }
   });
+
+  // Track brand interactions
+  const brands = document.querySelectorAll('.brand');
+  brands.forEach(brand => {
+    brand.addEventListener('click', () => {
+      const eventData = {
+        event_category: 'Brand Interaction',
+        event_label: `Click - ${brand.textContent.trim()}`,
+        transport_type: 'beacon'
+      };
+      console.log('Sending GA event for brand click:', eventData);
+      gtag('event', 'click', eventData);
+    });
+
+    brand.addEventListener('mouseenter', () => {
+      const eventData = {
+        event_category: 'Brand Interaction',
+        event_label: `Hover - ${brand.textContent.trim()}`,
+        non_interaction: true
+      };
+      console.log('Sending GA event for brand hover:', eventData);
+      gtag('event', 'mouseover', eventData);
+    });
+  });
+
+  // Track popover engagement
+  const popovers = document.querySelectorAll('[popover]');
+  popovers.forEach(popover => {
+    popover.addEventListener('toggle', () => {
+      if (popover.matches(':popover-open')) {
+        const eventData = {
+          event_category: 'Popover Engagement',
+          event_label: `View - ${popover.id}`,
+          non_interaction: true
+        };
+        console.log('Sending GA event for popover view:', eventData);
+        gtag('event', 'view_item', eventData);
+      }
+    });
+  });
 });
