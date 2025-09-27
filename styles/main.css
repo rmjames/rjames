@@ -289,30 +289,26 @@ header nav li a {
 }
 
 header nav li a::after {
-    /* Changed selector */
     content: "";
     position: absolute;
     bottom: 0;
     left: 0;
-    height: 2px; /* Border thickness */
-    background-color: var(--orange-3); /* Changed to --orange-3 */
+    height: 2px;
+    background-color: var(--orange-3);
     width: 0; /* Initial width */
-    transition: width 0.5s ease-in-out; /* Animation */
+    transition: width 0.5s ease-in-out;
 }
 
 header nav li a.animate-border-in::after {
-    /* Changed selector */
     width: 100%;
 }
 
 header nav li a.animate-border-out::after {
-    /* Changed selector */
     width: 0%;
 }
 
 /* Helper class to instantaneously set border to full width */
 header nav li a.force-border-full::after {
-    /* Changed selector */
     width: 100%;
     transition: none; /* No transition when applying this class */
 }
@@ -424,7 +420,6 @@ main {
         inset-block-start: 116%;
         inset-inline-start: 4%;
         inset-inline-end: 4%;
-        /*transform: translateX(-50%);*/
     }
 }
 
@@ -541,7 +536,6 @@ main {
     margin-block-end: 0.3rem;
 }
 
-/*resume */
 .resume-container {
     inline-size: clamp(32vmin, 36rem, 64vmin);
 }
@@ -663,28 +657,6 @@ details {
     padding-block-start: var(--l);
 }
 
-@keyframes slide-down {
-    from {
-        opacity: 0;
-        transform: translateY(0.75rem);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes slide-up {
-    from {
-        opacity: 1;
-        transform: translateY(0);
-    }
-    to {
-        opacity: 0;
-        transform: translateY(0.75rem);
-    }
-}
-
 @keyframes enter {
     from {
         opacity: 0;
@@ -735,5 +707,4 @@ details {
     initial-value: 10%;
     inherits: false;
 }
-
 /*# sourceMappingURL=main.css.map */
