@@ -127,6 +127,7 @@ body > * + * {
     --orange-2: hsl(38.8 100% 50%);
     --orange-3: hsl(13.9 95.2% 67.1%);
     --orange-4: #777;
+    --border-radius: var(--xs);
     --color-brand: hsl(200 11% 48%);
     --text-color: hsl(200 8% 16%);
     --text-shadow: var(--orange-1);
@@ -178,11 +179,9 @@ body > * + * {
         "wght" var(--recursive-wght);
 }
 
-:focus {
+:where(:focus, :focus-visible) {
     outline: 1px solid var(--orange-1);
-}
-:focus-visible {
-    outline: 1px solid var(--orange-1);
+    border-radius: var(--border-radius);
 }
 
 :where(:any-link, :-webkit-any-link) {
@@ -352,21 +351,29 @@ main {
     font-weight: 550;
     color: var(--gray-2);
     transition:
-        opacity 0.2s,
+        color 0.12s,
         font-weight 0.26s,
-        outline 0.24s;
+        opacity 0.2s,
+        outline 0.2s;
     cursor: pointer;
     background: none;
     border: none;
     padding: 0;
     font: inherit;
     text-decoration: none;
-    &:hover {
+    &:hover,
+    &:focus,
+    &:active,
+    &:target {
         opacity: 0.5;
         font-weight: 850;
         outline: 1px solid var(--orange-2);
-        outline-offset: 2px;
-        border-radius: 4px;
+        border-radius: var(--border-radius);
+    }
+    &:active,
+    &:target {
+        color: var(--white-1);
+        outline-width: 2px;
     }
 }
 
@@ -374,9 +381,9 @@ main {
     position: absolute;
     background: var(--bkgnd);
     border: 1px solid var(--orange-2);
-    border-radius: 4px;
+    border-radius: var(--border-radius);
     padding: 1rem;
-    max-width: calc(var(--xxxl) * 10);
+    inline-size: min(80%, 480px);
     font-size: 0.9rem;
     line-height: 1.4;
     transition:
@@ -407,7 +414,7 @@ main {
 
     .company-popover[popover] {
         position-anchor: --work-anchor;
-        inset-block-start: calc(anchor(bottom) - 36rem);
+        inset-block-start: calc(anchor(top) - 36vh);
     }
 }
 
@@ -417,9 +424,9 @@ main {
     }
 
     .company-popover {
-        inset-block-start: 116%;
-        inset-inline-start: 4%;
-        inset-inline-end: 4%;
+        inset-block-start: 126%;
+        inset-inline-start: 8%;
+        inset-inline-end: 8%;
     }
 }
 
