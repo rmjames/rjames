@@ -414,7 +414,7 @@ main {
 
     .company-popover[popover] {
         position-anchor: --work-anchor;
-        inset-block-start: calc((anchor(top) - 36vh));
+        inset-block-start: calc(anchor(top) - 36vh);
     }
 }
 
@@ -425,6 +425,8 @@ main {
 
     .company-popover {
         inset-block-start: 126%;
+        inset-inline-start: 8%;
+        inset-inline-end: 8%;
     }
 }
 
