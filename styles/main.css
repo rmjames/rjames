@@ -383,7 +383,7 @@ main {
     border: 1px solid var(--orange-2);
     border-radius: var(--border-radius);
     padding: 1rem;
-    max-width: calc(var(--xxxl) * 10);
+    inline-size: min(80%, 480px);
     font-size: 0.9rem;
     line-height: 1.4;
     transition:
@@ -414,7 +414,7 @@ main {
 
     .company-popover[popover] {
         position-anchor: --work-anchor;
-        inset-block-start: calc(anchor(bottom) - 36rem);
+        inset-block-start: calc((anchor(top) - 36vh));
     }
 }
 
@@ -424,9 +424,7 @@ main {
     }
 
     .company-popover {
-        inset-block-start: 116%;
-        inset-inline-start: 4%;
-        inset-inline-end: 4%;
+        inset-block-start: 126%;
     }
 }
 
