@@ -351,7 +351,7 @@ main {
     font-weight: 550;
     color: var(--gray-2);
     transition:
-        color 0.12s,
+        color 0.1s,
         font-weight 0.26s,
         opacity 0.2s,
         outline 0.2s;
@@ -364,7 +364,8 @@ main {
     &:hover,
     &:focus,
     &:active,
-    &:target {
+    &:target,
+    &:focus-within {
         opacity: 0.5;
         font-weight: 850;
         outline: 1px solid var(--orange-2);
@@ -414,7 +415,7 @@ main {
 
     .company-popover[popover] {
         position-anchor: --work-anchor;
-        inset-block-start: calc(anchor(top) - 36vh);
+        position-area: start center;
     }
 }
 
