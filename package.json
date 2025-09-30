@@ -4,7 +4,9 @@
   "description": "Redesign for 2023",
   "main": "sw.js",
   "scripts": {
-    "test": "vitest"
+    "start": "http-server -p 3000",
+    "test": "vitest",
+    "e2e": "playwright test"
   },
   "author": "",
   "license": "ISC",
@@ -15,6 +17,7 @@
     "postcss-cli": "^10.1.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.55.1",
     "cssnano": "^6.0.1",
     "http-server": "^14.1.1",
     "jsdom": "^27.0.0",
