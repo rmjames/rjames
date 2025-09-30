@@ -395,7 +395,7 @@ main {
 
     /* Exit state: hidden and moved up */
     opacity: 0;
-    transform: translateY(-1rem);
+    transform: translateY(-6rem);
     transition:
         opacity var(--link-timing) var(--link-ease),
         transform var(--link-timing) var(--link-ease),
@@ -434,7 +434,7 @@ main {
 @starting-style {
     .company-popover:popover-open {
         opacity: 0;
-        transform: translateY(2rem);
+        transform: translateY(4rem);
     }
 }
 
