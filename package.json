@@ -12,7 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "autoprefixer": "^10.4.14",
-    "browser-sync": "^2.29.3",
+    "browser-sync": "^3.0.4",
     "postcss": "^8.4.24",
     "postcss-cli": "^10.1.0"
   },
