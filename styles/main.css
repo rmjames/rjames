@@ -127,7 +127,7 @@ body > * + * {
     --orange-2: hsl(38.8 100% 50%);
     --orange-3: hsl(13.9 95.2% 67.1%);
     --orange-4: #777;
-    --border-radius: var(--xs);
+    --border-radius: var(--s);
     --color-brand: hsl(200 11% 48%);
     --text-color: hsl(200 8% 16%);
     --text-shadow: var(--orange-1);
@@ -381,12 +381,12 @@ main {
 .company-popover {
     position: absolute;
     background: var(--bkgnd);
-    border: 1px solid var(--orange-2);
+    border: 1px solid var(--orange-1);
     border-radius: var(--border-radius);
-    padding: 1rem;
+    padding: 1.25rem 1rem;
     inline-size: min(80%, 480px);
-    font-size: 0.9rem;
-    line-height: 1.4;
+    font-size: 0.88rem;
+    line-height: 1.5;
     transition:
         opacity var(--link-timing) var(--link-ease),
         transform var(--link-timing) var(--link-ease),
@@ -401,6 +401,11 @@ main {
         transform var(--link-timing) var(--link-ease),
         display var(--link-timing) allow-discrete,
         overlay var(--link-timing) allow-discrete;
+
+    box-shadow:
+        0 0 1px var(--orange-1),
+        0 0 2px var(--white-1),
+        0 0 4px var(--orange-2);
 }
 
 .company-popover:popover-open {
@@ -408,14 +413,23 @@ main {
     transform: translateY(0);
 }
 
+.work {
+    transition: filter var(--link-timing) var(--link-ease);
+}
+
+main:has(~ .company-popover:popover-open) .work {
+    filter: blur(2px) opacity(0.175) hue-rotate(206deg);
+}
+
 @supports (anchor-name: --a) and (position-anchor: --a) {
-    #work {
+    .work {
         anchor-name: --work-anchor;
     }
 
     .company-popover[popover] {
         position-anchor: --work-anchor;
         position-area: start center;
+        translate: 0 1rem;
     }
 }
 
