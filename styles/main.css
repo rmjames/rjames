@@ -396,7 +396,7 @@ main {
 
     /* Exit state: hidden and moved up */
     opacity: 0;
-    transform: translateY(-6rem);
+    transform: translateY(-6rem) rotateX(-15deg);
     transition:
         opacity var(--link-timing) var(--link-ease),
         transform var(--link-timing) var(--link-ease),
@@ -411,10 +411,11 @@ main {
 
 .company-popover:popover-open {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) rotateX(0);
 }
 
 .work {
+    perspective: 1000px;
     transition: filter var(--link-timing) var(--link-ease);
 }
 
@@ -449,7 +450,7 @@ main:has(~ .company-popover:popover-open) .work {
 @starting-style {
     .company-popover:popover-open {
         opacity: 0;
-        transform: translateY(4rem);
+        transform: translateY(4rem) rotateX(15deg);
     }
 }
 
