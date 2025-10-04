@@ -440,11 +440,11 @@ main:has(~ .company-popover:popover-open) .work {
     }
 
     .company-popover {
-        inset-block-start: 116vh;
+        inset-block-start: 116dvh;
         inset-inline-start: 8%;
         inset-inline-end: 8%;
-        @media (orientation: landscape) {
-            inset-block-start: 128vh;
+        @media (orientation: landscape) and (max-height: 420px) {
+            inset-block-start: 128dvh;
         }
     }
 }
