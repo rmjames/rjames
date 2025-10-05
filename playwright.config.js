@@ -28,6 +28,9 @@ export default defineConfig({
     },
   },
 
+  /* The maximum time one test can run for. */
+  timeout: 60 * 1000,
+
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
@@ -37,7 +40,6 @@ export default defineConfig({
     trace: "on-first-retry",
   },
 
-  timeout: 60 * 1000,
   /* Configure projects for major browsers */
   projects: [
     {
@@ -80,6 +82,10 @@ export default defineConfig({
       },
     },
     {
+      name: "Mobile Chrome",
+      use: { ...devices["Pixel 5"], viewport: { width: 393, height: 851 } },
+    },
+    {
       name: "Mobile Safari",
       use: { ...devices["iPhone 12"], viewport: { width: 390, height: 844 } },
     },
@@ -90,6 +96,13 @@ export default defineConfig({
     {
       name: "iPad",
       use: { ...devices["iPad Pro"], viewport: { width: 1024, height: 1366 } },
+    },
+    {
+      name: "Android Tablet",
+      use: {
+        ...devices["Galaxy Tab S4"],
+        viewport: { width: 712, height: 1138 },
+      },
     },
   ],
 
