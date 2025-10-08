@@ -432,8 +432,6 @@ main:has(~ .company-popover:popover-open) .work {
         position: absolute;
         position-anchor: --work-anchor;
         top: anchor(top);
-        left: anchor(center);
-        translate: -50% 1rem;
     }
 }
 
