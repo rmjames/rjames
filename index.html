@@ -1,18 +1,6 @@
 <!doctype html>
 <html lang="en">
     <head>
-        <script
-            async
-            src="https://www.googletagmanager.com/gtag/js?id=UA-51900523-1"
-        ></script>
-        <script>
-            window.dataLayer = window.dataLayer || [];
-            function gtag() {
-                dataLayer.push(arguments);
-            }
-            gtag("js", new Date());
-            gtag("config", "UA-51900523-1");
-        </script>
         <meta charset="UTF-8" />
         <meta name="color-scheme" content="dark light" />
         <meta
@@ -46,16 +34,17 @@
         <meta property="og:site_name" content="Robert James" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:image:alt" content="Robert James" />
+        <link rel="preload" href="fonts/recursive-variable.woff2" as="font" type="font/woff2" crossorigin />
+        <link rel="preload" href="styles/fonts.css" as="style" />
         <link rel="preload" href="styles/main.css" as="style" />
         <link rel="preload" href="styles/mpa.css" as="style" />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-        <link rel="preconnect" href="https://www.google-analytics.com" />
-        <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
         <link
-            href="https://fonts.googleapis.com/css2?family=Recursive:wght,CASL,CRSV,MONO@400..900,0..1,0..1,0..1&display=swap"
             rel="stylesheet"
+            href="styles/fonts.css"
+            media="print"
+            onload="this.media='all'"
         />
+        <noscript><link rel="stylesheet" href="styles/fonts.css" /></noscript>
         <link
             rel="stylesheet"
             href="styles/main.css"
@@ -391,6 +380,22 @@
             </ul>
             <p class="copyright">©Robert James</p>
         </footer>
+        <script>
+            window.addEventListener('load', function() {
+                setTimeout(function() {
+                    var gtagScript = document.createElement('script');
+                    gtagScript.async = true;
+                    gtagScript.src = 'https://www.googletagmanager.com/gtag/js?id=UA-51900523-1';
+                    document.head.appendChild(gtagScript);
+
+                    window.dataLayer = window.dataLayer || [];
+                    function gtag(){dataLayer.push(arguments);}
+                    window.gtag = gtag;
+                    gtag('js', new Date());
+                    gtag('config', 'UA-51900523-1');
+                }, 2000);
+            });
+        </script>
         <script src="scripts/analytics.js" defer></script>
     </body>
 </html>
