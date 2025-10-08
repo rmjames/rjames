@@ -425,12 +425,15 @@ main:has(~ .company-popover:popover-open) .work {
 @supports (anchor-name: --a) and (position-anchor: --a) {
     .work {
         anchor-name: --work-anchor;
+        position: relative;
     }
 
     .company-popover[popover] {
+        position: absolute;
         position-anchor: --work-anchor;
-        position-area: start center;
-        translate: 0 1rem;
+        top: anchor(top);
+        left: anchor(center);
+        translate: -50% 1rem;
     }
 }
 
