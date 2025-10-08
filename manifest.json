@@ -1,53 +1,48 @@
-{ 
-   "lang": "en-US",
-   "name": "Robert James",
-   "short_name": "RobertJames",
-   "description": "Portfolio for Robert James",
-   "orientation": "any",
-   "icons": [
-        {
-            "src": "/favicon_144.png",
-            "sizes": "144x144",
-            "type": "image/png",
-            "purpose": "any"
-        },
-        {
-            "src": "/favicon_192.png",
-            "sizes": "192x192",
-            "type": "image/png",
-            "purpose": "any"
-        },
-        {
-            "src": "/favicon_512.png",
-            "sizes": "512x512",
-            "type": "image/png",
-            "purpose": "maskable"
-        }
-    ],
-    "shortcuts": [
-        {
-          "name": "Work",
-          "description": "Page displaying past or current work",
-          "url": "./work.html"
-        },
-        {
-          "name": "Resume",
-          "description": "Professional resume and experience",
-          "url": "./resume.html"
-        }
-    ],
-    "share_target": {
+{
+  "lang": "en-US",
+  "name": "Robert James",
+  "short_name": "RobertJames",
+  "description": "Portfolio for Robert James",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/favicon_144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon_192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon_512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Resume",
+      "description": "Professional resume and experience",
+      "url": "./resume.html"
+    }
+  ],
+  "share_target": {
     "action": "/index.html",
     "params": {
-        "title": "Robert James",
-        "text": "Portfolio of Robert James",
-        "url": "./"
-        }
-    },
-    "theme_color": "#212121",
-    "background_color": "#dee1e3",
-    "display_override": ["window-controls-overlay","minimal-ui"],
-    "display": "standalone",
-    "id": "/",
-    "start_url": "/"
+      "title": "Robert James",
+      "text": "Portfolio of Robert James",
+      "url": "./"
+    }
+  },
+  "theme_color": "#212121",
+  "background_color": "#dee1e3",
+  "display_override": ["window-controls-overlay", "minimal-ui"],
+  "display": "standalone",
+  "id": "/",
+  "start_url": "/"
 }
