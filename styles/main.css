@@ -197,6 +197,7 @@ body > * + * {
 }
 
 html {
+    --bkgnd: var(--white-1);
     scroll-behavior: smooth;
     scroll-snap-type: y mandatory;
     overflow-y: scroll;
@@ -379,20 +380,26 @@ main {
 }
 
 .company-popover {
+    --popover-angle: 0deg;
     position: absolute;
-    background: var(--bkgnd);
-    border: 1px solid var(--orange-1);
+    border: 2px solid transparent;
     border-radius: var(--border-radius);
     padding: 1rem;
     padding-block-end: 1.25rem;
     inline-size: min(80%, 480px);
     font-size: 0.9rem;
     line-height: 1.4;
-    transition:
-        opacity var(--link-timing) var(--link-ease),
-        transform var(--link-timing) var(--link-ease),
-        display var(--link-timing) allow-discrete,
-        overlay var(--link-timing) allow-discrete;
+    background-image:
+        linear-gradient(var(--bkgnd), var(--bkgnd)),
+        conic-gradient(
+            from var(--popover-angle),
+            var(--white-1),
+            var(--orange-2),
+            var(--blue-2)
+        );
+    background-clip: padding-box, border-box;
+    background-origin: border-box;
+    animation: popover-spin 60s linear infinite;
 
     /* Exit state: hidden and moved up */
     opacity: 0;
@@ -402,11 +409,6 @@ main {
         transform var(--link-timing) var(--link-ease),
         display var(--link-timing) allow-discrete,
         overlay var(--link-timing) allow-discrete;
-
-    box-shadow:
-        0 0 1px var(--orange-1),
-        0 0 2px var(--white-1),
-        0 0 3px var(--orange-2);
 }
 
 .company-popover:popover-open {
@@ -705,6 +707,12 @@ details {
     }
 }
 
+@keyframes popover-spin {
+    to {
+        --popover-angle: 360deg;
+    }
+}
+
 @media (max-width: 760px) {
     [role="img"] {
         display: none;
@@ -732,6 +740,12 @@ details {
 @property --axis-x {
     syntax: "<percentage>";
     initial-value: 10%;
+    inherits: false;
+}
+
+@property --popover-angle {
+    syntax: "<angle>";
+    initial-value: 0deg;
     inherits: false;
 }
 
