@@ -16,3 +16,5 @@ This document provides guidelines for agents working on this repository.
 
 - [WCAG 2.0](https://www.w3.org/TR/WCAG20/)
 - [Baseline 2025](https://web.dev/baseline/2025)
+- [Web.dev](https://web.dev/)
+- [MDN](https://developer.mozilla.org/en-US/)
