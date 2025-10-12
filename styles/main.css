@@ -206,7 +206,11 @@ body {
     display: flex;
     flex-direction: column;
     background: var(--bkgnd);
-    background: var(--bkgnd)
+    background:
+        radial-gradient(40vmax circle at var(--blob-1-x) var(--blob-1-y), var(--blue-2) 10%, transparent 40%),
+        radial-gradient(30vmax circle at var(--blob-2-x) var(--blob-2-y), var(--orange-2) 10%, transparent 40%),
+        radial-gradient(25vmax circle at var(--blob-3-x) var(--blob-3-y), var(--white-2) 10%, transparent 40%),
+        var(--bkgnd)
         conic-gradient(
             from var(--gradient-angle) at -0% 72%,
             var(--bkgnd),
@@ -224,12 +228,21 @@ body {
     font-size: clamp(1rem, calc(1rem + 0.125cqi), 2rem);
     animation:
         rotate-gradient linear,
-        axis-x linear;
+        axis-x linear,
+        blob-1 15s infinite ease-in-out,
+        blob-2 20s infinite ease-in-out,
+        blob-3 25s infinite ease-in-out;
     animation-timeline: scroll();
     animation-range: 0 100vh;
 
     @media (prefers-reduced-motion: no-preference) {
         interpolate-size: allow-keywords;
+        animation:
+            rotate-gradient linear,
+            axis-x linear,
+            blob-1 15s infinite ease-in-out,
+            blob-2 20s infinite ease-in-out,
+            blob-3 25s infinite ease-in-out;
     }
 }
 
@@ -734,5 +747,99 @@ details {
     initial-value: 10%;
     inherits: false;
 }
+
+@property --blob-1-x {
+  syntax: '<percentage>';
+  initial-value: 20%;
+  inherits: false;
+}
+
+@property --blob-1-y {
+  syntax: '<percentage>';
+  initial-value: 20%;
+  inherits: false;
+}
+
+@property --blob-2-x {
+  syntax: '<percentage>';
+  initial-value: 60%;
+  inherits: false;
+}
+
+@property --blob-2-y {
+  syntax: '<percentage>';
+  initial-value: 70%;
+  inherits: false;
+}
+
+@property --blob-3-x {
+  syntax: '<percentage>';
+  initial-value: 50%;
+  inherits: false;
+}
+
+@property --blob-3-y {
+  syntax: '<percentage>';
+  initial-value: 30%;
+  inherits: false;
+}
+
+@keyframes blob-1 {
+  0%, 100% {
+    --blob-1-x: 20%;
+    --blob-1-y: 20%;
+  }
+  25% {
+    --blob-1-x: 40%;
+    --blob-1-y: 30%;
+  }
+  50% {
+    --blob-1-x: 30%;
+    --blob-1-y: 50%;
+  }
+  75% {
+    --blob-1-x: 10%;
+    --blob-1-y: 40%;
+  }
+}
+
+@keyframes blob-2 {
+  0%, 100% {
+    --blob-2-x: 60%;
+    --blob-2-y: 70%;
+  }
+  25% {
+    --blob-2-x: 80%;
+    --blob-2-y: 60%;
+  }
+  50% {
+    --blob-2-x: 70%;
+    --blob-2-y: 90%;
+  }
+  75% {
+    --blob-2-x: 50%;
+    --blob-2-y: 80%;
+  }
+}
+
+@keyframes blob-3 {
+  0%, 100% {
+    --blob-3-x: 50%;
+    --blob-3-y: 30%;
+  }
+  25% {
+    --blob-3-x: 40%;
+    --blob-3-y: 20%;
+  }
+  50% {
+    --blob-3-x: 60%;
+    --blob-3-y: 40%;
+  }
+  75% {
+    --blob-3-x: 70%;
+    --blob-3-y: 10%;
+  }
+}
+
 
 /*# sourceMappingURL=main.css.map */
