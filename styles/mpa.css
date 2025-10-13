@@ -15,6 +15,7 @@
 
 ::view-transition-old(cover) {
   animation: fade-out .4s, move-down .36s;
+  animation-delay: .1s;
 }
 
 ::view-transition-new(cover) {

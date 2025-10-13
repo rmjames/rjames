@@ -181,7 +181,6 @@ body > * + * {
 
 :where(:focus, :focus-visible) {
     outline: 1px solid var(--orange-1);
-    border-radius: var(--border-radius);
 }
 
 :where(:any-link, :-webkit-any-link) {
