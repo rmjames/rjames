@@ -2,7 +2,6 @@
     navigation: auto;
   }
  
- 
 .link-clicked {
   animation: link-click var(--link-timing) ease-in-out;
   pointer-events: none;
@@ -16,7 +15,6 @@
 
 ::view-transition-old(cover) {
   animation: fade-out .4s, move-down .36s;
-  animation-delay: .1s; 
 }
 
 ::view-transition-new(cover) {
@@ -24,25 +22,10 @@
 }
 
 /* Active navigation link style */
-nav ul li a.active {
-  border-bottom: 2px solid #fb805b; /* Orange color from email icon */
-  padding-bottom: 2px; /* Adjust as needed */
+.header a.active {
+  border-bottom:  var(--xxs) solid var(--blue-2); 
+  padding-bottom: var(--xxs); 
 }
-
-/* View transition for the active nav link border */
-::view-transition-old(active-nav-link),
-::view-transition-new(active-nav-link) {
-  animation-duration: 0.25s; /* Adjust timing as needed */
-  animation-timing-function: ease-in-out;
-}
-/* We only want to transition the border, so make the old and new text content invisible during transition */
-::view-transition-old(active-nav-link) {
-  /* No specific rules needed for the old state if default exit is fine */
-}
-::view-transition-new(active-nav-link) {
-  /* No specific rules needed for the new state if default entry is fine */
-}
-
 
 @keyframes link-click {
   0%, 100% {
@@ -51,7 +34,7 @@ nav ul li a.active {
   }
   50% {
     transform: scale(1.1);
-    color: #007bff;
+    color: var(--blue-2);
   }
 }
 
@@ -90,5 +73,4 @@ nav ul li a.active {
     transform: translateY(0);
   }
 }
-
 /*# sourceMappingURL=mpa.css.map */
