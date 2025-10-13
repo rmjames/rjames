@@ -181,7 +181,6 @@ body > * + * {
 
 :where(:focus, :focus-visible) {
     outline: 1px solid var(--orange-1);
-    border-radius: var(--border-radius);
 }
 
 :where(:any-link, :-webkit-any-link) {
@@ -226,7 +225,7 @@ body {
         rotate-gradient linear,
         axis-x linear;
     animation-timeline: scroll();
-    animation-range: 0 100vh;
+    animation-range: 0 100dvh;
 
     @media (prefers-reduced-motion: no-preference) {
         interpolate-size: allow-keywords;
@@ -245,18 +244,18 @@ header {
     width: 100%;
     min-block-size: 5rem;
     scroll-snap-align: center;
-}
 
-nav ul {
-    display: flex;
-    align-items: center;
-    transition:
-        opacity 0.2s,
-        font-weight 0.26s;
-    gap: 1cqi;
-    a:hover {
-        font-weight: 850;
-        opacity: 0.5;
+    nav ul {
+        display: flex;
+        align-items: center;
+        transition:
+            opacity 0.2s,
+            font-weight 0.26s;
+        gap: 1cqi;
+        a:hover {
+            font-weight: 850;
+            opacity: 0.5;
+        }
     }
 }
 
@@ -281,40 +280,15 @@ h1 {
     margin-block-end: 0.3rem;
 }
 
-header nav li a {
+.header a {
     filter: drop-shadow(0.5px 0.5px 1px var(--text-shadow));
-    position: relative; /* For border positioning */
-    padding-bottom: 5px; /* Space for the border */
-}
-
-header nav li a::after {
-    content: "";
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    height: 2px;
-    background-color: var(--orange-3);
-    width: 0; /* Initial width */
-    transition: width 0.5s ease-in-out;
-}
-
-header nav li a.animate-border-in::after {
-    width: 100%;
-}
-
-header nav li a.animate-border-out::after {
-    width: 0%;
-}
-
-/* Helper class to instantaneously set border to full width */
-header nav li a.force-border-full::after {
-    width: 100%;
-    transition: none; /* No transition when applying this class */
+    padding-bottom: var(--s);
 }
 
 main {
     margin: auto;
 }
+
 .icon-set {
     display: none;
 }
@@ -348,7 +322,7 @@ main {
 }
 
 .brand {
-    font-weight: 550;
+    --recursive-wght: 600;
     color: var(--gray-2);
     transition:
         color 0.1s,
@@ -361,32 +335,29 @@ main {
     padding: 0;
     font: inherit;
     text-decoration: none;
-    &:hover,
-    &:focus,
-    &:active,
-    &:target,
-    &:focus-within {
+
+    &:where(:hover, :focus, :active, :target, :focus-within) {
+        --recursive-wght: 800;
         opacity: 0.5;
-        font-weight: 850;
         outline: 1px solid var(--orange-2);
         border-radius: var(--border-radius);
     }
-    &:active,
-    &:target {
+
+    &:where(:active, :target) {
         color: var(--white-1);
-        outline-width: 2px;
+        outline-width: var(--xxs);
     }
 }
 
 .company-popover {
     position: absolute;
     background: var(--bkgnd);
-    border: 1px solid var(--orange-1);
+    border: 1px solid color-mix(in oklch, var(--blue-2) 88%, transparent 12%);
     border-radius: var(--border-radius);
     padding: 1rem;
     padding-block-end: 1.25rem;
     inline-size: min(80%, 480px);
-    font-size: 0.9rem;
+    font-size: 0.875rem;
     line-height: 1.4;
     transition:
         opacity var(--link-timing) var(--link-ease),
@@ -404,24 +375,36 @@ main {
         overlay var(--link-timing) allow-discrete;
 
     box-shadow:
-        0 0 1px var(--orange-1),
-        0 0 2px var(--white-1),
-        0 0 3px var(--orange-2);
-}
+        inset 0 0 2px color-mix(in oklch, var(--white-1) 72%, transparent 28%),
+        0 0 4px color-mix(in oklch, var(--blue-2) 48%, transparent 52%),
+        0 0 8px color-mix(in oklch, var(--white-1) 8%, transparent 92%),
+        0 0 16px color-mix(in oklch, var(--blue-2) 16%, transparent 84%);
 
-.company-popover:popover-open {
-    opacity: 1;
-    transform: translateY(0);
+    & .company-description {
+        --recursive-wght: 800;
+        --recursive-CASL: 0.25;
+        margin-block-end: var(--s);
+    }
+
+    & .work-summary {
+        color: var(--text-color);
+    }
+
+    &:popover-open {
+        opacity: 1;
+        transform: translateY(1.25rem); /* popover position on open */
+    }
 }
 
 .work {
     transition: filter var(--link-timing) var(--link-ease);
 }
 
+/* Blur .work background on :popover-open */
 main:has(~ .company-popover:popover-open) .work {
     filter: blur(2px) opacity(0.175) hue-rotate(206deg);
 }
-
+/* Position Anchor support */
 @supports (anchor-name: --a) and (position-anchor: --a) {
     .work {
         anchor-name: --work-anchor;
@@ -435,6 +418,7 @@ main:has(~ .company-popover:popover-open) .work {
     }
 }
 
+/* Position Anchor not supported */
 @supports not ((anchor-name: --a) and (position-anchor: --a)) {
     .work {
         position: relative;
@@ -453,7 +437,7 @@ main:has(~ .company-popover:popover-open) .work {
 @starting-style {
     .company-popover:popover-open {
         opacity: 0;
-        transform: translateY(4rem);
+        transform: translateY(4rem); /* popover position on open */
     }
 }
 
@@ -470,34 +454,24 @@ main:has(~ .company-popover:popover-open) .work {
     }
 }
 
-.company-description {
-    font-weight: 600;
-    color: var(--orange-2);
-    margin-bottom: 0.5rem;
-}
-
-.work-summary {
-    color: var(--text-color);
-}
-
 .link-contact {
     font-weight: 550;
     padding: 0;
     cursor: pointer;
     box-shadow:
-        inset 0 -1px 0 0 #4a98bf,
-        inset 0 -2px 0 0 rgba(74, 152, 191, 0.76),
-        inset 0 -6px 0 0 rgba(74, 152, 191, 0.52),
-        inset 0 -10px 0 0 rgba(74, 152, 191, 0.28);
+        inset 0 -1px 0 0 oklch(from #4a98bf l c h),
+        inset 0 -2px 0 0 oklch(from rgba(74, 152, 191, 0.76) l c h),
+        inset 0 -6px 0 0 oklch(from rgba(74, 152, 191, 0.52) l c h),
+        inset 0 -10px 0 0 oklch(from rgba(74, 152, 191, 0.28) l c h);
     transition: box-shadow var(--link-ease) var(--link-timing);
 }
 
 .link-contact:hover {
     box-shadow:
-        inset 0 -2px 0 0 rgba(74, 152, 191, 0.96),
-        inset 0 -4px 0 0 rgba(74, 152, 191, 0.72),
-        inset 0 -8px 0 0 rgba(74, 152, 191, 0.48),
-        inset 0 -12px 0 0 rgba(74, 152, 191, 0.24);
+        inset 0 -2px 0 0 oklch(from rgba(74, 152, 191, 0.96) l c h),
+        inset 0 -4px 0 0 oklch(from rgba(74, 152, 191, 0.72) l c h),
+        inset 0 -8px 0 0 oklch(from rgba(74, 152, 191, 0.48) l c h),
+        inset 0 -12px 0 0 oklch(from rgba(74, 152, 191, 0.24) l c h);
 }
 
 .footer-menu {
@@ -508,6 +482,7 @@ main:has(~ .company-popover:popover-open) .work {
     flex-wrap: wrap;
     margin-block-start: auto;
     font-size: clamp(1.1cqi, calc(var(--s) + 1.1cqi), var(--m));
+
     .copyright {
         align-self: center;
     }
@@ -577,6 +552,7 @@ main:has(~ .company-popover:popover-open) .work {
 ) {
     visibility: hidden;
 }
+
 :where(.bio, .skills-container) {
     display: none;
 }
@@ -628,8 +604,8 @@ details {
 
     .job-title {
         transition:
-            opacity 0.32s var(--ease-3),
-            translate 0.32s var(--ease-3);
+            opacity 0.32s var(--link-ease),
+            translate 0.32s var(--link-ease);
     }
 }
 
@@ -637,24 +613,24 @@ details {
     @media (hover) and (prefers-reduced-motion: no-preference) {
         & > details > summary {
             transition:
-                opacity 0.32s var(--ease-3),
-                transform 0.32s var(--ease-3);
+                opacity 0.32s var(--link-ease),
+                transform 0.32s var(--link-ease);
         }
 
         &:has(:hover) > details > summary:not(:hover) {
             opacity: 0.25;
             transform: scale(0.75), translate(0.125rem, 0);
             transition:
-                opacity 0.32s var(--ease-3),
-                transform 0.32s var(--ease-3);
+                opacity 0.32s var(--link-ease),
+                transform 0.32s var(--link-ease);
         }
 
         &:has(:focus) > details > summary:not(:focus) {
             opacity: 0.25;
             transform: scale(0.75), translate(0.125rem, 0);
             transition:
-                opacity 0.32s var(--ease-3),
-                transform 0.32s var(--ease-3);
+                opacity 0.32s var(--link-ease),
+                transform 0.32s var(--link-ease);
         }
     }
 }
@@ -687,9 +663,6 @@ details {
 @keyframes enter {
     from {
         opacity: 0;
-    }
-    to {
-        opacity: 1;
     }
 }
 
@@ -734,5 +707,4 @@ details {
     initial-value: 10%;
     inherits: false;
 }
-
 /*# sourceMappingURL=main.css.map */
