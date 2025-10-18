@@ -335,6 +335,7 @@ main {
     padding: 0;
     font: inherit;
     text-decoration: none;
+    text-align: left;
 
     &:where(:hover, :focus, :active, :target, :focus-within) {
         --recursive-wght: 800;
@@ -483,15 +484,22 @@ main:has(~ .company-popover:popover-open) .work {
     margin-block-start: auto;
     font-size: clamp(1.1cqi, calc(var(--s) + 1.1cqi), var(--m));
 
-    .copyright {
-        align-self: center;
-    }
-}
+        ul {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.25vmin;
+            @media (width < 264px) {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
 
-.footer-menu ul {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1.25vmin;
+        .copyright {
+            align-self: center;
+            @media (224px <= width < 264px) {
+                margin-block-start: calc(9dvh - 1rem);
+            } 
+        }
 }
 
 .footer-menu--item a {

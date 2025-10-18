@@ -11,6 +11,7 @@ This document provides guidelines for agents working on this repository.
     - **Units**: Prefer relative and intrinsic units (e.g., `rem`, `em`, `%`, `vw`, `vh`, `min-content`, `max-content`) over absolute units.
     - **Container Queries**: Use container queries where appropriate to create more resilient responsive components.
 - **Performance**: Code and solutions should be performant. This includes optimizing assets, minimizing network requests, and writing efficient code.
+    - All CSS should be loaded asynchronously using the `media="print"` onload trick with noscript fallbacks
 
 ## References
 
