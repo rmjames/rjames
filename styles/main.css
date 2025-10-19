@@ -350,6 +350,13 @@ main {
     }
 }
 
+.brands {
+    @media (width <= 264px) {
+            display: inline-grid;
+            grid-template-columns: repeat(2, 1fr);
+    }
+}
+
 .company-popover {
     position: absolute;
     background: var(--bkgnd);
