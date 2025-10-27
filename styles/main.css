@@ -353,7 +353,8 @@ main {
 .brands {
     @media (width <= 264px) {
             display: inline-grid;
-            grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr));
+            gap: 4vmin;
     }
 }
 
@@ -408,9 +409,9 @@ main {
     transition: filter var(--link-timing) var(--link-ease);
 }
 
-/* Blur .work background on :popover-open */
-main:has(~ .company-popover:popover-open) .work {
-    filter: blur(2px) opacity(0.175) hue-rotate(206deg);
+/* Blur verything in main that is not .company-popover on :popover-open */
+main:has(~ .company-popover:popover-open) :not(.company-popover) {
+    filter: blur(2px) opacity(0.375) hue-rotate(206deg);
 }
 /* Position Anchor support */
 @supports (anchor-name: --a) and (position-anchor: --a) {
@@ -722,4 +723,5 @@ details {
     initial-value: 10%;
     inherits: false;
 }
+
 /*# sourceMappingURL=main.css.map */
