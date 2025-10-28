@@ -389,12 +389,6 @@ main {
         0 0 8px color-mix(in oklch, var(--white-1) 8%, transparent 92%),
         0 0 16px color-mix(in oklch, var(--blue-2) 16%, transparent 84%);
 
-    & .company-description {
-        --recursive-wght: 800;
-        --recursive-CASL: 0.25;
-        margin-block-end: var(--s);
-    }
-
     & .work-summary {
         color: var(--text-color);
     }
