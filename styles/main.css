@@ -197,7 +197,8 @@ body > * + * {
 
 html {
     scroll-behavior: smooth;
-    scroll-snap-type: y mandatory;
+    scroll-snap-type: y proximity;
+    scroll-padding-top: 10vh;
     overflow-y: scroll;
 }
 
@@ -335,6 +336,8 @@ main {
     font: inherit;
     text-decoration: none;
     text-align: left;
+    transform-style: preserve-3d;
+    contain: paint;
 
     &:where(:hover, :focus, :active, :target, :focus-within) {
         --recursive-wght: 800;
@@ -349,7 +352,74 @@ main {
     }
 }
 
+/* Brand 1: SBE - Near layer */
+.brand:nth-child(1) {
+    animation: slide-in-from-below-near both;
+    animation-timeline: view();
+    animation-range: entry 2% cover 50%;
+    transform: perspective(37.5rem) translateZ(0);
+}
+
+/* Brand 2: Guardian - Mid layer */
+.brand:nth-child(2) {
+    animation: slide-in-from-above-mid both;
+    animation-timeline: view();
+    animation-range: entry 4% cover 50%;
+    transform: perspective(43.75rem) translateZ(-1.25rem);
+}
+
+/* Brand 3: MacMillan - Far layer */
+.brand:nth-child(3) {
+    animation: slide-in-from-below-far both;
+    animation-timeline: view();
+    animation-range: entry 6% cover 50%;
+    transform: perspective(50rem) translateZ(-2.5rem);
+}
+
+/* Brand 4: Weber Shandwick - Near layer */
+.brand:nth-child(4) {
+    animation: slide-in-from-above-near both;
+    animation-timeline: view();
+    animation-range: entry 8% cover 50%;
+    transform: perspective(40.625rem) translateZ(-0.625rem);
+}
+
+/* Brand 5: Royal Caribbean - Mid layer */
+.brand:nth-child(5) {
+    animation: slide-in-from-below-mid both;
+    animation-timeline: view();
+    animation-range: entry 10% cover 50%;
+    transform: perspective(46.875rem) translateZ(-1.875rem);
+}
+
+/* Brand 6: Microsoft - Far layer */
+.brand:nth-child(6) {
+    animation: slide-in-from-above-far both;
+    animation-timeline: view();
+    animation-range: entry 12% cover 50%;
+    transform: perspective(56.25rem) translateZ(-3.125rem);
+}
+
+/* Brand 7: Bank of America - Near layer */
+.brand:nth-child(7) {
+    animation: slide-in-from-below-near both;
+    animation-timeline: view();
+    animation-range: entry 14% cover 50%;
+    transform: perspective(38.75rem) translateZ(-0.3125rem);
+}
+
+/* Brand 8: Corteva - Mid layer */
+.brand:nth-child(8) {
+    animation: slide-in-from-above-mid both;
+    animation-timeline: view();
+    animation-range: entry 16% cover 50%;
+    transform: perspective(48.75rem) translateZ(-2.1875rem);
+}
+
 .brands {
+    transform-style: preserve-3d;
+    perspective: 50rem;
+    perspective-origin: center top;
     @media (width <= 264px) {
             display: inline-grid;
             grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr));
@@ -696,6 +766,94 @@ details {
     }
 }
 
+/* From Below - Near Layer */
+@keyframes slide-in-from-below-near {
+    from {
+      transform: rotateX(70deg) translateX(-7.5rem) translateY(5rem) translateZ(-6.25rem);
+      opacity: 0;
+    }
+    to {
+      transform: rotateX(0deg) translateX(0) translateY(0) translateZ(0);
+      opacity: 1;
+    }
+  }
+
+  /* From Below - Mid Layer */
+  @keyframes slide-in-from-below-mid {
+    from {
+      transform: rotateX(75deg) translateX(-11.25rem) translateY(7.5rem) translateZ(-12.5rem);
+      opacity: 0;
+    }
+    to {
+      transform: rotateX(0deg) translateX(0) translateY(0) translateZ(0);
+      opacity: 1;
+    }
+  }
+
+  /* From Below - Far Layer */
+  @keyframes slide-in-from-below-far {
+    from {
+      transform: rotateX(80deg) translateX(-15rem) translateY(10rem) translateZ(-21.875rem) scale(0.7);
+      opacity: 0;
+    }
+    to {
+      transform: rotateX(0deg) translateX(0) translateY(0) translateZ(0) scale(1);
+      opacity: 1;
+    }
+  }
+
+  /* From Above - Near Layer */
+  @keyframes slide-in-from-above-near {
+    from {
+      transform: rotateX(-85deg) translateX(7.5rem) translateY(-9.375rem) translateZ(-6.25rem) scale(0.8);
+      opacity: 0;
+      transform-origin: center bottom;
+    }
+    to {
+      transform: rotateX(0deg) translateX(0) translateY(0) translateZ(0) scale(1);
+      opacity: 1;
+      transform-origin: center center;
+    }
+  }
+
+  /* From Above - Mid Layer */
+  @keyframes slide-in-from-above-mid {
+    from {
+      transform: rotateX(-90deg) translateX(11.25rem) translateY(-12.5rem) translateZ(-12.5rem) scale(0.65);
+      opacity: 0;
+      transform-origin: center bottom;
+    }
+    to {
+      transform: rotateX(0deg) translateX(0) translateY(0) translateZ(0) scale(1);
+      opacity: 1;
+      transform-origin: center center;
+    }
+  }
+
+  /* From Above - Far Layer */
+  @keyframes slide-in-from-above-far {
+    from {
+      transform: rotateX(-95deg) translateX(15rem) translateY(-15.625rem) translateZ(-21.875rem) scale(0.5);
+      opacity: 0;
+      transform-origin: center bottom;
+    }
+    to {
+      transform: rotateX(0deg) translateX(0) translateY(0) translateZ(0) scale(1);
+      opacity: 1;
+      transform-origin: center center;
+    }
+  }
+
+  /* Continuous Scroll Parallax */
+  @keyframes scroll-parallax {
+    from {
+      transform: translateZ(0) rotateX(0deg);
+    }
+    to {
+      transform: translateZ(-20px) rotateX(2deg);
+    }
+  }
+
 @media (max-width: 760px) {
     [role="img"] {
         display: none;
@@ -720,5 +878,4 @@ details {
     initial-value: 10%;
     inherits: false;
 }
-
 /*# sourceMappingURL=main.css.map */
