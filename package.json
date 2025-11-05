@@ -6,7 +6,12 @@
   "scripts": {
     "start": "http-server -p 3000",
     "test": "vitest",
-    "e2e": "playwright test"
+    "e2e": "playwright test",
+    "deploy": "wrangler deploy --env production",
+    "deploy:staging": "wrangler deploy --env staging",
+    "deploy:dev": "wrangler dev",
+    "deploy:tail": "wrangler tail --env production",
+    "deploy:rollback": "wrangler deployments list"
   },
   "author": "",
   "license": "ISC",
