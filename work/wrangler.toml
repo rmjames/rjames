@@ -2,8 +2,9 @@
 # Documentation: https://developers.cloudflare.com/workers/
 
 name = "portfolio-secure-auth"
-main = "secure-worker.js"
-compatibility_date = "2024-01-01"
+main = "./secure-worker.js"
+compatibility_date = "2025-11-06"
+compatibility_flags = ["nodejs_compat"]
 
 # Required for production deployment
 # Update these with your actual domain
@@ -21,6 +22,10 @@ preview_id = "52f8652d4b394a4b8833d6c8bd4c920a"  # Preview KV for local dev
 # Environment: Production
 [env.production]
 vars = { ENVIRONMENT = "production" }
+[[env.production.kv_namespaces]]
+binding = "KV"
+id = "ee88e9680b2645f288512be9d7cc2160"
+preview_id = "52f8652d4b394a4b8833d6c8bd4c920a"
 
 # Environment: Staging (optional)
 [env.staging]

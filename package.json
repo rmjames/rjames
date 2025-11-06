@@ -7,11 +7,11 @@
     "start": "http-server -p 3000",
     "test": "vitest",
     "e2e": "playwright test",
-    "deploy": "wrangler deploy --env production",
-    "deploy:staging": "wrangler deploy --env staging",
-    "deploy:dev": "wrangler dev",
-    "deploy:tail": "wrangler tail --env production",
-    "deploy:rollback": "wrangler deployments list"
+    "deploy": "cd work && wrangler deploy --env production",
+    "deploy:staging": "cd work && wrangler deploy --env staging",
+    "deploy:dev": "cd work && wrangler dev",
+    "deploy:tail": "cd work && wrangler tail --env production",
+    "deploy:rollback": "cd work && wrangler deployments list"
   },
   "author": "",
   "license": "ISC",
