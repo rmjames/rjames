@@ -1,0 +1,138 @@
+# Production-Ready Secure Cloudflare Worker Configuration
+# Documentation: https://developers.cloudflare.com/workers/
+
+name = "portfolio-secure-auth"
+main = "./secure-worker.js"
+compatibility_date = "2025-11-06"
+compatibility_flags = ["nodejs_compat"]
+
+# Required for production deployment
+# Update these with your actual domain
+routes = [
+  { pattern = "robertjames.nyc/work/*", zone_name = "robertjames.nyc" }
+]
+
+# KV Namespace for session storage and rate limiting (REQUIRED)
+# Create with: wrangler kv namespace create "KV"
+[[kv_namespaces]]
+binding = "KV"
+id = "ee88e9680b2645f288512be9d7cc2160"  # Production KV namespace
+preview_id = "52f8652d4b394a4b8833d6c8bd4c920a"  # Preview KV for local dev
+
+# Environment: Production
+[env.production]
+vars = { ENVIRONMENT = "production" }
+[[env.production.kv_namespaces]]
+binding = "KV"
+id = "ee88e9680b2645f288512be9d7cc2160"
+preview_id = "52f8652d4b394a4b8833d6c8bd4c920a"
+
+# Environment: Staging (optional)
+[env.staging]
+vars = { ENVIRONMENT = "staging" }
+
+# ============================================
+# SETUP INSTRUCTIONS
+# ============================================
+
+# STEP 1: Install Wrangler CLI
+# -------------------------------
+# npm install -g wrangler
+
+# STEP 2: Login to Cloudflare
+# -------------------------------
+# wrangler login
+
+# STEP 3: Create KV Namespace (REQUIRED)
+# -------------------------------
+# wrangler kv:namespace create "KV"
+#
+# This will output something like:
+# [[kv_namespaces]]
+# binding = "KV"
+# id = "abc123def456789"
+#
+# Copy the ID and replace YOUR_KV_NAMESPACE_ID above
+
+# STEP 4: Generate Password Hash
+# -------------------------------
+# Use the helper script:
+# node hash-password.js your-secure-password
+#
+# This will output a SHA-256 hash
+
+# STEP 5: Set Password Hash as Secret
+# -------------------------------
+# wrangler secret put PASSWORD_HASH
+# Paste the hash from Step 4 when prompted
+
+# STEP 6: Update Routes
+# -------------------------------
+# Replace "robertjames.nyc" with your actual domain in the routes section above
+
+# STEP 7: Deploy
+# -------------------------------
+# wrangler deploy
+#
+# For staging environment:
+# wrangler deploy --env staging
+
+# STEP 8: Test
+# -------------------------------
+# Visit https://your-domain.com/work/
+# You should see the login page
+
+# ============================================
+# MANAGING SECRETS
+# ============================================
+
+# List all secrets:
+# wrangler secret list
+
+# Update password hash:
+# wrangler secret put PASSWORD_HASH
+
+# Delete a secret:
+# wrangler secret delete PASSWORD_HASH
+
+# ============================================
+# MONITORING & DEBUGGING
+# ============================================
+
+# View real-time logs:
+# wrangler tail
+
+# View logs for specific environment:
+# wrangler tail --env production
+
+# Filter logs by status code:
+# wrangler tail --status 401
+
+# View deployments:
+# wrangler deployments list
+
+# ============================================
+# LOCAL DEVELOPMENT
+# ============================================
+
+# Run locally:
+# wrangler dev
+#
+# Create .dev.vars file for local secrets:
+# echo "PASSWORD_HASH=your-hash-here" > .dev.vars
+# echo ".dev.vars" >> .gitignore
+
+# ============================================
+# SECURITY FEATURES
+# ============================================
+
+# ✅ Password hashing with SHA-256
+# ✅ Timing-safe password comparison
+# ✅ Rate limiting (5 attempts max)
+# ✅ IP-based lockouts (15 minutes)
+# ✅ Session management with KV storage
+# ✅ Secure cookies (HttpOnly, Secure, SameSite)
+# ✅ Security headers on all responses
+# ✅ HTTPS enforcement
+# ✅ Session hijacking protection (IP binding)
+# ✅ CSRF protection
