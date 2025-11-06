@@ -1,11 +1,104 @@
-.DS_Store
-.svn
-log/*.log
-tmp/**
+# ============================================
+# ENVIRONMENT & SECURITY
+# ============================================
+
+# Environment variables (NEVER commit these!)
+.env
+.env.*
+!.env.example
+.dev.vars
+
+# Password documentation (contains plaintext passwords)
+PORTFOLIO_PASSWORDS.md
+
+# ============================================
+# CLOUDFLARE WORKERS
+# ============================================
+
+.wrangler/
+wrangler.toml.backup
+
+# ============================================
+# DEPENDENCIES
+# ============================================
+
 node_modules/
-.sass-cache
-node_modules
-dist
-.tmp
-.sass-cache
+
+# ============================================
+# BUILD ARTIFACTS
+# ============================================
+
+dist/
+.tmp/
+tmp/**
+
+# ============================================
+# CACHE
+# ============================================
+
+.sass-cache/
+
+# ============================================
+# LOGS
+# ============================================
+
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+log/*.log
+
+# ============================================
+# OS FILES
+# ============================================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux
+*~
+
+# ============================================
+# IDE & EDITORS
+# ============================================
+
+# VSCode
+.vscode/
+*.code-workspace
+
+# JetBrains IDEs (IntelliJ, WebStorm, etc.)
+.idea/
+*.iml
+
+# Vim
+*.swp
+*.swo
+*.swn
+
+# Emacs
+*~
+\#*\#
+.\#*
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# ============================================
+# VERSION CONTROL
+# ============================================
+
+.svn/
+
+# ============================================
+# MISC
+# ============================================
+
 .babelrc
