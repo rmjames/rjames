@@ -7,25 +7,29 @@ const PORTFOLIO_DATA = {
   corteva: {
     company: 'Corteva',
     industry: 'Agricultural Technology',
-    role: 'Senior UX Engineer',
+    role: 'Frontend Developer & UX Researcher',
     duration: '2021 - 2022',
-    description: 'Worked on a team that built a blockchain-based tracking and traceability system from research through development. Including a mobile web app for production line management.',
+    description: 'I worked on a project that created a private blockchain to track items that have been "tokenized" on the blockchain. The project was a turnkey solution and was agnostic to any product. The initial kickoff project was customized for an agricultural product.',
     challenges: [
-      'Complex data tracking across multiple production stages',
-      'Mobile-first design for factory floor workers',
-      'Real-time blockchain integration for traceability'
+      'Determining if blockchain technology could effectively track and audit products throughout the supply line',
+      'Creating a product-agnostic system that could be customized for different industries',
+      'Designing intuitive interfaces for both desktop and mobile platforms',
+      'Coordinating between frontend team, backend developers, and fractional designer'
     ],
     solutions: [
-      'Developed intuitive mobile web interface for production line scanning',
-      'Implemented real-time data synchronization with blockchain backend',
-      'Created accessible components for diverse user base'
+      'Conducted user research with UX Researcher and Product Manager, including interviews to understand supply chain workflows',
+      'Produced user flows, personas, and technical schematics during research phase',
+      'Led system design and frontend development for desktop and mobile applications',
+      'Worked iteratively with designer to refine designs throughout development',
+      'Collaborated with frontend team member to implement the final designs'
     ],
     impact: [
-      'Reduced manual data entry errors by 40%',
-      'Improved product traceability across supply chain',
-      'Enabled compliance with regulatory requirements'
+      'Successfully delivered a turnkey blockchain tracking solution',
+      'Created reusable system architecture applicable across multiple industries',
+      'Validated blockchain use case for supply chain traceability',
+      'Established foundation for future product customizations'
     ],
-    technologies: ['React', 'TypeScript', 'Blockchain', 'Progressive Web Apps', 'Mobile UX']
+    technologies: ['React', 'Blockchain', 'Mobile Development', 'UX Research', 'System Design', 'Desktop & Mobile Apps']
   },
   microsoft: {
     company: 'Microsoft',
@@ -48,7 +52,7 @@ const PORTFOLIO_DATA = {
       'Automated complex royalty calculations',
       'Improved transparency for content creators'
     ],
-    technologies: ['Angular', 'Azure', 'Blockchain', 'TypeScript', 'Data Visualization']
+    technologies: ['React', 'Azure', 'Blockchain', 'TypeScript', 'Data Visualization']
   },
   'bank-of-america': {
     company: 'Bank of America',
@@ -223,6 +227,8 @@ function generatePortfolioHTML(projectSlug) {
             }
 
             .portfolio-header {
+                display: grid;
+                gap: var(--m);
                 margin-bottom: var(--xxxl);
                 padding-bottom: var(--xl);
                 border-bottom: 1px solid var(--gray-1);
@@ -322,6 +328,14 @@ function generatePortfolioHTML(projectSlug) {
                 margin: var(--xl) 0;
             }
 
+            .portfolio-image {
+                width: 100%;
+                height: auto;
+                border-radius: var(--border-radius);
+                margin: var(--xl) 0;
+                display: block;
+            }
+
             .back-link {
                 display: inline-flex;
                 align-items: center;
@@ -361,9 +375,13 @@ function generatePortfolioHTML(projectSlug) {
                 </div>
             </header>
 
-            <div class="portfolio-placeholder-image">
-                [Project Screenshot Placeholder]
-            </div>
+            ${projectSlug === 'microsoft' ? `
+            <img src="/images/portfolio_item_10_dashboard@2x.png" alt="${project.company} Dashboard" class="portfolio-image" />
+            ` : projectSlug === 'corteva' ? `
+            <img src="/images/corteva-0.jpg" alt="${project.company} Overview" class="portfolio-image" />
+            ` : `
+            <div class="portfolio-placeholder-image">[Project Screenshot Placeholder]</div>
+            `}
 
             <section class="portfolio-section">
                 <h2 class="portfolio-section-title">Challenges</h2>
@@ -372,9 +390,13 @@ function generatePortfolioHTML(projectSlug) {
                 </ul>
             </section>
 
-            <div class="portfolio-placeholder-image">
-                [Design Process Placeholder]
-            </div>
+            ${projectSlug === 'microsoft' ? `
+            <img src="/images/portfolio_item_8.jpg" alt="${project.company} Design Process" class="portfolio-image" />
+            ` : projectSlug === 'corteva' ? `
+            <img src="/images/corteva-1.jpg" alt="${project.company} Research & Design" class="portfolio-image" />
+            ` : `
+            <div class="portfolio-placeholder-image">[Design Process Placeholder]</div>
+            `}
 
             <section class="portfolio-section">
                 <h2 class="portfolio-section-title">Solutions</h2>
@@ -383,9 +405,13 @@ function generatePortfolioHTML(projectSlug) {
                 </ul>
             </section>
 
-            <div class="portfolio-placeholder-image">
-                [Implementation Screenshot Placeholder]
-            </div>
+            ${projectSlug === 'microsoft' ? `
+            <img src="/images/portfolio_item_4.jpg" alt="${project.company} Implementation" class="portfolio-image" />
+            ` : projectSlug === 'corteva' ? `
+            <img src="/images/corteva-2.jpg" alt="${project.company} Implementation" class="portfolio-image" />
+            ` : `
+            <div class="portfolio-placeholder-image">[Implementation Screenshot Placeholder]</div>
+            `}
 
             <section class="portfolio-section">
                 <h2 class="portfolio-section-title">Impact</h2>
