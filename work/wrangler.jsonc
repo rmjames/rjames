@@ -1,0 +1,37 @@
+{
+  "name": "portfolio-secure-auth",
+  "main": "./secure-worker.js",
+  "compatibility_date": "2025-11-06",
+  "compatibility_flags": ["nodejs_compat"],
+
+  // Required for production deployment
+  "routes": [
+    { "pattern": "robertjames.nyc/work/*", "zone_name": "robertjames.nyc" }
+  ],
+
+  // KV Namespace for session storage and rate limiting
+  "kv_namespaces": [
+    {
+      "binding": "KV",
+      "id": "ee88e9680b2645f288512be9d7cc2160",
+      "preview_id": "52f8652d4b394a4b8833d6c8bd4c920a"
+    }
+  ],
+
+  // Environment: Production
+  "env": {
+    "production": {
+      "vars": { "ENVIRONMENT": "production" },
+      "kv_namespaces": [
+        {
+          "binding": "KV",
+          "id": "ee88e9680b2645f288512be9d7cc2160",
+          "preview_id": "52f8652d4b394a4b8833d6c8bd4c920a"
+        }
+      ]
+    },
+    "staging": {
+      "vars": { "ENVIRONMENT": "staging" }
+    }
+  }
+}
