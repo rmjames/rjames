@@ -12,6 +12,7 @@
     "deploy:dev": "cd work && wrangler dev",
     "deploy:tail": "cd work && wrangler tail --env production",
     "deploy:rollback": "cd work && wrangler deployments list"
+    "e2e": "playwright test"
   },
   "author": "",
   "license": "ISC",
