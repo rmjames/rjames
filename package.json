@@ -6,12 +6,6 @@
   "scripts": {
     "start": "http-server -p 3000",
     "test": "vitest",
-    "e2e": "playwright test",
-    "deploy": "cd work && wrangler deploy --env production",
-    "deploy:staging": "cd work && wrangler deploy --env staging",
-    "deploy:dev": "cd work && wrangler dev",
-    "deploy:tail": "cd work && wrangler tail --env production",
-    "deploy:rollback": "cd work && wrangler deployments list"
     "e2e": "playwright test"
   },
   "author": "",
