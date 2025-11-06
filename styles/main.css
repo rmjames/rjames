@@ -165,8 +165,6 @@ body > * + * {
         --orange-2: oklch(from hsl(38.8 100% 50%) l c h);
         --orange-3: oklch(from hsl(13.9 95.2% 67.1%) l c h);
         --orange-4: oklch(from #777 l c h);
-        --color-brand: oklch(from hsl(200 11% 48%) l c h);
-        --text-color: oklch(from hsl(200 8% 16%) l c h);
     }
 }
 
@@ -399,35 +397,6 @@ main {
     }
 
     & .work-summary {
-        color: var(--text-color);
-        margin-block-end: var(--m);
-    }
-
-    & .portfolio-link {
-        display: inline-block;
-        margin-block-start: var(--s);
-        padding: var(--xs) var(--m);
-        color: var(--blue-2);
-        text-decoration: none;
-        font-weight: 600;
-        font-size: 0.85rem;
-        border-radius: var(--border-radius);
-        transition:
-            background-color 0.2s var(--link-ease),
-            color 0.2s var(--link-ease),
-            transform 0.15s var(--link-ease);
-
-        &:hover,
-        &:focus {
-            background-color: color-mix(in oklch, var(--blue-2) 15%, transparent 85%);
-            transform: translateX(0.25rem);
-        }
-
-        &:active {
-            transform: translateX(0.5rem);
-        }
-    }
-
         color: light-dark(var(--text-dark-color), var(--text-light-color));
         margin-block-end: var(--m);
     }
@@ -736,12 +705,7 @@ details {
 @media (prefers-color-scheme: dark) {
     body,
     html {
-        --text-color: var(--white-1);
         --text-shadow: var(--white-2);
-        --bkgnd: var(--black-3);
-    }
-    :where(.footer-menu--item a, .link-contact, nav a) {
-        color: var(--white-1);
     }
 }
 
@@ -756,4 +720,5 @@ details {
     initial-value: 10%;
     inherits: false;
 }
+
 /*# sourceMappingURL=main.css.map */
