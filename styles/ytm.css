@@ -1,0 +1,171 @@
+/* YouTube Music Case Study Styles */
+
+.case-study-hero {
+    padding: 2rem 1rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    scroll-snap-align: start;
+    scroll-margin-top: 2rem;
+}
+
+.case-study-title {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    line-height: 1.1;
+}
+
+.case-study-subtitle {
+    font-size: clamp(1.125rem, 2.5vw, 1.5rem);
+    color: light-dark(var(--black-5), var(--gray-1));
+    margin-bottom: 1.5rem;
+}
+
+.case-study-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+}
+
+.tag {
+    padding: 0.25rem 0.75rem;
+    background: light-dark(
+        oklch(from var(--black-1) l c h / 0.05),
+        oklch(from var(--white-1) l c h / 0.1)
+    );
+    border-radius: 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.quick-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    padding: 2rem;
+    background: light-dark(
+        oklch(from var(--black-1) l c h / 0.02),
+        oklch(from var(--white-1) l c h / 0.05)
+    );
+    border-radius: 0.5rem;
+    margin-bottom: 3rem;
+    scroll-snap-align: start;
+    scroll-margin-top: 2rem;
+}
+
+.summary-item h3 {
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: light-dark(var(--black-5), var(--gray-1));
+    margin-bottom: 0.5rem;
+}
+
+.summary-item p {
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.case-study-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+.case-study-section {
+    margin-bottom: 4rem;
+    scroll-snap-align: start;
+    scroll-margin-top: 2rem;
+}
+
+.case-study-section h2 {
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    margin-bottom: 1rem;
+}
+
+.case-study-section p {
+    font-size: clamp(1rem, 2vw, 1.125rem);
+    line-height: 1.7;
+    margin-bottom: 1.5rem;
+    max-width: 70ch;
+}
+
+.image-container {
+    width: 100%;
+    margin: 2rem 0;
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+.image-container img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.image-placeholder {
+    aspect-ratio: 16 / 9;
+    background: linear-gradient(135deg, hsl(237 70% 65%) 0%, hsl(278 43% 54%) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--white-1);
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.comparison-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin: 2rem 0;
+}
+
+.comparison-item h3 {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.feature-list {
+    list-style: none;
+    padding: 0;
+}
+
+.feature-list li {
+    padding-left: 2rem;
+    position: relative;
+    margin-bottom: 1rem;
+}
+
+.feature-list li::before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: light-dark(var(--blue-2), var(--blue-4));
+    font-weight: bold;
+    font-size: 1.25rem;
+}
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: light-dark(
+        oklch(from var(--black-1) l c h / 0.05),
+        oklch(from var(--white-1) l c h / 0.1)
+    );
+    border-radius: 0.5rem;
+    text-decoration: none;
+    font-weight: 500;
+    margin-bottom: 2rem;
+    transition: transform 0.2s ease;
+}
+
+.back-link:hover {
+    transform: translateX(-4px);
+}
+
+/*# sourceMappingURL=ytm.css.map */
