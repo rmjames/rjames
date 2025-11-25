@@ -401,6 +401,20 @@ main {
         margin-block-end: var(--m);
     }
 
+    & .roles {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--s);
+    }
+
+    & .role {
+        background: var(--gray-1);
+        color: var(--black-1);
+        padding: var(--xs) var(--s);
+        border-radius: var(--border-radius);
+        font-size: 0.75rem;
+    }
+
     &:popover-open {
         opacity: 1;
         transform: translateY(1.25rem); /* popover position on open */
