@@ -1,164 +1,150 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-51900523-1"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'UA-51900523-1');
-    </script>
-    <meta charset="UTF-8"/>
-    <meta name="color-scheme" content="dark light"/>
-    <meta name="theme-color" content="#212121" media="(prefers-color-scheme: dark)"/>
-    <meta name="theme-color" content="#dee1e3" media="(prefers-color-scheme: light)" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
-    <meta name="disabled-adaptations" content="watch"/>
-    <meta name="Description" content="Robert James - A UX Engineer who designs and builds digital experiences and products"/>
-    <title>Lab | Portfolio</title>
-    <meta property="og:title" content="Robert James"/>
-    <meta property="og:type" content="website"/>
-    <meta property="og:url" content="http:robertjames.nyc"/>
-    <meta property="og:image" content="https://assets.codepen.io/37861/rj-whole.png"/>
-    <meta property="og:locale" content="us_EN"/>
-    <meta property="og:site_name" content="Robert James"/>
-    <meta name="twitter:card" content="summary_large_image"/>
-    <meta name="twitter:image:alt" content="Robert James"/>
-    <link rel="preload" href="styles/main.css" as="style">
-    <link rel="preload" href="styles/mpa.css" as="style">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="dns-prefetch" href="https://www.googletagmanager.com">
-    <link rel="dns-prefetch" href="https://cpwebassets.codepen.io">
-    <link rel="preload" href="https://fonts.gstatic.com/s/recursive/v37/8vI9msNAzcmCWUBBJd-CFkYWgW-w2Q.woff2" as="font" type="font/woff2" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Recursive:wght,CASL,CRSV,MONO@400..900,0..1,0..1,0..1&display=swap" rel="stylesheet"> 
-    <link rel="stylesheet" href="styles/main.css">
-    <link rel="stylesheet" href="styles/mpa.css">
-    <link rel="icon" type="image/svg+xml" href="images/icon.svg">
-    <link rel="apple-touch-icon" href="/images/icon-ios.svg">
-    <link rel="icon" type="image/png" href="/favicon_144.png" sizes="144x144">
-    <link rel="icon" type="image/png" href="/favicon.png" sizes="144x144">
-    <link rel="icon" type="image/png" href="/favicon_512.png" sizes="512x512">
-    <link rel="icon" type="image/png" href="/favicon_192.png" sizes="192x192">
-    <link rel="manifest" href="manifest.json">
-  </head>
-  <body>
-    <svg class="icon-set">  
-      <symbol id="twitter">
-        <title>Social-Icon Twitter</title>
-        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path>
-      </symbol>
-      <symbol id="linkedIn">
-        <title>Social-Icon LinkedIn</title>
-        <path d="M21,21H17V14.25C17,13.19 15.81,12.31 14.75,12.31C13.69,12.31 13,13.19 13,14.25V21H9V9H13V11C13.66,9.93 15.36,9.24 16.5,9.24C19,9.24 21,11.28 21,13.75V21M7,21H3V9H7V21M5,3A2,2 0 0,1 7,5A2,2 0 0,1 5,7A2,2 0 0,1 3,5A2,2 0 0,1 5,3Z"></path>
-      </symbol>
-      <symbol id="github">
-        <title>Social-Icon Github</title>
-        <path d="M12,2A10,10 0 0,0 2,12C2,16.42 4.87,20.17 8.84,21.5C9.34,21.58 9.5,21.27 9.5,21C9.5,20.77 9.5,20.14 9.5,19.31C6.73,19.91 6.14,17.97 6.14,17.97C5.68,16.81 5.03,16.5 5.03,16.5C4.12,15.88 5.1,15.9 5.1,15.9C6.1,15.97 6.63,16.93 6.63,16.93C7.5,18.45 8.97,18 9.54,17.76C9.63,17.11 9.89,16.67 10.17,16.42C7.95,16.17 5.62,15.31 5.62,11.5C5.62,10.39 6,9.5 6.65,8.79C6.55,8.54 6.2,7.5 6.75,6.15C6.75,6.15 7.59,5.88 9.5,7.17C10.29,6.95 11.15,6.84 12,6.84C12.85,6.84 13.71,6.95 14.5,7.17C16.41,5.88 17.25,6.15 17.25,6.15C17.8,7.5 17.45,8.54 17.35,8.79C18,9.5 18.38,10.39 18.38,11.5C18.38,15.32 16.04,16.16 13.81,16.41C14.17,16.72 14.5,17.33 14.5,18.26C14.5,19.6 14.5,20.68 14.5,21C14.5,21.27 14.66,21.59 15.17,21.5C19.14,20.16 22,16.42 22,12A10,10 0 0,0 12,2Z"></path>
-      </symbol>
-      <symbol id="codepen">
-        <title>Social-Icon CodePen</title>
-        <path
-          d="M427 201.9c-0.6-4.2-2.9-8-6.4-10.3L264.2 87.3c-4.9-3.3-11.4-3.3-16.3 0L91.4 191.6c-4 2.7-6.5 7.4-6.5 12.2v104.3c0 4.8 2.5 9.6 6.5 12.2l156.4 104.3c4.9 3.3 11.4 3.3 16.3 0L420.6 320.4c4-2.6 6.6-7.4 6.6-12.2V203.9C427.1 203.2 427.1 202.6 427 201.9 427 201.7 427.1 202.6 427 201.9zM270.7 127.1l115.2 76.8 -51.5 34.4 -63.8-42.7V127.1zM241.3 127.1v68.6l-63.8 42.7 -51.5-34.4L241.3 127.1zM114.3 231.4l36.8 24.6 -36.8 24.6V231.4zM241.3 384.9L126.1 308.1l51.5-34.4 63.8 42.6V384.9zM256 290.8l-52-34.8 52-34.8 52 34.8L256 290.8zM270.7 384.9V316.3l63.8-42.6 51.5 34.4L270.7 384.9zM397.7 280.6l-36.8-24.6 36.8-24.6V280.6z"/>
-      </symbol>
-      <symbol id="email">
-        <title>Icon E-mail</title>
-        <path d="M20,4H4A2,2 0 0,0 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V6A2,2 0 0,0 20,4M20,18H4V8L12,13L20,8V18M20,6L12,11L4,6V6H20V6Z"></path>
-      </symbol>  
-    </svg>
-    <header class="header">
-      <h1><a href="index.html">robert james</a></h1>
-      <nav>
-        <ul>
-          <li class="nav-item"><a href="/resume.html">resume</a></li>
-        </ul>
-      </nav>
-    </header>
-    <main id="about">
-      <div class="cover">
-        
-          <p>example</p>
-          <p class="codepen" data-height="400" data-theme-id="47566" data-default-tab="result" data-slug-hash="oNOYMYM" data-pen-title="Microsoft-logo-proto" data-user="rmjames" data-token="de4f616f6e0aea6779262aec5b1dd329" style="height: 300px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;">
-            <span>See the Pen <a href="https://codepen.io/rmjames/pen/oNOYMYM/de4f616f6e0aea6779262aec5b1dd329">
-            Microsoft-logo-proto</a> by Robert James (<a href="https://codepen.io/rmjames">@rmjames</a>)
-            on <a href="https://codepen.io">CodePen</a>.</span>
-          </p>
-          <script async src="https://cpwebassets.codepen.io/assets/embed/ei.js"></script>
 
-          
-      </div>
-    </main>
-    <footer class="footer-menu">
+<head>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-51900523-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'UA-51900523-1');
+  </script>
+  <meta charset="UTF-8" />
+  <meta name="color-scheme" content="dark light" />
+  <meta name="theme-color" content="#212121" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#dee1e3" media="(prefers-color-scheme: light)" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="disabled-adaptations" content="watch" />
+  <meta name="Description"
+    content="Robert James - A UX Engineer who designs and builds digital experiences and products" />
+  <title>Lab | Portfolio</title>
+  <meta property="og:title" content="Robert James" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="http:robertjames.nyc" />
+  <meta property="og:image" content="https://assets.codepen.io/37861/rj-whole.png" />
+  <meta property="og:locale" content="us_EN" />
+  <meta property="og:site_name" content="Robert James" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image:alt" content="Robert James" />
+  <link rel="preload" href="styles/main.css" as="style">
+  <link rel="stylesheet" href="styles/main.css">
+  <link rel="icon" type="image/svg+xml" href="images/icon.svg">
+  <link rel="apple-touch-icon" href="/images/icon-ios.svg">
+  <link rel="icon" type="image/png" href="/favicon_144.png" sizes="144x144">
+  <link rel="icon" type="image/png" href="/favicon.png" sizes="144x144">
+  <link rel="icon" type="image/png" href="/favicon_512.png" sizes="512x512">
+  <link rel="icon" type="image/png" href="/favicon_192.png" sizes="192x192">
+  <link rel="manifest" href="manifest.json">
+</head>
+
+<body>
+  <svg class="icon-set">
+    <symbol id="twitter">
+      <title>Social-Icon Twitter</title>
+      <path
+        d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z">
+      </path>
+    </symbol>
+    <symbol id="linkedIn">
+      <title>Social-Icon LinkedIn</title>
+      <path
+        d="M21,21H17V14.25C17,13.19 15.81,12.31 14.75,12.31C13.69,12.31 13,13.19 13,14.25V21H9V9H13V11C13.66,9.93 15.36,9.24 16.5,9.24C19,9.24 21,11.28 21,13.75V21M7,21H3V9H7V21M5,3A2,2 0 0,1 7,5A2,2 0 0,1 5,7A2,2 0 0,1 3,5A2,2 0 0,1 5,3Z">
+      </path>
+    </symbol>
+    <symbol id="github">
+      <title>Social-Icon Github</title>
+      <path
+        d="M12,2A10,10 0 0,0 2,12C2,16.42 4.87,20.17 8.84,21.5C9.34,21.58 9.5,21.27 9.5,21C9.5,20.77 9.5,20.14 9.5,19.31C6.73,19.91 6.14,17.97 6.14,17.97C5.68,16.81 5.03,16.5 5.03,16.5C4.12,15.88 5.1,15.9 5.1,15.9C6.1,15.97 6.63,16.93 6.63,16.93C7.5,18.45 8.97,18 9.54,17.76C9.63,17.11 9.89,16.67 10.17,16.42C7.95,16.17 5.62,15.31 5.62,11.5C5.62,10.39 6,9.5 6.65,8.79C6.55,8.54 6.2,7.5 6.75,6.15C6.75,6.15 7.59,5.88 9.5,7.17C10.29,6.95 11.15,6.84 12,6.84C12.85,6.84 13.71,6.95 14.5,7.17C16.41,5.88 17.25,6.15 17.25,6.15C17.8,7.5 17.45,8.54 17.35,8.79C18,9.5 18.38,10.39 18.38,11.5C18.38,15.32 16.04,16.16 13.81,16.41C14.17,16.72 14.5,17.33 14.5,18.26C14.5,19.6 14.5,20.68 14.5,21C14.5,21.27 14.66,21.59 15.17,21.5C19.14,20.16 22,16.42 22,12A10,10 0 0,0 12,2Z">
+      </path>
+    </symbol>
+    <symbol id="codepen">
+      <title>Social-Icon CodePen</title>
+      <path
+        d="M427 201.9c-0.6-4.2-2.9-8-6.4-10.3L264.2 87.3c-4.9-3.3-11.4-3.3-16.3 0L91.4 191.6c-4 2.7-6.5 7.4-6.5 12.2v104.3c0 4.8 2.5 9.6 6.5 12.2l156.4 104.3c4.9 3.3 11.4 3.3 16.3 0L420.6 320.4c4-2.6 6.6-7.4 6.6-12.2V203.9C427.1 203.2 427.1 202.6 427 201.9 427 201.7 427.1 202.6 427 201.9zM270.7 127.1l115.2 76.8 -51.5 34.4 -63.8-42.7V127.1zM241.3 127.1v68.6l-63.8 42.7 -51.5-34.4L241.3 127.1zM114.3 231.4l36.8 24.6 -36.8 24.6V231.4zM241.3 384.9L126.1 308.1l51.5-34.4 63.8 42.6V384.9zM256 290.8l-52-34.8 52-34.8 52 34.8L256 290.8zM270.7 384.9V316.3l63.8-42.6 51.5 34.4L270.7 384.9zM397.7 280.6l-36.8-24.6 36.8-24.6V280.6z" />
+    </symbol>
+    <symbol id="email">
+      <title>Icon E-mail</title>
+      <path
+        d="M20,4H4A2,2 0 0,0 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V6A2,2 0 0,0 20,4M20,18H4V8L12,13L20,8V18M20,6L12,11L4,6V6H20V6Z">
+      </path>
+    </symbol>
+  </svg>
+  <header class="header">
+    <h1><a href="index.html">robert james</a></h1>
+    <nav>
       <ul>
-        <li class="footer-menu--item onEnter" style='--delay: .54s' role='listitem'>
-          <a href="https://www.linkedin.com/in/robertmajames" class="linkedIn" target="_blank" rel="noopener">
-            <svg 
-              id="icon-linkedIn"
-              role="img"
-              aria-label='LinkedIn Icon'
-              style="width:2em;height:2em"
-              viewbox="0 0 24 24">
-              <title>Linkedin icon</title>
-              <use href="#linkedIn"></use>
-            </svg>
-            <p class='icon-text'>LinkedIn</p>
-          </a>
-        </li>
-        <li class="footer-menu--item onEnter" style='--delay: .5s' role='listitem'>
-          <a href="https://github.com/rmjames" class="github" target="_blank" rel="noopener">
-            <svg
-              id="icon-github"
-              role="img"
-              aria-label='Github Icon'
-              style="width:2em;height:2em"
-              viewbox="0 0 24 24">
-              <title>Github icon</title>
-              <use href="#github"></use>
-            </svg>
-            <p class='icon-text'>Github</p>
-          </a>
-        </li>
-        <li class="footer-menu--item" role='listitem'>
-          <a href="https://codepen.io/rmjames/" class="codepen" target="_blank" rel="noopener">
-            <svg
-              id="icon-codepen"
-              role="img"
-              aria-label="Codepen Icon"
-              style="width:2em;height:2em"
-              viewbox="0 0 512 512">
-              <title>Codepen icon</title>
-              <use
-                href="#codepen"
-                transform="scale(1.2) translate(-20,-25)">
-              </use>
-            </svg>
-            <p>Codepen</p>
-          </a>
-        </li>
-        <li class="footer-menu--item onEnter" style='--delay: .48s' role='listitem'>
-          <a href="https://twitter.com/bkrjames" class="twitter" target="_blank" rel="noopener">
-            <svg
-              id="icon-twitter"
-              role="img"
-              aria-label="Twitter Icon"
-              style="width:2em;height:2em"
-              viewbox="0 0 24 24">
-              <title>Twitter icon</title>
-              <use href="#twitter"></use>
-            </svg>
-            <p class='icon-text'>X</p>
-          </a>
-        </li>
-        <li class="footer-menu--item onEnter" style='--delay: .44s' role='listitem'>
-          <a href="mailto:rma.james@gmail.com?Subject=Inquiry" class="email">
-            <svg id="icon-email" role="img" aria-label="Email Icon" style="width:2em;height:2em" viewBox="0 0 24 24">
-              <use href="#email"></use>
-            </svg>
-            <p class='icon-text'>Email</p>
-          </a>
-        </li>
+        <li class="nav-item"><a href="/resume.html">resume</a></li>
       </ul>
-      <p class="copyright">© Robert James 2025</p>
-    </footer>
-  </body>
+    </nav>
+  </header>
+  <main id="about">
+    <div class="cover">
+
+      <p>example</p>
+      <p class="codepen" data-height="400" data-theme-id="47566" data-default-tab="result" data-slug-hash="oNOYMYM"
+        data-pen-title="Microsoft-logo-proto" data-user="rmjames" data-token="de4f616f6e0aea6779262aec5b1dd329"
+        style="height: 300px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;">
+        <span>See the Pen <a href="https://codepen.io/rmjames/pen/oNOYMYM/de4f616f6e0aea6779262aec5b1dd329">
+            Microsoft-logo-proto</a> by Robert James (<a href="https://codepen.io/rmjames">@rmjames</a>)
+          on <a href="https://codepen.io">CodePen</a>.</span>
+      </p>
+      <script async src="https://cpwebassets.codepen.io/assets/embed/ei.js"></script>
+
+
+    </div>
+  </main>
+  <footer class="footer-menu">
+    <ul>
+      <li class="footer-menu--item onEnter" style='--delay: .54s' role='listitem'>
+        <a href="https://www.linkedin.com/in/robertmajames" class="linkedIn" target="_blank" rel="noopener">
+          <svg id="icon-linkedIn" role="img" aria-label='LinkedIn Icon' style="width:2em;height:2em"
+            viewbox="0 0 24 24">
+            <title>Linkedin icon</title>
+            <use href="#linkedIn"></use>
+          </svg>
+          <p class='icon-text'>LinkedIn</p>
+        </a>
+      </li>
+      <li class="footer-menu--item onEnter" style='--delay: .5s' role='listitem'>
+        <a href="https://github.com/rmjames" class="github" target="_blank" rel="noopener">
+          <svg id="icon-github" role="img" aria-label='Github Icon' style="width:2em;height:2em" viewbox="0 0 24 24">
+            <title>Github icon</title>
+            <use href="#github"></use>
+          </svg>
+          <p class='icon-text'>Github</p>
+        </a>
+      </li>
+      <li class="footer-menu--item" role='listitem'>
+        <a href="https://codepen.io/rmjames/" class="codepen" target="_blank" rel="noopener">
+          <svg id="icon-codepen" role="img" aria-label="Codepen Icon" style="width:2em;height:2em"
+            viewbox="0 0 512 512">
+            <title>Codepen icon</title>
+            <use href="#codepen" transform="scale(1.2) translate(-20,-25)">
+            </use>
+          </svg>
+          <p>Codepen</p>
+        </a>
+      </li>
+      <li class="footer-menu--item onEnter" style='--delay: .48s' role='listitem'>
+        <a href="https://twitter.com/bkrjames" class="twitter" target="_blank" rel="noopener">
+          <svg id="icon-twitter" role="img" aria-label="Twitter Icon" style="width:2em;height:2em" viewbox="0 0 24 24">
+            <title>Twitter icon</title>
+            <use href="#twitter"></use>
+          </svg>
+          <p class='icon-text'>X</p>
+        </a>
+      </li>
+      <li class="footer-menu--item onEnter" style='--delay: .44s' role='listitem'>
+        <a href="mailto:rma.james@gmail.com?Subject=Inquiry" class="email">
+          <svg id="icon-email" role="img" aria-label="Email Icon" style="width:2em;height:2em" viewBox="0 0 24 24">
+            <use href="#email"></use>
+          </svg>
+          <p class='icon-text'>Email</p>
+        </a>
+      </li>
+    </ul>
+    <p class="copyright">© Robert James 2025</p>
+  </footer>
+</body>
+
 </html>
