@@ -132,8 +132,9 @@ body>*+* {
     --color-brand: var(--gray-1);
     --text-dark-color: var(--black-3);
     --text-light-color: var(--white-1);
-    --text-shadow: var(--orange-1);
-    --text-shadow-subtle: drop-shadow(0 0 .125px var(--text-shadow)) --link-color: var(--blue-2);
+    --text-shadow: var(--white-1);
+    --text-shadow-subtle: drop-shadow(0 0 .125px var(--text-shadow));
+    --link-color: var(--blue-2);
     --link-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
     --link-timing: 444ms;
     --font-stack:
@@ -207,7 +208,7 @@ html {
 body {
     display: flex;
     flex-direction: column;
-    background: color-mix(in oklch, var(--bkgnd) 24%, var(--blue-3) 4%);
+    background: color-mix(in oklch, var(--bkgnd) 32%, var(--blue-3) 4%);
     color: light-dark(var(--text-dark-color), var(--text-light-color));
     font-family: var(--font-stack);
     font-optical-sizing: auto;
