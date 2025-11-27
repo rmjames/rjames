@@ -133,7 +133,7 @@ body>*+* {
     --text-dark-color: var(--black-3);
     --text-light-color: var(--white-1);
     --text-shadow: var(--orange-1);
-    --link-color: var(--blue-2);
+    --text-shadow-subtle: drop-shadow(0 0 .125px var(--text-shadow)) --link-color: var(--blue-2);
     --link-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
     --link-timing: 444ms;
     --font-stack:
@@ -207,7 +207,7 @@ html {
 body {
     display: flex;
     flex-direction: column;
-    background: var(--bkgnd);
+    background: color-mix(in oklch, var(--bkgnd) 24%, var(--blue-3) 4%);
     color: light-dark(var(--text-dark-color), var(--text-light-color));
     font-family: var(--font-stack);
     font-optical-sizing: auto;
@@ -267,7 +267,7 @@ h1 {
     filter: drop-shadow(0.5px 0.5px 1px var(--text-shadow));
 
     &:hover {
-        --recursive-wght: 900;
+        --recursive-wght: 800;
         --recursive-CASL: 0.1;
     }
 }
@@ -279,7 +279,7 @@ h1 {
 }
 
 .header a {
-    filter: drop-shadow(0.5px 0.5px 1px var(--text-shadow));
+    filter: var(--text-shadow-subtle);
     padding-bottom: var(--s);
 }
 
@@ -296,8 +296,9 @@ main {
     flex-direction: column;
     justify-content: center;
     min-block-size: 100vh;
-    padding: 1rem;
+    padding: var(--m);
     position: relative;
+    text-wrap: pretty;
 }
 
 :where(.cover, footer) {
@@ -332,6 +333,7 @@ main {
     font: inherit;
     text-decoration: none;
     text-align: left;
+    filter: var(--text-shadow-subtle);
 
     &:where(:hover, :focus, :active, :target, :focus-within) {
         --recursive-wght: 800;
@@ -355,24 +357,28 @@ main {
 }
 
 .company-popover {
-    position: absolute;
+    position: fixed;
+    inset: 0;
+    margin: auto;
     background: var(--bkgnd);
     border: 1px solid color-mix(in oklch, var(--blue-2) 88%, transparent 12%);
     border-radius: var(--border-radius);
-    padding: 1rem;
-    padding-block-end: 1.25rem;
+    padding: var(--m);
+    padding-block-end: 1.125rem;
     inline-size: min(80%, 480px);
+    block-size: fit-content;
     font-size: 0.875rem;
     line-height: 1.4;
+    text-wrap: pretty;
     transition:
         opacity var(--link-timing) var(--link-ease),
         transform var(--link-timing) var(--link-ease),
         display var(--link-timing) allow-discrete,
         overlay var(--link-timing) allow-discrete;
 
-    /* Exit state: hidden and moved up */
+    /* Exit state: hidden and moved down */
     opacity: 0;
-    transform: translateY(-6rem);
+    transform: translateY(2rem);
     transition:
         opacity var(--link-timing) var(--link-ease),
         transform var(--link-timing) var(--link-ease),
@@ -388,15 +394,16 @@ main {
         0 0 32px color-mix(in oklch, var(--white-1) 24%, transparent 76%);
 
     & .company-description {
-        --recursive-wght: 800;
-        --recursive-CASL: 0.25;
-        margin-block-end: var(--s);
+        --recursive-wght: 650;
+        --recursive-CASL: 0.75;
+        margin-block-start: var(--xxs);
+        margin-block-end: calc(var(--xxs) + var(--s));
+        filter: var(--text-shadow-subtle);
     }
 
     & .work-summary {
         color: light-dark(var(--text-dark-color), var(--text-light-color));
         margin-block-end: var(--m);
-        font-size: calc(var(--xs) + var(--s));
     }
 
     & .roles {
@@ -407,16 +414,14 @@ main {
 
     & .role {
         border: 1px solid;
-        padding: var(--xxs) var(--xs);
+        padding: var(--xxs) var(--s);
         border-radius: var(--border-radius);
-        font-size: calc(var(--xs) + var(--s));
-        ;
+        font-size: calc(var(--xxs) + var(--s));
     }
 
     &:popover-open {
         opacity: 1;
-        transform: translateY(1.25rem);
-        /* popover position on open */
+        transform: translateY(0);
     }
 }
 
@@ -429,55 +434,10 @@ main:has(~ .company-popover:popover-open) :not(.company-popover) {
     filter: blur(4px) opacity(0.64) hue-rotate(206deg);
 }
 
-/* Position Anchor support */
-@supports (anchor-name: --a) and (position-anchor: --a) {
-    .work {
-        anchor-name: --work-anchor;
-        position: relative;
-    }
-
-    .company-popover[popover] {
-        position: absolute;
-        position-anchor: --work-anchor;
-        top: anchor(top);
-    }
-}
-
-/* Position Anchor not supported */
-@supports not ((anchor-name: --a) and (position-anchor: --a)) {
-    .work {
-        position: relative;
-    }
-
-    .company-popover {
-        inset-block-start: 116dvh;
-        inset-inline-start: 8%;
-        inset-inline-end: 8%;
-
-        @media (orientation: landscape) and (max-height: 420px) {
-            inset-block-start: 128dvh;
-        }
-    }
-}
-
 @starting-style {
     .company-popover:popover-open {
         opacity: 0;
-        transform: translateY(4rem);
-        /* popover position on open */
-    }
-}
-
-/* Fallback for browsers without @starting-style support */
-@supports not (selector(:popover-open)) {
-    .company-popover {
-        opacity: 0;
-        transform: translateY(1rem);
-    }
-
-    .company-popover:popover-open {
-        opacity: 1;
-        transform: translateY(0);
+        transform: translateY(2rem);
     }
 }
 
@@ -491,6 +451,13 @@ main:has(~ .company-popover:popover-open) :not(.company-popover) {
         inset 0 -6px 0 0 oklch(from rgba(74, 152, 191, 0.52) l c h),
         inset 0 -10px 0 0 oklch(from rgba(74, 152, 191, 0.28) l c h);
     transition: box-shadow var(--link-ease) var(--link-timing);
+    --recursive-CRSV: 1;
+}
+
+.headline {
+    display: inline-block;
+    --recursive-wght: 500;
+    margin-block-end: var(--m);
 }
 
 .link-contact:hover {
