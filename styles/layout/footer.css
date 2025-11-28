@@ -1,0 +1,63 @@
+.footer-menu {
+    --recursive-wght: 200;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-block-start: auto;
+    font-size: clamp(1.1cqi, calc(var(--s) + 1.1cqi), var(--m));
+
+    ul {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.25vmin;
+
+        @media (width < 264px) {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    .copyright {
+        align-self: center;
+
+        @media (224px <=width < 264px) {
+            margin-block-start: calc(9dvh - 1rem);
+        }
+    }
+}
+
+.footer-menu--item a {
+    display: flex;
+    align-items: end;
+    margin-inline-end: var(--xxs);
+    gap: 1ch;
+    filter: drop-shadow(0.5px 0.5px 1px var(--text-shadow));
+    transition: fill 330ms;
+
+    @supports (color: color(display-p3 1 1 1)) and (prefers-color-scheme: dark) {
+        .footer-menu--item a {
+            --text-shadow: color(display-p3 0.873 0.883 0.889);
+        }
+    }
+}
+
+.footer-menu--item a.twitter:where(:hover, :focus, :active) {
+    fill: var(--blue-4);
+    filter: drop-shadow(1px 1px 1px var(--black-5));
+}
+
+.footer-menu--item a.email:where(:hover, :focus, :active) {
+    fill: #fb805b;
+    filter: drop-shadow(1px 1px 1px var(--orange-4));
+}
+
+.footer-menu--item a.linkedIn:where(:hover, :focus, :active) {
+    fill: var(--blue-1);
+    filter: drop-shadow(1px 1px 1px var(--black-5));
+}
+
+.footer-menu--item a.github:where(:hover, :focus, :active) {
+    fill: var(--black-4);
+    filter: drop-shadow(1px 1px 1px var(--black-5));
+}

@@ -1,0 +1,84 @@
+.company-popover {
+    position: fixed;
+    inset: 0;
+    margin: auto;
+    background: var(--bkgnd);
+    border: 1px solid color-mix(in oklch, var(--blue-2) 88%, transparent 12%);
+    border-radius: var(--border-radius);
+    padding: var(--m);
+    padding-block-end: 1.125rem;
+    inline-size: min(80%, 480px);
+    block-size: fit-content;
+    font-size: 0.875rem;
+    line-height: 1.4;
+    text-wrap: pretty;
+    transition:
+        opacity var(--link-timing) var(--link-ease),
+        transform var(--link-timing) var(--link-ease),
+        display var(--link-timing) allow-discrete,
+        overlay var(--link-timing) allow-discrete;
+
+    /* Exit state: hidden and moved down */
+    opacity: 0;
+    transform: translateY(2rem);
+    transition:
+        opacity var(--link-timing) var(--link-ease),
+        transform var(--link-timing) var(--link-ease),
+        display var(--link-timing) allow-discrete,
+        overlay var(--link-timing) allow-discrete;
+
+    box-shadow:
+        inset 0 0 2px color-mix(in oklch, var(--white-1) 44%, transparent 56%),
+        inset 0 0 1px color-mix(in oklch, var(--white-1) 72%, transparent 28%),
+        0 0 4px color-mix(in oklch, var(--blue-2) 48%, transparent 52%),
+        0 0 8px color-mix(in oklch, var(--white-1) 8%, transparent 92%),
+        0 0 16px color-mix(in oklch, var(--blue-2) 16%, transparent 84%),
+        0 0 32px color-mix(in oklch, var(--white-1) 24%, transparent 76%);
+
+    & .company-description {
+        --recursive-wght: 650;
+        --recursive-CASL: 0.75;
+        margin-block-start: var(--xxs);
+        margin-block-end: calc(var(--xxs) + var(--s));
+        filter: var(--text-shadow-subtle);
+    }
+
+    & .work-summary {
+        color: light-dark(var(--text-dark-color), var(--text-light-color));
+        margin-block-end: var(--m);
+    }
+
+    & .roles {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--s);
+    }
+
+    & .role {
+        border: 1px solid;
+        padding: var(--xxs) var(--s);
+        border-radius: var(--border-radius);
+        font-size: calc(var(--xxs) + var(--s));
+    }
+
+    &:popover-open {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.work {
+    transition: filter var(--link-timing) var(--link-ease);
+}
+
+/* Blur verything in main that is not .company-popover on :popover-open */
+main:has(~ .company-popover:popover-open) :not(.company-popover) {
+    filter: blur(4px) opacity(0.64) hue-rotate(206deg);
+}
+
+@starting-style {
+    .company-popover:popover-open {
+        opacity: 0;
+        transform: translateY(2rem);
+    }
+}

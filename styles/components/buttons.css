@@ -1,0 +1,58 @@
+.brand {
+    --recursive-wght: 600;
+    color: var(--gray-2);
+    transition:
+        color 0.1s,
+        font-weight 0.26s,
+        opacity 0.2s,
+        outline 0.2s;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+    text-decoration: none;
+    text-align: left;
+    filter: var(--text-shadow-subtle);
+
+    &:where(:hover, :focus, :active, :target, :focus-within) {
+        --recursive-wght: 800;
+        opacity: 0.5;
+        outline: 1px solid var(--orange-2);
+        border-radius: var(--border-radius);
+    }
+
+    &:where(:active, :target) {
+        color: light-dark(var(--text-dark-color), var(--text-light-color));
+        outline-width: var(--xxs);
+    }
+}
+
+.brands {
+    @media (width <=264px) {
+        display: inline-grid;
+        grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr));
+        gap: 4vmin;
+    }
+}
+
+.link-contact {
+    font-weight: 550;
+    padding: 0;
+    cursor: pointer;
+    box-shadow:
+        inset 0 -1px 0 0 oklch(from #4a98bf l c h),
+        inset 0 -2px 0 0 oklch(from rgba(74, 152, 191, 0.76) l c h),
+        inset 0 -6px 0 0 oklch(from rgba(74, 152, 191, 0.52) l c h),
+        inset 0 -10px 0 0 oklch(from rgba(74, 152, 191, 0.28) l c h);
+    transition: box-shadow var(--link-ease) var(--link-timing);
+    --recursive-CRSV: 1;
+}
+
+.link-contact:hover {
+    box-shadow:
+        inset 0 -2px 0 0 oklch(from rgba(74, 152, 191, 0.96) l c h),
+        inset 0 -4px 0 0 oklch(from rgba(74, 152, 191, 0.72) l c h),
+        inset 0 -8px 0 0 oklch(from rgba(74, 152, 191, 0.48) l c h),
+        inset 0 -12px 0 0 oklch(from rgba(74, 152, 191, 0.24) l c h);
+}

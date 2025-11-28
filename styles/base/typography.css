@@ -1,0 +1,40 @@
+*,
+*:before,
+*:after {
+    font-variation-settings:
+        "MONO" var(--recursive-MONO),
+        "CASL" var(--recursive-CASL),
+        "slnt" var(--recursive-slnt),
+        "CRSV" var(--recursive-CRSV),
+        "wght" var(--recursive-wght);
+}
+
+:where(:any-link, :-webkit-any-link) {
+    color: light-dark(var(--text-dark-color), var(--text-light-color));
+    text-decoration: none;
+    padding: 0 var(--xs);
+    transition: opacity 0.2s;
+}
+
+h1 {
+    --recursive-wght: 700;
+    --recursive-CASL: 0.64;
+    font-family: "Recursive", sans-serif, system-ui;
+    font-size: clamp(var(--f-base), calc(var(--f-base) + 0.4cqi), 1.5rem);
+    line-height: 1.1;
+    text-transform: uppercase;
+    transition: font-variation-settings 0.48s;
+    filter: drop-shadow(0.5px 0.5px 1px var(--text-shadow));
+
+    &:hover {
+        --recursive-wght: 800;
+        --recursive-CASL: 0.1;
+    }
+}
+
+/* header - drop shadow */
+:where(h1, .nav-item, .copyright) {
+    filter: drop-shadow(0.5px 0.5px 1px var(--text-shadow),
+            0.75px 0.75px 3px var(--text-shadow),
+            1.25px 1.25px 6px var(--text-shadow));
+}
