@@ -1,0 +1,119 @@
+.resume-container {
+    inline-size: clamp(32vmin, 36rem, 64vmin);
+}
+
+:where(#technical-skills-heading,
+    #work-experience-heading,
+    #education-heading,
+    #certifications-heading,
+    [aria-label="technical-skills"],
+    date) {
+    visibility: hidden;
+}
+
+:where(.bio, .skills-container) {
+    display: none;
+}
+
+:where([aria-label="technical-skills"],
+    [aria-label="work-experience"],
+    [aria-label="education"],
+    [aria-label="certifications"]) {
+    margin-block-end: 2.5rem;
+}
+
+:where(summary h3, date, .copyright) {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+details {
+    margin-block-end: var(--xxl);
+    margin-inline-start: var(--m);
+
+    * {
+        margin: 0;
+    }
+
+    ul {
+        padding-inline-start: var(--m);
+        padding-block-start: var(--m);
+    }
+
+    li {
+        padding-block: var(--s);
+    }
+
+    >summary {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        list-style: none;
+        list-style-type: outside;
+        position: relative;
+        cursor: pointer;
+        transition: text-shadow 0.32s ease-in-out;
+    }
+
+    &[open]>summary:focus {
+        text-shadow: 2px 2px 5px var(--text-shadow);
+    }
+
+    .job-title {
+        transition:
+            opacity 0.32s var(--link-ease),
+            translate 0.32s var(--link-ease);
+    }
+}
+
+.resume-container section {
+    @media (hover) and (prefers-reduced-motion: no-preference) {
+        &>details>summary {
+            transition:
+                opacity 0.32s var(--link-ease),
+                transform 0.32s var(--link-ease);
+        }
+
+        &:has(:hover)>details>summary:not(:hover) {
+            opacity: 0.25;
+            transform: scale(0.75), translate(0.125rem, 0);
+            transition:
+                opacity 0.32s var(--link-ease),
+                transform 0.32s var(--link-ease);
+        }
+
+        &:has(:focus)>details>summary:not(:focus) {
+            opacity: 0.25;
+            transform: scale(0.75), translate(0.125rem, 0);
+            transition:
+                opacity 0.32s var(--link-ease),
+                transform 0.32s var(--link-ease);
+        }
+    }
+}
+
+::details-content {
+    block-size: 0;
+    padding-left: 1.5rem;
+    opacity: 0;
+    overflow: clip;
+    transition:
+        block-size 0.32s ease-in-out,
+        content-visibility 0.32s ease-in-out allow-discrete,
+        opacity 0.64s,
+        text-shadow 0.32s ease-in-out;
+}
+
+[open]::details-content {
+    block-size: auto;
+    opacity: 1;
+}
+
+.job-title {
+    display: flex;
+    justify-content: space-between;
+    font-style: italic;
+    font-weight: 550;
+    padding-block-start: var(--l);
+}

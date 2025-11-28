@@ -1,0 +1,29 @@
+@keyframes enter {
+    from {
+        opacity: 0;
+    }
+}
+
+@keyframes rotate-gradient {
+    to {
+        --gradient-angle: 270deg;
+    }
+}
+
+@keyframes axis-x {
+    to {
+        --axis-x: 2%;
+    }
+}
+
+@property --gradient-angle {
+    syntax: "<angle>";
+    initial-value: 0deg;
+    inherits: false;
+}
+
+@property --axis-x {
+    syntax: "<percentage>";
+    initial-value: 10%;
+    inherits: false;
+}
