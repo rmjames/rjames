@@ -1,0 +1,11 @@
+:where(.about-item) {
+    font-size: max(var(--f-base), calc(1rem + 1cqi));
+    animation-name: enter;
+    animation-timeline: view();
+}
+
+.headline {
+    display: inline-block;
+    --recursive-wght: 500;
+    margin-block-end: var(--m);
+}

@@ -1,0 +1,27 @@
+header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    width: 100%;
+    min-block-size: 5rem;
+    scroll-snap-align: center;
+
+    nav ul {
+        display: flex;
+        align-items: center;
+        transition:
+            opacity 0.2s,
+            font-weight 0.26s;
+        gap: 1cqi;
+
+        a:hover {
+            font-weight: 850;
+            opacity: 0.5;
+        }
+    }
+}
+
+.header a {
+    filter: var(--text-shadow-subtle);
+    padding-bottom: var(--s);
+}
