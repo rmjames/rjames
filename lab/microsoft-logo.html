@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Microsoft Logo Proto</title>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <style>
+        *,
+        *:after,
+        *:before {
+            box-sizing: border-box;
+        }
+
+        body {
+            display: grid;
+            place-items: center;
+            min-block-size: 100vh;
+            margin: 0;
+            --timing: cubic-bezier(1, 0, 1, 1.19);
+            --delay: .36s;
+        }
+
+        section {
+            display: flex;
+            flex-wrap: wrap;
+            inline-size: 76vmin;
+            height: 76vmin;
+            gap: 0 1vmin;
+        }
+
+        .box {
+            block-size: 37vmin;
+            inline-size: 37vmin;
+            clip-path: inset(100% 100% 0% 0%);
+            background-color: var(--bg);
+        }
+
+        .toTop {
+            animation: toTop var(--delay) 1s var(--timing) forwards;
+        }
+
+        .toRight {
+            animation: toRight var(--delay) 1.125s var(--timing) forwards;
+        }
+
+        .toLeft {
+            animation: toLeft var(--delay) 1.25s var(--timing) forwards;
+        }
+
+        .toBottom {
+            animation: toBottom var(--delay) 1.375s var(--timing) forwards;
+        }
+
+        .reset-btn {
+            position: fixed;
+            bottom: 3cqi;
+            right: 3cqi;
+            background: transparent;
+            color: #33333a;
+            border: none;
+            cursor: pointer;
+            font-family: sans-serif;
+            font-weight: bold;
+            opacity: 0.5;
+            transition: opacity 0.2s;
+
+            &:hover {
+                opacity: 1;
+            }
+        }
+
+        @keyframes toRight {
+            to {
+                clip-path: inset(0% 0% 0% 0%);
+            }
+        }
+
+        @keyframes toBottom {
+            from {
+                clip-path: inset(0% 100% 100% 0%);
+            }
+
+            to {
+                clip-path: inset(0% 0% 0% 0%);
+            }
+        }
+
+        @keyframes toLeft {
+            from {
+                clip-path: inset(0% 0% 100% 100%);
+            }
+
+            to {
+                clip-path: inset(0% 0% 0% 0%);
+            }
+        }
+
+        @keyframes toTop {
+            from {
+                clip-path: inset(100% 0% 0% 100%);
+            }
+
+            to {
+                clip-path: inset(0% 0% 0% 0%);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <section>
+        <div class="box toTop" style='--bg: hsl(13.1, 90.4%, 55.3%)'></div>
+        <div class='box toRight' style='--bg: hsl(79.1, 93.8%, 38%)'></div>
+        <div class='box toLeft' style='--bg: hsl(199.1, 95.9%, 48.2%)'></div>
+        <div class='box toBottom' style='--bg: hsl(43.5, 100%, 50.8%)'></div>
+    </section>
+    <button class="reset-btn" onclick="resetAnimation()">
+        <span class="material-symbols-outlined">
+            refresh
+        </span>
+    </button>
+    <script>
+        function resetAnimation() {
+            const elements = document.querySelectorAll('.box');
+            elements.forEach(el => {
+                el.style.animation = 'none';
+                el.offsetHeight; /* trigger reflow */
+                el.style.animation = null;
+            });
+        }
+    </script>
+</body>
+
+</html>

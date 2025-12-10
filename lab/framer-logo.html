@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Framer Logo</title>
+    <style>
+        :root {
+            --color: #8DF;
+            --triangle: polygon(100% 0%, 100% 100%, 0% 0%);
+            --dimension: 9;
+        }
+
+        body {
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-size: 2vmin;
+        }
+
+        .polygon {
+            height: calc(var(--dimension) * 1em);
+            width: calc(var(--dimension) * 1em);
+            --dimension: 3;
+            position: relative;
+            background: var(--color);
+        }
+
+        .polygon:nth-child(2) {
+            --color: #09F;
+            background: var(--color);
+        }
+
+        .polygon:nth-child(3) {
+            --color: #05F;
+            background: var(--color);
+            clip-path: var(--triangle);
+            transform: translate(-3em, 0);
+        }
+
+        .top:before,
+        .mid:before {
+            height: calc(var(--dimension) * 1em);
+            width: calc(var(--dimension) * 1em);
+            --dimension: 3;
+            content: '';
+            position: absolute;
+            top: 0;
+            clip-path: var(--triangle);
+            transform: translate(-3em, 0);
+            background: inherit;
+        }
+
+        .mid {
+            transform: translate(-3em, 0);
+        }
+
+        .mid:before {
+            transform: translate(3em, 0);
+            clip-path: polygon(0% 0%, 100% 100%, 0% 100%);
+        }
+    </style>
+</head>
+
+<body>
+    <section class='icon'>
+        <div class='polygon top'></div>
+        <div class='polygon mid'></div>
+        <div class='polygon bottom'></div>
+    </section>
+</body>
+
+</html>

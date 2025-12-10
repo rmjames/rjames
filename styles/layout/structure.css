@@ -11,11 +11,6 @@ body {
     min-block-size: 100vh;
     padding: 0 4cqi;
     font-size: clamp(1rem, calc(1rem + 0.125cqi), 2rem);
-    animation:
-        rotate-gradient linear,
-        axis-x linear;
-    animation-timeline: scroll();
-    animation-range: 0 100dvh;
 
     @media (prefers-reduced-motion: no-preference) {
         interpolate-size: allow-keywords;
@@ -34,10 +29,6 @@ main {
     padding: var(--m);
     position: relative;
     text-wrap: pretty;
-}
-
-:where(.cover, footer) {
-    scroll-snap-align: start;
 }
 
 #about {

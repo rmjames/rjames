@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emoji Speaker Animation</title>
+    <style>
+        body {
+            --init-opacity: .32;
+            display: grid;
+            place-items: center;
+            block-size: 100vh;
+            background-color: oklch(from hsl(200 24% 88%) l c h);
+            margin: 0;
+        }
+
+        .stack {
+            display: grid;
+            place-items: center;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .stack li {
+            opacity: var(--init-opacity);
+            font-size: 20vmin;
+            grid-area: 1/1;
+            animation: step-thru 1.48s ease-in-out infinite both, shake .64s ease-in-out infinite both;
+        }
+
+        @supports (x: attr(x type(*))) {
+            .stack li {
+                animation-delay: calc(attr(data-index type(<number>)) * 1s);
+            }
+        }
+
+        @keyframes step-thru {
+            0% {
+                opacity: var(--init-opacity);
+            }
+
+            50% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: var(--init-opacity);
+            }
+        }
+
+        @keyframes shake {
+
+            10%,
+            90% {
+                transform: translateX(-.25px);
+            }
+
+            20%,
+            80% {
+                transform: translateX(.5px);
+            }
+
+            30%,
+            50%,
+            70% {
+                transform: translateX(-.75px);
+            }
+
+            40%,
+            60% {
+                transform: translateX(.75px);
+            }
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <ul class='stack'>
+        <li data-index='0'>🔈</li>
+        <li data-index='.32'>🔉</li>
+        <li data-index='.48'>🔊</li>
+    </ul>
+</body>
+
+</html>

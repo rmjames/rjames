@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Search Loader</title>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <style>
+        :root {
+            --dur-slow: .35s;
+            --dur-const: 2;
+            --dur-reg: calc(var(--dur-slow) / var(--dur-const));
+            --dur-med: calc(var(--dur-reg) / var(--dur-const));
+            --dur-fast: calc(var(--dur-med) / var(--dur-const));
+            --item-dimension: .2em;
+            --initState: translate3d(-10%, 30%, 0) scale(2.5);
+            --initShadow: 0 0 0 0;
+            --animation: '';
+            --equalizer: equalizer 1.5s ease-in-out forwards;
+            --levitate: levitate 1.4s ease-in-out 4 forwards;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            margin-top: 10em;
+            margin: 0;
+            height: 100vh;
+            align-items: center;
+        }
+
+        .container {
+            background: hsla(360, 100%, 100%, .9);
+            font-size: 2vmin;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 5.1em;
+            width: 5.1em;
+            border-radius: 50%;
+            box-shadow: var(--initShadow);
+            transform: var(--initState);
+            transform-style: preserve-3d;
+            transition: transform .4s cubic-bezier(.12, .99, .96, .76);
+            will-change: transform, box-shadow;
+            padding: 0;
+            margin: 0;
+        }
+
+        .item {
+            height: var(--item-dimension);
+            width: var(--item-dimension);
+            background: blue;
+            margin: .244em;
+            padding: .051em;
+            border-radius: 50%;
+            list-style: none;
+            transition: all .3s;
+            animation: levitate 1.4s ease-in-out infinite forwards;
+        }
+
+        .item:nth-child(1) {
+            animation-delay: var(--dur-fast);
+        }
+
+        .item:nth-child(2) {
+            background: red;
+            animation-delay: var(--dur-med);
+        }
+
+        .item:nth-child(3) {
+            background: orange;
+            animation-delay: var(--dur-reg);
+        }
+
+        .item:nth-child(4) {
+            background: green;
+            animation-delay: var(--dur-slow);
+        }
+
+        .equalizer {
+            animation: equalizer 1.5s ease-in-out forwards,
+                levitate 1.5s ease-in-out infinite forwards;
+        }
+
+        .talkState {
+            --initState: translate3d(calc(50vw - 12vmin), -14em, 0) scale(1.1);
+            --initShadow: inset 0 .32em 2em hsla(0, 10%, 66%, .4), -1em -.52em 4.5em .1em hsla(0, 0%, 0%, .1);
+        }
+
+        .reset-btn {
+            position: fixed;
+            bottom: 4cqi;
+            right: 4cqi;
+            background: transparent;
+            color: #33333a;
+            border: none;
+            cursor: pointer;
+            font-family: sans-serif;
+            font-weight: bold;
+            opacity: 0.5;
+            transition: opacity 0.2s;
+
+            &:hover {
+                opacity: 1;
+            }
+        }
+
+        @keyframes levitate {
+
+            0%,
+            100% {
+                transform: translate(0, 0);
+            }
+
+            50% {
+                transform: translate(0, .57em);
+            }
+        }
+
+        @keyframes box-dot--blue {
+            10% {
+                transform: translate(0, 0);
+            }
+
+            20% {
+                transform: translate(0, 0);
+            }
+
+            30% {
+                transform: translate();
+            }
+
+            40% {
+                transform: translate();
+            }
+
+            50% {
+                transform: translate();
+            }
+
+            60% {
+                transform: translate();
+            }
+
+            70% {
+                transform: translate();
+            }
+
+            80% {
+                transform: translate();
+            }
+
+            90% {
+                transform: translate();
+            }
+
+            100% {
+                transform: translate();
+            }
+        }
+
+        @keyframes box-dot--red {
+            10% {
+                transform: translate(0, 0);
+            }
+
+            20% {
+                transform: translate(0, 0);
+            }
+
+            30% {
+                transform: translate();
+            }
+
+            40% {
+                transform: translate();
+            }
+
+            50% {
+                transform: translate();
+            }
+
+            60% {
+                transform: translate();
+            }
+
+            70% {
+                transform: translate();
+            }
+
+            80% {
+                transform: translate();
+            }
+
+            90% {
+                transform: translate();
+            }
+
+            100% {
+                transform: translate();
+            }
+        }
+
+        @keyframes box-dot--orange {
+            10% {
+                transform: translate(0, 0);
+            }
+
+            20% {
+                transform: translate(-.1em, -.15em);
+            }
+
+            30% {
+                transform: translate();
+            }
+
+            40% {
+                transform: translate();
+            }
+
+            50% {
+                transform: translate();
+            }
+
+            60% {
+                transform: translate();
+            }
+
+            70% {
+                transform: translate();
+            }
+
+            80% {
+                transform: translate();
+            }
+
+            90% {
+                transform: translate();
+            }
+
+            100% {
+                transform: translate();
+            }
+        }
+
+        @keyframes box-dot--green {
+            10% {
+                transform: translate(-.1em, .16em);
+            }
+
+            20% {
+                transform: translate(-.3em, .7em);
+            }
+
+            30% {
+                transform: translate();
+            }
+
+            40% {
+                transform: translate();
+            }
+
+            50% {
+                transform: translate();
+            }
+
+            60% {
+                transform: translate();
+            }
+
+            70% {
+                transform: translate();
+            }
+
+            80% {
+                transform: translate();
+            }
+
+            90% {
+                transform: translate();
+            }
+
+            100% {
+                transform: translate();
+            }
+        }
+
+        @keyframes rotate {
+            to {
+                transform: rotate(1turn)
+            }
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(.3);
+            }
+
+            50% {
+                transform: scale(1.2);
+            }
+        }
+
+        @keyframes colorShift {
+            0% {
+                background: hsla(10, 80%, 79%, .4);
+            }
+
+            50% {
+                background: orange;
+            }
+
+            100% {
+                background: hsla(50, 80%, 79%, .5);
+            }
+        }
+
+        @keyframes equalizer {
+            0% {
+                height: 3em;
+            }
+
+            10% {
+                height: 2.72em;
+            }
+
+            20% {
+                height: .2em;
+            }
+
+            30% {
+                height: 1.7em;
+            }
+
+            40% {
+                height: 2em;
+            }
+
+            50% {
+                height: 3.2em;
+            }
+
+            60% {
+                height: .5em;
+            }
+
+            70%,
+            90% {
+                height: 1.5em;
+            }
+
+            80% {
+                height: 2.5em;
+            }
+
+            100% {
+                height: var(--item-dimension);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <ul class="container">
+        <li class="item"></li>
+        <li class="item"></li>
+        <li class="item"></li>
+        <li class="item"></li>
+    </ul>
+
+    <button class="reset-btn" onclick="resetAnimation()">
+        <span class="material-symbols-outlined">
+            refresh
+        </span>
+    </button>
+
+    <script>
+        const container = document.querySelector('.container'),
+            dot = document.querySelector('.item'),
+            dots = document.querySelectorAll('.item'),
+            aniDotGreen = 'box-dot--green 1s ease-in';
+
+        const load = () => {
+            setTimeout(() => {
+                Promise.resolve(container.classList.add('talkState'));
+            }, 3700
+            );
+        };
+
+        load();
+
+        container.addEventListener('click', () => {
+            dots.forEach(dot => { dot.classList.toggle('equalizer') })
+        })
+
+        function resetAnimation() {
+            const elements = document.querySelectorAll('.item');
+            elements.forEach(el => {
+                el.style.animation = 'none';
+                el.offsetHeight; /* trigger reflow */
+                el.style.animation = null;
+            });
+        }
+    </script>
+</body>
+
+</html>
