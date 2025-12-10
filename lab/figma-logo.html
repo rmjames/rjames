@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Figma Logo</title>
+    <style>
+        :root {
+            --color: #000;
+            --dimension: 4.44;
+        }
+
+        body {
+            display: grid;
+            height: 100vh;
+            background: var(--color);
+            margin: 0;
+            font-size: 2vmin;
+        }
+
+        .icon {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            margin: auto;
+        }
+
+        .icon>* {
+            height: calc(var(--dimension) * 1em);
+            width: calc(var(--dimension) * 1em);
+        }
+
+        .arc:first-of-type,
+        .arc:nth-child(3) {
+            --color: #f24e1e;
+            background: var(--color);
+            border-radius: 50px 0 0 50px;
+        }
+
+        .arc:nth-child(2) {
+            --color: #ff7262;
+            background: var(--color);
+            border-radius: 0 50px 50px 0;
+        }
+
+        .arc:nth-child(3) {
+            --color: #a259ff;
+            background: var(--color)
+        }
+
+        .circle {
+            --color: #1abcfe;
+            background: var(--color);
+            border-radius: 50%
+        }
+
+        .drop {
+            --color: #0acf83;
+            background: var(--color);
+            border-radius: 50px 0 50px 50px
+        }
+    </style>
+</head>
+
+<body>
+    <div class="icon">
+        <div class="arc"></div>
+        <div class="arc"></div>
+        <div class="arc"></div>
+        <div class="circle"></div>
+        <div class="drop"></div>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buttons with Custom Properties</title>
+    <style>
+        :root {
+            --x: 0;
+            --y: 0;
+            --z: 0;
+            --h: 220;
+            --s: 25;
+            --l: 27;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linen;
+            margin: 0;
+        }
+
+        button {
+            --color: hsl(calc(var(--h) * 1), calc(var(--s) * 1%), calc(var(--l) * 1%));
+            --shadow-x: 4px;
+            --shadow-y: 5px;
+            --shadow-blur: 16px;
+            background: transparent;
+            padding: 1.1em;
+            margin: 1.4em;
+            border: .01em solid hsla(0, 0%, 90%, .76);
+            outline: none;
+            color: var(--color);
+            transition: all .244s ease-in-out;
+            transform: translate(calc(var(--x) * 1vmin), calc(var(--y) * 1vmin), calc(var(--z) * 1vmin));
+            box-shadow: var(--shadow-x) var(--shadow-y) var(--shadow-blur) currentcolor;
+            font-size: 4vmin;
+            cursor: pointer;
+        }
+
+        button:active {
+            --shadow-x: 1.3px;
+            --shadow-y: 1.27px;
+            --shadow-blur: 5.5px;
+        }
+
+        button.brown {
+            --h: 10;
+        }
+    </style>
+</head>
+
+<body>
+    <button>Enter</button>
+    <button class="brown">Enter</button>
+</body>
+
+</html>

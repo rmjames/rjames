@@ -1,11 +1,13 @@
 .brand {
-    --recursive-wght: 600;
+    --recursive-wght: 700;
+    --recursive-CRSV: 1;
     color: var(--gray-2);
     transition:
         color 0.1s,
         font-weight 0.26s,
         opacity 0.2s,
-        outline 0.2s;
+        outline 0.2s,
+        border-radius .01s;
     cursor: pointer;
     background: none;
     border: none;
@@ -13,7 +15,6 @@
     font: inherit;
     text-decoration: none;
     text-align: left;
-    filter: var(--text-shadow-subtle);
 
     &:where(:hover, :focus, :active, :target, :focus-within) {
         --recursive-wght: 800;

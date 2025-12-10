@@ -6,6 +6,17 @@ const assetsToCache = [
   '/work.html',
   '/resume.html',
   '/lab.html',
+  '/lab/buttons-custom-properties.html',
+  '/lab/emoji-speaker.html',
+  '/lab/figma-logo.html',
+  '/lab/framer-flows.html',
+  '/lab/framer-loaders.html',
+  '/lab/framer-logo.html',
+  '/lab/google-loader.html',
+  '/lab/google-search-loader.html',
+  '/lab/headphones.html',
+  '/lab/media-player.html',
+  '/lab/microsoft-logo.html',
   '/styles/fonts.css',
   '/styles/main.css',
   '/styles/mpa.css',
@@ -19,8 +30,8 @@ const assetsToCache = [
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(cacheName)
-          .then(cache => cache.addAll(assetsToCache))
-          .then(() => self.skipWaiting())
+      .then(cache => cache.addAll(assetsToCache))
+      .then(() => self.skipWaiting())
   );
 });
 
@@ -32,7 +43,7 @@ self.addEventListener('fetch', event => {
 
   event.respondWith(
     caches.open(cacheName).then((cache) => {
-      return fetch(event.request).then((networkResponse) =>{
+      return fetch(event.request).then((networkResponse) => {
         cache.put(event.request, networkResponse.clone());
         return networkResponse;
       }).catch(() => {
