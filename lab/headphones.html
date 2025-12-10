@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Headphones Knock</title>
+    <style>
+        body {
+            --base: oklch(from hsl(210 4% 4%) l c h);
+            --accent: oklch(from hsl(210 96% 96%) l c h);
+            display: grid;
+            place-items: center;
+            block-size: 100vh;
+            background-color: oklch(from hsl(210 32% 12%) l c h);
+            margin: 0;
+            overflow: hidden;
+        }
+
+        body>* {
+            grid-area: 1/1;
+        }
+
+        .headphone {
+            font-size: 12cqi;
+            animation: shake .64s infinite;
+            background: linear-gradient(180deg, var(--base) 2%, var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            cursor: default;
+        }
+
+        :where(.note, .notes) {
+            @starting-style {
+                opacity: 0;
+            }
+
+            font-size: 6cqi;
+            background: linear-gradient(180deg, var(--base) 2%, var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            pointer-events: none;
+        }
+
+        .note {
+            animation: note 2.48s infinite;
+        }
+
+        .notes {
+            animation: notes 2.48s .25s infinite;
+        }
+
+        @keyframes shake {
+
+            10%,
+            90% {
+                transform: translateX(-.125px);
+            }
+
+            20%,
+            80% {
+                transform: translateX(1.25px);
+            }
+
+            30%,
+            50%,
+            70% {
+                transform: translateX(-.75px);
+            }
+
+            40%,
+            60% {
+                transform: translateX(.75px);
+            }
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes note {
+            0% {
+                opacity: 0;
+                transform: translate(4.5cqi, .25em);
+            }
+
+            32% {
+                opacity: .48;
+            }
+
+            100% {
+                opacity: 0;
+                transform: translate(8.5cqi, -12.5cqi);
+                font-size: 3cqi;
+            }
+        }
+
+        @keyframes notes {
+            0% {
+                opacity: 0;
+                transform: translate(-4.5cqi, .25em);
+            }
+
+            32% {
+                opacity: .48;
+            }
+
+            100% {
+                opacity: 0;
+                transform: translate(-8.5cqi, -12.52cqi);
+                font-size: 3cqi;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class='headphone'>🎧</div>
+    <div class='note'>🎶</div>
+    <div class='notes'>🎶</div>
+</body>
+
+</html>

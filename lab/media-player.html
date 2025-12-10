@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Media Player</title>
+    <style>
+        body {
+            display: grid;
+            place-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #1a1a1a;
+            color: white;
+            font-family: system-ui, sans-serif;
+            font-size: .5rem;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings:
+                'FILL' 0,
+                'wght' 400,
+                'GRAD' 0,
+                'opsz' 2124
+        }
+
+
+        .media-player {
+            display: grid;
+            /* grid-template-columns: repeat(5, 1fr); */
+            gap: .25rem;
+            padding: .75rem;
+            background: #2a2a2a;
+            border-radius: 2rem;
+            container-type: inline-size;
+            inline-size: 264px;
+            max-inline-size: 270px;
+        }
+
+        .media-player__controls,
+        .media-player__presets {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            padding: .75rem;
+            border-radius: 1.25rem;
+            background: #333;
+            gap: .5rem;
+        }
+
+        .media-player__controls__play {
+            grid-column: -1;
+        }
+
+        .media-player__controls__option {
+            grid-column: 5;
+        }
+
+        button {
+            padding: .5rem;
+            margin: 0;
+            border: none;
+            border-radius: .5rem;
+            background: #444;
+            color: white;
+            cursor: pointer;
+            display: grid;
+            place-items: center;
+            max-block-size: 3rem;
+            max-inline-size: 3rem;
+            aspect-ratio: 1;
+            /* box-shadow: 0 0 0 .0625rem #5c5c5c; */
+            outline: .0625rem solid #5c5c5c;
+        }
+
+        button:hover {
+            background: #555;
+        }
+
+        .media-player__controls__play {
+            background: #007bff;
+        }
+
+        .media-player__controls__play:hover {
+            background: #0056b3;
+        }
+
+        .media-player__meta {
+            grid-column: 2 / 5;
+            padding: 0 .5rem;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .media-player__meta__title {
+            font-weight: bold;
+            font-size: .875rem;
+            margin-bottom: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .media-player__meta__artist {
+            font-weight: normal;
+            font-size: .75rem;
+            color: #ccc;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .pulse {
+            animation: pulse-animation 0.3s ease-in-out;
+        }
+
+        @keyframes pulse-animation {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.2);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <section class="media-player">
+        <div class="media-player__controls">
+            <button class="media-player__controls__current">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
+                    fill="#e3e3e3">
+                    <path
+                        d="M360-400h400L622-580l-92 120-62-80-108 140Zm-40 160q-33 0-56.5-23.5T240-320v-480q0-33 23.5-56.5T320-880h480q33 0 56.5 23.5T880-800v480q0 33-23.5 56.5T800-240H320Zm0-80h480v-480H320v480ZM160-80q-33 0-56.5-23.5T80-160v-560h80v560h560v80H160Zm160-720v480-480Z" />
+                </svg>
+            </button>
+            <div class="media-player__meta">
+                <div class="media-player__meta__title">Coffee Shop</div>
+                <div class="media-player__meta__artist">Ambience</div>
+            </div>
+            <button class="media-player__controls__option">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
+                    fill="#e3e3e3">
+                    <path
+                        d="M720-120H280v-520l280-280 50 50q7 7 11.5 19t4.5 23v14l-44 174h258q32 0 56 24t24 56v80q0 7-2 15t-4 15L794-168q-9 20-30 34t-44 14Zm-360-80h360l120-280v-80H480l54-220-174 174v406Zm0-406v406-406Zm-80-34v80H160v360h120v80H80v-520h200Z" />
+                </svg>
+            </button>
+            <button class="media-player__controls__play">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
+                    fill="#e3e3e3">
+                    <path d="M320-200v-560l440 280-440 280Zm80-280Zm0 134 210-134-210-134v268Z" />
+                </svg>
+            </button>
+        </div>
+        <div class="media-player__presets">
+            <button class="media-player__presets__preset"
+                data-src="https://assets.codepen.io/37861/14+-+For+The+Family+ft+Dave+East+x+Don+Q+%28Prod+by+Sonaro%29+%28DatPiff+Exclusive%29.mp3">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
+                    fill="#e3e3e3">
+                    <path
+                        d="M360-400h400L622-580l-92 120-62-80-108 140Zm-40 160q-33 0-56.5-23.5T240-320v-480q0-33 23.5-56.5T320-880h480q33 0 56.5 23.5T880-800v480q0 33-23.5 56.5T800-240H320Zm0-80h480v-480H320v480ZM160-80q-33 0-56.5-23.5T80-160v-560h80v560h560v80H160Zm160-720v480-480Z" />
+                </svg>
+            </button>
+            <button class="media-player__presets__preset"
+                data-src="https://assets.codepen.io/37861/07+-+Only+You+Can+Tell+It+Feat+Wale+%28Prod+By+Boogz+N+Tapes%29.mp3">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
+                    fill="#e3e3e3">
+                    <path
+                        d="M360-400h400L622-580l-92 120-62-80-108 140Zm-40 160q-33 0-56.5-23.5T240-320v-480q0-33 23.5-56.5T320-880h480q33 0 56.5 23.5T880-800v480q0 33-23.5 56.5T800-240H320Zm0-80h480v-480H320v480ZM160-80q-33 0-56.5-23.5T80-160v-560h80v560h560v80H160Zm160-720v480-480Z" />
+                </svg>
+            </button>
+            <button class="media-player__presets__preset"
+                data-src="https://assets.codepen.io/37861/02+-+To+The+Sky+ft+Shake+%28Prod+by+Sonaro%29+%28DatPiff+Exclusive%29.mp3">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
+                    fill="#e3e3e3">
+                    <path
+                        d="M360-400h400L622-580l-92 120-62-80-108 140Zm-40 160q-33 0-56.5-23.5T240-320v-480q0-33 23.5-56.5T320-880h480q33 0 56.5 23.5T880-800v480q0 33-23.5 56.5T800-240H320Zm0-80h480v-480H320v480ZM160-80q-33 0-56.5-23.5T80-160v-560h80v560h560v80H160Zm160-720v480-480Z" />
+                </svg>
+            </button>
+            <button class="media-player__presets__preset"
+                data-src="https://actions.google.com/sounds/v1/water/stream_water_flowing.ogg">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
+                    fill="#e3e3e3">
+                    <path
+                        d="M360-400h400L622-580l-92 120-62-80-108 140Zm-40 160q-33 0-56.5-23.5T240-320v-480q0-33 23.5-56.5T320-880h480q33 0 56.5 23.5T880-800v480q0 33-23.5 56.5T800-240H320Zm0-80h480v-480H320v480ZM160-80q-33 0-56.5-23.5T80-160v-560h80v560h560v80H160Zm160-720v480-480Z" />
+                </svg>
+            </button>
+            <button class="media-player__presets__preset"
+                data-src="https://actions.google.com/sounds/v1/ambiences/fire.ogg">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
+                    fill="#e3e3e3">
+                    <path
+                        d="M360-400h400L622-580l-92 120-62-80-108 140Zm-40 160q-33 0-56.5-23.5T240-320v-480q0-33 23.5-56.5T320-880h480q33 0 56.5 23.5T880-800v480q0 33-23.5 56.5T800-240H320Zm0-80h480v-480H320v480ZM160-80q-33 0-56.5-23.5T80-160v-560h80v560h560v80H160Zm160-720v480-480Z" />
+                </svg>
+            </button>
+        </div>
+    </section>
+
+    <audio id="audio-player" src="https://actions.google.com/sounds/v1/ambiences/coffee_shop.ogg"></audio>
+
+    <script>
+        const audio = document.getElementById('audio-player');
+        const playButton = document.querySelector('.media-player__controls__play');
+        const playIconPath = playButton.querySelector('svg path');
+
+        const playPath = "M320-200v-560l440 280-440 280Zm80-280Zm0 134 210-134-210-134v268Z";
+        const pausePath = "M528-192v-576h240v576H528Zm-336 0v-576h240v576H192Zm408-72h96v-432h-96v432Zm-336 0h96v-432h-96v432Zm0-432v432-432Zm336 0v432-432Z";
+
+        playButton.addEventListener('click', () => {
+            if (audio.paused) {
+                audio.play();
+                playIconPath.setAttribute('d', pausePath);
+            } else {
+                audio.pause();
+                playIconPath.setAttribute('d', playPath);
+            }
+        });
+
+        const presets = document.querySelectorAll('.media-player__presets__preset');
+        presets.forEach(preset => {
+            preset.addEventListener('click', () => {
+                const src = preset.getAttribute('data-src');
+                if (src) {
+                    audio.src = src;
+                    audio.play();
+                    playIconPath.setAttribute('d', pausePath);
+                }
+            });
+        });
+
+        const optionButton = document.querySelector('.media-player__controls__option');
+        const optionIconPath = optionButton.querySelector('svg path');
+        const equalizerPath = "M280-240v-480h80v480h-80ZM440-80v-800h80v800h-80ZM120-400v-160h80v160h-80Zm480 160v-480h80v480h-80Zm160-160v-160h80v160h-80Z";
+        const likePath = "M720-120H280v-520l280-280 50 50q7 7 11.5 19t4.5 23v14l-44 174h258q32 0 56 24t24 56v80q0 7-2 15t-4 15L794-168q-9 20-30 34t-44 14Zm-360-80h360l120-280v-80H480l54-220-174 174v406Zm0-406v406-406Zm-80-34v80H160v360h120v80H80v-520h200Z";
+        const likeFilledPath = "M720-120H280v-520l280-280 50 50q7 7 11.5 19t4.5 23v14l-44 174h258q32 0 56 24t24 56v80q0 7-2 15t-4 15L794-168q-9 20-30 34t-44 14Zm-440-520v80H160v360h120v80H80v-520h200Z";
+        const rewindPath = "M480-80q-75 0-140.5-28.5t-114-77q-48.5-48.5-77-114T120-440h80q0 117 81.5 198.5T480-160q117 0 198.5-81.5T760-440q0-117-81.5-198.5T480-720h-6l62 62-56 58-160-160 160-160 56 58-62 62h6q75 0 140.5 28.5t114 77q48.5 48.5-77 114T840-440q0 75-28.5 140.5t-77 114q-48.5 48.5-114 77T480-80ZM360-320v-180h-60v-60h120v240h-60Zm140 0q-17 0-28.5-11.5T460-360v-160q0-17 11.5-28.5T500-560h80q17 0 28.5 11.5T620-520v160q0 17-11.5 28.5T580-320h-80Zm20-60h40v-120h-40v120Z";
+
+        let longPressTimer;
+        let mode = 'like'; // Default mode
+        let liked = false;
+
+        const updateIcon = () => {
+            if (mode === 'equalizer') {
+                optionIconPath.setAttribute('d', equalizerPath);
+            } else if (mode === 'rewind') {
+                optionIconPath.setAttribute('d', rewindPath);
+            } else {
+                optionIconPath.setAttribute('d', liked ? likeFilledPath : likePath);
+            }
+        };
+
+        const toggleMode = () => {
+            if (mode === 'like') {
+                mode = 'equalizer';
+            } else if (mode === 'equalizer') {
+                mode = 'rewind';
+            } else {
+                mode = 'like';
+            }
+            if (navigator.vibrate) navigator.vibrate(500);
+
+            // Visual feedback
+            optionButton.classList.add('pulse');
+            setTimeout(() => optionButton.classList.remove('pulse'), 300);
+
+            updateIcon();
+        };
+
+        const toggleLike = () => {
+            if (mode === 'like') {
+                liked = !liked;
+                updateIcon();
+            } else if (mode === 'rewind') {
+                audio.currentTime = Math.max(0, audio.currentTime - 10);
+            }
+        };
+
+        let longPressTriggered = false;
+
+        const startPress = (e) => {
+            longPressTriggered = false;
+            // e.preventDefault(); // Removed to allow click event
+            longPressTimer = setTimeout(() => {
+                longPressTriggered = true;
+                toggleMode();
+            }, 500); // 500ms for long press
+        };
+
+        const cancelPress = () => {
+            clearTimeout(longPressTimer);
+        };
+
+        optionButton.addEventListener('mousedown', startPress);
+        optionButton.addEventListener('touchstart', startPress);
+        optionButton.addEventListener('mouseup', cancelPress);
+        optionButton.addEventListener('mouseleave', cancelPress);
+        optionButton.addEventListener('touchend', cancelPress);
+        optionButton.addEventListener('contextmenu', (e) => e.preventDefault());
+
+        optionButton.addEventListener('click', (e) => {
+            if (longPressTriggered) return;
+            toggleLike();
+        });
+
+        // Initialize icon
+        updateIcon();
+    </script>
+
+</body>
+
+</html>
