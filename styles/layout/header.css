@@ -4,7 +4,6 @@ header {
     justify-content: space-between;
     width: 100%;
     min-block-size: 5rem;
-    scroll-snap-align: center;
 
     nav ul {
         display: flex;
