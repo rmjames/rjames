@@ -35,6 +35,7 @@
     --text-shadow-subtle: drop-shadow(0 0 .125px var(--text-shadow));
     --link-color: var(--blue-2);
     --link-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+    --ease-3: cubic-bezier(0.25, 0, 0.3, 1);
     --link-timing: 444ms;
     --font-stack:
         "Recursive", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",

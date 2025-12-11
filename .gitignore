@@ -13,3 +13,4 @@ test-results/
 playwright-report/
 /playwright-report/index.html
 .last-run.json
+*.map
