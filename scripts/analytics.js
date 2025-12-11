@@ -122,4 +122,21 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   });
+
+  // Track details engagement (Resume Job History)
+  const detailsElements = document.querySelectorAll("details");
+  detailsElements.forEach((details) => {
+    details.addEventListener("toggle", () => {
+      if (details.open) {
+        const summary = details.querySelector("summary");
+        const label = summary ? summary.textContent.trim() : "Details Expanded";
+        const eventData = {
+          event_category: "Resume Interaction",
+          event_label: `Expand - ${label}`,
+          transport_type: "beacon",
+        };
+        gtag("event", "select_content", eventData);
+      }
+    });
+  });
 });
