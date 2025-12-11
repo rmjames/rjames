@@ -1,0 +1,20 @@
+.lab-container {
+    container-type: inline-size;
+    width: 100%;
+}
+
+.demo-examples {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.25cqi;
+    margin-block: 20cqi;
+
+    & article>iframe {
+        aspect-ratio: 1;
+        block-size: 300px;
+    }
+}
+
+#about {
+    max-inline-size: max(48ch, 76ch);
+}
