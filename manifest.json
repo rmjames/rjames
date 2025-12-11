@@ -29,6 +29,11 @@
       "name": "Resume",
       "description": "Professional resume and experience",
       "url": "./resume.html"
+    },
+    {
+      "name": "Lab",
+      "description": "Experimental animations and designs",
+      "url": "./lab.html"
     }
   ],
   "share_target": {
@@ -41,7 +46,10 @@
   },
   "theme_color": "#212121",
   "background_color": "#dee1e3",
-  "display_override": ["window-controls-overlay", "minimal-ui"],
+  "display_override": [
+    "window-controls-overlay",
+    "minimal-ui"
+  ],
   "display": "standalone",
   "id": "/",
   "start_url": "/"
