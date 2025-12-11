@@ -73,6 +73,19 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  document.addEventListener("mouseover", (event) => {
+    const link = event.target.closest("[data-analytics-link]");
+    if (link) {
+      const linkName = link.dataset.analyticsLink;
+      const eventData = {
+        event_category: "Link Hover",
+        event_label: linkName,
+        non_interaction: true,
+      };
+      gtag("event", "mouseover", eventData);
+    }
+  });
+
   // Track brand interactions
   const brands = document.querySelectorAll(".brand");
   brands.forEach((brand) => {
