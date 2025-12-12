@@ -40,6 +40,10 @@
             --text-shadow: color(display-p3 0.873 0.883 0.889);
         }
     }
+
+    & [role="img"] {
+        display: none;
+    }
 }
 
 .footer-menu--item a.twitter:where(:hover, :focus, :active) {
