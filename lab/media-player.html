@@ -36,6 +36,8 @@
             container-type: inline-size;
             inline-size: 264px;
             max-inline-size: 270px;
+            box-shadow: 0 0 2px color-mix(in oklch, orange 48%, transparent 52%);
+
         }
 
         .media-player__controls,
@@ -55,6 +57,34 @@
 
         .media-player__controls__option {
             grid-column: 5;
+            position: relative;
+        }
+
+        .media-player__controls__option::after {
+            content: '';
+            position: absolute;
+            inset: -0.0625rem;
+            border-radius: inherit;
+            border: .0625rem solid #5c5c5c;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .media-player__controls__option.animate-outline::after {
+            animation: outline-expand 0.32s ease-out forwards;
+        }
+
+        @keyframes outline-expand {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(1.6);
+                opacity: 0;
+            }
         }
 
         button {
@@ -287,11 +317,18 @@
 
         let longPressTriggered = false;
 
+        const triggerOutlineAnimation = () => {
+            optionButton.classList.remove('animate-outline');
+            // Force reflow
+            void optionButton.offsetWidth;
+            optionButton.classList.add('animate-outline');
+        };
+
         const startPress = (e) => {
             longPressTriggered = false;
-            // e.preventDefault(); // Removed to allow click event
             longPressTimer = setTimeout(() => {
                 longPressTriggered = true;
+                triggerOutlineAnimation();
                 toggleMode();
             }, 500); // 500ms for long press
         };
@@ -306,6 +343,9 @@
         optionButton.addEventListener('mouseleave', cancelPress);
         optionButton.addEventListener('touchend', cancelPress);
         optionButton.addEventListener('contextmenu', (e) => e.preventDefault());
+        optionButton.addEventListener('animationend', () => {
+            optionButton.classList.remove('animate-outline');
+        });
 
         optionButton.addEventListener('click', (e) => {
             if (longPressTriggered) return;
