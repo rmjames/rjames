@@ -114,6 +114,26 @@
                 font-size: 3cqi;
             }
         }
+
+        .toggle-btn {
+            position: fixed;
+            bottom: 1rem;
+            right: 1rem;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            color: var(--accent);
+            opacity: 0.5;
+            transition: opacity 0.2s;
+            padding: 0;
+            display: grid;
+            place-items: center;
+            z-index: 10;
+        }
+
+        .toggle-btn:hover {
+            opacity: 1;
+        }
     </style>
 </head>
 
@@ -121,6 +141,31 @@
     <div class='headphone'>🎧</div>
     <div class='note'>🎶</div>
     <div class='notes'>🎶</div>
+    <button class="toggle-btn" aria-label="Pause animation">
+        <svg xmlns="http://www.w3.org/2000/svg" height="32px" viewBox="0 -960 960 960" width="32px"
+            fill="currentColor">
+            <path
+                d="M528-192v-576h240v576H528Zm-336 0v-576h240v576H192Zm408-72h96v-432h-96v432Zm-336 0h96v-432h-96v432Zm0-432v432-432Zm336 0v432-432Z" />
+        </svg>
+    </button>
+    <script>
+        const btn = document.querySelector('.toggle-btn');
+        const iconPath = btn.querySelector('path');
+        const animatedElements = document.querySelectorAll('.headphone, .note, .notes');
+
+        const playPath = "M320-200v-560l440 280-440 280Zm80-280Zm0 134 210-134-210-134v268Z";
+        const pausePath = "M528-192v-576h240v576H528Zm-336 0v-576h240v576H192Zm408-72h96v-432h-96v432Zm-336 0h96v-432h-96v432Zm0-432v432-432Zm336 0v432-432Z";
+
+        let isPlaying = true;
+
+        btn.addEventListener('click', () => {
+            isPlaying = !isPlaying;
+            const state = isPlaying ? 'running' : 'paused';
+            animatedElements.forEach(el => el.style.animationPlayState = state);
+            iconPath.setAttribute('d', isPlaying ? pausePath : playPath);
+            btn.setAttribute('aria-label', isPlaying ? 'Pause animation' : 'Play animation');
+        });
+    </script>
 </body>
 
 </html>
