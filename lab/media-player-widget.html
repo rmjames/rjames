@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Media Player Widget</title>
+    <style>
+        body {
+            display: grid;
+            place-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: oklch(from #1a1a1a l c h);
+            color: white;
+            font-family: system-ui, sans-serif;
+            font-size: .5rem;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings:
+                'FILL' 0,
+                'wght' 400,
+                'GRAD' 0,
+                'opsz' 2124
+        }
+
+        .media-player {
+            container-type: inline-size;
+            display: grid;
+            grid-template-columns: 2rem 1fr;
+            grid-template-rows: 1rem 2rem;
+            gap: .5rem;
+            padding: .75rem;
+            inline-size: 18rem;
+            background: oklch(from #2a2a2a l c h);
+            border-radius: .75rem;
+            box-shadow: 0 0 2px color-mix(in oklch, oklch(from orange l c h) 48%, transparent 52%);
+            align-items: center;
+        }
+
+        .media-player__controls {
+            display: grid;
+            grid-column: 2;
+            grid-template-columns: repeat(5, 1fr);
+            gap: .125rem;
+            align-items: center;
+            justify-items: center;
+            inline-size: 15rem;
+            padding: .25rem;
+            border-radius: .5rem;
+            /* background: oklch(from #333 l c h); */
+        }
+
+        button {
+            padding: .25rem;
+            margin: 0;
+            border: none;
+            border-radius: .25rem;
+            background: oklch(from #444 l c h);
+            color: white;
+            cursor: pointer;
+            display: grid;
+            place-items: center;
+            inline-size: 75%;
+            aspect-ratio: 1;
+            outline: .0625rem solid oklch(from #5c5c5c l c h);
+        }
+
+        button:hover {
+            background: oklch(from #555 l c h);
+        }
+
+        .media-player__play {
+            background: oklch(from #007bff l c h);
+        }
+
+        .media-player__play:hover {
+            background: oklch(from #0056b3 l c h);
+        }
+
+        .media-player__current {
+            grid-column: 1;
+            grid-row: 2;
+            inline-size: 2rem;
+            block-size: 2rem;
+            padding: 0;
+        }
+
+        .media-player__meta {
+            grid-column: 2 / -1;
+            grid-row: 1;
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            text-align: left;
+            padding-inline-start: .25rem;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .media-player__meta__title {
+            font-weight: bold;
+            font-size: .65rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .media-player__meta__artist {
+            font-size: .55rem;
+            color: oklch(from #ccc l c h);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+
+        .media-player__like {}
+
+        svg {
+            width: 100%;
+            height: 100%;
+            max-width: 24px;
+            max-height: 24px;
+            fill: oklch(from #e3e3e3 l c h);
+        }
+    </style>
+</head>
+
+<body>
+
+    <section class="media-player">
+        <div class="media-player__meta">
+            <div class="media-player__meta__title">Coffee Shop</div>
+            <div class="media-player__meta__artist">Ambience</div>
+        </div>
+        <button class="media-player__current" title="Current Track">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
+                <path
+                    d="M400-120q-66 0-113-47t-47-113q0-66 47-113t113-47q23 0 42.5 5.5T480-418v-422h240v160H560v400q0 66-47 113t-113 47Z" />
+            </svg>
+        </button>
+
+        <div class="media-player__controls">
+            <button class="media-player__dislike" title="Dislike">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
+                    <path
+                        d="M240-840h520v80h-80v360q0 33-23.5 56.5T600-320H306l50 198v16q0 12-5 25t-15 23l-44 44-262-262v-480h210Zm0 80v366l114 114h146v-480H240Zm520 0v480h80v-480h-80Z" />
+                </svg>
+            </button>
+
+            <button class="media-player__prev" title="Previous">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
+                    <path d="M240-240v-480h80v480h-80Zm440 0L400-480l280-240v480Z" />
+                </svg>
+            </button>
+
+            <button class="media-player__play" title="Play">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
+                    <path d="M320-200v-560l440 280-440 280Zm80-280Zm0 134 210-134-210-134v268Z" />
+                </svg>
+            </button>
+
+            <button class="media-player__next" title="Next">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
+                    <path d="M640-240v-480h80v480h-80ZM280-240v-480l280 240-280 240Z" />
+                </svg>
+            </button>
+
+            <button class="media-player__like" title="Like">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
+                    <path
+                        d="M720-120H280v-520l280-280 50 50q7 7 11.5 19t4.5 23v14l-44 174h258q32 0 56 24t24 56v80q0 7-2 15t-4 15L794-168q-9 20-30 34t-44 14Zm-360-80h360l120-280v-80H480l54-220-174 174v406Zm0-406v406-406Zm-80-34v80H160v360h120v80H80v-520h200Z" />
+                </svg>
+            </button>
+        </div>
+    </section>
+
+    <!-- Dummy audio for functionality -->
+    <audio id="audio-player" src="https://actions.google.com/sounds/v1/ambiences/coffee_shop.ogg"></audio>
+
+    <script>
+        const audio = document.getElementById('audio-player');
+        const playButton = document.querySelector('.media-player__play');
+        const playIconPath = playButton.querySelector('svg path');
+        const likeButton = document.querySelector('.media-player__like');
+        const likeIconPath = likeButton.querySelector('svg path');
+
+        const playPath = "M320-200v-560l440 280-440 280Zm80-280Zm0 134 210-134-210-134v268Z";
+        const pausePath = "M528-192v-576h240v576H528Zm-336 0v-576h240v576H192Zm408-72h96v-432h-96v432Zm-336 0h96v-432h-96v432Zm0-432v432-432Zm336 0v432-432Z";
+
+        const likePath = "M720-120H280v-520l280-280 50 50q7 7 11.5 19t4.5 23v14l-44 174h258q32 0 56 24t24 56v80q0 7-2 15t-4 15L794-168q-9 20-30 34t-44 14Zm-360-80h360l120-280v-80H480l54-220-174 174v406Zm0-406v406-406Zm-80-34v80H160v360h120v80H80v-520h200Z";
+        const likeFilledPath = "M720-120H280v-520l280-280 50 50q7 7 11.5 19t4.5 23v14l-44 174h258q32 0 56 24t24 56v80q0 7-2 15t-4 15L794-168q-9 20-30 34t-44 14Zm-440-520v80H160v360h120v80H80v-520h200Z";
+
+        let isPlaying = false;
+        let isLiked = false;
+
+        playButton.addEventListener('click', () => {
+            if (audio.paused) {
+                audio.play();
+                playIconPath.setAttribute('d', pausePath);
+                isPlaying = true;
+            } else {
+                audio.pause();
+                playIconPath.setAttribute('d', playPath);
+                isPlaying = false;
+            }
+        });
+
+        likeButton.addEventListener('click', () => {
+            isLiked = !isLiked;
+            likeIconPath.setAttribute('d', isLiked ? likeFilledPath : likePath);
+        });
+
+    </script>
+</body>
+
+</html>
