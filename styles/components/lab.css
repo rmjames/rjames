@@ -6,7 +6,7 @@
 .demo-examples {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1.25cqi;
+    gap: 2.25cqi;
     margin-block: 20cqi;
 
     & article {
@@ -65,6 +65,7 @@
     & article>iframe {
         aspect-ratio: 1;
         block-size: 300px;
+        box-shadow: 0 0 4px color-mix(in oklch, var(--blue-2) 48%, transparent 52%);
     }
 }
 

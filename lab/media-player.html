@@ -11,7 +11,7 @@
             place-items: center;
             min-height: 100vh;
             margin: 0;
-            background-color: #1a1a1a;
+            background-color: oklch(from #1a1a1a l c h);
             color: white;
             font-family: system-ui, sans-serif;
             font-size: .5rem;
@@ -27,15 +27,15 @@
 
 
         .media-player {
+            container-type: inline-size;
             display: grid;
-            /* grid-template-columns: repeat(5, 1fr); */
             gap: .25rem;
             padding: .75rem;
-            background: #2a2a2a;
+            inline-size: 16.5rem;
+            max-inline-size: 16.875rem;
+            background: oklch(from #2a2a2a l c h);
             border-radius: 2rem;
-            container-type: inline-size;
-            inline-size: 264px;
-            max-inline-size: 270px;
+            box-shadow: 0 0 2px color-mix(in oklch, oklch(from orange l c h) 48%, transparent 52%);
         }
 
         .media-player__controls,
@@ -45,7 +45,7 @@
             grid-template-columns: repeat(5, 1fr);
             padding: .75rem;
             border-radius: 1.25rem;
-            background: #333;
+            background: oklch(from #333 l c h);
             gap: .5rem;
         }
 
@@ -55,6 +55,34 @@
 
         .media-player__controls__option {
             grid-column: 5;
+            position: relative;
+        }
+
+        .media-player__controls__option::after {
+            content: '';
+            position: absolute;
+            inset: -0.0625rem;
+            border-radius: inherit;
+            border: .0625rem solid oklch(from #5c5c5c l c h);
+            opacity: 0;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .media-player__controls__option.animate-outline::after {
+            animation: outline-expand 0.32s ease-out forwards;
+        }
+
+        @keyframes outline-expand {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(1.6);
+                opacity: 0;
+            }
         }
 
         button {
@@ -62,7 +90,7 @@
             margin: 0;
             border: none;
             border-radius: .5rem;
-            background: #444;
+            background: oklch(from #444 l c h);
             color: white;
             cursor: pointer;
             display: grid;
@@ -70,20 +98,19 @@
             max-block-size: 3rem;
             max-inline-size: 3rem;
             aspect-ratio: 1;
-            /* box-shadow: 0 0 0 .0625rem #5c5c5c; */
-            outline: .0625rem solid #5c5c5c;
+            outline: .0625rem solid oklch(from #5c5c5c l c h);
         }
 
         button:hover {
-            background: #555;
+            background: oklch(from #555 l c h);
         }
 
         .media-player__controls__play {
-            background: #007bff;
+            background: oklch(from #007bff l c h);
         }
 
         .media-player__controls__play:hover {
-            background: #0056b3;
+            background: oklch(from #0056b3 l c h);
         }
 
         .media-player__meta {
@@ -107,7 +134,7 @@
         .media-player__meta__artist {
             font-weight: normal;
             font-size: .75rem;
-            color: #ccc;
+            color: oklch(from #ccc l c h);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -287,11 +314,18 @@
 
         let longPressTriggered = false;
 
+        const triggerOutlineAnimation = () => {
+            optionButton.classList.remove('animate-outline');
+            // Force reflow
+            void optionButton.offsetWidth;
+            optionButton.classList.add('animate-outline');
+        };
+
         const startPress = (e) => {
             longPressTriggered = false;
-            // e.preventDefault(); // Removed to allow click event
             longPressTimer = setTimeout(() => {
                 longPressTriggered = true;
+                triggerOutlineAnimation();
                 toggleMode();
             }, 500); // 500ms for long press
         };
@@ -306,6 +340,9 @@
         optionButton.addEventListener('mouseleave', cancelPress);
         optionButton.addEventListener('touchend', cancelPress);
         optionButton.addEventListener('contextmenu', (e) => e.preventDefault());
+        optionButton.addEventListener('animationend', () => {
+            optionButton.classList.remove('animate-outline');
+        });
 
         optionButton.addEventListener('click', (e) => {
             if (longPressTriggered) return;
