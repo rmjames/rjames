@@ -113,6 +113,13 @@
             background: oklch(from #0056b3 l c h);
         }
 
+        .media-player__controls__current img {
+            inline-size: 100%;
+            block-size: 100%;
+            object-fit: cover;
+            border-radius: inherit;
+        }
+
         .media-player__meta {
             grid-column: 2 / 5;
             padding: 0 .5rem;
@@ -172,8 +179,8 @@
                 </svg>
             </button>
             <div class="media-player__meta">
-                <div class="media-player__meta__title">Coffee Shop</div>
-                <div class="media-player__meta__artist">Ambience</div>
+                <div class="media-player__meta__title">Select Track</div>
+                <div class="media-player__meta__artist">...</div>
             </div>
             <button class="media-player__controls__option">
                 <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
@@ -190,81 +197,102 @@
             </button>
         </div>
         <div class="media-player__presets">
-            <button class="media-player__presets__preset"
-                data-src="https://assets.codepen.io/37861/14+-+For+The+Family+ft+Dave+East+x+Don+Q+%28Prod+by+Sonaro%29+%28DatPiff+Exclusive%29.mp3">
-                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
-                    fill="#e3e3e3">
-                    <path
-                        d="M360-400h400L622-580l-92 120-62-80-108 140Zm-40 160q-33 0-56.5-23.5T240-320v-480q0-33 23.5-56.5T320-880h480q33 0 56.5 23.5T880-800v480q0 33-23.5 56.5T800-240H320Zm0-80h480v-480H320v480ZM160-80q-33 0-56.5-23.5T80-160v-560h80v560h560v80H160Zm160-720v480-480Z" />
-                </svg>
-            </button>
-            <button class="media-player__presets__preset"
-                data-src="https://assets.codepen.io/37861/07+-+Only+You+Can+Tell+It+Feat+Wale+%28Prod+By+Boogz+N+Tapes%29.mp3">
-                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
-                    fill="#e3e3e3">
-                    <path
-                        d="M360-400h400L622-580l-92 120-62-80-108 140Zm-40 160q-33 0-56.5-23.5T240-320v-480q0-33 23.5-56.5T320-880h480q33 0 56.5 23.5T880-800v480q0 33-23.5 56.5T800-240H320Zm0-80h480v-480H320v480ZM160-80q-33 0-56.5-23.5T80-160v-560h80v560h560v80H160Zm160-720v480-480Z" />
-                </svg>
-            </button>
-            <button class="media-player__presets__preset"
-                data-src="https://assets.codepen.io/37861/02+-+To+The+Sky+ft+Shake+%28Prod+by+Sonaro%29+%28DatPiff+Exclusive%29.mp3">
-                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
-                    fill="#e3e3e3">
-                    <path
-                        d="M360-400h400L622-580l-92 120-62-80-108 140Zm-40 160q-33 0-56.5-23.5T240-320v-480q0-33 23.5-56.5T320-880h480q33 0 56.5 23.5T880-800v480q0 33-23.5 56.5T800-240H320Zm0-80h480v-480H320v480ZM160-80q-33 0-56.5-23.5T80-160v-560h80v560h560v80H160Zm160-720v480-480Z" />
-                </svg>
-            </button>
-            <button class="media-player__presets__preset"
-                data-src="https://actions.google.com/sounds/v1/water/stream_water_flowing.ogg">
-                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
-                    fill="#e3e3e3">
-                    <path
-                        d="M360-400h400L622-580l-92 120-62-80-108 140Zm-40 160q-33 0-56.5-23.5T240-320v-480q0-33 23.5-56.5T320-880h480q33 0 56.5 23.5T880-800v480q0 33-23.5 56.5T800-240H320Zm0-80h480v-480H320v480ZM160-80q-33 0-56.5-23.5T80-160v-560h80v560h560v80H160Zm160-720v480-480Z" />
-                </svg>
-            </button>
-            <button class="media-player__presets__preset"
-                data-src="https://actions.google.com/sounds/v1/ambiences/fire.ogg">
-                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
-                    fill="#e3e3e3">
-                    <path
-                        d="M360-400h400L622-580l-92 120-62-80-108 140Zm-40 160q-33 0-56.5-23.5T240-320v-480q0-33 23.5-56.5T320-880h480q33 0 56.5 23.5T880-800v480q0 33-23.5 56.5T800-240H320Zm0-80h480v-480H320v480ZM160-80q-33 0-56.5-23.5T80-160v-560h80v560h560v80H160Zm160-720v480-480Z" />
-                </svg>
-            </button>
+            <!-- Dynamically populated -->
         </div>
     </section>
 
-    <audio id="audio-player" src="https://actions.google.com/sounds/v1/ambiences/coffee_shop.ogg"></audio>
+    <audio id="audio-player"></audio>
 
-    <script>
+    <script type="module">
+        import { audioLibrary } from '../scripts/AudioLibrary.js';
+
         const audio = document.getElementById('audio-player');
         const playButton = document.querySelector('.media-player__controls__play');
         const playIconPath = playButton.querySelector('svg path');
+        const titleEl = document.querySelector('.media-player__meta__title');
+        const artistEl = document.querySelector('.media-player__meta__artist');
+        const currentArtBtn = document.querySelector('.media-player__controls__current');
 
         const playPath = "M320-200v-560l440 280-440 280Zm80-280Zm0 134 210-134-210-134v268Z";
         const pausePath = "M528-192v-576h240v576H528Zm-336 0v-576h240v576H192Zm408-72h96v-432h-96v432Zm-336 0h96v-432h-96v432Zm0-432v432-432Zm336 0v432-432Z";
 
+        const updatePlayIcon = () => {
+            if (audio.paused) {
+                playIconPath.setAttribute('d', playPath);
+            } else {
+                playIconPath.setAttribute('d', pausePath);
+            }
+        };
+
         playButton.addEventListener('click', () => {
+            if (!audio.src) return;
             if (audio.paused) {
                 audio.play();
-                playIconPath.setAttribute('d', pausePath);
             } else {
                 audio.pause();
-                playIconPath.setAttribute('d', playPath);
             }
+            updatePlayIcon();
         });
 
-        const presets = document.querySelectorAll('.media-player__presets__preset');
-        presets.forEach(preset => {
-            preset.addEventListener('click', () => {
-                const src = preset.getAttribute('data-src');
-                if (src) {
-                    audio.src = src;
-                    audio.play();
-                    playIconPath.setAttribute('d', pausePath);
+        audio.addEventListener('play', updatePlayIcon);
+        audio.addEventListener('pause', updatePlayIcon);
+        audio.addEventListener('ended', () => {
+            playIconPath.setAttribute('d', playPath);
+        });
+
+        const presetsContainer = document.querySelector('.media-player__presets');
+
+        // Populate presets
+        const tracks = audioLibrary.getAll();
+
+        // Load first track as default (optional, but good UX)
+        if (tracks.length > 0) {
+            const first = tracks[0];
+            // Don't auto play, just set src
+            // audio.src = first.src;
+            // titleEl.textContent = first.title;
+            // artistEl.textContent = first.artist;
+        }
+
+        tracks.forEach(track => {
+            const btn = document.createElement('button');
+            btn.className = 'media-player__presets__preset';
+            btn.dataset.id = track.id;
+            // Use same icon for all for now
+            btn.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
+                    fill="#e3e3e3">
+                    <path
+                        d="M360-400h400L622-580l-92 120-62-80-108 140Zm-40 160q-33 0-56.5-23.5T240-320v-480q0-33 23.5-56.5T320-880h480q33 0 56.5 23.5T880-800v480q0 33-23.5 56.5T800-240H320Zm0-80h480v-480H320v480ZM160-80q-33 0-56.5-23.5T80-160v-560h80v560h560v80H160Zm160-720v480-480Z" />
+                </svg>
+            `;
+
+            btn.addEventListener('click', () => {
+
+                if (audio.src.endsWith(track.src) && !audio.paused) {
+                     audio.pause();
+                } else {
+                     audio.src = track.src;
+                     titleEl.textContent = track.title;
+                     artistEl.textContent = track.artist;
+
+                     if (track.albumArt) {
+                         currentArtBtn.innerHTML = `<img src="${track.albumArt}" alt="${track.title}">`;
+                     } else {
+                         currentArtBtn.innerHTML = `
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
+                                <path d="M360-400h400L622-580l-92 120-62-80-108 140Zm-40 160q-33 0-56.5-23.5T240-320v-480q0-33 23.5-56.5T320-880h480q33 0 56.5 23.5T880-800v480q0 33-23.5 56.5T800-240H320Zm0-80h480v-480H320v480ZM160-80q-33 0-56.5-23.5T80-160v-560h80v560h560v80H160Zm160-720v480-480Z" />
+                            </svg>
+                         `;
+                     }
+
+                     audio.play();
                 }
             });
+            presetsContainer.appendChild(btn);
         });
 
+        // Option/Like button logic
         const optionButton = document.querySelector('.media-player__controls__option');
         const optionIconPath = optionButton.querySelector('svg path');
         const equalizerPath = "M280-240v-480h80v480h-80ZM440-80v-800h80v800h-80ZM120-400v-160h80v160h-80Zm480 160v-480h80v480h-80Zm160-160v-160h80v160h-80Z";
