@@ -18,9 +18,13 @@ const findArtInDir = (dir) => {
     } catch { return null; }
 };
 
+// Helper to separate path normalization
+const toForwardSlashes = (p) => p.split(path.sep).join('/');
+
 // Helper to parse a single track
 async function parseTrackInfo(filePath, mm) {
-    const relativePath = path.relative(path.join(__dirname, '../'), filePath);
+    // Calculate path relative to THIS script (which is where AudioLibrary.js will live)
+    const relativePath = path.relative(__dirname, filePath);
     const fileName = path.basename(filePath);
     const dirName = path.dirname(filePath);
     const albumName = path.basename(dirName);
@@ -53,7 +57,8 @@ async function parseTrackInfo(filePath, mm) {
     }
 
     if (artFullPath) {
-        albumArt = '/' + path.relative(path.join(__dirname, '../'), artFullPath);
+        // Relative to THIS script
+        albumArt = toForwardSlashes(path.relative(__dirname, artFullPath));
     }
 
     let duration = null;
@@ -81,7 +86,8 @@ async function parseTrackInfo(filePath, mm) {
                 console.log(`Extracted album art for ${album} to ${coverName}`);
             }
 
-            albumArt = '/' + path.relative(path.join(__dirname, '../'), coverPath);
+            // Relative to THIS script
+            albumArt = toForwardSlashes(path.relative(__dirname, coverPath));
         } catch (e) {
             console.warn(`Failed to extract art for ${fileName}:`, e.message);
         }
@@ -90,7 +96,7 @@ async function parseTrackInfo(filePath, mm) {
     const id = (artist + '-' + title).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 
     return {
-        id, title, artist, src: '/' + relativePath, genre: 'Hip Hop', album, duration, albumArt
+        id, title, artist, src: toForwardSlashes(relativePath), genre: 'Hip Hop', album, duration, albumArt
     };
 }
 
@@ -106,7 +112,12 @@ const saveLibrary = () => {
 
     const fileContent = `class AudioLibrary {
     constructor() {
-        this._tracks = ${JSON.stringify(sortedTracks, null, 4)};
+        const rawTracks = ${JSON.stringify(sortedTracks, null, 4)};
+        this._tracks = rawTracks.map(track => ({
+            ...track,
+            src: new URL(track.src, import.meta.url).href,
+            albumArt: track.albumArt ? new URL(track.albumArt, import.meta.url).href : null
+        }));
     }
     get tracks() { return this._tracks; }
     getAll() { return this._tracks; }
