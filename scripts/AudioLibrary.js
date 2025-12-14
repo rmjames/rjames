@@ -1,3 +1,6 @@
+
+const audioAssets = import.meta.glob('../assets/audio/**/*', { eager: true, query: '?url', import: 'default' });
+
 class AudioLibrary {
     constructor() {
         const rawTracks = [
@@ -1322,11 +1325,21 @@ class AudioLibrary {
         "albumArt": "../assets/audio/Kendrick Lamar-Section.80/extracted_cover.jpg"
     }
 ];
-        this._tracks = rawTracks.map(track => ({
-            ...track,
-            src: new URL(track.src, import.meta.url).href,
-            albumArt: track.albumArt ? new URL(track.albumArt, import.meta.url).href : null
-        }));
+        this._tracks = rawTracks.map(track => {
+            const srcUrl = audioAssets[track.src];
+            // If albumArt is null, mappedArt is null. If it's a path, look it up.
+            const mappedArt = track.albumArt ? audioAssets[track.albumArt] : null;
+
+            if (!srcUrl) { 
+                console.warn('Audio asset not found in build:', track.src);
+            }
+
+            return {
+                ...track,
+                src: srcUrl || track.src,
+                albumArt: mappedArt || null
+            };
+        });
     }
     get tracks() { return this._tracks; }
     getAll() { return this._tracks; }
