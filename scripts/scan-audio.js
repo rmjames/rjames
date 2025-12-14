@@ -110,14 +110,27 @@ const saveLibrary = () => {
     // Sort tracks by ID for consistency
     const sortedTracks = Array.from(trackCache.values()).sort((a, b) => a.id.localeCompare(b.id));
 
-    const fileContent = `class AudioLibrary {
+    const fileContent = `
+const audioAssets = import.meta.glob('../assets/audio/**/*', { eager: true, query: '?url', import: 'default' });
+
+class AudioLibrary {
     constructor() {
         const rawTracks = ${JSON.stringify(sortedTracks, null, 4)};
-        this._tracks = rawTracks.map(track => ({
-            ...track,
-            src: new URL(track.src, import.meta.url).href,
-            albumArt: track.albumArt ? new URL(track.albumArt, import.meta.url).href : null
-        }));
+        this._tracks = rawTracks.map(track => {
+            const srcUrl = audioAssets[track.src];
+            // If albumArt is null, mappedArt is null. If it's a path, look it up.
+            const mappedArt = track.albumArt ? audioAssets[track.albumArt] : null;
+
+            if (!srcUrl) { 
+                console.warn('Audio asset not found in build:', track.src);
+            }
+
+            return {
+                ...track,
+                src: srcUrl || track.src,
+                albumArt: mappedArt || null
+            };
+        });
     }
     get tracks() { return this._tracks; }
     getAll() { return this._tracks; }
