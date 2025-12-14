@@ -9,7 +9,9 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest",
-    "e2e": "playwright test"
+    "e2e": "playwright test",
+    "gen-audio": "node scripts/scan-audio.js",
+    "watch-audio": "node scripts/scan-audio.js --watch"
   },
   "author": "",
   "license": "ISC",
@@ -22,9 +24,11 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.57.0",
+    "chokidar": "^5.0.0",
     "cssnano": "^6.0.1",
     "http-server": "^14.1.1",
     "jsdom": "^27.0.0",
+    "music-metadata": "^11.10.3",
     "playwright": "^1.45.3",
     "postcss-import": "^16.1.1",
     "vitest": "^3.2.4"
