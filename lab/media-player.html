@@ -38,23 +38,45 @@
             box-shadow: 0 0 2px color-mix(in oklch, oklch(from orange l c h) 48%, transparent 52%);
         }
 
-        .media-player__controls,
-        .media-player__presets {
+        .media-player__controls {
             grid-column: 1 / -1;
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
+            grid-template-columns: repeat(5, minmax(0, 1fr));
             padding: .75rem;
             border-radius: 1.25rem;
             background: oklch(from #333 l c h);
             gap: .5rem;
         }
 
+        .media-player__presets {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-auto-flow: column;
+            grid-auto-columns: calc((100% - 2rem) / 5);
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            scroll-padding-left: .75rem;
+            padding: .75rem;
+            border-radius: 1.25rem;
+            background: oklch(from #333 l c h);
+            gap: .5rem;
+            scrollbar-width: none;
+        }
+
+        .media-player__presets::-webkit-scrollbar {
+            display: none;
+        }
+
+        .media-player__presets>* {
+            scroll-snap-align: start;
+        }
+
         .media-player__controls__play {
-            grid-column: -1;
+            grid-column: 5;
         }
 
         .media-player__controls__option {
-            grid-column: 5;
+            grid-column: 4;
             position: relative;
         }
 
@@ -113,7 +135,23 @@
             background: oklch(from #0056b3 l c h);
         }
 
-        .media-player__controls__current img {
+        /* Fix for Firefox Mobile shrinking images */
+        button.has-art {
+            padding: 0;
+            display: block;
+            overflow: hidden;
+        }
+
+        button.has-art img {
+            display: block;
+            inline-size: 100%;
+            block-size: 100%;
+            object-fit: cover;
+            border-radius: inherit;
+        }
+
+        .media-player__controls__current img,
+        .media-player__presets__preset img {
             inline-size: 100%;
             block-size: 100%;
             object-fit: cover;
@@ -121,7 +159,7 @@
         }
 
         .media-player__meta {
-            grid-column: 2 / 5;
+            grid-column: 2 / 4;
             padding: 0 .5rem;
             text-align: left;
             display: flex;
@@ -245,60 +283,81 @@
         // Populate presets
         const tracks = audioLibrary.getAll();
 
-        // Load first track as default (optional, but good UX)
-        if (tracks.length > 0) {
-            const first = tracks[0];
-            // Don't auto play, just set src
-            // audio.src = first.src;
-            // titleEl.textContent = first.title;
-            // artistEl.textContent = first.artist;
+        const loadTrack = (track, play = false) => {
+            audio.src = track.src;
+            titleEl.textContent = track.title;
+            artistEl.textContent = track.artist;
+
+            if (track.albumArt) {
+                currentArtBtn.classList.add('has-art');
+                currentArtBtn.style.padding = ''; // Clear inline if any
+                currentArtBtn.innerHTML = `<img src="${track.albumArt}" alt="${track.title}">`;
+            } else {
+                currentArtBtn.classList.remove('has-art');
+                currentArtBtn.style.padding = '';
+                currentArtBtn.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
+                        <path d="M360-400h400L622-580l-92 120-62-80-108 140Zm-40 160q-33 0-56.5-23.5T240-320v-480q0-33 23.5-56.5T320-880h480q33 0 56.5 23.5T880-800v480q0 33-23.5 56.5T800-240H320Zm0-80h480v-480H320v480ZM160-80q-33 0-56.5-23.5T80-160v-560h80v560h560v80H160Zm160-720v480-480Z" />
+                    </svg>
+                 `;
+            }
+
+            if (play) audio.play();
         }
+
+        // Load first track as default
+        if (tracks.length > 0) {
+            loadTrack(tracks[0], false);
+        }
+
+        const fragment = document.createDocumentFragment();
 
         tracks.forEach(track => {
             const btn = document.createElement('button');
             btn.className = 'media-player__presets__preset';
             btn.dataset.id = track.id;
-            // Use same icon for all for now
-            btn.innerHTML = `
-                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
-                    fill="#e3e3e3">
-                    <path
-                        d="M360-400h400L622-580l-92 120-62-80-108 140Zm-40 160q-33 0-56.5-23.5T240-320v-480q0-33 23.5-56.5T320-880h480q33 0 56.5 23.5T880-800v480q0 33-23.5 56.5T800-240H320Zm0-80h480v-480H320v480ZM160-80q-33 0-56.5-23.5T80-160v-560h80v560h560v80H160Zm160-720v480-480Z" />
-                </svg>
-            `;
+            btn.setAttribute('aria-label', `Play ${track.title} by ${track.artist}`);
 
-            btn.addEventListener('click', () => {
+            if (track.albumArt) {
+                btn.classList.add('has-art');
+                btn.innerHTML = `<img src="${track.albumArt}" alt="Album art for ${track.title}" loading="lazy">`;
+            } else {
+                btn.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
+                        fill="#e3e3e3">
+                        <path
+                            d="M360-400h400L622-580l-92 120-62-80-108 140Zm-40 160q-33 0-56.5-23.5T240-320v-480q0-33 23.5-56.5T320-880h480q33 0 56.5 23.5T880-800v480q0 33-23.5 56.5T800-240H320Zm0-80h480v-480H320v480ZM160-80q-33 0-56.5-23.5T80-160v-560h80v560h560v80H160Zm160-720v480-480Z" />
+                    </svg>
+                `;
+            }
+            fragment.appendChild(btn);
+        });
+        presetsContainer.appendChild(fragment);
 
+        // Event Delegation
+        presetsContainer.addEventListener('click', (e) => {
+            const btn = e.target.closest('.media-player__presets__preset');
+            if (!btn) return;
+
+            const id = btn.dataset.id;
+            const track = audioLibrary.getById(id);
+
+            if (track) {
                 if (audio.src.endsWith(track.src) && !audio.paused) {
-                     audio.pause();
+                    audio.pause();
                 } else {
-                     audio.src = track.src;
-                     titleEl.textContent = track.title;
-                     artistEl.textContent = track.artist;
-
-                     if (track.albumArt) {
-                         currentArtBtn.innerHTML = `<img src="${track.albumArt}" alt="${track.title}">`;
-                     } else {
-                         currentArtBtn.innerHTML = `
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
-                                <path d="M360-400h400L622-580l-92 120-62-80-108 140Zm-40 160q-33 0-56.5-23.5T240-320v-480q0-33 23.5-56.5T320-880h480q33 0 56.5 23.5T880-800v480q0 33-23.5 56.5T800-240H320Zm0-80h480v-480H320v480ZM160-80q-33 0-56.5-23.5T80-160v-560h80v560h560v80H160Zm160-720v480-480Z" />
-                            </svg>
-                         `;
-                     }
-
-                     audio.play();
+                    loadTrack(track, true);
                 }
-            });
-            presetsContainer.appendChild(btn);
+            }
         });
 
         // Option/Like button logic
         const optionButton = document.querySelector('.media-player__controls__option');
         const optionIconPath = optionButton.querySelector('svg path');
         const equalizerPath = "M280-240v-480h80v480h-80ZM440-80v-800h80v800h-80ZM120-400v-160h80v160h-80Zm480 160v-480h80v480h-80Zm160-160v-160h80v160h-80Z";
+        const rewindPath = "M480-80q-75 0-140.5-28.5t-114-77q-48.5-48.5-77-114T120-440h80q0 117 81.5 198.5T480-160q117 0 198.5-81.5T760-440q0-117-81.5-198.5T480-720h-6l62 62-56 58-160-160 160-160 56 58-62 62h6q75 0 140.5 28.5t114 77q48.5 48.5-77 114T840-440q0 75-28.5 140.5t-77 114q-48.5 48.5-114 77T480-80ZM360-320v-180h-60v-60h120v240h-60Zm140 0q-17 0-28.5-11.5T460-360v-160q0-17 11.5-28.5T500-560h80q17 0 28.5 11.5T620-520v160q0 17-11.5 28.5T580-320h-80Zm20-60h40v-120h-40v120Z";
         const likePath = "M720-120H280v-520l280-280 50 50q7 7 11.5 19t4.5 23v14l-44 174h258q32 0 56 24t24 56v80q0 7-2 15t-4 15L794-168q-9 20-30 34t-44 14Zm-360-80h360l120-280v-80H480l54-220-174 174v406Zm0-406v406-406Zm-80-34v80H160v360h120v80H80v-520h200Z";
         const likeFilledPath = "M720-120H280v-520l280-280 50 50q7 7 11.5 19t4.5 23v14l-44 174h258q32 0 56 24t24 56v80q0 7-2 15t-4 15L794-168q-9 20-30 34t-44 14Zm-440-520v80H160v360h120v80H80v-520h200Z";
-        const rewindPath = "M480-80q-75 0-140.5-28.5t-114-77q-48.5-48.5-77-114T120-440h80q0 117 81.5 198.5T480-160q117 0 198.5-81.5T760-440q0-117-81.5-198.5T480-720h-6l62 62-56 58-160-160 160-160 56 58-62 62h6q75 0 140.5 28.5t114 77q48.5 48.5-77 114T840-440q0 75-28.5 140.5t-77 114q-48.5 48.5-114 77T480-80ZM360-320v-180h-60v-60h120v240h-60Zm140 0q-17 0-28.5-11.5T460-360v-160q0-17 11.5-28.5T500-560h80q17 0 28.5 11.5T620-520v160q0 17-11.5 28.5T580-320h-80Zm20-60h40v-120h-40v120Z";
 
         let longPressTimer;
         let mode = 'like'; // Default mode
@@ -380,7 +439,6 @@
         // Initialize icon
         updateIcon();
     </script>
-
 </body>
 
 </html>
