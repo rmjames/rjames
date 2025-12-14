@@ -85,6 +85,14 @@
             inline-size: 2rem;
             block-size: 2rem;
             padding: 0;
+            overflow: hidden;
+        }
+
+        .media-player__current img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: inherit;
         }
 
         .media-player__meta {
@@ -132,8 +140,8 @@
 
     <section class="media-player">
         <div class="media-player__meta">
-            <div class="media-player__meta__title">Coffee Shop</div>
-            <div class="media-player__meta__artist">Ambience</div>
+            <div class="media-player__meta__title">Loading...</div>
+            <div class="media-player__meta__artist">...</div>
         </div>
         <button class="media-player__current" title="Current Track">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
@@ -177,15 +185,21 @@
         </div>
     </section>
 
-    <!-- Dummy audio for functionality -->
-    <audio id="audio-player" src="https://actions.google.com/sounds/v1/ambiences/coffee_shop.ogg"></audio>
+    <audio id="audio-player"></audio>
 
-    <script>
+    <script type="module">
+        import { audioLibrary } from '../scripts/AudioLibrary.js';
+
         const audio = document.getElementById('audio-player');
         const playButton = document.querySelector('.media-player__play');
         const playIconPath = playButton.querySelector('svg path');
         const likeButton = document.querySelector('.media-player__like');
         const likeIconPath = likeButton.querySelector('svg path');
+        const prevButton = document.querySelector('.media-player__prev');
+        const nextButton = document.querySelector('.media-player__next');
+        const titleEl = document.querySelector('.media-player__meta__title');
+        const artistEl = document.querySelector('.media-player__meta__artist');
+        const currentArtBtn = document.querySelector('.media-player__current');
 
         const playPath = "M320-200v-560l440 280-440 280Zm80-280Zm0 134 210-134-210-134v268Z";
         const pausePath = "M528-192v-576h240v576H528Zm-336 0v-576h240v576H192Zm408-72h96v-432h-96v432Zm-336 0h96v-432h-96v432Zm0-432v432-432Zm336 0v432-432Z";
@@ -193,24 +207,73 @@
         const likePath = "M720-120H280v-520l280-280 50 50q7 7 11.5 19t4.5 23v14l-44 174h258q32 0 56 24t24 56v80q0 7-2 15t-4 15L794-168q-9 20-30 34t-44 14Zm-360-80h360l120-280v-80H480l54-220-174 174v406Zm0-406v406-406Zm-80-34v80H160v360h120v80H80v-520h200Z";
         const likeFilledPath = "M720-120H280v-520l280-280 50 50q7 7 11.5 19t4.5 23v14l-44 174h258q32 0 56 24t24 56v80q0 7-2 15t-4 15L794-168q-9 20-30 34t-44 14Zm-440-520v80H160v360h120v80H80v-520h200Z";
 
-        let isPlaying = false;
+        const tracks = audioLibrary.getAll();
+        let currentIndex = 0;
         let isLiked = false;
 
+        function loadTrack(index) {
+            if (index < 0) index = tracks.length - 1;
+            if (index >= tracks.length) index = 0;
+            currentIndex = index;
+            const track = tracks[currentIndex];
+
+            // Only update if changed or not set
+            if (!audio.src.endsWith(track.src)) {
+                audio.src = track.src;
+            }
+
+            titleEl.textContent = track.title;
+            artistEl.textContent = track.artist;
+
+            if (track.albumArt) {
+                 currentArtBtn.innerHTML = `<img src="${track.albumArt}" alt="${track.title}">`;
+            } else {
+                 currentArtBtn.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
+                        <path d="M400-120q-66 0-113-47t-47-113q0-66 47-113t113-47q23 0 42.5 5.5T480-418v-422h240v160H560v400q0 66-47 113t-113 47Z" />
+                    </svg>`;
+            }
+        }
+
+        if (tracks.length > 0) {
+            loadTrack(0);
+        }
+
+        const updatePlayIcon = () => {
+             if (audio.paused) playIconPath.setAttribute('d', playPath);
+             else playIconPath.setAttribute('d', pausePath);
+        };
+
         playButton.addEventListener('click', () => {
+            if (!audio.src && tracks.length > 0) loadTrack(0);
+
             if (audio.paused) {
                 audio.play();
-                playIconPath.setAttribute('d', pausePath);
-                isPlaying = true;
             } else {
                 audio.pause();
-                playIconPath.setAttribute('d', playPath);
-                isPlaying = false;
             }
+            updatePlayIcon();
         });
 
         likeButton.addEventListener('click', () => {
             isLiked = !isLiked;
             likeIconPath.setAttribute('d', isLiked ? likeFilledPath : likePath);
+        });
+
+        prevButton.addEventListener('click', () => {
+            loadTrack(currentIndex - 1);
+            audio.play();
+        });
+
+        nextButton.addEventListener('click', () => {
+            loadTrack(currentIndex + 1);
+            audio.play();
+        });
+
+        audio.addEventListener('play', updatePlayIcon);
+        audio.addEventListener('pause', updatePlayIcon);
+        audio.addEventListener('ended', () => {
+             playIconPath.setAttribute('d', playPath);
         });
 
     </script>
