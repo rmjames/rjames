@@ -230,7 +230,7 @@
         }
 
         .media-player__equalizer.active {
-            opacity: 1;
+            opacity: .98;
             pointer-events: all;
             transform: translateY(0);
         }
@@ -283,20 +283,84 @@
         </div>
 
         <div class="media-player__equalizer">
-            <input type="range" min="-12" max="12" value="3" aria-label="60Hz">
+            <input type="range" min="-12" max="12" value="3" aria-label="50Hz">
             <input type="range" min="-12" max="12" value="6" aria-label="230Hz">
             <input type="range" min="-12" max="12" value="-2" aria-label="910Hz">
             <input type="range" min="-12" max="12" value="4" aria-label="4kHz">
-            <input type="range" min="-12" max="12" value="0" aria-label="14kHz">
+            <input type="range" min="-12" max="12" value="0" aria-label="12kHz">
         </div>
     </section>
 
-    <audio id="audio-player"></audio>
+    <audio id="audio-player" crossorigin="anonymous"></audio>
 
     <script type="module">
         import { audioLibrary } from '../scripts/AudioLibrary.js';
 
         const audio = document.getElementById('audio-player');
+        // Web Audio API Context
+        let audioCtx;
+        let source;
+        const filters = [];
+
+        const initAudioContext = () => {
+            if (audioCtx) return;
+
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            audioCtx = new AudioContext();
+
+            source = audioCtx.createMediaElementSource(audio);
+
+            // Create filters
+            // 50Hz: LowShelf (Deeper Bass)
+            const bass = audioCtx.createBiquadFilter();
+            bass.type = 'lowshelf';
+            bass.frequency.value = 40;
+
+            // 230Hz: Peaking
+            const lowMid = audioCtx.createBiquadFilter();
+            lowMid.type = 'peaking';
+            lowMid.frequency.value = 230;
+            lowMid.Q.value = 1;
+
+            // 910Hz: Peaking
+            const mid = audioCtx.createBiquadFilter();
+            mid.type = 'peaking';
+            mid.frequency.value = 910;
+            mid.Q.value = 1;
+
+            // 4kHz: Peaking
+            const highMid = audioCtx.createBiquadFilter();
+            highMid.type = 'peaking';
+            highMid.frequency.value = 4000;
+            highMid.Q.value = 1;
+
+            // 12kHz: HighShelf (Crisper Treble)
+            const treble = audioCtx.createBiquadFilter();
+            treble.type = 'highshelf';
+            treble.frequency.value = 12000;
+
+            filters.push(bass, lowMid, mid, highMid, treble);
+
+            // Connect nodes
+            source.connect(bass);
+            bass.connect(lowMid);
+            lowMid.connect(mid);
+            mid.connect(highMid);
+            highMid.connect(treble);
+            treble.connect(audioCtx.destination);
+
+            // Apply initial values
+            // Apply initial values
+            const eqInputs = document.querySelectorAll('.media-player__equalizer input');
+            eqInputs.forEach((input, index) => {
+                if (filters[index]) {
+                    filters[index].gain.value = input.value;
+                }
+            });
+        };
+
+
+
         const playButton = document.querySelector('.media-player__controls__play');
         const playIconPath = playButton.querySelector('svg path');
         const titleEl = document.querySelector('.media-player__meta__title');
@@ -315,6 +379,11 @@
         };
 
         playButton.addEventListener('click', () => {
+            initAudioContext();
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
             if (!audio.src) return;
             if (audio.paused) {
                 audio.play();
@@ -324,7 +393,13 @@
             updatePlayIcon();
         });
 
-        audio.addEventListener('play', updatePlayIcon);
+        audio.addEventListener('play', () => {
+            initAudioContext();
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            updatePlayIcon();
+        });
         audio.addEventListener('pause', updatePlayIcon);
         audio.addEventListener('ended', () => {
             playIconPath.setAttribute('d', playPath);
@@ -514,6 +589,18 @@
         optionButton.addEventListener('click', (e) => {
             if (longPressTriggered) return;
             toggleLike();
+        });
+
+        // Equalizer Input Listeners
+        const eqInputs = document.querySelectorAll('.media-player__equalizer input');
+
+        eqInputs.forEach((input, index) => {
+            input.addEventListener('input', (e) => {
+                const value = e.target.value;
+                if (filters && filters[index]) {
+                    filters[index].gain.value = value;
+                }
+            });
         });
 
         // Initialize icon
