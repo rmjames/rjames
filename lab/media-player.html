@@ -243,8 +243,51 @@
             background: transparent;
             cursor: pointer;
             outline: none;
-            /* Accent color for the sliders */
-            accent-color: oklch(from #ccc l c h);
+            position: absolute;
+            z-index: 10;
+            opacity: 0;
+            margin: 0;
+            inset: 0;
+        }
+
+        .media-player__equalizer__slider {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .eq-slider__track {
+            position: absolute;
+            background: oklch(from #fff l c h / 0.1);
+            width: 4px;
+            height: 80%;
+            border-radius: 4px;
+        }
+
+        .eq-slider__fill {
+            position: absolute;
+            background: oklch(from #eee l c h);
+            width: 4px;
+            border-radius: 4px;
+            box-shadow: 0 0 8px oklch(from #eee l c h / 0.5);
+            transition: height 0.05s linear, top 0.05s linear;
+        }
+
+        .eq-slider__thumb {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: #fff;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+            transform: translate(-50%, -50%);
+            /* Center on the point */
+            left: 50%;
+            pointer-events: none;
+            transition: top 0.05s linear;
         }
     </style>
 </head>
@@ -283,11 +326,36 @@
         </div>
 
         <div class="media-player__equalizer">
-            <input type="range" min="-12" max="12" value="3" aria-label="50Hz">
-            <input type="range" min="-12" max="12" value="6" aria-label="230Hz">
-            <input type="range" min="-12" max="12" value="-2" aria-label="910Hz">
-            <input type="range" min="-12" max="12" value="4" aria-label="4kHz">
-            <input type="range" min="-12" max="12" value="0" aria-label="12kHz">
+            <div class="media-player__equalizer__slider">
+                <div class="eq-slider__track"></div>
+                <div class="eq-slider__fill"></div>
+                <div class="eq-slider__thumb"></div>
+                <input type="range" min="-12" max="12" value="3" aria-label="50Hz" step="0.1">
+            </div>
+            <div class="media-player__equalizer__slider">
+                <div class="eq-slider__track"></div>
+                <div class="eq-slider__fill"></div>
+                <div class="eq-slider__thumb"></div>
+                <input type="range" min="-12" max="12" value="6" aria-label="230Hz" step="0.1">
+            </div>
+            <div class="media-player__equalizer__slider">
+                <div class="eq-slider__track"></div>
+                <div class="eq-slider__fill"></div>
+                <div class="eq-slider__thumb"></div>
+                <input type="range" min="-12" max="12" value="-2" aria-label="910Hz" step="0.1">
+            </div>
+            <div class="media-player__equalizer__slider">
+                <div class="eq-slider__track"></div>
+                <div class="eq-slider__fill"></div>
+                <div class="eq-slider__thumb"></div>
+                <input type="range" min="-12" max="12" value="4" aria-label="4kHz" step="0.1">
+            </div>
+            <div class="media-player__equalizer__slider">
+                <div class="eq-slider__track"></div>
+                <div class="eq-slider__fill"></div>
+                <div class="eq-slider__thumb"></div>
+                <input type="range" min="-12" max="12" value="0" aria-label="12kHz" step="0.1">
+            </div>
         </div>
     </section>
 
@@ -301,6 +369,51 @@
         let audioCtx;
         let source;
         const filters = [];
+
+        const updateSliderVisuals = (input) => {
+            const min = parseFloat(input.min);
+            const max = parseFloat(input.max);
+            const val = parseFloat(input.value);
+
+            // Normalize value to 0-100%
+            const pct = ((val - min) / (max - min)) * 100;
+
+            const wrapper = input.parentElement;
+            const fill = wrapper.querySelector('.eq-slider__fill');
+            const thumb = wrapper.querySelector('.eq-slider__thumb');
+            const track = wrapper.querySelector('.eq-slider__track');
+
+            if (!fill || !thumb) return;
+
+            // Visual range is essentially inside the track height (80% of container)
+            // But let's map it simply to the container height for now to match input
+            // The input covers 100% height.
+            // 0% value = Bottom (100% top). 100% value = Top (0% top).
+            // Input vertical: max at top, min at bottom.
+
+            // Thumb position
+            // top: 0% is max value. top: 100% is min value.
+            const topPos = 100 - pct;
+            thumb.style.top = `${topPos}%`;
+
+            // Center-Zero Fill Logic
+            // Center is 50%
+            const center = 50;
+
+            if (pct >= center) {
+                // Expanding UP from center
+                // Top is current pos, Height is distance from center
+                const height = pct - center;
+                fill.style.top = `${topPos}%`;
+                fill.style.height = `${height}%`;
+            } else {
+                // Expanding DOWN from center
+                // Top is center, Height is distance to bottom
+                const height = center - pct;
+                fill.style.top = `50%`;
+                fill.style.height = `${height}%`;
+            }
+        };
 
         const initAudioContext = () => {
             if (audioCtx) return;
@@ -353,6 +466,7 @@
             // Apply initial values
             const eqInputs = document.querySelectorAll('.media-player__equalizer input');
             eqInputs.forEach((input, index) => {
+                updateSliderVisuals(input);
                 if (filters[index]) {
                     filters[index].gain.value = input.value;
                 }
@@ -595,7 +709,11 @@
         const eqInputs = document.querySelectorAll('.media-player__equalizer input');
 
         eqInputs.forEach((input, index) => {
+            // Initialize visual state
+            updateSliderVisuals(input);
+
             input.addEventListener('input', (e) => {
+                updateSliderVisuals(e.target);
                 const value = e.target.value;
                 if (filters && filters[index]) {
                     filters[index].gain.value = value;
