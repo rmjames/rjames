@@ -123,13 +123,19 @@ function findAssetKey(src) {
     // Sometimes spaces or special chars might be issue.
     
     const keys = Object.keys(audioAssets);
-    
+    const fileName = src.split('/').pop();
+    const lowerFileName = fileName.toLowerCase();
+
     // 1. Try URI encoded version (Vite sometimes encodes keys?)
     // 2. Try looking for exact ending match (file name)
-    
-    const fileName = src.split('/').pop();
-    // Find key ending with this filename (preceded by /)
-    const match = keys.find(k => k.endsWith('/' + fileName) || k === fileName);
+    // 3. Case insensitive suffix match
+
+    const match = keys.find(k => 
+        k.endsWith('/' + fileName) || 
+        k === fileName ||
+        k.toLowerCase().endsWith('/' + lowerFileName) || 
+        k.toLowerCase() === lowerFileName
+    );
     
     if (match) {
         console.debug('Fuzzy matched asset:', src, '->', match);
@@ -151,6 +157,10 @@ class AudioLibrary {
 
             if (!srcUrl) { 
                 console.warn('Audio asset not found in build:', track.src);
+            }
+
+            if (track.albumArt && !mappedArt) {
+                 console.warn('Album art asset not found in build:', track.albumArt);
             }
 
             return {
