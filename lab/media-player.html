@@ -37,7 +37,6 @@
             border-radius: 2rem;
             box-shadow: 0 0 2px color-mix(in oklch, oklch(from orange l c h) 48%, transparent 52%);
             position: relative;
-            /* Establish positioning context */
         }
 
         .media-player__controls {
@@ -77,11 +76,17 @@
             grid-column: 5;
         }
 
+        /* Hide Option Button when EQ is open */
+        .media-player.is-eq-open .media-player__controls__option {
+            opacity: 0;
+            pointer-events: none;
+        }
+
         .media-player__controls__option {
             grid-column: 4;
             position: relative;
-            z-index: 20;
-            /* Ensure it stays above the equalizer popover */
+            transition: opacity 0.2s ease;
+            animation: pulse-shadow 16s infinite ease-in-out;
         }
 
         .media-player__controls__option::after {
@@ -207,47 +212,112 @@
             }
         }
 
+        @keyframes pulse-shadow {
+
+            0%,
+            10%,
+            100% {
+                box-shadow: 0 0 0px 0 oklch(from #ccc l c h / .5);
+            }
+
+            2% {
+                box-shadow: 0 0 4px 0 oklch(from #ccc l c h / .5);
+            }
+        }
+
         /* Equalizer Popover */
         .media-player__equalizer {
             position: absolute;
             inset: 0;
-            /* Cover the entire media player */
             background: oklch(from #333 l c h);
             border-radius: inherit;
-            /* Find parent border-radius (2rem) */
-            padding: 1.5rem;
-            /* Increased padding */
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: .5rem;
-            align-items: center;
-            justify-items: center;
+            padding: 1rem;
+            display: flex;
+            flex-direction: row;
+            gap: 1rem;
+            align-items: stretch;
             opacity: 0;
             pointer-events: none;
             transform: translateY(10px);
             transition: opacity 0.2s ease, transform 0.2s ease;
             z-index: 10;
+
+            &.active {
+                opacity: .98;
+                pointer-events: all;
+                transform: translateY(0);
+            }
+
+            &.disabled .eq-grid {
+                opacity: 0.3;
+                pointer-events: none;
+            }
+
+            input[type="range"] {
+                -webkit-appearance: slider-vertical;
+                appearance: slider-vertical;
+                width: 100%;
+                height: 100%;
+                background: transparent;
+                cursor: pointer;
+                outline: none;
+                position: absolute;
+                z-index: 10;
+                opacity: 0;
+                margin: 0;
+                inset: 0;
+            }
         }
 
-        .media-player__equalizer.active {
-            opacity: .98;
-            pointer-events: all;
-            transform: translateY(0);
+        .eq-sidebar {
+            display: flex;
+            flex-direction: column;
+            width: 32px;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
+
+            .eq-sidebar__btn {
+                background: none;
+                border: none;
+                padding: 0;
+                cursor: pointer;
+                color: oklch(from #eee l c h / 0.5);
+                transition: color 0.2s ease, transform 0.1s ease;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                outline: none;
+
+                svg {
+                    width: 20px;
+                    height: 20px;
+                }
+
+                &:hover {
+                    color: oklch(from #eee l c h / 0.9);
+                }
+
+                &.active {
+                    color: oklch(from #4ec9b0 l c h);
+                    /* Accent color */
+                }
+
+                &:active {
+                    transform: scale(0.9);
+                }
+            }
         }
 
-        .media-player__equalizer input[type="range"] {
-            -webkit-appearance: slider-vertical;
-            appearance: slider-vertical;
-            width: 100%;
-            height: 100%;
-            background: transparent;
-            cursor: pointer;
-            outline: none;
-            position: absolute;
-            z-index: 10;
-            opacity: 0;
-            margin: 0;
-            inset: 0;
+        .eq-grid {
+            flex: 1;
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0.25rem;
+            align-items: center;
+            justify-items: center;
+            transition: opacity 0.3s ease;
         }
 
         .media-player__equalizer__slider {
@@ -259,54 +329,54 @@
             justify-content: center;
             align-items: center;
             gap: 0.25rem;
-        }
 
-        .eq-slider__wrapper {
-            position: relative;
-            width: 100%;
-            flex: 1;
-            display: flex;
-            justify-content: center;
-        }
+            .eq-slider__wrapper {
+                position: relative;
+                width: 100%;
+                flex: 1;
+                display: flex;
+                justify-content: center;
+            }
 
-        .eq-slider__label {
-            font-size: 0.65rem;
-            color: oklch(from #ccc l c h / 0.7);
-            text-align: center;
-            font-variant-numeric: tabular-nums;
-            letter-spacing: 0.02em;
-        }
+            .eq-slider__label {
+                font-size: 0.65rem;
+                color: oklch(from #ccc l c h / 0.7);
+                text-align: center;
+                font-variant-numeric: tabular-nums;
+                letter-spacing: 0.02em;
+            }
 
-        .eq-slider__track {
-            position: absolute;
-            background: oklch(from #fff l c h / 0.1);
-            width: 4px;
-            height: 100%;
-            /* Fill the wrapper */
-            border-radius: 4px;
-        }
+            .eq-slider__track {
+                position: absolute;
+                background: oklch(from #fff l c h / 0.1);
+                width: 4px;
+                height: 100%;
+                /* Fill the wrapper */
+                border-radius: 4px;
+            }
 
-        .eq-slider__fill {
-            position: absolute;
-            background: oklch(from #eee l c h);
-            width: 4px;
-            border-radius: 4px;
-            box-shadow: 0 0 8px oklch(from #eee l c h / 0.5);
-            transition: height 0.05s linear, top 0.05s linear;
-        }
+            .eq-slider__fill {
+                position: absolute;
+                background: oklch(from #eee l c h);
+                width: 4px;
+                border-radius: 4px;
+                box-shadow: 0 0 8px oklch(from #eee l c h / 0.5);
+                transition: height 0.05s linear, top 0.05s linear;
+            }
 
-        .eq-slider__thumb {
-            position: absolute;
-            width: 12px;
-            height: 12px;
-            background: #fff;
-            border-radius: 50%;
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
-            transform: translate(-50%, -50%);
-            /* Center on the point */
-            left: 50%;
-            pointer-events: none;
-            transition: top 0.05s linear;
+            .eq-slider__thumb {
+                position: absolute;
+                width: 12px;
+                height: 12px;
+                background: #fff;
+                border-radius: 50%;
+                box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+                transform: translate(-50%, -50%);
+                /* Center on the point */
+                left: 50%;
+                pointer-events: none;
+                transition: top 0.05s linear;
+            }
         }
     </style>
 </head>
@@ -345,50 +415,85 @@
         </div>
 
         <div class="media-player__equalizer">
-            <div class="media-player__equalizer__slider">
-                <div class="eq-slider__wrapper">
-                    <div class="eq-slider__track"></div>
-                    <div class="eq-slider__fill"></div>
-                    <div class="eq-slider__thumb"></div>
-                    <input type="range" min="-12" max="12" value="3" aria-label="50Hz" step="0.1">
-                </div>
-                <span class="eq-slider__label">50Hz</span>
+            <div class="eq-sidebar">
+                <button class="eq-sidebar__btn" id="eq-close-btn" aria-label="Close Equalizer">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
+                        fill="currentColor">
+                        <path
+                            d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z" />
+                    </svg>
+                </button>
+
+                <button class="eq-sidebar__btn" id="eq-power-btn" aria-label="Toggle Equalizer">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
+                        fill="currentColor">
+                        <path
+                            d="M480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q54 0 104-17.5t92-50.5L228-676q-33 42-50.5 92T160-480q0 134 93 227t227 93Zm252-124q33-42 50.5-92T800-480q0-134-93-227t-227-93q-54 0-104 17.5T284-732l448 448Z" />
+                    </svg>
+                </button>
+
+                <button class="eq-sidebar__btn" id="eq-save-btn" aria-label="Save Settings">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
+                        fill="currentColor">
+                        <path
+                            d="M840-680v480q0 33-23.5 56.5T760-120H200q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h480l160 160Zm-80 34L646-760H200v560h560v-446ZM480-240q50 0 85-35t35-85q0-50-35-85t-85-35q-50 0-85 35t-35 85q0 50 35 85t85 35ZM240-560h360v-160H240v160Zm-40-86v446-560 114Z" />
+                    </svg>
+                </button>
+                <button class="eq-sidebar__btn" id="eq-load-btn" aria-label="Load Settings">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
+                        fill="currentColor">
+                        <path
+                            d="M480-120q-75 0-140.5-28.5t-114-77q-48.5-48.5-77-114T120-480q0-75 28.5-140.5t77-114q48.5-48.5 114-77T480-840q82 0 155.5 35T760-706v-94h80v240H600v-80h110q-41-56-101-88t-129-32q-117 0-198.5 81.5T200-480q0 117 81.5 198.5T480-200q106 0 183.5-68.5T758-440h84q-17 106-102 173t-180 67Z" />
+                    </svg>
+                </button>
             </div>
-            <div class="media-player__equalizer__slider">
-                <div class="eq-slider__wrapper">
-                    <div class="eq-slider__track"></div>
-                    <div class="eq-slider__fill"></div>
-                    <div class="eq-slider__thumb"></div>
-                    <input type="range" min="-12" max="12" value="6" aria-label="230Hz" step="0.1">
+
+            <div class="eq-grid">
+                <div class="media-player__equalizer__slider">
+                    <div class="eq-slider__wrapper">
+                        <div class="eq-slider__track"></div>
+                        <div class="eq-slider__fill"></div>
+                        <div class="eq-slider__thumb"></div>
+                        <input type="range" min="-12" max="12" value="3" aria-label="50Hz" step="0.1">
+                    </div>
+                    <span class="eq-slider__label">50Hz</span>
                 </div>
-                <span class="eq-slider__label">230Hz</span>
-            </div>
-            <div class="media-player__equalizer__slider">
-                <div class="eq-slider__wrapper">
-                    <div class="eq-slider__track"></div>
-                    <div class="eq-slider__fill"></div>
-                    <div class="eq-slider__thumb"></div>
-                    <input type="range" min="-12" max="12" value="-2" aria-label="910Hz" step="0.1">
+                <div class="media-player__equalizer__slider">
+                    <div class="eq-slider__wrapper">
+                        <div class="eq-slider__track"></div>
+                        <div class="eq-slider__fill"></div>
+                        <div class="eq-slider__thumb"></div>
+                        <input type="range" min="-12" max="12" value="6" aria-label="230Hz" step="0.1">
+                    </div>
+                    <span class="eq-slider__label">230Hz</span>
                 </div>
-                <span class="eq-slider__label">910Hz</span>
-            </div>
-            <div class="media-player__equalizer__slider">
-                <div class="eq-slider__wrapper">
-                    <div class="eq-slider__track"></div>
-                    <div class="eq-slider__fill"></div>
-                    <div class="eq-slider__thumb"></div>
-                    <input type="range" min="-12" max="12" value="4" aria-label="4kHz" step="0.1">
+                <div class="media-player__equalizer__slider">
+                    <div class="eq-slider__wrapper">
+                        <div class="eq-slider__track"></div>
+                        <div class="eq-slider__fill"></div>
+                        <div class="eq-slider__thumb"></div>
+                        <input type="range" min="-12" max="12" value="-2" aria-label="910Hz" step="0.1">
+                    </div>
+                    <span class="eq-slider__label">910Hz</span>
                 </div>
-                <span class="eq-slider__label">4kHz</span>
-            </div>
-            <div class="media-player__equalizer__slider">
-                <div class="eq-slider__wrapper">
-                    <div class="eq-slider__track"></div>
-                    <div class="eq-slider__fill"></div>
-                    <div class="eq-slider__thumb"></div>
-                    <input type="range" min="-12" max="12" value="0" aria-label="12kHz" step="0.1">
+                <div class="media-player__equalizer__slider">
+                    <div class="eq-slider__wrapper">
+                        <div class="eq-slider__track"></div>
+                        <div class="eq-slider__fill"></div>
+                        <div class="eq-slider__thumb"></div>
+                        <input type="range" min="-12" max="12" value="4" aria-label="4kHz" step="0.1">
+                    </div>
+                    <span class="eq-slider__label">4kHz</span>
                 </div>
-                <span class="eq-slider__label">12kHz</span>
+                <div class="media-player__equalizer__slider">
+                    <div class="eq-slider__wrapper">
+                        <div class="eq-slider__track"></div>
+                        <div class="eq-slider__fill"></div>
+                        <div class="eq-slider__thumb"></div>
+                        <input type="range" min="-12" max="12" value="0" aria-label="12kHz" step="0.1">
+                    </div>
+                    <span class="eq-slider__label">12kHz</span>
+                </div>
             </div>
         </div>
     </section>
@@ -419,8 +524,6 @@
 
             if (!fill || !thumb) return;
 
-            // Visual range is essentially inside the track height (80% of container)
-            // But let's map it simply to the container height for now to match input
             // The input covers 100% height.
             // 0% value = Bottom (100% top). 100% value = Top (0% top).
             // Input vertical: max at top, min at bottom.
@@ -497,7 +600,6 @@
             treble.connect(audioCtx.destination);
 
             // Apply initial values
-            // Apply initial values
             const eqInputs = document.querySelectorAll('.media-player__equalizer input');
             eqInputs.forEach((input, index) => {
                 updateSliderVisuals(input);
@@ -506,8 +608,6 @@
                 }
             });
         };
-
-
 
         const playButton = document.querySelector('.media-player__controls__play');
         const playIconPath = playButton.querySelector('svg path');
@@ -646,22 +746,20 @@
             } else {
                 optionIconPath.setAttribute('d', liked ? likeFilledPath : likePath);
             }
-
-            // Hide equalizer if switching away from it (optional, but good UX)
-            // But wait, toggleMode cycles modes. 
-            // If we switch MODE away from equalizer, we should probably close the popover if open?
-            // The requirement is "when ... equalizer ... is SELECTED".
-            // So sticking to the logic that click handles the action.
         };
 
         const equalizerContainer = document.querySelector('.media-player__equalizer');
 
         const toggleEqualizerPopover = () => {
             const isActive = equalizerContainer.classList.contains('active');
+            const mediaPlayer = document.querySelector('.media-player');
+
             if (isActive) {
                 equalizerContainer.classList.remove('active');
+                mediaPlayer.classList.remove('is-eq-open');
             } else {
                 equalizerContainer.classList.add('active');
+                mediaPlayer.classList.add('is-eq-open');
             }
         };
 
@@ -695,12 +793,6 @@
                 toggleEqualizerPopover();
             }
         };
-
-        // Close equalizer when clicking outside or engaging other controls?
-        // For now, only the toggle closes it or specific logic.
-        // Let's ensure switching modes hides it if we want strict mode adherence.
-        // But the prompt says "when ... option = equalizer ... and that is selected".
-        // This implies the action happens on click.
 
         let longPressTriggered = false;
 
@@ -750,10 +842,120 @@
                 updateSliderVisuals(e.target);
                 const value = e.target.value;
                 if (filters && filters[index]) {
-                    filters[index].gain.value = value;
+                    // Update filter gain immediately only if EQ is ON
+                    if (isEqOn) {
+                        filters[index].gain.value = value;
+                    }
                 }
             });
         });
+
+        // --- Advanced EQ Features ---
+        const powerBtn = document.getElementById('eq-power-btn');
+        const saveBtn = document.getElementById('eq-save-btn');
+        const loadBtn = document.getElementById('eq-load-btn');
+        const closeBtn = document.getElementById('eq-close-btn');
+        const eqContainerFull = document.querySelector('.media-player__equalizer');
+        const eqToggleBtn = document.querySelector('.media-player__controls__option');
+
+        let isEqOn = true;
+
+        closeBtn.addEventListener('click', () => {
+            eqContainerFull.classList.remove('active');
+            document.querySelector('.media-player').classList.remove('is-eq-open');
+        });
+
+        const togglePower = () => {
+            isEqOn = !isEqOn;
+
+            // Visual Update
+            if (isEqOn) {
+                powerBtn.classList.add('active');
+                eqContainerFull.classList.remove('disabled');
+                powerBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M480-80q-150 0-255-105T120-480q0-150 105-255t255-105q14 0 27.5 1t26.5 3v82q-12-2-25.5-3t-28.5-1q-116 0-198 82t-82 198q0 116 82 198t198 82q116 0 198-82t82-198q0-11-1-25.5t-3-28.5h82q2 13 3 26.5t1 27.5q0 150-105 255T480-120Zm-40-360v-440h80v440h-80Z"/></svg>`;
+            } else {
+                powerBtn.classList.remove('active');
+                eqContainerFull.classList.add('disabled');
+                powerBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M480-120q-150 0-255-105T120-480q0-150 105-255t255-105q14 0 27.5 1t26.5 3v82q-12-2-25.5-3t-28.5-1q-116 0-198 82t-82 198q0 116 82 198t198 82q116 0 198-82t82-198q0-11-1-25.5t-3-28.5h82q2 13 3 26.5t1 27.5q0 150-105 255T480-120Zm-40-360v-440h80v440h-80Z"/></svg>`;
+            }
+
+            // Audio Update
+            filters.forEach((filter, index) => {
+                if (filter) {
+                    if (isEqOn) {
+                        filter.gain.value = eqInputs[index].value;
+                    } else {
+                        filter.gain.value = 0;
+                    }
+                }
+            });
+        };
+
+        // Initial Active State
+        powerBtn.classList.add('active'); // Start ON
+        powerBtn.addEventListener('click', togglePower);
+
+        // Save
+        saveBtn.addEventListener('click', () => {
+            const settings = Array.from(eqInputs).map(input => input.value);
+            localStorage.setItem('rj-eq-settings', JSON.stringify(settings));
+
+            // Visual feedback
+            const originalHTML = saveBtn.innerHTML;
+            saveBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M382-240 154-468l57-57 171 171 367-367 57 57-424 424Z"/></svg>'; // Checkmark
+            saveBtn.classList.add('active');
+            setTimeout(() => {
+                saveBtn.innerHTML = originalHTML;
+                saveBtn.classList.remove('active');
+            }, 1000);
+        });
+
+        // Load
+        loadBtn.addEventListener('click', () => {
+            const saved = localStorage.getItem('rj-eq-settings');
+            if (saved) {
+                try {
+                    const settings = JSON.parse(saved);
+                    eqInputs.forEach((input, index) => {
+                        if (settings[index] !== undefined) {
+                            input.value = settings[index];
+                            updateSliderVisuals(input);
+                            // If EQ is on, apply immediately
+                            if (isEqOn && filters[index]) {
+                                filters[index].gain.value = input.value;
+                            }
+                        }
+                    });
+                    // Visual feedback
+                    const originalHTML = loadBtn.innerHTML;
+                    loadBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M382-240 154-468l57-57 171 171 367-367 57 57-424 424Z"/></svg>';
+                    loadBtn.classList.add('active');
+                    setTimeout(() => {
+                        loadBtn.innerHTML = originalHTML;
+                        loadBtn.classList.remove('active');
+                    }, 1000);
+                } catch (e) {
+                    console.error('Do not care about corrupt settings');
+                }
+            }
+        });
+
+        // Load on startup if exists
+        const autoLoadFn = () => {
+            const saved = localStorage.getItem('rj-eq-settings');
+            if (saved) {
+                try {
+                    const settings = JSON.parse(saved);
+                    eqInputs.forEach((input, index) => {
+                        if (settings[index] !== undefined) {
+                            input.value = settings[index];
+                            updateSliderVisuals(input);
+                        }
+                    });
+                } catch (e) { }
+            }
+        }
+        autoLoadFn();
 
         // Initialize icon
         updateIcon();
