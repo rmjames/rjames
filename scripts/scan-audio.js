@@ -113,13 +113,41 @@ const saveLibrary = () => {
     const fileContent = `
 const audioAssets = import.meta.glob('../assets/audio/**/*', { eager: true, query: '?url', import: 'default' });
 
+// Helper to find asset key robustly
+function findAssetKey(src) {
+    if (!src) return null;
+    if (audioAssets[src]) return src;
+
+    // Try verifying path normalization quirks
+    // Vite glob keys are exactly as written in the pattern prefix + file path
+    // Sometimes spaces or special chars might be issue.
+    
+    const keys = Object.keys(audioAssets);
+    
+    // 1. Try URI encoded version (Vite sometimes encodes keys?)
+    // 2. Try looking for exact ending match (file name)
+    
+    const fileName = src.split('/').pop();
+    // Find key ending with this filename (preceded by /)
+    const match = keys.find(k => k.endsWith('/' + fileName) || k === fileName);
+    
+    if (match) {
+        console.debug('Fuzzy matched asset:', src, '->', match);
+        return match;
+    }
+    
+    return null;
+}
+
 class AudioLibrary {
     constructor() {
         const rawTracks = ${JSON.stringify(sortedTracks, null, 4)};
         this._tracks = rawTracks.map(track => {
-            const srcUrl = audioAssets[track.src];
-            // If albumArt is null, mappedArt is null. If it's a path, look it up.
-            const mappedArt = track.albumArt ? audioAssets[track.albumArt] : null;
+            const srcKey = findAssetKey(track.src);
+            const srcUrl = srcKey ? audioAssets[srcKey] : null;
+
+            const artKey = findAssetKey(track.albumArt);
+            const mappedArt = artKey ? audioAssets[artKey] : null;
 
             if (!srcUrl) { 
                 console.warn('Audio asset not found in build:', track.src);
