@@ -11,13 +11,19 @@ function findAssetKey(src) {
     // Sometimes spaces or special chars might be issue.
     
     const keys = Object.keys(audioAssets);
-    
+    const fileName = src.split('/').pop();
+    const lowerFileName = fileName.toLowerCase();
+
     // 1. Try URI encoded version (Vite sometimes encodes keys?)
     // 2. Try looking for exact ending match (file name)
-    
-    const fileName = src.split('/').pop();
-    // Find key ending with this filename (preceded by /)
-    const match = keys.find(k => k.endsWith('/' + fileName) || k === fileName);
+    // 3. Case insensitive suffix match
+
+    const match = keys.find(k => 
+        k.endsWith('/' + fileName) || 
+        k === fileName ||
+        k.toLowerCase().endsWith('/' + lowerFileName) || 
+        k.toLowerCase() === lowerFileName
+    );
     
     if (match) {
         console.debug('Fuzzy matched asset:', src, '->', match);
@@ -30,86 +36,6 @@ function findAssetKey(src) {
 class AudioLibrary {
     constructor() {
         const rawTracks = [
-    {
-        "id": "bob-marley-the-wailers-bob-marley-the-wailers-concrete-jungle-live",
-        "title": "Bob Marley & The Wailers - Concrete Jungle (Live)",
-        "artist": "Bob Marley & The Wailers",
-        "src": "../assets/audio/Bob Marley & The Wailers - Live @ Quiet Night Club (Chicago, IL) (6-10-1975)/03 - Bob Marley & The Wailers - Concrete Jungle (Live).m4a",
-        "genre": "Hip Hop",
-        "album": "Live @ Quiet Night Club (Chicago, IL) (6-10-1975)",
-        "duration": 366.71274376417233,
-        "albumArt": null
-    },
-    {
-        "id": "bob-marley-the-wailers-bob-marley-the-wailers-i-shot-the-sheriff-live",
-        "title": "Bob Marley & The Wailers - I Shot The Sheriff (Live)",
-        "artist": "Bob Marley & The Wailers",
-        "src": "../assets/audio/Bob Marley & The Wailers - Live @ Quiet Night Club (Chicago, IL) (6-10-1975)/07 - Bob Marley & The Wailers - I Shot The Sheriff (Live).m4a",
-        "genre": "Hip Hop",
-        "album": "Live @ Quiet Night Club (Chicago, IL) (6-10-1975)",
-        "duration": 746.4983219954648,
-        "albumArt": null
-    },
-    {
-        "id": "bob-marley-the-wailers-bob-marley-the-wailers-midnight-raver-live",
-        "title": "Bob Marley & The Wailers - Midnight Raver (Live)",
-        "artist": "Bob Marley & The Wailers",
-        "src": "../assets/audio/Bob Marley & The Wailers - Live @ Quiet Night Club (Chicago, IL) (6-10-1975)/04 - Bob Marley & The Wailers - Midnight Raver (Live).m4a",
-        "genre": "Hip Hop",
-        "album": "Live @ Quiet Night Club (Chicago, IL) (6-10-1975)",
-        "duration": 401.26403628117913,
-        "albumArt": null
-    },
-    {
-        "id": "bob-marley-the-wailers-bob-marley-the-wailers-natty-dread-live",
-        "title": "Bob Marley & The Wailers - Natty Dread (Live)",
-        "artist": "Bob Marley & The Wailers",
-        "src": "../assets/audio/Bob Marley & The Wailers - Live @ Quiet Night Club (Chicago, IL) (6-10-1975)/08 - Bob Marley & The Wailers - Natty Dread (Live).m4a",
-        "genre": "Hip Hop",
-        "album": "Live @ Quiet Night Club (Chicago, IL) (6-10-1975)",
-        "duration": 495.74603174603175,
-        "albumArt": null
-    },
-    {
-        "id": "bob-marley-the-wailers-bob-marley-the-wailers-rebel-music-live",
-        "title": "Bob Marley & The Wailers - Rebel Music (Live)",
-        "artist": "Bob Marley & The Wailers",
-        "src": "../assets/audio/Bob Marley & The Wailers - Live @ Quiet Night Club (Chicago, IL) (6-10-1975)/06 - Bob Marley & The Wailers - Rebel Music (Live).m4a",
-        "genre": "Hip Hop",
-        "album": "Live @ Quiet Night Club (Chicago, IL) (6-10-1975)",
-        "duration": 456.6900680272109,
-        "albumArt": null
-    },
-    {
-        "id": "bob-marley-the-wailers-bob-marley-the-wailers-slave-driver-live",
-        "title": "Bob Marley & The Wailers - Slave Driver (Live)",
-        "artist": "Bob Marley & The Wailers",
-        "src": "../assets/audio/Bob Marley & The Wailers - Live @ Quiet Night Club (Chicago, IL) (6-10-1975)/01 - Bob Marley & The Wailers - Slave Driver (Live).m4a",
-        "genre": "Hip Hop",
-        "album": "Live @ Quiet Night Club (Chicago, IL) (6-10-1975)",
-        "duration": 267.00625850340134,
-        "albumArt": null
-    },
-    {
-        "id": "bob-marley-the-wailers-bob-marley-the-wailers-talkin-blues-live",
-        "title": "Bob Marley & The Wailers - Talkin' Blues (Live)",
-        "artist": "Bob Marley & The Wailers",
-        "src": "../assets/audio/Bob Marley & The Wailers - Live @ Quiet Night Club (Chicago, IL) (6-10-1975)/05 - Bob Marley & The Wailers - Talkin' Blues (Live).m4a",
-        "genre": "Hip Hop",
-        "album": "Live @ Quiet Night Club (Chicago, IL) (6-10-1975)",
-        "duration": 370.66013605442174,
-        "albumArt": null
-    },
-    {
-        "id": "bob-marley-the-wailers-bob-marley-the-wailers-trenchtown-rock-live",
-        "title": "Bob Marley & The Wailers - Trenchtown Rock (Live)",
-        "artist": "Bob Marley & The Wailers",
-        "src": "../assets/audio/Bob Marley & The Wailers - Live @ Quiet Night Club (Chicago, IL) (6-10-1975)/02 - Bob Marley & The Wailers - Trenchtown Rock (Live).m4a",
-        "genre": "Hip Hop",
-        "album": "Live @ Quiet Night Club (Chicago, IL) (6-10-1975)",
-        "duration": 360.23437641723353,
-        "albumArt": null
-    },
     {
         "id": "fabolous-01-fabolous-transformation",
         "title": "01 Fabolous - Transformation",
@@ -411,16 +337,6 @@ class AudioLibrary {
         "albumArt": "../assets/audio/Ghostface Killah - Ironman/Ghostface Killah - Ironman.jpg"
     },
     {
-        "id": "ghostface-killah-apollo-kids-featuring-raekwon",
-        "title": "APOLLO KIDS (FEATURING RAEKWON)",
-        "artist": "GHOSTFACE KILLAH",
-        "src": "../assets/audio/GHOSTFACE KILLAH - SUPREME CLIENTELE/06 - APOLLO KIDS (FEATURING RAEKWON).mp3",
-        "genre": "Hip Hop",
-        "album": "SUPREME CLIENTELE",
-        "duration": 234.2138775510204,
-        "albumArt": null
-    },
-    {
         "id": "ghostface-killah-assassination-day-feat-raekwon-the-rza-inspectah-deck",
         "title": "Assassination Day feat Raekwon, The RZA & Inspectah Deck",
         "artist": "Ghostface Killah",
@@ -451,16 +367,6 @@ class AudioLibrary {
         "albumArt": "../assets/audio/Ghostface Killah - Ironman/Ghostface Killah - Ironman.jpg"
     },
     {
-        "id": "ghostface-killah-buck-50-featuring-cappadonna-method-man-masta-killah-redman",
-        "title": "BUCK 50 (FEATURING CAPPADONNA, METHOD MAN, MASTA KILLAH & REDMAN)",
-        "artist": "GHOSTFACE KILLAH",
-        "src": "../assets/audio/GHOSTFACE KILLAH - SUPREME CLIENTELE/08 - BUCK 50 (FEATURING CAPPADONNA, METHOD MAN, MASTA KILLAH & REDMAN).mp3",
-        "genre": "Hip Hop",
-        "album": "SUPREME CLIENTELE",
-        "duration": 242.2595918367347,
-        "albumArt": null
-    },
-    {
         "id": "ghostface-killah-camay-feat-raekwon-cappadonna",
         "title": "Camay feat Raekwon & Cappadonna",
         "artist": "Ghostface Killah",
@@ -469,36 +375,6 @@ class AudioLibrary {
         "album": "Ironman",
         "duration": 274.1812244897959,
         "albumArt": "../assets/audio/Ghostface Killah - Ironman/Ghostface Killah - Ironman.jpg"
-    },
-    {
-        "id": "ghostface-killah-cherchez-laghost",
-        "title": "CHERCHEZ LAGHOST",
-        "artist": "GHOSTFACE KILLAH",
-        "src": "../assets/audio/GHOSTFACE KILLAH - SUPREME CLIENTELE/18 - CHERCHEZ LAGHOST.mp3",
-        "genre": "Hip Hop",
-        "album": "SUPREME CLIENTELE",
-        "duration": 191.3991836734694,
-        "albumArt": null
-    },
-    {
-        "id": "ghostface-killah-child-s-play",
-        "title": "CHILD'S PLAY",
-        "artist": "GHOSTFACE KILLAH",
-        "src": "../assets/audio/GHOSTFACE KILLAH - SUPREME CLIENTELE/17 - CHILD'S PLAY.mp3",
-        "genre": "Hip Hop",
-        "album": "SUPREME CLIENTELE",
-        "duration": 213.15918367346939,
-        "albumArt": null
-    },
-    {
-        "id": "ghostface-killah-clyde-smith",
-        "title": "CLYDE SMITH",
-        "artist": "GHOSTFACE KILLAH",
-        "src": "../assets/audio/GHOSTFACE KILLAH - SUPREME CLIENTELE/20 - CLYDE SMITH.mp3",
-        "genre": "Hip Hop",
-        "album": "SUPREME CLIENTELE",
-        "duration": 160.10448979591837,
-        "albumArt": null
     },
     {
         "id": "ghostface-killah-daytona-500-feat-raekwon-cappadonna",
@@ -521,26 +397,6 @@ class AudioLibrary {
         "albumArt": "../assets/audio/Ghostface Killah - Ironman/Ghostface Killah - Ironman.jpg"
     },
     {
-        "id": "ghostface-killah-ghost-deini-featuring-superb",
-        "title": "GHOST DEINI (FEATURING SUPERB)",
-        "artist": "GHOSTFACE KILLAH",
-        "src": "../assets/audio/GHOSTFACE KILLAH - SUPREME CLIENTELE/05 - GHOST DEINI (FEATURING SUPERB).mp3",
-        "genre": "Hip Hop",
-        "album": "SUPREME CLIENTELE",
-        "duration": 245.68163265306123,
-        "albumArt": null
-    },
-    {
-        "id": "ghostface-killah-intro",
-        "title": "INTRO",
-        "artist": "GHOSTFACE KILLAH",
-        "src": "../assets/audio/GHOSTFACE KILLAH - SUPREME CLIENTELE/01 - INTRO.mp3",
-        "genre": "Hip Hop",
-        "album": "SUPREME CLIENTELE",
-        "duration": 46.65469387755102,
-        "albumArt": null
-    },
-    {
         "id": "ghostface-killah-iron-maiden-feat-raekwon-cappadonna",
         "title": "Iron Maiden feat Raekwon & Cappadonna",
         "artist": "Ghostface Killah",
@@ -549,36 +405,6 @@ class AudioLibrary {
         "album": "Ironman",
         "duration": 286.7722448979592,
         "albumArt": "../assets/audio/Ghostface Killah - Ironman/Ghostface Killah - Ironman.jpg"
-    },
-    {
-        "id": "ghostface-killah-iron-s-theme-conclusion",
-        "title": "IRON'S THEME - CONCLUSION",
-        "artist": "GHOSTFACE KILLAH",
-        "src": "../assets/audio/GHOSTFACE KILLAH - SUPREME CLIENTELE/21 - IRON'S THEME - CONCLUSION.mp3",
-        "genre": "Hip Hop",
-        "album": "SUPREME CLIENTELE",
-        "duration": 118.75265306122449,
-        "albumArt": null
-    },
-    {
-        "id": "ghostface-killah-iron-s-theme-intermission",
-        "title": "IRON'S THEME - INTERMISSION",
-        "artist": "GHOSTFACE KILLAH",
-        "src": "../assets/audio/GHOSTFACE KILLAH - SUPREME CLIENTELE/14 - IRON'S THEME - INTERMISSION.mp3",
-        "genre": "Hip Hop",
-        "album": "SUPREME CLIENTELE",
-        "duration": 90.48816326530613,
-        "albumArt": null
-    },
-    {
-        "id": "ghostface-killah-malcolm",
-        "title": "MALCOLM",
-        "artist": "GHOSTFACE KILLAH",
-        "src": "../assets/audio/GHOSTFACE KILLAH - SUPREME CLIENTELE/15 - MALCOLM.mp3",
-        "genre": "Hip Hop",
-        "album": "SUPREME CLIENTELE",
-        "duration": 255.3208163265306,
-        "albumArt": null
     },
     {
         "id": "ghostface-killah-marvel",
@@ -591,16 +417,6 @@ class AudioLibrary {
         "albumArt": "../assets/audio/Ghostface Killah - Ironman/Ghostface Killah - Ironman.jpg"
     },
     {
-        "id": "ghostface-killah-mighty-healthy",
-        "title": "MIGHTY HEALTHY",
-        "artist": "GHOSTFACE KILLAH",
-        "src": "../assets/audio/GHOSTFACE KILLAH - SUPREME CLIENTELE/09 - MIGHTY HEALTHY.mp3",
-        "genre": "Hip Hop",
-        "album": "SUPREME CLIENTELE",
-        "duration": 201.74367346938774,
-        "albumArt": null
-    },
-    {
         "id": "ghostface-killah-motherless-child-feat-raekwo",
         "title": "Motherless Child feat Raekwo",
         "artist": "Ghostface Killah",
@@ -609,26 +425,6 @@ class AudioLibrary {
         "album": "Ironman",
         "duration": 225.33224489795919,
         "albumArt": "../assets/audio/Ghostface Killah - Ironman/Ghostface Killah - Ironman.jpg"
-    },
-    {
-        "id": "ghostface-killah-nutmeg-featuring-the-rza",
-        "title": "NUTMEG (FEATURING THE RZA)",
-        "artist": "GHOSTFACE KILLAH",
-        "src": "../assets/audio/GHOSTFACE KILLAH - SUPREME CLIENTELE/02 - NUTMEG (FEATURING THE RZA).mp3",
-        "genre": "Hip Hop",
-        "album": "SUPREME CLIENTELE",
-        "duration": 265.09061224489795,
-        "albumArt": null
-    },
-    {
-        "id": "ghostface-killah-one",
-        "title": "ONE",
-        "artist": "GHOSTFACE KILLAH",
-        "src": "../assets/audio/GHOSTFACE KILLAH - SUPREME CLIENTELE/03 - ONE.mp3",
-        "genre": "Hip Hop",
-        "album": "SUPREME CLIENTELE",
-        "duration": 226.37714285714284,
-        "albumArt": null
     },
     {
         "id": "ghostface-killah-poisonous-darts",
@@ -641,36 +437,6 @@ class AudioLibrary {
         "albumArt": "../assets/audio/Ghostface Killah - Ironman/Ghostface Killah - Ironman.jpg"
     },
     {
-        "id": "ghostface-killah-saturday-nite",
-        "title": "SATURDAY NITE",
-        "artist": "GHOSTFACE KILLAH",
-        "src": "../assets/audio/GHOSTFACE KILLAH - SUPREME CLIENTELE/04 - SATURDAY NITE.mp3",
-        "genre": "Hip Hop",
-        "album": "SUPREME CLIENTELE",
-        "duration": 99.42204081632653,
-        "albumArt": null
-    },
-    {
-        "id": "ghostface-killah-stay-true-featuring-60-second-assassin",
-        "title": "STAY TRUE (FEATURING 60 SECOND ASSASSIN)",
-        "artist": "GHOSTFACE KILLAH",
-        "src": "../assets/audio/GHOSTFACE KILLAH - SUPREME CLIENTELE/11 - STAY TRUE (FEATURING 60 SECOND ASSASSIN).mp3",
-        "genre": "Hip Hop",
-        "album": "SUPREME CLIENTELE",
-        "duration": 99.44816326530612,
-        "albumArt": null
-    },
-    {
-        "id": "ghostface-killah-stroke-of-death",
-        "title": "STROKE OF DEATH",
-        "artist": "GHOSTFACE KILLAH",
-        "src": "../assets/audio/GHOSTFACE KILLAH - SUPREME CLIENTELE/13 - STROKE OF DEATH.mp3",
-        "genre": "Hip Hop",
-        "album": "SUPREME CLIENTELE",
-        "duration": 116.48,
-        "albumArt": null
-    },
-    {
         "id": "ghostface-killah-the-faster-blade-feat-raekwon",
         "title": "The Faster Blade feat Raekwon",
         "artist": "Ghostface Killah",
@@ -681,16 +447,6 @@ class AudioLibrary {
         "albumArt": "../assets/audio/Ghostface Killah - Ironman/Ghostface Killah - Ironman.jpg"
     },
     {
-        "id": "ghostface-killah-the-grain-featuring-the-rza",
-        "title": "THE GRAIN (FEATURING THE RZA)",
-        "artist": "GHOSTFACE KILLAH",
-        "src": "../assets/audio/GHOSTFACE KILLAH - SUPREME CLIENTELE/07 - THE GRAIN (FEATURING THE RZA).mp3",
-        "genre": "Hip Hop",
-        "album": "SUPREME CLIENTELE",
-        "duration": 154.72326530612244,
-        "albumArt": null
-    },
-    {
         "id": "ghostface-killah-the-soul-controller-feat-the-force-md-s",
         "title": "The Soul Controller feat The Force MD's",
         "artist": "Ghostface Killah",
@@ -699,26 +455,6 @@ class AudioLibrary {
         "album": "Ironman",
         "duration": 410.5404081632653,
         "albumArt": "../assets/audio/Ghostface Killah - Ironman/Ghostface Killah - Ironman.jpg"
-    },
-    {
-        "id": "ghostface-killah-we-made-it-featuring-superb",
-        "title": "WE MADE IT (FEATURING SUPERB)",
-        "artist": "GHOSTFACE KILLAH",
-        "src": "../assets/audio/GHOSTFACE KILLAH - SUPREME CLIENTELE/12 - WE MADE IT (FEATURING SUPERB).mp3",
-        "genre": "Hip Hop",
-        "album": "SUPREME CLIENTELE",
-        "duration": 277.99510204081633,
-        "albumArt": null
-    },
-    {
-        "id": "ghostface-killah-who-would-you-fuck",
-        "title": "WHO WOULD YOU FUCK",
-        "artist": "GHOSTFACE KILLAH",
-        "src": "../assets/audio/GHOSTFACE KILLAH - SUPREME CLIENTELE/16 - WHO WOULD YOU FUCK.mp3",
-        "genre": "Hip Hop",
-        "album": "SUPREME CLIENTELE",
-        "duration": 164.46693877551022,
-        "albumArt": null
     },
     {
         "id": "ghostface-killah-wildflower",
@@ -739,26 +475,6 @@ class AudioLibrary {
         "album": "Ironman",
         "duration": 280.71183673469386,
         "albumArt": "../assets/audio/Ghostface Killah - Ironman/Ghostface Killah - Ironman.jpg"
-    },
-    {
-        "id": "ghostface-killah-woodrow-the-base-head",
-        "title": "WOODROW THE BASE HEAD",
-        "artist": "GHOSTFACE KILLAH",
-        "src": "../assets/audio/GHOSTFACE KILLAH - SUPREME CLIENTELE/10 - WOODROW THE BASE HEAD.mp3",
-        "genre": "Hip Hop",
-        "album": "SUPREME CLIENTELE",
-        "duration": 184.29387755102042,
-        "albumArt": null
-    },
-    {
-        "id": "ghostface-killah-wu-banga-101-featuring-gza-cappadonna-masta-killah-raekwon",
-        "title": "WU BANGA 101 (FEATURING GZA, CAPPADONNA, MASTA KILLAH & RAEKWON)",
-        "artist": "GHOSTFACE KILLAH",
-        "src": "../assets/audio/GHOSTFACE KILLAH - SUPREME CLIENTELE/19 - WU BANGA 101 (FEATURING GZA, CAPPADONNA, MASTA KILLAH & RAEKWON).mp3",
-        "genre": "Hip Hop",
-        "album": "SUPREME CLIENTELE",
-        "duration": 263.26204081632653,
-        "albumArt": null
     },
     {
         "id": "kendrick-lamar-backseat-freestyle",
@@ -1360,6 +1076,10 @@ class AudioLibrary {
 
             if (!srcUrl) { 
                 console.warn('Audio asset not found in build:', track.src);
+            }
+
+            if (track.albumArt && !mappedArt) {
+                 console.warn('Album art asset not found in build:', track.albumArt);
             }
 
             return {
