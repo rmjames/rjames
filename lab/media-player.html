@@ -36,6 +36,8 @@
             background: oklch(from #2a2a2a l c h);
             border-radius: 2rem;
             box-shadow: 0 0 2px color-mix(in oklch, oklch(from orange l c h) 48%, transparent 52%);
+            position: relative;
+            /* Establish positioning context */
         }
 
         .media-player__controls {
@@ -78,6 +80,8 @@
         .media-player__controls__option {
             grid-column: 4;
             position: relative;
+            z-index: 20;
+            /* Ensure it stays above the equalizer popover */
         }
 
         .media-player__controls__option::after {
@@ -202,6 +206,46 @@
                 transform: scale(1);
             }
         }
+
+        /* Equalizer Popover */
+        .media-player__equalizer {
+            position: absolute;
+            inset: 0;
+            /* Cover the entire media player */
+            background: oklch(from #333 l c h);
+            border-radius: inherit;
+            /* Find parent border-radius (2rem) */
+            padding: 1.5rem;
+            /* Increased padding */
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: .5rem;
+            align-items: center;
+            justify-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(10px);
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            z-index: 10;
+        }
+
+        .media-player__equalizer.active {
+            opacity: 1;
+            pointer-events: all;
+            transform: translateY(0);
+        }
+
+        .media-player__equalizer input[type="range"] {
+            -webkit-appearance: slider-vertical;
+            appearance: slider-vertical;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            cursor: pointer;
+            outline: none;
+            /* Accent color for the sliders */
+            accent-color: oklch(from #ccc l c h);
+        }
     </style>
 </head>
 
@@ -236,6 +280,14 @@
         </div>
         <div class="media-player__presets">
             <!-- Dynamically populated -->
+        </div>
+
+        <div class="media-player__equalizer">
+            <input type="range" min="-12" max="12" value="3" aria-label="60Hz">
+            <input type="range" min="-12" max="12" value="6" aria-label="230Hz">
+            <input type="range" min="-12" max="12" value="-2" aria-label="910Hz">
+            <input type="range" min="-12" max="12" value="4" aria-label="4kHz">
+            <input type="range" min="-12" max="12" value="0" aria-label="14kHz">
         </div>
     </section>
 
@@ -371,9 +423,29 @@
             } else {
                 optionIconPath.setAttribute('d', liked ? likeFilledPath : likePath);
             }
+
+            // Hide equalizer if switching away from it (optional, but good UX)
+            // But wait, toggleMode cycles modes. 
+            // If we switch MODE away from equalizer, we should probably close the popover if open?
+            // The requirement is "when ... equalizer ... is SELECTED".
+            // So sticking to the logic that click handles the action.
+        };
+
+        const equalizerContainer = document.querySelector('.media-player__equalizer');
+
+        const toggleEqualizerPopover = () => {
+            const isActive = equalizerContainer.classList.contains('active');
+            if (isActive) {
+                equalizerContainer.classList.remove('active');
+            } else {
+                equalizerContainer.classList.add('active');
+            }
         };
 
         const toggleMode = () => {
+            // Ensure popover is closed when switching modes
+            equalizerContainer.classList.remove('active');
+
             if (mode === 'like') {
                 mode = 'equalizer';
             } else if (mode === 'equalizer') {
@@ -396,8 +468,16 @@
                 updateIcon();
             } else if (mode === 'rewind') {
                 audio.currentTime = Math.max(0, audio.currentTime - 10);
+            } else if (mode === 'equalizer') {
+                toggleEqualizerPopover();
             }
         };
+
+        // Close equalizer when clicking outside or engaging other controls?
+        // For now, only the toggle closes it or specific logic.
+        // Let's ensure switching modes hides it if we want strict mode adherence.
+        // But the prompt says "when ... option = equalizer ... and that is selected".
+        // This implies the action happens on click.
 
         let longPressTriggered = false;
 
