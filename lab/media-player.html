@@ -68,6 +68,13 @@
             display: none;
         }
 
+        .media-player__presets__preset {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+            touch-action: manipulation;
+        }
+
         .media-player__presets>* {
             scroll-snap-align: start;
         }
@@ -217,11 +224,11 @@
             0%,
             10%,
             100% {
-                box-shadow: 0 0 0px 0 oklch(from #ccc l c h / .5);
+                box-shadow: 0 0 0px 0 oklch(from #ccc l c h / .76);
             }
 
             4% {
-                box-shadow: 0 0 4px 0 oklch(from #ccc l c h / .5);
+                box-shadow: 0 0 4px 0 oklch(from #ccc l c h / .76);
             }
         }
 
@@ -376,6 +383,35 @@
                 transition: top 0.05s linear;
             }
         }
+
+        /* Popover for Presets */
+        #preset-popover {
+            position-anchor: --active-preset;
+            top: anchor(bottom);
+            left: anchor(center);
+            position-visibility: anchors-visible;
+            position-try-options: flip-block, flip-inline;
+            margin: 0;
+            padding: 0.5rem 0.75rem;
+            background: oklch(from #222 l c h / 0.95);
+            color: white;
+            border: 1px solid oklch(from #555 l c h);
+            border-radius: 0.5rem;
+            font-size: 0.75rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            /* Centering fix since left: anchor(center) aligns left edge to center */
+            translate: -50% .5rem;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s ease, translate 0.2s ease;
+            white-space: nowrap;
+            z-index: 100;
+        }
+
+        #preset-popover:popover-open {
+            opacity: 1;
+            translate: -50% -6rem;
+        }
     </style>
 </head>
 
@@ -494,7 +530,17 @@
                 </div>
             </div>
         </div>
+        <!-- Preset Popover -->
+        <div id="preset-popover" popover="hint">
+            <div style="font-weight: bold; margin-bottom: 0.125rem;">Artist Name</div>
+            <div style="font-size: 0.65rem; color: #ccc;">Album Name</div>
+        </div>
+        </div>
+
+        </div>
     </section>
+
+
 
     <audio id="audio-player" crossorigin="anonymous"></audio>
 
@@ -707,8 +753,98 @@
         });
         presetsContainer.appendChild(fragment);
 
-        // Event Delegation
+        // Popover Logic
+        const popoverEl = document.getElementById('preset-popover');
+        let pressTimer;
+        let activeAnchorBtn = null;
+
+        const showPopover = (btn, track) => {
+            if (!popoverEl || !track) return;
+
+            // Populate Content
+            const artist = track.artist || 'Unknown Artist';
+            const album = track.album || track.title || 'Unknown Album';
+
+            popoverEl.innerHTML = `
+                <div style="font-weight: bold; margin-bottom: 0.125rem;">${artist}</div>
+                <div style="font-size: 0.65rem; color: oklch(from #ccc l c h);">${album}</div>
+                <div style="font-size: 0.65rem; color: oklch(from #ccc l c h);">${track.title}</div>
+            `;
+
+            // Clear previous anchor if any
+            if (activeAnchorBtn) {
+                activeAnchorBtn.style.removeProperty('anchor-name');
+            }
+
+            // Set anchor
+            activeAnchorBtn = btn;
+            btn.style.anchorName = '--active-preset';
+
+            // Show
+            try {
+                popoverEl.showPopover();
+            } catch (e) {
+                console.warn('Popover API not supported fully', e);
+            }
+        };
+
+        const hidePopover = () => {
+            if (popoverEl) {
+                try {
+                    popoverEl.hidePopover();
+                } catch (e) { }
+            }
+            if (activeAnchorBtn) {
+                activeAnchorBtn.style.removeProperty('anchor-name');
+                activeAnchorBtn = null;
+            }
+        };
+
+        // Event Delegation for both Click and Long Press
+        presetsContainer.addEventListener('mousedown', handlePressStart);
+        presetsContainer.addEventListener('touchstart', handlePressStart, { passive: true });
+
+        presetsContainer.addEventListener('mouseup', handlePressEnd);
+        presetsContainer.addEventListener('mouseleave', handlePressEnd);
+        presetsContainer.addEventListener('touchend', handlePressEnd);
+        presetsContainer.addEventListener('touchcancel', handlePressEnd);
+        presetsContainer.addEventListener('contextmenu', (e) => {
+            if (e.target.closest('.media-player__presets__preset')) {
+                e.preventDefault();
+            }
+        });
+
+        let isLongPress = false;
+
+        function handlePressStart(e) {
+            const btn = e.target.closest('.media-player__presets__preset');
+            if (!btn) return;
+
+            isLongPress = false;
+
+            pressTimer = setTimeout(() => {
+                isLongPress = true;
+                const id = btn.dataset.id;
+                const track = audioLibrary.getById(id);
+                showPopover(btn, track);
+            }, 500);
+        }
+
+        function handlePressEnd(e) {
+            if (pressTimer) clearTimeout(pressTimer);
+            if (isLongPress) {
+                setTimeout(hidePopover, 1500);
+                hidePopover();
+            }
+        }
+
         presetsContainer.addEventListener('click', (e) => {
+            if (isLongPress) {
+                e.stopImmediatePropagation();
+                e.preventDefault();
+                return;
+            }
+
             const btn = e.target.closest('.media-player__presets__preset');
             if (!btn) return;
 
