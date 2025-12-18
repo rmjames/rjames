@@ -101,7 +101,7 @@ body {
 .media-player .has-art {
     padding: 0;
     display: block;
-    overflow: hidden;
+    overflow: clip;
 }
 
 .media-player .has-art img,

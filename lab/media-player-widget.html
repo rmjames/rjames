@@ -9,11 +9,11 @@
     <style>
         .media-player {
             grid-template-columns: auto 1fr;
-            grid-template-rows: .5rem 2rem;
+            grid-template-rows: .5rem 1.75rem;
             gap: .5rem;
             padding: .75rem;
             padding-inline-start: 0;
-            inline-size: 18rem;
+            inline-size: 18.5rem;
             border-radius: .75rem;
             align-items: center;
             overflow: clip;
@@ -24,10 +24,16 @@
             grid-template-columns: repeat(5, 1fr);
             gap: .125rem;
             inline-size: 15rem;
+            background: transparent;
 
             button {
                 outline: none;
                 background: transparent;
+                padding: 0;
+
+                &:hover {
+                    background: transparent;
+                }
             }
         }
 
@@ -37,16 +43,18 @@
             inline-size: 3rem;
             block-size: 4.5rem;
             padding: 0;
-            border-radius: 0;
+            border-radius: initial !important;
         }
 
         .media-player__meta {
             grid-column: 2 / -1;
             grid-row: 1;
             flex-direction: row;
+            justify-content: start;
             gap: .5rem;
-            padding-inline-start: .65rem;
+            padding-inline-start: .75rem;
             width: 100%;
+            overflow: clip;
         }
 
         .media-player__meta__title {
@@ -55,6 +63,10 @@
 
         .media-player__meta__artist {
             font-size: .55rem;
+        }
+
+        .media-player__play {
+            background-color: transparent !important;
         }
     </style>
 </head>
