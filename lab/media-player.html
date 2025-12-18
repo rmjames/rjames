@@ -546,192 +546,51 @@
 
     <script type="module">
         import { audioLibrary } from '../scripts/AudioLibrary.js';
+        import { MediaPlayerCore } from '../scripts/media/MediaPlayerCore.js';
+        import { Equalizer } from '../scripts/media/Equalizer.js';
+        import { UI } from '../scripts/media/MediaPlayerUI.js';
+        import { SVG_PATHS } from '../scripts/media/Constants.js';
 
         const audio = document.getElementById('audio-player');
-        // Web Audio API Context
-        let audioCtx;
-        let source;
-        const filters = [];
+        const core = new MediaPlayerCore(audio);
+        const eq = new Equalizer(audio);
 
-        const updateSliderVisuals = (input) => {
-            const min = parseFloat(input.min);
-            const max = parseFloat(input.max);
-            const val = parseFloat(input.value);
-
-            // Normalize value to 0-100%
-            const pct = ((val - min) / (max - min)) * 100;
-
-            const wrapper = input.parentElement;
-            const fill = wrapper.querySelector('.eq-slider__fill');
-            const thumb = wrapper.querySelector('.eq-slider__thumb');
-            const track = wrapper.querySelector('.eq-slider__track');
-
-            if (!fill || !thumb) return;
-
-            // The input covers 100% height.
-            // 0% value = Bottom (100% top). 100% value = Top (0% top).
-            // Input vertical: max at top, min at bottom.
-
-            // Thumb position
-            // top: 0% is max value. top: 100% is min value.
-            const topPos = 100 - pct;
-            thumb.style.top = `${topPos}%`;
-
-            // Center-Zero Fill Logic
-            // Center is 50%
-            const center = 50;
-
-            if (pct >= center) {
-                // Expanding UP from center
-                // Top is current pos, Height is distance from center
-                const height = pct - center;
-                fill.style.top = `${topPos}%`;
-                fill.style.height = `${height}%`;
-            } else {
-                // Expanding DOWN from center
-                // Top is center, Height is distance to bottom
-                const height = center - pct;
-                fill.style.top = `50%`;
-                fill.style.height = `${height}%`;
-            }
-        };
-
-        const initAudioContext = () => {
-            if (audioCtx) return;
-
-            const AudioContext = window.AudioContext || window.webkitAudioContext;
-            audioCtx = new AudioContext();
-
-            source = audioCtx.createMediaElementSource(audio);
-
-            // Create filters
-            // 50Hz: LowShelf (Deeper Bass)
-            const bass = audioCtx.createBiquadFilter();
-            bass.type = 'lowshelf';
-            bass.frequency.value = 40;
-
-            // 230Hz: Peaking
-            const lowMid = audioCtx.createBiquadFilter();
-            lowMid.type = 'peaking';
-            lowMid.frequency.value = 230;
-            lowMid.Q.value = 1;
-
-            // 910Hz: Peaking
-            const mid = audioCtx.createBiquadFilter();
-            mid.type = 'peaking';
-            mid.frequency.value = 910;
-            mid.Q.value = 1;
-
-            // 4kHz: Peaking
-            const highMid = audioCtx.createBiquadFilter();
-            highMid.type = 'peaking';
-            highMid.frequency.value = 4000;
-            highMid.Q.value = 1;
-
-            // 12kHz: HighShelf (Crisper Treble)
-            const treble = audioCtx.createBiquadFilter();
-            treble.type = 'highshelf';
-            treble.frequency.value = 12000;
-
-            filters.push(bass, lowMid, mid, highMid, treble);
-
-            // Connect nodes
-            source.connect(bass);
-            bass.connect(lowMid);
-            lowMid.connect(mid);
-            mid.connect(highMid);
-            highMid.connect(treble);
-            treble.connect(audioCtx.destination);
-
-            // Apply initial values
-            const eqInputs = document.querySelectorAll('.media-player__equalizer input');
-            eqInputs.forEach((input, index) => {
-                updateSliderVisuals(input);
-                if (filters[index]) {
-                    filters[index].gain.value = input.value;
-                }
-            });
-        };
-
+        // UI Elements
         const playButton = document.querySelector('.media-player__controls__play');
-        const playIconPath = playButton.querySelector('svg path');
         const titleEl = document.querySelector('.media-player__meta__title');
         const artistEl = document.querySelector('.media-player__meta__artist');
         const currentArtBtn = document.querySelector('.media-player__controls__current');
-
-        const playPath = "M320-200v-560l440 280-440 280Zm80-280Zm0 134 210-134-210-134v268Z";
-        const pausePath = "M528-192v-576h240v576H528Zm-336 0v-576h240v576H192Zm408-72h96v-432h-96v432Zm-336 0h96v-432h-96v432Zm0-432v432-432Zm336 0v432-432Z";
-
-        const updatePlayIcon = () => {
-            if (audio.paused) {
-                playIconPath.setAttribute('d', playPath);
-            } else {
-                playIconPath.setAttribute('d', pausePath);
-            }
-        };
-
-        playButton.addEventListener('click', () => {
-            initAudioContext();
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
-
-            if (!audio.src) return;
-            if (audio.paused) {
-                audio.play();
-            } else {
-                audio.pause();
-            }
-            updatePlayIcon();
-        });
-
-        audio.addEventListener('play', () => {
-            initAudioContext();
-            if (audioCtx && audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
-            updatePlayIcon();
-        });
-        audio.addEventListener('pause', updatePlayIcon);
-        audio.addEventListener('ended', () => {
-            playIconPath.setAttribute('d', playPath);
-        });
-
         const presetsContainer = document.querySelector('.media-player__presets');
+        const popoverEl = document.getElementById('preset-popover');
+        const optionButton = document.querySelector('.media-player__controls__option');
+        const optionIconPath = optionButton.querySelector('svg path');
+        const equalizerContainer = document.querySelector('.media-player__equalizer');
+        const eqInputs = document.querySelectorAll('.media-player__equalizer input');
 
-        // Populate presets
-        const tracks = audioLibrary.getAll();
+        // Mode State
+        let mode = 'like'; // like, equalizer, rewind
+        let liked = false;
+        let isEqOn = true;
+        let activeAnchorBtn = null;
 
-        const loadTrack = (track, play = false) => {
-            audio.src = track.src;
-            titleEl.textContent = track.title;
-            artistEl.textContent = track.artist;
-
-            if (track.albumArt) {
-                currentArtBtn.classList.add('has-art');
-                currentArtBtn.style.padding = ''; // Clear inline if any
-                currentArtBtn.innerHTML = `<img src="${track.albumArt}" alt="${track.title}">`;
-            } else {
-                currentArtBtn.classList.remove('has-art');
-                currentArtBtn.style.padding = '';
-                currentArtBtn.innerHTML = `
-                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
-                        <path d="M360-400h400L622-580l-92 120-62-80-108 140Zm-40 160q-33 0-56.5-23.5T240-320v-480q0-33 23.5-56.5T320-880h480q33 0 56.5 23.5T880-800v480q0 33-23.5 56.5T800-240H320Zm0-80h480v-480H320v480ZM160-80q-33 0-56.5-23.5T80-160v-560h80v560h560v80H160Zm160-720v480-480Z" />
-                    </svg>
-                 `;
+        // --- Core Subscriptions ---
+        core.subscribe((event, data) => {
+            if (event === 'play' || event === 'pause' || event === 'ended') {
+                if (event === 'play') eq.init();
+                UI.updatePlayIcon(playButton, audio.paused);
             }
+            if (event === 'trackChanged') {
+                UI.updateTrackInfo({ title: titleEl, artist: artistEl, artBtn: currentArtBtn }, data);
+            }
+        });
 
-            if (play) audio.play();
-        }
+        // --- Init ---
+        // Load first track
+        core.loadTrack(0);
 
-        // Load first track as default
-        if (tracks.length > 0) {
-            loadTrack(tracks[0], false);
-        }
-
+        // Populate Presets
         const fragment = document.createDocumentFragment();
-
-        tracks.forEach(track => {
+        core.tracks.forEach(track => {
             const btn = document.createElement('button');
             btn.className = 'media-player__presets__preset';
             btn.dataset.id = track.id;
@@ -742,10 +601,8 @@
                 btn.innerHTML = `<img src="${track.albumArt}" alt="Album art for ${track.title}" loading="lazy">`;
             } else {
                 btn.innerHTML = `
-                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
-                        fill="#e3e3e3">
-                        <path
-                            d="M360-400h400L622-580l-92 120-62-80-108 140Zm-40 160q-33 0-56.5-23.5T240-320v-480q0-33 23.5-56.5T320-880h480q33 0 56.5 23.5T880-800v480q0 33-23.5 56.5T800-240H320Zm0-80h480v-480H320v480ZM160-80q-33 0-56.5-23.5T80-160v-560h80v560h560v80H160Zm160-720v480-480Z" />
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
+                        <path d="M360-400h400L622-580l-92 120-62-80-108 140Zm-40 160q-33 0-56.5-23.5T240-320v-480q0-33 23.5-56.5T320-880h480q33 0 56.5 23.5T880-800v480q0 33-23.5 56.5T800-240H320Zm0-80h480v-480H320v480ZM160-80q-33 0-56.5-23.5T80-160v-560h80v560h560v80H160Zm160-720v480-480Z" />
                     </svg>
                 `;
             }
@@ -753,346 +610,171 @@
         });
         presetsContainer.appendChild(fragment);
 
-        // Popover Logic
-        const popoverEl = document.getElementById('preset-popover');
-        let pressTimer;
-        let activeAnchorBtn = null;
-
-        const showPopover = (btn, track) => {
-            if (!popoverEl || !track) return;
-
-            // Populate Content
-            const artist = track.artist || 'Unknown Artist';
-            const album = track.album || track.title || 'Unknown Album';
-
-            popoverEl.innerHTML = `
-                <div style="font-weight: bold; margin-bottom: 0.125rem;">${artist}</div>
-                <div style="font-size: 0.65rem; color: oklch(from #ccc l c h);">${album}</div>
-                <div style="font-size: 0.65rem; color: oklch(from #ccc l c h);">${track.title}</div>
-            `;
-
-            // Clear previous anchor if any
-            if (activeAnchorBtn) {
-                activeAnchorBtn.style.removeProperty('anchor-name');
-            }
-
-            // Set anchor
-            activeAnchorBtn = btn;
-            btn.style.anchorName = '--active-preset';
-
-            // Show
-            try {
-                popoverEl.showPopover();
-            } catch (e) {
-                console.warn('Popover API not supported fully', e);
-            }
-        };
-
-        const hidePopover = () => {
-            if (popoverEl) {
-                try {
-                    popoverEl.hidePopover();
-                } catch (e) { }
-            }
-            if (activeAnchorBtn) {
-                activeAnchorBtn.style.removeProperty('anchor-name');
-                activeAnchorBtn = null;
-            }
-        };
-
-        // Event Delegation for both Click and Long Press
-        presetsContainer.addEventListener('mousedown', handlePressStart);
-        presetsContainer.addEventListener('touchstart', handlePressStart, { passive: true });
-
-        presetsContainer.addEventListener('mouseup', handlePressEnd);
-        presetsContainer.addEventListener('mouseleave', handlePressEnd);
-        presetsContainer.addEventListener('touchend', handlePressEnd);
-        presetsContainer.addEventListener('touchcancel', handlePressEnd);
-        presetsContainer.addEventListener('contextmenu', (e) => {
-            if (e.target.closest('.media-player__presets__preset')) {
-                e.preventDefault();
-            }
+        // --- Event Handlers ---
+        playButton.addEventListener('click', () => {
+            eq.init();
+            eq.resume();
+            core.togglePlay();
         });
 
-        let isLongPress = false;
-
-        function handlePressStart(e) {
-            const btn = e.target.closest('.media-player__presets__preset');
-            if (!btn) return;
-
-            isLongPress = false;
-
-            pressTimer = setTimeout(() => {
-                isLongPress = true;
-                const id = btn.dataset.id;
-                const track = audioLibrary.getById(id);
-                showPopover(btn, track);
-            }, 500);
-        }
-
-        function handlePressEnd(e) {
-            if (pressTimer) clearTimeout(pressTimer);
-            if (isLongPress) {
-                setTimeout(hidePopover, 1500);
-                hidePopover();
-            }
-        }
-
-        presetsContainer.addEventListener('click', (e) => {
-            if (isLongPress) {
-                e.stopImmediatePropagation();
-                e.preventDefault();
-                return;
-            }
-
-            const btn = e.target.closest('.media-player__presets__preset');
-            if (!btn) return;
-
-            const id = btn.dataset.id;
-            const track = audioLibrary.getById(id);
-
-            if (track) {
-                if (audio.src.endsWith(track.src) && !audio.paused) {
-                    audio.pause();
-                } else {
-                    loadTrack(track, true);
-                }
-            }
-        });
-
-        // Option/Like button logic
-        const optionButton = document.querySelector('.media-player__controls__option');
-        const optionIconPath = optionButton.querySelector('svg path');
-        const equalizerPath = "M280-240v-480h80v480h-80ZM440-80v-800h80v800h-80ZM120-400v-160h80v160h-80Zm480 160v-480h80v480h-80Zm160-160v-160h80v160h-80Z";
-        const rewindPath = "M480-80q-75 0-140.5-28.5t-114-77q-48.5-48.5-77-114T120-440h80q0 117 81.5 198.5T480-160q117 0 198.5-81.5T760-440q0-117-81.5-198.5T480-720h-6l62 62-56 58-160-160 160-160 56 58-62 62h6q75 0 140.5 28.5t114 77q48.5 48.5-77 114T840-440q0 75-28.5 140.5t-77 114q-48.5 48.5-114 77T480-80ZM360-320v-180h-60v-60h120v240h-60Zm140 0q-17 0-28.5-11.5T460-360v-160q0-17 11.5-28.5T500-560h80q17 0 28.5 11.5T620-520v160q0 17-11.5 28.5T580-320h-80Zm20-60h40v-120h-40v120Z";
-        const likePath = "M720-120H280v-520l280-280 50 50q7 7 11.5 19t4.5 23v14l-44 174h258q32 0 56 24t24 56v80q0 7-2 15t-4 15L794-168q-9 20-30 34t-44 14Zm-360-80h360l120-280v-80H480l54-220-174 174v406Zm0-406v406-406Zm-80-34v80H160v360h120v80H80v-520h200Z";
-        const likeFilledPath = "M720-120H280v-520l280-280 50 50q7 7 11.5 19t4.5 23v14l-44 174h258q32 0 56 24t24 56v80q0 7-2 15t-4 15L794-168q-9 20-30 34t-44 14Zm-440-520v80H160v360h120v80H80v-520h200Z";
-
-        let longPressTimer;
-        let mode = 'like'; // Default mode
-        let liked = false;
-
-        const updateIcon = () => {
-            if (mode === 'equalizer') {
-                optionIconPath.setAttribute('d', equalizerPath);
-            } else if (mode === 'rewind') {
-                optionIconPath.setAttribute('d', rewindPath);
-            } else {
-                optionIconPath.setAttribute('d', liked ? likeFilledPath : likePath);
-            }
+        // Option Button Logic
+        const ICON_PATHS = {
+            equalizer: "M280-240v-480h80v480h-80ZM440-80v-800h80v800h-80ZM120-400v-160h80v160h-80Zm480 160v-480h80v480h-80Zm160-160v-160h80v160h-80Z",
+            rewind: "M480-80q-75 0-140.5-28.5t-114-77q-48.5-48.5-77-114T120-440h80q0 117 81.5 198.5T480-160q117 0 198.5-81.5T760-440q0-117-81.5-198.5T480-720h-6l62 62-56 58-160-160 160-160 56 58-62 62h6q75 0 140.5 28.5t114 77q48.5 48.5-77 114T840-440q0 75-28.5 140.5t-77 114q-48.5 48.5-114 77T480-80ZM360-320v-180h-60v-60h120v240h-60Zm140 0q-17 0-28.5-11.5T460-360v-160q0-17 11.5-28.5T500-560h80q17 0 28.5 11.5T620-520v160q0 17-11.5 28.5T580-320h-80Zm20-60h40v-120h-40v120Z",
+            like: SVG_PATHS.LIKE,
+            likeFilled: SVG_PATHS.LIKE_FILLED
         };
 
-        const equalizerContainer = document.querySelector('.media-player__equalizer');
-
-        const toggleEqualizerPopover = () => {
-            const isActive = equalizerContainer.classList.contains('active');
-            const mediaPlayer = document.querySelector('.media-player');
-
-            if (isActive) {
-                equalizerContainer.classList.remove('active');
-                mediaPlayer.classList.remove('is-eq-open');
-            } else {
-                equalizerContainer.classList.add('active');
-                mediaPlayer.classList.add('is-eq-open');
-            }
+        const updateOptionIcon = () => {
+            if (mode === 'equalizer') optionIconPath.setAttribute('d', ICON_PATHS.equalizer);
+            else if (mode === 'rewind') optionIconPath.setAttribute('d', ICON_PATHS.rewind);
+            else optionIconPath.setAttribute('d', liked ? ICON_PATHS.likeFilled : ICON_PATHS.like);
         };
 
         const toggleMode = () => {
-            // Ensure popover is closed when switching modes
             equalizerContainer.classList.remove('active');
+            if (mode === 'like') mode = 'equalizer';
+            else if (mode === 'equalizer') mode = 'rewind';
+            else mode = 'like';
 
-            if (mode === 'like') {
-                mode = 'equalizer';
-            } else if (mode === 'equalizer') {
-                mode = 'rewind';
-            } else {
-                mode = 'like';
-            }
             if (navigator.vibrate) navigator.vibrate(500);
-
-            // Visual feedback
             optionButton.classList.add('pulse');
             setTimeout(() => optionButton.classList.remove('pulse'), 300);
-
-            updateIcon();
+            updateOptionIcon();
         };
 
-        const toggleLike = () => {
+        const handleOptionClick = () => {
             if (mode === 'like') {
                 liked = !liked;
-                updateIcon();
+                updateOptionIcon();
             } else if (mode === 'rewind') {
                 audio.currentTime = Math.max(0, audio.currentTime - 10);
             } else if (mode === 'equalizer') {
-                toggleEqualizerPopover();
+                const isActive = equalizerContainer.classList.toggle('active');
+                document.querySelector('.media-player').classList.toggle('is-eq-open', isActive);
             }
         };
 
+        let longPressTimer;
         let longPressTriggered = false;
 
-        const triggerOutlineAnimation = () => {
-            optionButton.classList.remove('animate-outline');
-            // Force reflow
-            void optionButton.offsetWidth;
-            optionButton.classList.add('animate-outline');
-        };
-
-        const startPress = (e) => {
+        optionButton.addEventListener('mousedown', () => {
             longPressTriggered = false;
             longPressTimer = setTimeout(() => {
                 longPressTriggered = true;
-                triggerOutlineAnimation();
+                optionButton.classList.add('animate-outline');
                 toggleMode();
-            }, 500); // 500ms for long press
-        };
-
-        const cancelPress = () => {
-            clearTimeout(longPressTimer);
-        };
-
-        optionButton.addEventListener('mousedown', startPress);
-        optionButton.addEventListener('touchstart', startPress);
-        optionButton.addEventListener('mouseup', cancelPress);
-        optionButton.addEventListener('mouseleave', cancelPress);
-        optionButton.addEventListener('touchend', cancelPress);
-        optionButton.addEventListener('contextmenu', (e) => e.preventDefault());
-        optionButton.addEventListener('animationend', () => {
-            optionButton.classList.remove('animate-outline');
+            }, 500);
         });
 
-        optionButton.addEventListener('click', (e) => {
+        const stopOptionPress = () => clearTimeout(longPressTimer);
+        ['mouseup', 'mouseleave', 'touchend'].forEach(evt => optionButton.addEventListener(evt, stopOptionPress));
+
+        optionButton.addEventListener('click', () => {
             if (longPressTriggered) return;
-            toggleLike();
+            handleOptionClick();
         });
 
-        // Equalizer Input Listeners
-        const eqInputs = document.querySelectorAll('.media-player__equalizer input');
+        // --- Presets & Popover ---
+        let pressTimer;
+        let isLongPress = false;
 
-        eqInputs.forEach((input, index) => {
-            // Initialize visual state
-            updateSliderVisuals(input);
+        const handlePresetPressStart = (e) => {
+            const btn = e.target.closest('.media-player__presets__preset');
+            if (!btn) return;
+            isLongPress = false;
+            pressTimer = setTimeout(() => {
+                isLongPress = true;
+                const track = audioLibrary.getById(btn.dataset.id);
+                UI.showPopover(popoverEl, btn, track);
+                activeAnchorBtn = btn;
+            }, 500);
+        };
 
-            input.addEventListener('input', (e) => {
-                updateSliderVisuals(e.target);
-                const value = e.target.value;
-                if (filters && filters[index]) {
-                    // Update filter gain immediately only if EQ is ON
-                    if (isEqOn) {
-                        filters[index].gain.value = value;
-                    }
+        const handlePresetPressEnd = () => {
+            clearTimeout(pressTimer);
+            if (isLongPress) {
+                setTimeout(() => UI.hidePopover(popoverEl, activeAnchorBtn), 1500);
+            }
+        };
+
+        presetsContainer.addEventListener('mousedown', handlePresetPressStart);
+        presetsContainer.addEventListener('mouseup', handlePresetPressEnd);
+        presetsContainer.addEventListener('mouseleave', handlePresetPressEnd);
+
+        presetsContainer.addEventListener('click', (e) => {
+            if (isLongPress) return;
+            const btn = e.target.closest('.media-player__presets__preset');
+            if (!btn) return;
+            const track = audioLibrary.getById(btn.dataset.id);
+            if (track) {
+                if (audio.src.endsWith(track.src) && !audio.paused) {
+                    core.pause();
+                } else {
+                    core.loadTrack(core.tracks.indexOf(track));
+                    core.play();
                 }
-            });
+            }
         });
 
-        // --- Advanced EQ Features ---
+        // --- Equalizer Features ---
         const powerBtn = document.getElementById('eq-power-btn');
         const saveBtn = document.getElementById('eq-save-btn');
         const loadBtn = document.getElementById('eq-load-btn');
         const closeBtn = document.getElementById('eq-close-btn');
-        const eqContainerFull = document.querySelector('.media-player__equalizer');
-        const eqToggleBtn = document.querySelector('.media-player__controls__option');
 
-        let isEqOn = true;
+        eqInputs.forEach((input, index) => {
+            UI.updateSliderVisuals(input);
+            input.addEventListener('input', (e) => {
+                UI.updateSliderVisuals(e.target);
+                if (isEqOn) eq.setGain(index, e.target.value);
+            });
+        });
 
         closeBtn.addEventListener('click', () => {
-            eqContainerFull.classList.remove('active');
+            equalizerContainer.classList.remove('active');
             document.querySelector('.media-player').classList.remove('is-eq-open');
         });
 
-        const togglePower = () => {
+        powerBtn.addEventListener('click', () => {
             isEqOn = !isEqOn;
+            powerBtn.classList.toggle('active', isEqOn);
+            equalizerContainer.classList.toggle('disabled', !isEqOn);
+            eqInputs.forEach((input, index) => {
+                eq.setGain(index, isEqOn ? input.value : 0);
+            });
+        });
 
-            // Visual Update
-            if (isEqOn) {
-                powerBtn.classList.add('active');
-                eqContainerFull.classList.remove('disabled');
-                powerBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M480-80q-150 0-255-105T120-480q0-150 105-255t255-105q14 0 27.5 1t26.5 3v82q-12-2-25.5-3t-28.5-1q-116 0-198 82t-82 198q0 116 82 198t198 82q116 0 198-82t82-198q0-11-1-25.5t-3-28.5h82q2 13 3 26.5t1 27.5q0 150-105 255T480-120Zm-40-360v-440h80v440h-80Z"/></svg>`;
-            } else {
-                powerBtn.classList.remove('active');
-                eqContainerFull.classList.add('disabled');
-                powerBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M480-120q-150 0-255-105T120-480q0-150 105-255t255-105q14 0 27.5 1t26.5 3v82q-12-2-25.5-3t-28.5-1q-116 0-198 82t-82 198q0 116 82 198t198 82q116 0 198-82t82-198q0-11-1-25.5t-3-28.5h82q2 13 3 26.5t1 27.5q0 150-105 255T480-120Zm-40-360v-440h80v440h-80Z"/></svg>`;
-            }
+        saveBtn.addEventListener('click', () => {
+            const settings = Array.from(eqInputs).map(i => i.value);
+            localStorage.setItem('rj-eq-settings', JSON.stringify(settings));
+            saveBtn.classList.add('active');
+            setTimeout(() => saveBtn.classList.remove('active'), 1000);
+        });
 
-            // Audio Update
-            filters.forEach((filter, index) => {
-                if (filter) {
-                    if (isEqOn) {
-                        filter.gain.value = eqInputs[index].value;
-                    } else {
-                        filter.gain.value = 0;
-                    }
+        loadBtn.addEventListener('click', () => {
+            const saved = JSON.parse(localStorage.getItem('rj-eq-settings') || '[]');
+            eqInputs.forEach((input, index) => {
+                if (saved[index] !== undefined) {
+                    input.value = saved[index];
+                    UI.updateSliderVisuals(input);
+                    if (isEqOn) eq.setGain(index, input.value);
                 }
             });
-        };
-
-        // Initial Active State
-        powerBtn.classList.add('active'); // Start ON
-        powerBtn.addEventListener('click', togglePower);
-
-        // Save
-        saveBtn.addEventListener('click', () => {
-            const settings = Array.from(eqInputs).map(input => input.value);
-            localStorage.setItem('rj-eq-settings', JSON.stringify(settings));
-
-            // Visual feedback
-            const originalHTML = saveBtn.innerHTML;
-            saveBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M382-240 154-468l57-57 171 171 367-367 57 57-424 424Z"/></svg>'; // Checkmark
-            saveBtn.classList.add('active');
-            setTimeout(() => {
-                saveBtn.innerHTML = originalHTML;
-                saveBtn.classList.remove('active');
-            }, 1000);
+            loadBtn.classList.add('active');
+            setTimeout(() => loadBtn.classList.remove('active'), 1000);
         });
 
-        // Load
-        loadBtn.addEventListener('click', () => {
-            const saved = localStorage.getItem('rj-eq-settings');
-            if (saved) {
-                try {
-                    const settings = JSON.parse(saved);
-                    eqInputs.forEach((input, index) => {
-                        if (settings[index] !== undefined) {
-                            input.value = settings[index];
-                            updateSliderVisuals(input);
-                            // If EQ is on, apply immediately
-                            if (isEqOn && filters[index]) {
-                                filters[index].gain.value = input.value;
-                            }
-                        }
-                    });
-                    // Visual feedback
-                    const originalHTML = loadBtn.innerHTML;
-                    loadBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M382-240 154-468l57-57 171 171 367-367 57 57-424 424Z"/></svg>';
-                    loadBtn.classList.add('active');
-                    setTimeout(() => {
-                        loadBtn.innerHTML = originalHTML;
-                        loadBtn.classList.remove('active');
-                    }, 1000);
-                } catch (e) {
-                    console.error('Do not care about corrupt settings');
-                }
+        // Auto Load
+        const savedSettings = JSON.parse(localStorage.getItem('rj-eq-settings') || '[]');
+        eqInputs.forEach((input, index) => {
+            if (savedSettings[index] !== undefined) {
+                input.value = savedSettings[index];
+                UI.updateSliderVisuals(input);
             }
         });
 
-        // Load on startup if exists
-        const autoLoadFn = () => {
-            const saved = localStorage.getItem('rj-eq-settings');
-            if (saved) {
-                try {
-                    const settings = JSON.parse(saved);
-                    eqInputs.forEach((input, index) => {
-                        if (settings[index] !== undefined) {
-                            input.value = settings[index];
-                            updateSliderVisuals(input);
-                        }
-                    });
-                } catch (e) { }
-            }
-        }
-        autoLoadFn();
-
-        // Initialize icon
-        updateIcon();
+        updateOptionIcon();
     </script>
 </body>
 
