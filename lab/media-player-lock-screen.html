@@ -21,33 +21,40 @@
         }
 
         .media-player-grid {
-            display: grid;
-            grid-template-rows: repeat(3, 1fr);
-            grid-template-columns: repeat(5, 1fr);
-            gap: 0.75rem;
-            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            padding: .5rem;
             inline-size: var(--widget-width);
-            background: oklch(from #2a2a2a l c h / 0.9);
+            background: linear-gradient(oklch(from #2a2a2a l c h / 0.8), oklch(from #2a2a2a l c h / 0.8)), var(--bg-image, none);
+            background-size: cover;
+            background-position: center;
             backdrop-filter: blur(10px);
             border-radius: 1.5rem;
             border: 1px solid oklch(from #444 l c h / 0.5);
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            transition: background-image 0.5s ease-in-out;
         }
 
-        /* Row 1: YouTube Music & This Phone */
+        .media-player-grid__row {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 0.5rem;
+            width: 100%;
+            align-items: center;
+        }
+
+        /* Row 1 Content */
         .grid-item--yt {
-            grid-row: 1;
             grid-column: 1;
         }
 
         .grid-item--phone {
-            grid-row: 1;
-            grid-column: 5;
+            grid-column: 8;
         }
 
-        /* Row 2: Meta Data & Play/Pause */
+        /* Row 2 Content */
         .media-player__meta {
-            grid-row: 2;
             grid-column: 1 / 5;
             display: flex;
             flex-direction: column;
@@ -57,42 +64,36 @@
         }
 
         .media-player__play-pause {
-            grid-row: 2;
-            grid-column: 5;
+            grid-column: 8;
         }
 
-        /* Row 3: Prev, Slider, Forward, Like, Random */
+        /* Row 3 Content */
         .media-player__prev {
-            grid-row: 3;
             grid-column: 1;
         }
 
         .media-player__progress {
-            grid-row: 3;
-            grid-column: 2;
+            grid-column: 2 / 6;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
         .media-player__next {
-            grid-row: 3;
-            grid-column: 3;
+            grid-column: 6;
         }
 
         .media-player__like {
-            grid-row: 3;
-            grid-column: 4;
+            grid-column: 7;
         }
 
         .media-player__random {
-            grid-row: 3;
-            grid-column: 5;
+            grid-column: 8;
         }
 
         /* Custom Styles for Icons/Buttons */
         .media-player-grid button {
-            background: oklch(from #333 l c h);
+            background: transparent;
             border: none;
             border-radius: 0.75rem;
             color: white;
@@ -102,8 +103,8 @@
             justify-content: center;
             cursor: pointer;
             transition: all 0.2s ease;
-            inline-size: 100%;
-            block-size: 100%;
+            inline-size: 2rem;
+            block-size: 2rem;
             aspect-ratio: 1;
         }
 
@@ -165,8 +166,8 @@
 
         /* SVG Sizing */
         svg {
-            inline-size: 24px;
-            block-size: 24px;
+            inline-size: 20px;
+            block-size: 20px;
             fill: currentColor;
         }
 
@@ -180,57 +181,63 @@
 
     <section class="media-player-grid">
         <!-- Row 1 -->
-        <button class="grid-item--yt icon-btn--brand" title="YouTube Music">
-            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path
-                    d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-2.5-12.5v9l7.5-4.5-7.5-4.5z" />
-            </svg>
-        </button>
-        <button class="grid-item--phone icon-btn--brand" title="This Phone">
-            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path
-                    d="M17 1H7c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-2-2-2zm0 18H7V5h10v14z" />
-            </svg>
-        </button>
+        <article class="media-player-grid__row">
+            <button class="grid-item--yt icon-btn--brand" title="YouTube Music">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-2.5-12.5v9l7.5-4.5-7.5-4.5z" />
+                </svg>
+            </button>
+            <button class="grid-item--phone icon-btn--brand" title="This Phone">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M17 1H7c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-2-2-2zm0 18H7V5h10v14z" />
+                </svg>
+            </button>
+        </article>
 
         <!-- Row 2 -->
-        <div class="media-player__meta">
-            <div class="media-player__meta__title">Loading...</div>
-            <div class="media-player__meta__artist">...</div>
-            <div class="media-player__meta__album">...</div>
-        </div>
-        <button class="media-player__play-pause" title="Play">
-            <svg viewBox="0 -960 960 960">
-                <path d="M320-200v-560l440 280-440 280Zm80-280Zm0 134 210-134-210-134v268Z" />
-            </svg>
-        </button>
+        <article class="media-player-grid__row">
+            <div class="media-player__meta">
+                <div class="media-player__meta__title">Loading...</div>
+                <div class="media-player__meta__artist">...</div>
+                <div class="media-player__meta__album">...</div>
+            </div>
+            <button class="media-player__play-pause" title="Play">
+                <svg viewBox="0 -960 960 960">
+                    <path d="M320-200v-560l440 280-440 280Zm80-280Zm0 134 210-134-210-134v268Z" />
+                </svg>
+            </button>
+        </article>
 
         <!-- Row 3 -->
-        <button class="media-player__prev" title="Previous">
-            <svg viewBox="0 -960 960 960">
-                <path d="M240-240v-480h80v480h-80Zm440 0L400-480l280-240v480Z" />
-            </svg>
-        </button>
-        <div class="media-player__progress">
-            <input type="range" class="progress-slider" min="0" max="100" value="0">
-        </div>
-        <button class="media-player__next" title="Next">
-            <svg viewBox="0 -960 960 960">
-                <path d="M640-240v-480h80v480h-80ZM280-240v-480l280 240-280 240Z" />
-            </svg>
-        </button>
-        <button class="media-player__like" title="Like">
-            <svg viewBox="0 -960 960 960">
-                <path
-                    d="M720-120H280v-520l280-280 50 50q7 7 11.5 19t4.5 23v14l-44 174h258q32 0 56 24t24 56v80q0 7-2 15t-4 15L794-168q-9 20-30 34t-44 14Zm-360-80h360l120-280v-80H480l54-220-174 174v406Zm0-406v406-406Zm-80-34v80H160v360h120v80H80v-520h200Z" />
-            </svg>
-        </button>
-        <button class="media-player__random" title="Random">
-            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path
-                    d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.45 20 9.5V4h-5.5zm.59 11.59l-1.41-1.41-1.42 1.41 1.42 1.41 1.41-1.41z" />
-            </svg>
-        </button>
+        <article class="media-player-grid__row">
+            <button class="media-player__prev" title="Previous">
+                <svg viewBox="0 -960 960 960">
+                    <path d="M240-240v-480h80v480h-80Zm440 0L400-480l280-240v480Z" />
+                </svg>
+            </button>
+            <div class="media-player__progress">
+                <input type="range" class="progress-slider" min="0" max="100" value="0">
+            </div>
+            <button class="media-player__next" title="Next">
+                <svg viewBox="0 -960 960 960">
+                    <path d="M640-240v-480h80v480h-80ZM280-240v-480l280 240-280 240Z" />
+                </svg>
+            </button>
+            <button class="media-player__like" title="Like">
+                <svg viewBox="0 -960 960 960">
+                    <path
+                        d="M720-120H280v-520l280-280 50 50q7 7 11.5 19t4.5 23v14l-44 174h258q32 0 56 24t24 56v80q0 7-2 15t-4 15L794-168q-9 20-30 34t-44 14Zm-360-80h360l120-280v-80H480l54-220-174 174v406Zm0-406v406-406Zm-80-34v80H160v360h120v80H80v-520h200Z" />
+                </svg>
+            </button>
+            <button class="media-player__random" title="Random">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.45 20 9.5V4h-5.5zm.59 11.59l-1.41-1.41-1.42 1.41 1.42 1.41 1.41-1.41z" />
+                </svg>
+            </button>
+        </article>
     </section>
 
     <audio id="audio-player"></audio>
@@ -243,7 +250,7 @@
         const audio = document.getElementById('audio-player');
         const core = new MediaPlayerCore(audio);
 
-        // Elements
+        const container = document.querySelector('.media-player-grid');
         const titleEl = document.querySelector('.media-player__meta__title');
         const artistEl = document.querySelector('.media-player__meta__artist');
         const albumEl = document.querySelector('.media-player__meta__album');
@@ -265,6 +272,7 @@
                 artistEl.textContent = data.artist;
                 albumEl.textContent = data.album || 'Unknown Album';
                 slider.value = 0;
+                UI.updateBackgroundArt(container, data);
             }
             if (event === 'play' || event === 'pause') {
                 const iconPath = playBtn.querySelector('svg path');

@@ -87,5 +87,11 @@ export const UI = {
         if (anchorBtn) {
             anchorBtn.style.removeProperty('anchor-name');
         }
+    },
+
+    updateBackgroundArt(element, track) {
+        if (!element || !track) return;
+        const bgValue = track.albumArt ? `url("${track.albumArt}")` : 'none';
+        element.style.setProperty('--bg-image', bgValue);
     }
 };
