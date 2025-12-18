@@ -9,7 +9,11 @@
     <style>
         :root {
             --widget-width: 20rem;
+<<<<<<< HEAD
             --widget-height: 9.125rem;
+=======
+            --widget-height: 12rem;
+>>>>>>> 4a7a438 (init -> media player lock scrreen)
         }
 
         body {
@@ -21,6 +25,7 @@
         }
 
         .media-player-grid {
+<<<<<<< HEAD
             display: flex;
             flex-direction: column;
             gap: 0.5rem;
@@ -30,10 +35,20 @@
             background: linear-gradient(oklch(from #2a2a2a l c h / 0.8), oklch(from #2a2a2a l c h / 0.8)), var(--bg-image, none);
             background-size: cover;
             background-position: center;
+=======
+            display: grid;
+            grid-template-rows: repeat(3, 1fr);
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0.75rem;
+            padding: 1rem;
+            inline-size: var(--widget-width);
+            background: oklch(from #2a2a2a l c h / 0.9);
+>>>>>>> 4a7a438 (init -> media player lock scrreen)
             backdrop-filter: blur(10px);
             border-radius: 1.5rem;
             border: 1px solid oklch(from #444 l c h / 0.5);
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+<<<<<<< HEAD
             transition: background-image 0.5s ease-in-out;
         }
 
@@ -47,21 +62,40 @@
 
         /* Row 1 Content */
         .grid-item--yt {
+=======
+        }
+
+        /* Row 1: YouTube Music & This Phone */
+        .grid-item--yt {
+            grid-row: 1;
+>>>>>>> 4a7a438 (init -> media player lock scrreen)
             grid-column: 1;
         }
 
         .grid-item--phone {
+<<<<<<< HEAD
             grid-column: 8;
         }
 
         /* Row 2 Content */
         .media-player__meta {
             grid-column: 1 / 8;
+=======
+            grid-row: 1;
+            grid-column: 5;
+        }
+
+        /* Row 2: Meta Data & Play/Pause */
+        .media-player__meta {
+            grid-row: 2;
+            grid-column: 1 / 5;
+>>>>>>> 4a7a438 (init -> media player lock scrreen)
             display: flex;
             flex-direction: column;
             justify-content: center;
             gap: 0.125rem;
             padding-inline-start: 0.25rem;
+<<<<<<< HEAD
             min-inline-size: 0;
             /* Important for truncation */
         }
@@ -72,17 +106,35 @@
 
         /* Row 3 Content */
         .media-player__prev {
+=======
+        }
+
+        .media-player__play-pause {
+            grid-row: 2;
+            grid-column: 5;
+        }
+
+        /* Row 3: Prev, Slider, Forward, Like, Random */
+        .media-player__prev {
+            grid-row: 3;
+>>>>>>> 4a7a438 (init -> media player lock scrreen)
             grid-column: 1;
         }
 
         .media-player__progress {
+<<<<<<< HEAD
             grid-column: 2 / 6;
+=======
+            grid-row: 3;
+            grid-column: 2;
+>>>>>>> 4a7a438 (init -> media player lock scrreen)
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
         .media-player__next {
+<<<<<<< HEAD
             grid-column: 6;
         }
 
@@ -92,11 +144,29 @@
 
         .media-player__random {
             grid-column: 8;
+=======
+            grid-row: 3;
+            grid-column: 3;
+        }
+
+        .media-player__like {
+            grid-row: 3;
+            grid-column: 4;
+        }
+
+        .media-player__random {
+            grid-row: 3;
+            grid-column: 5;
+>>>>>>> 4a7a438 (init -> media player lock scrreen)
         }
 
         /* Custom Styles for Icons/Buttons */
         .media-player-grid button {
+<<<<<<< HEAD
             background: transparent;
+=======
+            background: oklch(from #333 l c h);
+>>>>>>> 4a7a438 (init -> media player lock scrreen)
             border: none;
             border-radius: 0.75rem;
             color: white;
@@ -106,6 +176,7 @@
             justify-content: center;
             cursor: pointer;
             transition: all 0.2s ease;
+<<<<<<< HEAD
             inline-size: 2rem;
             block-size: 2rem;
             aspect-ratio: 1;
@@ -128,6 +199,29 @@
         .grid-item--phone svg {
             inline-size: 22px;
             block-size: 22px;
+=======
+            inline-size: 100%;
+            block-size: 100%;
+            aspect-ratio: 1;
+        }
+
+        .media-player-grid button:hover {
+            background: oklch(from #444 l c h);
+            transform: translateY(-1px);
+        }
+
+        .media-player-grid button:active {
+            transform: translateY(0);
+        }
+
+        .media-player-grid .media-player__play-pause {
+            background: oklch(from #007bff l c h);
+            border-radius: 1rem;
+        }
+
+        .media-player-grid .media-player__play-pause:hover {
+            background: oklch(from #0056b3 l c h);
+>>>>>>> 4a7a438 (init -> media player lock scrreen)
         }
 
         /* Meta Styles */
@@ -145,6 +239,7 @@
         .media-player__meta__album {
             font-size: 0.65rem;
             color: #777;
+<<<<<<< HEAD
 
         }
 
@@ -168,10 +263,24 @@
             background: #444;
             border-radius: 2px;
             border: none;
+=======
+        }
+
+        /* Slider Reset */
+        .progress-slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 4px;
+            background: #444;
+            border-radius: 2px;
+            outline: none;
+            cursor: pointer;
+>>>>>>> 4a7a438 (init -> media player lock scrreen)
         }
 
         .progress-slider::-webkit-slider-thumb {
             -webkit-appearance: none;
+<<<<<<< HEAD
             width: 4px;
             height: 16px;
             background: oklch(from #fff l c h / 0.8);
@@ -180,12 +289,25 @@
             margin-top: -6px;
             /* (4px track / 2) - (16px thumb / 2) = -6 */
             border: none;
+=======
+            width: 12px;
+            height: 12px;
+            background: #007bff;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 4px rgba(0, 123, 255, 0.5);
+>>>>>>> 4a7a438 (init -> media player lock scrreen)
         }
 
         /* SVG Sizing */
         svg {
+<<<<<<< HEAD
             inline-size: 20px;
             block-size: 20px;
+=======
+            inline-size: 24px;
+            block-size: 24px;
+>>>>>>> 4a7a438 (init -> media player lock scrreen)
             fill: currentColor;
         }
 
@@ -199,6 +321,7 @@
 
     <section class="media-player-grid">
         <!-- Row 1 -->
+<<<<<<< HEAD
         <article class="media-player-grid__row">
             <button class="grid-item--yt icon-btn--brand themed-background" title="YouTube Music">
                 <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -256,6 +379,59 @@
                 </svg>
             </button>
         </article>
+=======
+        <button class="grid-item--yt icon-btn--brand" title="YouTube Music">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path
+                    d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-2.5-12.5v9l7.5-4.5-7.5-4.5z" />
+            </svg>
+        </button>
+        <button class="grid-item--phone icon-btn--brand" title="This Phone">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path
+                    d="M17 1H7c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-2-2-2zm0 18H7V5h10v14z" />
+            </svg>
+        </button>
+
+        <!-- Row 2 -->
+        <div class="media-player__meta">
+            <div class="media-player__meta__title">Loading...</div>
+            <div class="media-player__meta__artist">...</div>
+            <div class="media-player__meta__album">...</div>
+        </div>
+        <button class="media-player__play-pause" title="Play">
+            <svg viewBox="0 -960 960 960">
+                <path d="M320-200v-560l440 280-440 280Zm80-280Zm0 134 210-134-210-134v268Z" />
+            </svg>
+        </button>
+
+        <!-- Row 3 -->
+        <button class="media-player__prev" title="Previous">
+            <svg viewBox="0 -960 960 960">
+                <path d="M240-240v-480h80v480h-80Zm440 0L400-480l280-240v480Z" />
+            </svg>
+        </button>
+        <div class="media-player__progress">
+            <input type="range" class="progress-slider" min="0" max="100" value="0">
+        </div>
+        <button class="media-player__next" title="Next">
+            <svg viewBox="0 -960 960 960">
+                <path d="M640-240v-480h80v480h-80ZM280-240v-480l280 240-280 240Z" />
+            </svg>
+        </button>
+        <button class="media-player__like" title="Like">
+            <svg viewBox="0 -960 960 960">
+                <path
+                    d="M720-120H280v-520l280-280 50 50q7 7 11.5 19t4.5 23v14l-44 174h258q32 0 56 24t24 56v80q0 7-2 15t-4 15L794-168q-9 20-30 34t-44 14Zm-360-80h360l120-280v-80H480l54-220-174 174v406Zm0-406v406-406Zm-80-34v80H160v360h120v80H80v-520h200Z" />
+            </svg>
+        </button>
+        <button class="media-player__random" title="Random">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path
+                    d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.45 20 9.5V4h-5.5zm.59 11.59l-1.41-1.41-1.42 1.41 1.42 1.41 1.41-1.41z" />
+            </svg>
+        </button>
+>>>>>>> 4a7a438 (init -> media player lock scrreen)
     </section>
 
     <audio id="audio-player"></audio>
@@ -268,7 +444,11 @@
         const audio = document.getElementById('audio-player');
         const core = new MediaPlayerCore(audio);
 
+<<<<<<< HEAD
         const container = document.querySelector('.media-player-grid');
+=======
+        // Elements
+>>>>>>> 4a7a438 (init -> media player lock scrreen)
         const titleEl = document.querySelector('.media-player__meta__title');
         const artistEl = document.querySelector('.media-player__meta__artist');
         const albumEl = document.querySelector('.media-player__meta__album');
@@ -290,8 +470,11 @@
                 artistEl.textContent = data.artist;
                 albumEl.textContent = data.album || 'Unknown Album';
                 slider.value = 0;
+<<<<<<< HEAD
                 UI.updateBackgroundArt(container, data);
                 UI.applyAccentColor(container, data, '--themed-background');
+=======
+>>>>>>> 4a7a438 (init -> media player lock scrreen)
             }
             if (event === 'play' || event === 'pause') {
                 const iconPath = playBtn.querySelector('svg path');
@@ -321,12 +504,20 @@
             isLiked = !isLiked;
             const path = likeBtn.querySelector('svg path');
             path.setAttribute('d', isLiked ? SVG_PATHS.LIKE_FILLED : SVG_PATHS.LIKE);
+<<<<<<< HEAD
             likeBtn.style.color = isLiked ? 'oklch(from #007bff l c h / .8)' : 'white';
+=======
+            likeBtn.style.color = isLiked ? '#007bff' : 'white';
+>>>>>>> 4a7a438 (init -> media player lock scrreen)
         });
 
         randomBtn.addEventListener('click', () => {
             isRandom = !isRandom;
+<<<<<<< HEAD
             randomBtn.style.color = isRandom ? 'oklch(from #007bff l c h / .8)' : 'white';
+=======
+            randomBtn.style.color = isRandom ? '#007bff' : 'white';
+>>>>>>> 4a7a438 (init -> media player lock scrreen)
             if (isRandom) core.shuffle();
         });
 
