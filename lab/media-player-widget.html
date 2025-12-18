@@ -5,85 +5,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Media Player Widget</title>
+    <link rel="stylesheet" href="../styles/components/media-player.css">
     <style>
-        body {
-            display: grid;
-            place-items: center;
-            min-height: 100vh;
-            margin: 0;
-            background-color: oklch(from #1a1a1a l c h);
-            color: white;
-            font-family: system-ui, sans-serif;
-            font-size: .5rem;
-        }
-
-        .material-symbols-outlined {
-            font-variation-settings:
-                'FILL' 0,
-                'wght' 400,
-                'GRAD' 0,
-                'opsz' 2124
-        }
-
         .media-player {
-            container-type: inline-size;
-            display: grid;
             grid-template-columns: auto 1fr;
-            grid-template-rows: .5rem 2rem;
+            grid-template-rows: .5rem 1.75rem;
             gap: .5rem;
             padding: .75rem;
             padding-inline-start: 0;
-            inline-size: 18rem;
-            background: oklch(from #2a2a2a l c h);
+            inline-size: 18.5rem;
             border-radius: .75rem;
-            box-shadow: 0 0 2px color-mix(in oklch, oklch(from orange l c h) 48%, transparent 52%);
             align-items: center;
             overflow: clip;
         }
 
         .media-player__controls {
-            display: grid;
             grid-column: 2;
             grid-template-columns: repeat(5, 1fr);
             gap: .125rem;
-            align-items: center;
-            justify-items: center;
             inline-size: 15rem;
-            /* padding: .25rem; */
-            border-radius: .5rem;
-            /* background: oklch(from #333 l c h); */
+            background: transparent;
 
             button {
                 outline: none;
                 background: transparent;
+                padding: 0;
+
+                &:hover {
+                    background: transparent;
+                }
             }
-        }
-
-        button {
-            padding: .25rem;
-            margin: 0;
-            border: none;
-            border-radius: .25rem;
-            background: oklch(from #444 l c h);
-            color: white;
-            cursor: pointer;
-            display: grid;
-            place-items: center;
-            inline-size: 75%;
-            aspect-ratio: 1;
-            outline: .0625rem solid oklch(from #5c5c5c l c h);
-        }
-
-        button:hover {
-            background: transparent;
-        }
-
-        .media-player__play {
-            background: oklch(from #007bff l c h);
-        }
-
-        .media-player__play:hover {
-            background: transparent
         }
 
         .media-player__current {
@@ -92,54 +43,30 @@
             inline-size: 3rem;
             block-size: 4.5rem;
             padding: 0;
-            overflow: hidden;
-            border-radius: 0;
-        }
-
-        .media-player__current img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: inherit;
+            border-radius: initial !important;
         }
 
         .media-player__meta {
             grid-column: 2 / -1;
             grid-row: 1;
-            display: flex;
-            align-items: center;
+            flex-direction: row;
+            justify-content: start;
             gap: .5rem;
-            text-align: left;
-            padding-inline-start: .65rem;
+            padding-inline-start: .75rem;
             width: 100%;
-            overflow: hidden;
+            overflow: clip;
         }
 
         .media-player__meta__title {
-            font-weight: bold;
             font-size: .65rem;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
         }
 
         .media-player__meta__artist {
             font-size: .55rem;
-            color: oklch(from #ccc l c h);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
         }
 
-
-        .media-player__like {}
-
-        svg {
-            width: 100%;
-            height: 100%;
-            max-width: 24px;
-            max-height: 24px;
-            fill: oklch(from #e3e3e3 l c h);
+        .media-player__play {
+            background-color: transparent !important;
         }
     </style>
 </head>
@@ -196,11 +123,14 @@
     <audio id="audio-player"></audio>
 
     <script type="module">
-        import { audioLibrary } from '../scripts/AudioLibrary.js';
+        import { MediaPlayerCore } from '../scripts/media/MediaPlayerCore.js';
+        import { UI } from '../scripts/media/MediaPlayerUI.js';
+        import { SVG_PATHS } from '../scripts/media/Constants.js';
 
         const audio = document.getElementById('audio-player');
+        const core = new MediaPlayerCore(audio);
+
         const playButton = document.querySelector('.media-player__play');
-        const playIconPath = playButton.querySelector('svg path');
         const likeButton = document.querySelector('.media-player__like');
         const likeIconPath = likeButton.querySelector('svg path');
         const dislikeButton = document.querySelector('.media-player__dislike');
@@ -211,95 +141,44 @@
         const artistEl = document.querySelector('.media-player__meta__artist');
         const currentArtBtn = document.querySelector('.media-player__current');
 
-        const playPath = "M320-200v-560l440 280-440 280Zm80-280Zm0 134 210-134-210-134v268Z";
-        const pausePath = "M528-192v-576h240v576H528Zm-336 0v-576h240v576H192Zm408-72h96v-432h-96v432Zm-336 0h96v-432h-96v432Zm0-432v432-432Zm336 0v432-432Z";
-
-        const likePath = "M720-120H280v-520l280-280 50 50q7 7 11.5 19t4.5 23v14l-44 174h258q32 0 56 24t24 56v80q0 7-2 15t-4 15L794-168q-9 20-30 34t-44 14Zm-360-80h360l120-280v-80H480l54-220-174 174v406Zm0-406v406-406Zm-80-34v80H160v360h120v80H80v-520h200Z";
-        const likeFilledPath = "M720-120H280v-520l280-280 50 50q7 7 11.5 19t4.5 23v14l-44 174h258q32 0 56 24t24 56v80q0 7-2 15t-4 15L794-168q-9 20-30 34t-44 14Zm-440-520v80H160v360h120v80H80v-520h200Z";
-
-        const tracks = audioLibrary.getAll();
-        let currentIndex = 0;
         let isLiked = false;
         let isDisliked = false;
 
-        function loadTrack(index) {
-            if (index < 0) index = tracks.length - 1;
-            if (index >= tracks.length) index = 0;
-            currentIndex = index;
-            const track = tracks[currentIndex];
-
-            // Only update if changed or not set
-            if (!audio.src.endsWith(track.src)) {
-                audio.src = track.src;
+        // --- Core Subscriptions ---
+        core.subscribe((event, data) => {
+            if (event === 'play' || event === 'pause' || event === 'ended') {
+                UI.updatePlayIcon(playButton, audio.paused);
             }
-
-            titleEl.textContent = track.title;
-            artistEl.textContent = track.artist;
-
-            if (track.albumArt) {
-                currentArtBtn.innerHTML = `<img src="${track.albumArt}" alt="${track.title}">`;
-            } else {
-                currentArtBtn.innerHTML = `
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
-                        <path d="M400-120q-66 0-113-47t-47-113q0-66 47-113t113-47q23 0 42.5 5.5T480-418v-422h240v160H560v400q0 66-47 113t-113 47Z" />
-                    </svg>`;
+            if (event === 'trackChanged') {
+                UI.updateTrackInfo({ title: titleEl, artist: artistEl, artBtn: currentArtBtn }, data);
             }
-        }
-
-        if (tracks.length > 0) {
-            loadTrack(0);
-        }
-
-        const updatePlayIcon = () => {
-            if (audio.paused) playIconPath.setAttribute('d', playPath);
-            else playIconPath.setAttribute('d', pausePath);
-        };
-
-        playButton.addEventListener('click', () => {
-            if (!audio.src && tracks.length > 0) loadTrack(0);
-
-            if (audio.paused) {
-                audio.play();
-            } else {
-                audio.pause();
-            }
-            updatePlayIcon();
         });
+
+        // --- Init ---
+        core.loadTrack(0);
+
+        // --- Event Handlers ---
+        playButton.addEventListener('click', () => core.togglePlay());
+        prevButton.addEventListener('click', () => core.prev());
+        nextButton.addEventListener('click', () => core.next());
 
         likeButton.addEventListener('click', () => {
             isLiked = !isLiked;
             if (isLiked) {
                 isDisliked = false;
-                dislikeIconPath.setAttribute('d', likePath); // Reset dislike
+                dislikeIconPath.setAttribute('d', SVG_PATHS.LIKE);
             }
-            likeIconPath.setAttribute('d', isLiked ? likeFilledPath : likePath);
+            likeIconPath.setAttribute('d', isLiked ? SVG_PATHS.LIKE_FILLED : SVG_PATHS.LIKE);
         });
 
         dislikeButton.addEventListener('click', () => {
             isDisliked = !isDisliked;
             if (isDisliked) {
                 isLiked = false;
-                likeIconPath.setAttribute('d', likePath); // Reset like
+                likeIconPath.setAttribute('d', SVG_PATHS.LIKE);
             }
-            dislikeIconPath.setAttribute('d', isDisliked ? likeFilledPath : likePath);
+            dislikeIconPath.setAttribute('d', isDisliked ? SVG_PATHS.LIKE_FILLED : SVG_PATHS.LIKE);
         });
-
-        prevButton.addEventListener('click', () => {
-            loadTrack(currentIndex - 1);
-            audio.play();
-        });
-
-        nextButton.addEventListener('click', () => {
-            loadTrack(currentIndex + 1);
-            audio.play();
-        });
-
-        audio.addEventListener('play', updatePlayIcon);
-        audio.addEventListener('pause', updatePlayIcon);
-        audio.addEventListener('ended', () => {
-            playIconPath.setAttribute('d', playPath);
-        });
-
     </script>
 </body>
 
