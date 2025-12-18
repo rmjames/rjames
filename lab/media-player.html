@@ -5,48 +5,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Media Player</title>
+    <link rel="stylesheet" href="../styles/components/media-player.css">
     <style>
-        body {
-            display: grid;
-            place-items: center;
-            min-height: 100vh;
-            margin: 0;
-            background-color: oklch(from #1a1a1a l c h);
-            color: white;
-            font-family: system-ui, sans-serif;
-            font-size: .5rem;
-        }
-
-        .material-symbols-outlined {
-            font-variation-settings:
-                'FILL' 0,
-                'wght' 400,
-                'GRAD' 0,
-                'opsz' 2124
-        }
-
-
         .media-player {
-            container-type: inline-size;
-            display: grid;
-            gap: .25rem;
-            padding: .75rem;
             inline-size: 16.5rem;
             max-inline-size: 16.875rem;
-            background: oklch(from #2a2a2a l c h);
-            border-radius: 2rem;
-            box-shadow: 0 0 2px color-mix(in oklch, oklch(from orange l c h) 48%, transparent 52%);
-            position: relative;
+            gap: .25rem;
+            padding: .75rem;
         }
 
         .media-player__controls {
             grid-column: 1 / -1;
-            display: grid;
             grid-template-columns: repeat(5, minmax(0, 1fr));
             padding: .75rem;
-            border-radius: 1.25rem;
-            background: oklch(from #333 l c h);
-            gap: .5rem;
         }
 
         .media-player__presets {
@@ -68,13 +39,6 @@
             display: none;
         }
 
-        .media-player__presets__preset {
-            -webkit-touch-callout: none;
-            -webkit-user-select: none;
-            user-select: none;
-            touch-action: manipulation;
-        }
-
         .media-player__presets>* {
             scroll-snap-align: start;
         }
@@ -83,334 +47,28 @@
             grid-column: 5;
         }
 
+        .media-player__controls__option {
+            grid-column: 4;
+            transition: opacity 0.2s ease;
+        }
+
         /* Hide Option Button when EQ is open */
         .media-player.is-eq-open .media-player__controls__option {
             opacity: 0;
             pointer-events: none;
         }
 
-        .media-player__controls__option {
-            grid-column: 4;
-            position: relative;
-            transition: opacity 0.2s ease;
-            animation: pulse-shadow 16s infinite ease-in-out;
-        }
-
-        .media-player__controls__option::after {
-            content: '';
-            position: absolute;
-            inset: -0.0625rem;
-            border-radius: inherit;
-            border: .0625rem solid oklch(from #5c5c5c l c h);
-            opacity: 0;
-            pointer-events: none;
-            z-index: 1;
-        }
-
-        .media-player__controls__option.animate-outline::after {
-            animation: outline-expand 0.32s ease-out forwards;
-        }
-
-        @keyframes outline-expand {
-            0% {
-                transform: scale(1);
-                opacity: 1;
-            }
-
-            100% {
-                transform: scale(1.6);
-                opacity: 0;
-            }
-        }
-
-        button {
-            padding: .5rem;
-            margin: 0;
-            border: none;
-            border-radius: .5rem;
-            background: oklch(from #444 l c h);
-            color: white;
-            cursor: pointer;
-            display: grid;
-            place-items: center;
-            max-block-size: 3rem;
-            max-inline-size: 3rem;
-            aspect-ratio: 1;
-            outline: .0625rem solid oklch(from #5c5c5c l c h);
-        }
-
-        button:hover {
-            background: oklch(from #555 l c h);
-        }
-
-        .media-player__controls__play {
-            background: oklch(from #007bff l c h);
-        }
-
-        .media-player__controls__play:hover {
-            background: oklch(from #0056b3 l c h);
-        }
-
-        /* Fix for Firefox Mobile shrinking images */
-        button.has-art {
-            padding: 0;
-            display: block;
-            overflow: hidden;
-        }
-
-        button.has-art img {
-            display: block;
-            inline-size: 100%;
-            block-size: 100%;
-            object-fit: cover;
-            border-radius: inherit;
-        }
-
-        .media-player__controls__current img,
-        .media-player__presets__preset img {
-            inline-size: 100%;
-            block-size: 100%;
-            object-fit: cover;
-            border-radius: inherit;
-        }
-
         .media-player__meta {
             grid-column: 2 / 4;
             padding: 0 .5rem;
-            text-align: left;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
         }
 
         .media-player__meta__title {
-            font-weight: bold;
             font-size: .875rem;
-            margin-bottom: 0;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
         }
 
         .media-player__meta__artist {
-            font-weight: normal;
             font-size: .75rem;
-            color: oklch(from #ccc l c h);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .pulse {
-            animation: pulse-animation 0.3s ease-in-out;
-        }
-
-        @keyframes pulse-animation {
-            0% {
-                transform: scale(1);
-            }
-
-            50% {
-                transform: scale(1.2);
-            }
-
-            100% {
-                transform: scale(1);
-            }
-        }
-
-        @keyframes pulse-shadow {
-
-            0%,
-            10%,
-            100% {
-                box-shadow: 0 0 0px 0 oklch(from #ccc l c h / .76);
-            }
-
-            4% {
-                box-shadow: 0 0 4px 0 oklch(from #ccc l c h / .76);
-            }
-        }
-
-        /* Equalizer Popover */
-        .media-player__equalizer {
-            position: absolute;
-            inset: 0;
-            background: oklch(from #333 l c h);
-            border-radius: inherit;
-            padding: 1rem;
-            display: flex;
-            flex-direction: row;
-            gap: 1rem;
-            align-items: stretch;
-            opacity: 0;
-            pointer-events: none;
-            transform: translateY(10px);
-            transition: opacity 0.2s ease, transform 0.2s ease;
-            z-index: 10;
-
-            &.active {
-                opacity: .98;
-                pointer-events: all;
-                transform: translateY(0);
-            }
-
-            &.disabled .eq-grid {
-                opacity: 0.3;
-                pointer-events: none;
-            }
-
-            input[type="range"] {
-                -webkit-appearance: slider-vertical;
-                appearance: slider-vertical;
-                width: 100%;
-                height: 100%;
-                background: transparent;
-                cursor: pointer;
-                outline: none;
-                position: absolute;
-                z-index: 10;
-                opacity: 0;
-                margin: 0;
-                inset: 0;
-            }
-        }
-
-        .eq-sidebar {
-            display: flex;
-            flex-direction: column;
-            width: 32px;
-            justify-content: space-between;
-            align-items: center;
-            padding-top: 0.5rem;
-            padding-bottom: 0.5rem;
-
-            .eq-sidebar__btn {
-                background: none;
-                border: none;
-                padding: 0;
-                cursor: pointer;
-                color: oklch(from #eee l c h / 0.5);
-                transition: color 0.2s ease, transform 0.1s ease;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                outline: none;
-
-                svg {
-                    width: 20px;
-                    height: 20px;
-                }
-
-                &:hover {
-                    color: oklch(from #eee l c h / 0.9);
-                }
-
-                &.active {
-                    color: oklch(from #4ec9b0 l c h);
-                }
-
-                &:active {
-                    transform: scale(0.9);
-                }
-            }
-        }
-
-        .eq-grid {
-            flex: 1;
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 0.25rem;
-            align-items: center;
-            justify-items: center;
-            transition: opacity 0.3s ease;
-        }
-
-        .media-player__equalizer__slider {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            gap: 0.25rem;
-
-            .eq-slider__wrapper {
-                position: relative;
-                width: 100%;
-                flex: 1;
-                display: flex;
-                justify-content: center;
-            }
-
-            .eq-slider__label {
-                font-size: 0.65rem;
-                color: oklch(from #ccc l c h / 0.7);
-                text-align: center;
-                font-variant-numeric: tabular-nums;
-                letter-spacing: 0.02em;
-            }
-
-            .eq-slider__track {
-                position: absolute;
-                background: oklch(from #fff l c h / 0.1);
-                width: 4px;
-                height: 100%;
-                border-radius: 4px;
-            }
-
-            .eq-slider__fill {
-                position: absolute;
-                background: oklch(from #eee l c h);
-                width: 4px;
-                border-radius: 4px;
-                box-shadow: 0 0 8px oklch(from #eee l c h / 0.5);
-                transition: height 0.05s linear, top 0.05s linear;
-            }
-
-            .eq-slider__thumb {
-                position: absolute;
-                width: 12px;
-                height: 12px;
-                background: #fff;
-                border-radius: 50%;
-                box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
-                transform: translate(-50%, -50%);
-                /* Center on the point */
-                left: 50%;
-                pointer-events: none;
-                transition: top 0.05s linear;
-            }
-        }
-
-        /* Popover for Presets */
-        #preset-popover {
-            position-anchor: --active-preset;
-            top: anchor(bottom);
-            left: anchor(center);
-            position-visibility: anchors-visible;
-            position-try-options: flip-block, flip-inline;
-            margin: 0;
-            padding: 0.5rem 0.75rem;
-            background: oklch(from #222 l c h / 0.95);
-            color: white;
-            border: 1px solid oklch(from #555 l c h);
-            border-radius: 0.5rem;
-            font-size: 0.75rem;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-            /* Centering fix since left: anchor(center) aligns left edge to center */
-            translate: -50% .5rem;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.2s ease, translate 0.2s ease;
-            white-space: nowrap;
-            z-index: 100;
-        }
-
-        #preset-popover:popover-open {
-            opacity: 1;
-            translate: -50% -6rem;
         }
     </style>
 </head>
