@@ -214,12 +214,13 @@
             transform: translateY(0);
         }
 
-        .media-player-grid .media-player__play-pause {
-            background: oklch(from #007bff l c h);
+        .media-player-grid .themed-background {
+            background: var(--themed-background, oklch(from #007bff l c h));
             border-radius: 1rem;
+            transition: background-color 0.5s ease;
         }
 
-        .media-player-grid .media-player__play-pause:hover {
+        .media-player-grid .themed-background:hover {
             background: oklch(from #0056b3 l c h);
 >>>>>>> 4a7a438 (init -> media player lock scrreen)
         }
@@ -473,8 +474,11 @@
 <<<<<<< HEAD
                 UI.updateBackgroundArt(container, data);
                 UI.applyAccentColor(container, data, '--themed-background');
+<<<<<<< HEAD
 =======
 >>>>>>> 4a7a438 (init -> media player lock scrreen)
+=======
+>>>>>>> 5ae0e95 (modular color extractor funtion)
             }
             if (event === 'play' || event === 'pause') {
                 const iconPath = playBtn.querySelector('svg path');
