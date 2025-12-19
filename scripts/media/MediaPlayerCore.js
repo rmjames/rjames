@@ -75,4 +75,17 @@ export class MediaPlayerCore {
     get currentTrack() {
         return this.tracks[this.currentIndex];
     }
+
+    shuffle() {
+        if (this.tracks.length <= 1) return this.currentTrack;
+
+        let nextRandom;
+        do {
+            nextRandom = Math.floor(Math.random() * this.tracks.length);
+        } while (nextRandom === this.currentIndex);
+
+        const track = this.loadTrack(nextRandom);
+        this.play();
+        return track;
+    }
 }
