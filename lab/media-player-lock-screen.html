@@ -10,10 +10,14 @@
         :root {
             --widget-width: 20rem;
 <<<<<<< HEAD
+<<<<<<< HEAD
             --widget-height: 9.125rem;
 =======
             --widget-height: 12rem;
 >>>>>>> 4a7a438 (init -> media player lock scrreen)
+=======
+            --widget-height: 9.125rem;
+>>>>>>> 337e516 (set fixed height on container)
         }
 
         body {
@@ -80,6 +84,7 @@
         /* Row 2 Content */
         .media-player__meta {
             grid-column: 1 / 8;
+<<<<<<< HEAD
 =======
             grid-row: 1;
             grid-column: 5;
@@ -90,12 +95,17 @@
             grid-row: 2;
             grid-column: 1 / 5;
 >>>>>>> 4a7a438 (init -> media player lock scrreen)
+=======
+>>>>>>> 337e516 (set fixed height on container)
             display: flex;
             flex-direction: column;
             justify-content: center;
             gap: 0.125rem;
             padding-inline-start: 0.25rem;
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 337e516 (set fixed height on container)
             min-inline-size: 0;
             /* Important for truncation */
         }
@@ -258,6 +268,9 @@
             font-size: 0.65rem;
             color: #777;
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 337e516 (set fixed height on container)
 
         }
 
@@ -552,19 +565,27 @@
             const path = likeBtn.querySelector('svg path');
             path.setAttribute('d', isLiked ? SVG_PATHS.LIKE_FILLED : SVG_PATHS.LIKE);
 <<<<<<< HEAD
+<<<<<<< HEAD
             likeBtn.style.color = isLiked ? 'oklch(from #007bff l c h / .8)' : 'white';
 =======
             likeBtn.style.color = isLiked ? '#007bff' : 'white';
 >>>>>>> 4a7a438 (init -> media player lock scrreen)
+=======
+            likeBtn.style.color = isLiked ? 'oklch(from #007bff l c h / .8)' : 'white';
+>>>>>>> 337e516 (set fixed height on container)
         });
 
         randomBtn.addEventListener('click', () => {
             isRandom = !isRandom;
 <<<<<<< HEAD
+<<<<<<< HEAD
             randomBtn.style.color = isRandom ? 'oklch(from #007bff l c h / .8)' : 'white';
 =======
             randomBtn.style.color = isRandom ? '#007bff' : 'white';
 >>>>>>> 4a7a438 (init -> media player lock scrreen)
+=======
+            randomBtn.style.color = isRandom ? 'oklch(from #007bff l c h / .8)' : 'white';
+>>>>>>> 337e516 (set fixed height on container)
             if (isRandom) core.shuffle();
         });
 
