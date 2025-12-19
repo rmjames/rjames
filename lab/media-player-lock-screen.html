@@ -117,12 +117,13 @@
             transform: translateY(0);
         }
 
-        .media-player-grid .media-player__play-pause {
-            background: oklch(from #007bff l c h);
+        .media-player-grid .themed-background {
+            background: var(--themed-background, oklch(from #007bff l c h));
             border-radius: 1rem;
+            transition: background-color 0.5s ease;
         }
 
-        .media-player-grid .media-player__play-pause:hover {
+        .media-player-grid .themed-background:hover {
             background: oklch(from #0056b3 l c h);
         }
 
@@ -182,13 +183,13 @@
     <section class="media-player-grid">
         <!-- Row 1 -->
         <article class="media-player-grid__row">
-            <button class="grid-item--yt icon-btn--brand" title="YouTube Music">
+            <button class="grid-item--yt icon-btn--brand themed-background" title="YouTube Music">
                 <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path
                         d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-2.5-12.5v9l7.5-4.5-7.5-4.5z" />
                 </svg>
             </button>
-            <button class="grid-item--phone icon-btn--brand" title="This Phone">
+            <button class="grid-item--phone icon-btn--brand themed-background" title="This Phone">
                 <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path
                         d="M17 1H7c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-2-2-2zm0 18H7V5h10v14z" />
@@ -203,7 +204,7 @@
                 <div class="media-player__meta__artist">...</div>
                 <div class="media-player__meta__album">...</div>
             </div>
-            <button class="media-player__play-pause" title="Play">
+            <button class="media-player__play-pause themed-background" title="Play">
                 <svg viewBox="0 -960 960 960">
                     <path d="M320-200v-560l440 280-440 280Zm80-280Zm0 134 210-134-210-134v268Z" />
                 </svg>
@@ -273,6 +274,7 @@
                 albumEl.textContent = data.album || 'Unknown Album';
                 slider.value = 0;
                 UI.updateBackgroundArt(container, data);
+                UI.applyAccentColor(container, data, '--themed-background');
             }
             if (event === 'play' || event === 'pause') {
                 const iconPath = playBtn.querySelector('svg path');
