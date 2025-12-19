@@ -182,6 +182,7 @@
             aspect-ratio: 1;
         }
 
+<<<<<<< HEAD
         .media-player-grid .themed-background {
             background: var(--themed-background, oklch(from #007bff l c h));
             border-radius: 1rem;
@@ -214,15 +215,31 @@
             transform: translateY(0);
         }
 
+=======
+>>>>>>> 4f99bf3 (change lider thumb, row1 & play buttons get accent color from album art)
         .media-player-grid .themed-background {
             background: var(--themed-background, oklch(from #007bff l c h));
             border-radius: 1rem;
             transition: background-color 0.5s ease;
         }
 
+<<<<<<< HEAD
         .media-player-grid .themed-background:hover {
             background: oklch(from #0056b3 l c h);
 >>>>>>> 4a7a438 (init -> media player lock scrreen)
+=======
+        /* Specialized sizing for Row 1 items */
+        .grid-item--yt,
+        .grid-item--phone {
+            inline-size: 2rem !important;
+            block-size: 2rem !important;
+        }
+
+        .grid-item--yt svg,
+        .grid-item--phone svg {
+            inline-size: 22px;
+            block-size: 22px;
+>>>>>>> 4f99bf3 (change lider thumb, row1 & play buttons get accent color from album art)
         }
 
         /* Meta Styles */
@@ -267,25 +284,45 @@
 =======
         }
 
-        /* Slider Reset */
+        /* Slider Stylings */
         .progress-slider {
             -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+            /* Element background should be transparent */
+            outline: none;
+            cursor: pointer;
+            height: 16px;
+            /* Total height matches thumb height */
+            display: flex;
+            align-items: center;
+        }
+
+        .progress-slider::-webkit-slider-runnable-track {
             width: 100%;
             height: 4px;
             background: #444;
             border-radius: 2px;
+<<<<<<< HEAD
             outline: none;
             cursor: pointer;
 >>>>>>> 4a7a438 (init -> media player lock scrreen)
+=======
+            border: none;
+>>>>>>> 4f99bf3 (change lider thumb, row1 & play buttons get accent color from album art)
         }
 
         .progress-slider::-webkit-slider-thumb {
             -webkit-appearance: none;
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 4f99bf3 (change lider thumb, row1 & play buttons get accent color from album art)
             width: 4px;
             height: 16px;
             background: oklch(from #fff l c h / 0.8);
             border-radius: 2px;
+<<<<<<< HEAD
             cursor: pointer;
             margin-top: -6px;
             /* (4px track / 2) - (16px thumb / 2) = -6 */
@@ -298,6 +335,12 @@
             cursor: pointer;
             box-shadow: 0 0 4px rgba(0, 123, 255, 0.5);
 >>>>>>> 4a7a438 (init -> media player lock scrreen)
+=======
+            cursor: pointer;
+            margin-top: -6px;
+            /* (4px track / 2) - (16px thumb / 2) = -6 */
+            border: none;
+>>>>>>> 4f99bf3 (change lider thumb, row1 & play buttons get accent color from album art)
         }
 
         /* SVG Sizing */

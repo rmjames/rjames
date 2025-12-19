@@ -1,0 +1,9 @@
+# HTML Link Replacement Patterns
+# Pattern 1: CSS links - avoid external URLs starting with http
+s/\(<link[^>]*href="\)\([^"]*[^/]\.css\)\("[^>]*>\)/\1\2.min\3/g
+
+# Pattern 2: CSS links - exclude http URLs
+/href="http/!s/\(<link[^>]*href="\)\([^"]*\.css\)\("/\)/\1\2.min\3/g
+
+# Pattern 3: JS scripts - exclude http URLs
+/src="http/!s/\(<script[^>]*src="\)\([^"]*\.js\)\("/\)/\1\2.min\3/g
