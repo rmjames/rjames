@@ -56,7 +56,7 @@ export const UI = {
         }
     },
 
-    // Popover-helper
+    // Popover helper
     showPopover(popoverEl, anchorBtn, track) {
         if (!popoverEl || !track) return;
 
