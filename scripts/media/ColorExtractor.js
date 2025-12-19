@@ -3,7 +3,6 @@ export const ColorExtractor = {
      * Converts RGB to OKLCH color string.
      * Implementation based on OKLCH standard math.
      */
-
     rgbToOklch(r, g, b) {
         // 1. Normalize RGB to [0, 1]
         r /= 255; g /= 255; b /= 255;
