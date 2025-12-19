@@ -1,4 +1,5 @@
 import { SVG_PATHS } from './Constants.js';
+import { ColorExtractor } from './ColorExtractor.js';
 
 export const UI = {
     updatePlayIcon(button, isPaused) {
@@ -87,5 +88,17 @@ export const UI = {
         if (anchorBtn) {
             anchorBtn.style.removeProperty('anchor-name');
         }
+    },
+
+    updateBackgroundArt(element, track) {
+        if (!element || !track) return;
+        const bgValue = track.albumArt ? `url("${track.albumArt}")` : 'none';
+        element.style.setProperty('--bg-image', bgValue);
+    },
+
+    async applyAccentColor(element, track, cssVarName) {
+        if (!element || !track || !cssVarName) return;
+        const color = await ColorExtractor.getAccentColor(track.albumArt);
+        element.style.setProperty(cssVarName, color);
     }
 };
