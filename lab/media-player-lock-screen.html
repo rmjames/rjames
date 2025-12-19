@@ -108,23 +108,23 @@
             aspect-ratio: 1;
         }
 
-        .media-player-grid button:hover {
-            background: oklch(from #444 l c h);
-            transform: translateY(-1px);
-        }
-
-        .media-player-grid button:active {
-            transform: translateY(0);
-        }
-
         .media-player-grid .themed-background {
             background: var(--themed-background, oklch(from #007bff l c h));
             border-radius: 1rem;
             transition: background-color 0.5s ease;
         }
 
-        .media-player-grid .themed-background:hover {
-            background: oklch(from #0056b3 l c h);
+        /* Specialized sizing for Row 1 items */
+        .grid-item--yt,
+        .grid-item--phone {
+            inline-size: 2rem !important;
+            block-size: 2rem !important;
+        }
+
+        .grid-item--yt svg,
+        .grid-item--phone svg {
+            inline-size: 22px;
+            block-size: 22px;
         }
 
         /* Meta Styles */
@@ -144,25 +144,38 @@
             color: #777;
         }
 
-        /* Slider Reset */
+        /* Slider Stylings */
         .progress-slider {
             -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+            /* Element background should be transparent */
+            outline: none;
+            cursor: pointer;
+            height: 16px;
+            /* Total height matches thumb height */
+            display: flex;
+            align-items: center;
+        }
+
+        .progress-slider::-webkit-slider-runnable-track {
             width: 100%;
             height: 4px;
             background: #444;
             border-radius: 2px;
-            outline: none;
-            cursor: pointer;
+            border: none;
         }
 
         .progress-slider::-webkit-slider-thumb {
             -webkit-appearance: none;
-            width: 12px;
-            height: 12px;
-            background: #007bff;
-            border-radius: 50%;
+            width: 4px;
+            height: 16px;
+            background: oklch(from #fff l c h / 0.8);
+            border-radius: 2px;
             cursor: pointer;
-            box-shadow: 0 0 4px rgba(0, 123, 255, 0.5);
+            margin-top: -6px;
+            /* (4px track / 2) - (16px thumb / 2) = -6 */
+            border: none;
         }
 
         /* SVG Sizing */
