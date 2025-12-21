@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Media Player Lock Screen (WC)</title>
+    <link rel="stylesheet" href="../styles/components/media-player.css">
+    <style>
+        :root {
+            --widget-width: 20rem;
+            --widget-height: 10rem;
+        }
+
+        body {
+            background-color: oklch(from #1a1a1a l c h) !important;
+            margin: 0;
+            display: grid;
+            place-items: center;
+            min-height: 100vh;
+        }
+
+        .player-container {
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            gap: 0.5rem;
+            padding: 1rem;
+            inline-size: var(--widget-width);
+            block-size: var(--widget-height);
+            background: linear-gradient(oklch(from #2a2a2a l c h / 0.8), oklch(from #2a2a2a l c h / 0.8)), var(--bg-image, none);
+            background-size: cover;
+            background-position: center;
+            backdrop-filter: blur(10px);
+            border-radius: 1.5rem;
+            border: 1px solid oklch(from #444 l c h / 0.5);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            transition: background-image 0.5s ease-in-out;
+            container-type: inline-size;
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .meta-group {
+            grid-column: 1 / 7;
+        }
+
+        .play-pause-group {
+            grid-column: 7 / 9;
+            aspect-ratio: 1.5 / 1;
+        }
+
+        .controls-row {
+            grid-column: 1 / -1;
+        }
+
+        media-button {
+            --btn-color: white;
+        }
+
+        .brand-btn {
+            grid-column: span 1;
+            aspect-ratio: 1;
+        }
+
+        .brand-btn--end {
+            grid-column: 8;
+        }
+    </style>
+</head>
+
+<body>
+
+    <media-provider>
+        <div class="player-container">
+            <!-- Row 1: Brand/Device -->
+            <div class="row">
+                <media-button type="shuffle" class="brand-btn" label="YouTube Music"></media-button>
+                <media-button type="next" class="brand-btn brand-btn--end" label="This Phone"></media-button>
+            </div>
+
+            <!-- Row 2: Info & Play -->
+            <div class="row">
+                <media-meta class="meta-group"></media-meta>
+                <media-button type="play" class="play-pause-group"
+                    style="--btn-bg: oklch(0.6 0.2 260); --btn-radius: 1rem;"></media-button>
+            </div>
+
+            <!-- Row 3: Seek & Transport -->
+            <div class="row controls-row">
+                <media-button type="prev" style="grid-column: 1;"></media-button>
+                <media-progress style="grid-column: 2 / 6;"></media-progress>
+                <media-button type="next" style="grid-column: 6;"></media-button>
+                <media-button type="like" style="grid-column: 7;"></media-button>
+                <media-button type="shuffle" style="grid-column: 8;"></media-button>
+            </div>
+        </div>
+    </media-provider>
+
+    <script type="module">
+        import '../scripts/components/media/MediaProvider.js';
+        import '../scripts/components/media/MediaButton.js';
+        import '../scripts/components/media/MediaMeta.js';
+        import '../scripts/components/media/MediaProgress.js';
+        import '../scripts/components/media/MediaArt.js';
+        import { UI } from '../scripts/media/MediaPlayerUI.js';
+
+        const provider = document.querySelector('media-provider');
+        const container = document.querySelector('.player-container');
+        const meta = document.querySelector('media-meta');
+        const playBtn = document.querySelector('.play-pause-group');
+        const progress = document.querySelector('media-progress');
+        const likeBtn = document.querySelector('media-button[type="like"]');
+
+        provider.addEventListener('media-state-change', ({ detail }) => {
+            const { event, data } = detail;
+
+            if (event === 'trackChanged') {
+                meta.setAttribute('title', data.title);
+                meta.setAttribute('artist', data.artist);
+                UI.updateBackgroundArt(container, data);
+            }
+
+            if (event === 'play' || event === 'pause') {
+                playBtn.toggleAttribute('active', event === 'play');
+            }
+        });
+
+        // Time Updates (since core doesn't broadcast time yet)
+        const audio = provider.querySelector('audio');
+        audio.addEventListener('timeupdate', () => {
+            if (!audio.duration) return;
+            progress.setAttribute('value', audio.currentTime);
+            progress.setAttribute('max', audio.duration);
+            progress.setAttribute('current-time', formatTime(audio.currentTime));
+            progress.setAttribute('duration', formatTime(audio.duration));
+        });
+
+        document.addEventListener('media-action', ({ detail }) => {
+            if (detail.action === 'play') provider.play();
+            if (detail.action === 'pause') provider.pause();
+            if (detail.action === 'next') provider.next();
+            if (detail.action === 'prev') provider.prev();
+            if (detail.action === 'like') {
+                // Handle like logic here
+                likeBtn.toggleAttribute('active');
+            }
+        });
+
+        document.addEventListener('media-seek', ({ detail }) => {
+            audio.currentTime = detail.value;
+        });
+
+        // Initialize when components are ready
+        const init = async () => {
+            console.log('Waiting for components to define...');
+            try {
+                await Promise.all([
+                    customElements.whenDefined('media-provider'),
+                    customElements.whenDefined('media-button'),
+                    customElements.whenDefined('media-meta')
+                ]);
+                console.log('Components defined. Initializing track...');
+                provider.loadTrack(0);
+            } catch (err) {
+                console.error('Failed to initialize components:', err);
+            }
+        };
+
+        init();
+
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+    </script>
+</body>
+
+</html>

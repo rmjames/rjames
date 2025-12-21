@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compact Media Player (WC)</title>
+    <link rel="stylesheet" href="../styles/components/media-player.css">
+    <style>
+        body {
+            background-color: oklch(from #1a1a1a l c h) !important;
+            margin: 0;
+            display: grid;
+            place-items: center;
+            min-height: 100vh;
+        }
+
+        .media-player {
+            inline-size: 18rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            padding: 1rem;
+            background: oklch(from #222 l c h);
+            border-radius: 1.5rem;
+            color: white;
+            container-type: inline-size;
+        }
+
+        .header {
+            display: grid;
+            grid-template-columns: 3rem 1fr 2.5rem 2.5rem;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .controls-main {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0.25rem;
+        }
+
+        media-art {
+            inline-size: 3rem;
+            border-radius: 0.5rem;
+        }
+
+        media-button {
+            --btn-color: #e3e3e3;
+        }
+
+        .eq-panel {
+            display: none;
+        }
+
+        .eq-panel.active {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+
+    <media-provider id="main-provider">
+        <div class="media-player">
+            <!-- Header Section -->
+            <div class="header">
+                <media-art></media-art>
+                <media-meta></media-meta>
+                <media-button type="shuffle" id="eq-toggle" label="Toggle Equalizer"
+                    style="--btn-color: oklch(0.6 0.2 260);"></media-button>
+                <media-button type="play" id="main-play"
+                    style="--btn-bg: oklch(from white l c h / 0.1);"></media-button>
+            </div>
+
+            <!-- Presets Section -->
+            <media-presets></media-presets>
+
+            <!-- EQ Section -->
+            <div class="eq-panel">
+                <media-equalizer>
+                    <media-button slot="actions" type="shuffle" label="Power"
+                        style="--btn-color: green;"></media-button>
+                </media-equalizer>
+            </div>
+        </div>
+    </media-provider>
+
+    <script type="module">
+        import '../scripts/components/media/MediaProvider.js';
+        import '../scripts/components/media/MediaButton.js';
+        import '../scripts/components/media/MediaMeta.js';
+        import '../scripts/components/media/MediaProgress.js';
+        import '../scripts/components/media/MediaArt.js';
+        import '../scripts/components/media/MediaPresets.js';
+        import '../scripts/components/media/MediaEqualizer.js';
+        import { Equalizer } from '../scripts/media/Equalizer.js';
+
+        const provider = document.getElementById('main-provider');
+        const art = document.querySelector('media-art');
+        const meta = document.querySelector('media-meta');
+        const presets = document.querySelector('media-presets');
+        const playBtn = document.getElementById('main-play');
+        const eqPanel = document.querySelector('.eq-panel');
+        const eqToggle = document.getElementById('eq-toggle');
+        const eqComponent = document.querySelector('media-equalizer');
+
+        let audioContextInit = false;
+        let eqLogic = null;
+
+        provider.addEventListener('media-state-change', ({ detail }) => {
+            const { event, data } = detail;
+
+            if (event === 'trackChanged') {
+                art.setAttribute('src', data.albumArt || '');
+                meta.setAttribute('title', data.title);
+                meta.setAttribute('artist', data.artist);
+            }
+
+            if (event === 'play' || event === 'pause') {
+                playBtn.toggleAttribute('active', event === 'play');
+
+                // Init EQ logic on first play
+                if (event === 'play' && !audioContextInit) {
+                    const audio = provider.querySelector('audio');
+                    eqLogic = new Equalizer(audio);
+                    eqLogic.init();
+                    audioContextInit = true;
+                }
+            }
+        });
+
+        // Initialize when components are ready
+        const init = async () => {
+            console.log('Waiting for components to define...');
+            try {
+                await Promise.all([
+                    customElements.whenDefined('media-provider'),
+                    customElements.whenDefined('media-button'),
+                    customElements.whenDefined('media-meta'),
+                    customElements.whenDefined('media-presets'),
+                    customElements.whenDefined('media-equalizer')
+                ]);
+                console.log('Components defined. Initializing track...');
+                const core = provider.core;
+                if (core) {
+                    presets.tracks = core.tracks;
+                    provider.loadTrack(0);
+                } else {
+                    console.warn('Provider core not ready yet');
+                    // Fallback to check later
+                    setTimeout(() => {
+                        if (provider.core) {
+                            presets.tracks = provider.core.tracks;
+                            provider.loadTrack(0);
+                        }
+                    }, 500);
+                }
+            } catch (err) {
+                console.error('Failed to initialize components:', err);
+            }
+        };
+
+        document.addEventListener('media-action', ({ detail }) => {
+            if (detail.action === 'play') provider.play();
+            if (detail.action === 'pause') provider.pause();
+        });
+
+        document.addEventListener('media-select-track', ({ detail }) => {
+            provider.loadTrack(detail.index);
+            provider.play();
+        });
+
+        document.addEventListener('media-eq-change', ({ detail }) => {
+            if (eqLogic) {
+                eqLogic.setGain(detail.index, detail.value);
+            }
+        });
+
+        eqToggle.addEventListener('click', () => {
+            eqPanel.classList.toggle('active');
+        });
+
+        init();
+    </script>
+</body>
+
+</html>
