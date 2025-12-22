@@ -103,8 +103,9 @@
                 </span>
             </p>
             <p class="about-item">
-                If you'd like to discuss a project, review some <a class="link-contact" href="lab.html"
-                    data-analytics-link="Work">work</a> or just
+                If you'd like to discuss a project, review some <a interestfor="link-lab-popover"
+                    style="anchor-name: --lab-link" class="link-contact
+                    lab" href="lab.html" data-analytics-link="Work">work</a> or just
                 say hello, feel free
                 to
                 <a aria-label="Send email to contact Robert James" id="contact" class="link-contact"
@@ -113,7 +114,8 @@
             </p>
         </div>
     </main>
-    <div id="sbe-popover" popover class="company-popover">
+    <!-- popovers  -->
+    <div id="sbe-popover" popover class="popover">
         <div class="company-description">Hospitality & Entertainment</div>
         <div class="work-summary">
             At sbe.com I contributed to marketing campaigns through HTML
@@ -123,7 +125,7 @@
             <span class="role">frontend</span>
         </div>
     </div>
-    <div id="guardian-popover" popover class="company-popover">
+    <div id="guardian-popover" popover class="popover">
         <div class="company-description">Insurance</div>
         <div class="work-summary">
             Built out pages for Guardian's My Account Management Portal
@@ -133,7 +135,7 @@
             <span class="role">frontend</span>
         </div>
     </div>
-    <div id="macmillan-popover" popover class="company-popover">
+    <div id="macmillan-popover" popover class="popover">
         <div class="company-description">
             International Publishing & Education
         </div>
@@ -146,7 +148,7 @@
             <span class="role">frontend</span>
         </div>
     </div>
-    <div id="weber-shandwick-popover" popover class="company-popover">
+    <div id="weber-shandwick-popover" popover class="popover">
         <div class="company-description">Large Media Company </div>
         <div class="work-summary">
             I worked on a project management tool that allocates resources & staff to projects
@@ -155,7 +157,7 @@
             <span class="role">frontend</span>
         </div>
     </div>
-    <div id="royal-caribbean-popover" popover class="company-popover">
+    <div id="royal-caribbean-popover" popover class="popover">
         <div class="company-description">Media & Entertainment</div>
         <div class="work-summary">
             I was part of a team that collaborated with the client to
@@ -166,7 +168,7 @@
             <span class="role">devops</span>
         </div>
     </div>
-    <div id="microsoft-popover" popover class="company-popover">
+    <div id="microsoft-popover" popover class="popover">
         <div class="company-description">Large Technology Company</div>
         <div class="work-summary">
             Worked on a team that delivered a royalties payment processing
@@ -178,7 +180,7 @@
             <span class="role">frontend</span>
         </div>
     </div>
-    <div id="bank-of-america-popover" popover class="company-popover">
+    <div id="bank-of-america-popover" popover class="popover">
         <div class="company-description">Financial Services</div>
         <div class="work-summary">
             Worked on a team that implemented a blockchain solution to
@@ -191,7 +193,7 @@
             <span class="role">frontend</span>
         </div>
     </div>
-    <div id="corteva-popover" popover class="company-popover">
+    <div id="corteva-popover" popover class="popover">
         <div class="company-description">Agricultural Technology</div>
         <div class="work-summary">
             Worked on a team that built a blockchain-based tracking and
@@ -204,6 +206,10 @@
             <span class="role">system design</span>
         </div>
     </div>
+    <div id="link-lab-popover" popover="hint" class="interest-popover">
+        <div>Playground of experiments</div>
+    </div>
+    <!-- end popovers -->
     <footer class="footer-menu">
         <ul>
             <li class="footer-menu--item" role="listitem">
