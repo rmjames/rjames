@@ -1,7 +1,6 @@
-.company-popover {
+.popover,
+.interest-popover {
     position: fixed;
-    inset: 0;
-    margin: auto;
     background: var(--bkgnd);
     border: 1px solid color-mix(in oklch, var(--blue-2) 88%, transparent 12%);
     border-radius: var(--border-radius);
@@ -21,11 +20,6 @@
     /* Exit state: hidden and moved down */
     opacity: 0;
     transform: translateY(2rem);
-    transition:
-        opacity var(--link-timing) var(--link-ease),
-        transform var(--link-timing) var(--link-ease),
-        display var(--link-timing) allow-discrete,
-        overlay var(--link-timing) allow-discrete;
 
     box-shadow:
         inset 0 0 2px color-mix(in oklch, var(--white-1) 44%, transparent 56%),
@@ -34,6 +28,16 @@
         0 0 8px color-mix(in oklch, var(--white-1) 8%, transparent 92%),
         0 0 16px color-mix(in oklch, var(--blue-2) 16%, transparent 84%),
         0 0 32px color-mix(in oklch, var(--white-1) 24%, transparent 76%);
+
+    &:popover-open {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.popover {
+    inset: 0;
+    margin: auto;
 
     & .company-description {
         --recursive-wght: 650;
@@ -60,10 +64,36 @@
         border-radius: var(--border-radius);
         font-size: calc(var(--xxs) + var(--s));
     }
+}
+
+.interest-popover {
+    inset: 0;
+    margin: auto;
+    position-anchor: --lab-link;
+    position-area: top right;
+    position-try-fallbacks: flip-inline, flip-block;
+    margin-block-end: var(--s);
+    inline-size: max-content;
+    max-inline-size: min(90%, 480px);
+    translate: -8ch 0;
+    transition:
+        opacity var(--link-timing) var(--link-ease),
+        transform var(--link-timing) var(--link-ease),
+        display var(--link-timing) allow-discrete,
+        overlay var(--link-timing) allow-discrete;
+
+    opacity: 0;
+    transform: translateY(2rem);
 
     &:popover-open {
         opacity: 1;
         transform: translateY(0);
+    }
+
+    & div {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 }
 
@@ -71,13 +101,19 @@
     transition: filter var(--link-timing) var(--link-ease);
 }
 
-/* Blur verything in main that is not .company-popover on :popover-open */
-main:has(~ .company-popover:popover-open) :not(.company-popover) {
+/* Blur everything in main that is not .popover on :popover-open */
+main:has(~ .popover:popover-open) :not(.popover) {
     filter: blur(4px) opacity(0.64) hue-rotate(206deg);
 }
 
+[interestfor] {
+    interest-delay: 0.24s .72s;
+}
+
 @starting-style {
-    .company-popover:popover-open {
+
+    .popover:popover-open,
+    .interest-popover:popover-open {
         opacity: 0;
         transform: translateY(2rem);
     }
