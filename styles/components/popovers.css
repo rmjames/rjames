@@ -2,6 +2,7 @@
 .interest-popover {
     position: fixed;
     background: var(--bkgnd);
+    background: light-dark(var(--white-1), color-mix(in oklch, var(--bkgnd) 92%, var(--blue-3) 4%));
     border: 1px solid color-mix(in oklch, var(--blue-2) 88%, transparent 12%);
     border-radius: var(--border-radius);
     padding: var(--m);
@@ -22,12 +23,12 @@
     transform: translateY(2rem);
 
     box-shadow:
-        inset 0 0 2px color-mix(in oklch, var(--white-1) 44%, transparent 56%),
-        inset 0 0 1px color-mix(in oklch, var(--white-1) 72%, transparent 28%),
-        0 0 4px color-mix(in oklch, var(--blue-2) 48%, transparent 52%),
-        0 0 8px color-mix(in oklch, var(--white-1) 8%, transparent 92%),
-        0 0 16px color-mix(in oklch, var(--blue-2) 16%, transparent 84%),
-        0 0 32px color-mix(in oklch, var(--white-1) 24%, transparent 76%);
+        inset 0 0 2px light-dark(color-mix(in oklch, white 80%, transparent), color-mix(in oklch, var(--white-1) 44%, transparent 56%)),
+        inset 0 0 1px light-dark(color-mix(in oklch, white 90%, transparent), color-mix(in oklch, var(--white-1) 72%, transparent 28%)),
+        0 0 4px light-dark(color-mix(in oklch, var(--blue-2) 12%, transparent), color-mix(in oklch, var(--blue-2) 48%, transparent 52%)),
+        0 0 8px light-dark(color-mix(in oklch, var(--black-1) 4%, transparent), color-mix(in oklch, var(--white-1) 8%, transparent 92%)),
+        0 0 16px light-dark(color-mix(in oklch, var(--blue-2) 8%, transparent), color-mix(in oklch, var(--blue-2) 16%, transparent 84%)),
+        0 0 32px light-dark(color-mix(in oklch, var(--black-1) 12%, transparent), color-mix(in oklch, var(--white-1) 24%, transparent 76%));
 
     &:popover-open {
         opacity: 1;
