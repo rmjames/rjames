@@ -1,7 +1,7 @@
 body {
     display: flex;
     flex-direction: column;
-    background: light-dark(var(--white-1), color-mix(in oklch, var(--bkgnd) 32%, var(--blue-3) 4%));
+    background: light-dark(var(--white-1), color-mix(in oklch, var(--bkgnd) 24%, var(--blue-3) 2%));
     color: light-dark(var(--text-dark-color), var(--text-light-color));
     font-family: var(--font-stack);
     font-optical-sizing: auto;

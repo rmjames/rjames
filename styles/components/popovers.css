@@ -68,15 +68,14 @@
 }
 
 .interest-popover {
+    position: fixed;
     inset: 0;
     margin: auto;
     position-anchor: --lab-link;
     position-area: top right;
     position-try-fallbacks: flip-inline, flip-block;
-    margin-block-end: var(--s);
+    position-try: flip-inline, flip-block;
     inline-size: max-content;
-    max-inline-size: min(90%, 480px);
-    translate: -8ch 0;
     transition:
         opacity var(--link-timing) var(--link-ease),
         transform var(--link-timing) var(--link-ease),
@@ -89,12 +88,6 @@
     &:popover-open {
         opacity: 1;
         transform: translateY(0);
-    }
-
-    & div {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
     }
 }
 
