@@ -6,12 +6,22 @@
 .demo-examples {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 2.25cqi;
+    gap: 8cqi;
     margin-block: 20cqi;
 
     & article {
         animation: enter 0.6s var(--ease-3) forwards;
         opacity: 0;
+        transition: transform 0.24s var(--ease-3), box-shadow 0.32s var(--ease-3);
+        outline: none;
+        /* Hide default focus ring as we have custom elevation */
+        cursor: pointer;
+
+        &:hover,
+        &:focus-within {
+            transform: translateY(-.75rem);
+            z-index: 10;
+        }
     }
 
     & article:nth-child(1) {
@@ -65,7 +75,14 @@
     & article>iframe {
         aspect-ratio: 1;
         block-size: 300px;
-        box-shadow: 0 0 4px color-mix(in oklch, var(--blue-2) 48%, transparent 52%);
+        box-shadow: 0 0 8px color-mix(in oklch, var(--blue-2) 24%, transparent 76%);
+        transition: transform 0.24s var(--ease-3), box-shadow 0.28s var(--ease-3);
+    }
+
+    & article:hover>iframe,
+    & article:focus-within>iframe {
+        transform: scale(1.01);
+        box-shadow: 0 0 16px color-mix(in oklch, var(--blue-2) 36%, transparent 64%);
     }
 }
 
