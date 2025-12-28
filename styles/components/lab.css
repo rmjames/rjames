@@ -18,6 +18,7 @@
         cursor: pointer;
 
         &:hover,
+        &:focus,
         &:focus-within {
             transform: translateY(-.75rem);
             z-index: 10;

@@ -38,6 +38,18 @@ document.addEventListener("DOMContentLoaded", () => {
                     gtag("event", "mouseover", eventData);
                 }
             });
+
+            // Track focus on the article
+            wrapper.addEventListener("focus", () => {
+                const eventData = {
+                    event_category: "Lab Demo Focus",
+                    event_label: iframe.title,
+                    non_interaction: true,
+                };
+                if (typeof gtag === 'function') {
+                    gtag("event", "focus", eventData);
+                }
+            });
         }
 
         // Track clicks inside the iframe
