@@ -50,7 +50,8 @@
     --recursive-CRSV: 1;
 }
 
-.link-contact:hover {
+.link-contact:is(:hover, :focus, :focus-within) {
+    opacity: 0.76;
     box-shadow:
         inset 0 -2px 0 0 oklch(from rgba(74, 152, 191, 0.96) l c h),
         inset 0 -4px 0 0 oklch(from rgba(74, 152, 191, 0.72) l c h),
