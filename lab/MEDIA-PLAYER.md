@@ -103,6 +103,8 @@ Standardized 5-band frequency control.
 - **Sizing**:
   - The component is designed to be **fully responsive**.
   - `.media-player__equalizer` should take **100% of the available width and height** of its parent container.
+- **Overlay**:
+  - The component must be positioned absolutely (`position: absolute`) within its parent container to create a seamless overlay effect when active, particularly in space-constrained variants like the Lock Screen Player.
 - **Plug-and-Play**:
   - Initialize using `new Equalizer(audioElement)`.
   - Bind slider `input` events to `eq.setGain(index, value)`.

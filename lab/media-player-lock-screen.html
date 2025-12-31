@@ -21,6 +21,7 @@
         }
 
         .media-player-grid {
+            position: relative;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -36,6 +37,81 @@
             border: 1px solid oklch(from #444 l c h / 0.5);
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
             transition: background-image 0.5s ease-in-out;
+            overflow: clip;
+        }
+
+        .media-player__equalizer {
+            position: absolute;
+            inset: 0;
+            background: oklch(from #1a1a1a l c h / 0.9);
+            backdrop-filter: blur(20px);
+            border-radius: inherit;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.95);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 20;
+        }
+
+        .media-player__equalizer.active {
+            opacity: 1;
+            pointer-events: all;
+            transform: scale(1);
+        }
+
+        .eq-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #fff;
+            flex-shrink: 0;
+        }
+
+        .eq-header h3 {
+            margin: 0;
+            font-size: 0.875rem;
+            font-weight: 500;
+            letter-spacing: 0.025em;
+        }
+
+        .eq-close {
+            background: transparent !important;
+            border: none !important;
+            padding: 0 !important;
+            inline-size: 1.5rem !important;
+            block-size: 1.5rem !important;
+            opacity: 0.7;
+            transition: opacity 0.2s ease !important;
+        }
+
+        .eq-close:hover {
+            opacity: 1;
+        }
+
+        .eq-close svg {
+            inline-size: 18px !important;
+            block-size: 18px !important;
+        }
+
+        .eq-grid {
+            flex: 1;
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0.5rem;
+            align-items: stretch;
+            min-height: 0;
+        }
+
+        .media-player__equalizer__slider {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
         }
 
         .media-player-grid__row {
@@ -50,12 +126,22 @@
             margin-block-start: 0.5rem;
         }
 
-        .grid-item--yt {
+        .grid-item--eq,
+        .grid-item--phone {
             grid-column: 1;
+            inline-size: 1.5rem !important;
+            block-size: 1.5rem !important;
+            padding: initial !important;
         }
 
         .grid-item--phone {
             grid-column: 8;
+        }
+
+        .grid-item--eq svg,
+        .grid-item--phone svg {
+            inline-size: 16px;
+            block-size: 16px;
         }
 
         .media-player__meta {
@@ -130,19 +216,6 @@
             transition: background-color 0.5s ease;
         }
 
-        .grid-item--yt,
-        .grid-item--phone {
-            inline-size: 1.5rem !important;
-            block-size: 1.5rem !important;
-            padding: initial !important;
-        }
-
-        .grid-item--yt svg,
-        .grid-item--phone svg {
-            inline-size: 16px;
-            block-size: 16px;
-        }
-
         .media-player__meta__title {
             font-size: 0.875rem;
             font-weight: 600;
@@ -162,6 +235,7 @@
 
         .progress-slider {
             -webkit-appearance: none;
+            appearance: none;
             width: 100%;
             background: transparent;
             outline: none;
@@ -207,10 +281,10 @@
 
     <section class="media-player-grid">
         <article class="media-player-grid__row">
-            <button class="grid-item--yt icon-btn--brand themed-background" title="YouTube Music">
-                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <button class="grid-item--eq icon-btn--brand themed-background" title="Equalizer">
+                <svg viewBox="0 -960 960 960" xmlns="http://www.w3.org/2000/svg">
                     <path
-                        d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-2.5-12.5v9l7.5-4.5-7.5-4.5z" />
+                        d="M280-240v-480h80v480h-80ZM440-80v-800h80v800h-80ZM120-400v-160h80v160h-80Zm480 160v-480h80v480h-80Zm160-160v-160h80v160h-80Z" />
                 </svg>
             </button>
             <button class="grid-item--phone icon-btn--brand themed-background" title="This Phone">
@@ -258,19 +332,40 @@
                 </svg>
             </button>
         </article>
+        <div class="media-player__equalizer">
+            <div class="eq-header">
+                <h3>Equalizer</h3>
+                <button class="eq-close" title="Close">
+                    <svg viewBox="0 -960 960 960">
+                        <path
+                            d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z" />
+                    </svg>
+                </button>
+            </div>
+            <div class="eq-grid">
+                <!-- Dynamically populated sliders -->
+            </div>
+        </div>
     </section>
 
     <audio id="audio-player"></audio>
 
     <script type="module">
         import { MediaPlayerCore } from '../scripts/media/MediaPlayerCore.js';
+        import { Equalizer } from '../scripts/media/Equalizer.js';
         import { UI } from '../scripts/media/MediaPlayerUI.js';
-        import { SVG_PATHS } from '../scripts/media/Constants.js';
+        import { SVG_PATHS, EQ_CONFIG } from '../scripts/media/Constants.js';
 
         const audio = document.getElementById('audio-player');
         const core = new MediaPlayerCore(audio);
+        const eq = new Equalizer(audio);
 
         const container = document.querySelector('.media-player-grid');
+        const eqContainer = document.querySelector('.media-player__equalizer');
+        const eqGrid = document.querySelector('.eq-grid');
+        const eqBtn = document.querySelector('.grid-item--eq');
+        const eqCloseBtn = document.querySelector('.eq-close');
+
         const titleEl = document.querySelector('.media-player__meta__title');
         const artistEl = document.querySelector('.media-player__meta__artist');
         const playBtn = document.querySelector('.media-player__play-pause');
@@ -282,6 +377,38 @@
 
         let isLiked = false;
         let isRandom = false;
+
+        // Init EQ
+        EQ_CONFIG.forEach((config, index) => {
+            const sliderWrapper = document.createElement('div');
+            sliderWrapper.className = 'media-player__equalizer__slider';
+            sliderWrapper.innerHTML = `
+                <div class="eq-slider__wrapper">
+                    <div class="eq-slider__track"></div>
+                    <div class="eq-slider__fill"></div>
+                    <div class="eq-slider__thumb"></div>
+                    <input type="range" min="-12" max="12" value="0" step="0.1" aria-label="${config.label}">
+                </div>
+                <span class="eq-slider__label">${config.label}</span>
+            `;
+            const input = sliderWrapper.querySelector('input');
+            input.addEventListener('input', (e) => {
+                eq.setGain(index, parseFloat(e.target.value));
+                UI.updateSliderVisuals(e.target);
+            });
+            eqGrid.appendChild(sliderWrapper);
+            UI.updateSliderVisuals(input);
+        });
+
+        eqBtn.addEventListener('click', () => {
+            eq.init();
+            eq.resume();
+            eqContainer.classList.add('active');
+        });
+
+        eqCloseBtn.addEventListener('click', () => {
+            eqContainer.classList.remove('active');
+        });
 
         core.subscribe((event, data) => {
             if (event === 'trackChanged') {
