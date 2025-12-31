@@ -121,13 +121,33 @@ Standardized binary state control (e.g., Shuffle, Repeat, Power).
 - **Plug-and-Play**:
   - Use `.active` class to indicate the "on" state.
   - Update `aria-pressed` attribute for accessibility.
-  - Use `SVM_PATHS` for standard iconography.
+  - Use `SVG_PATHS` for standard iconography.
+
+### 7. `MediaOptionButton` (NEW)
+Standardized multi-mode control with state persistence and kinetic feedback.
+- **Structure**:
+  ```html
+  <button class="media-player__option" title="Mode Name">
+    <svg><path d="..." /></svg>
+  </button>
+  ```
+- **Interactions**:
+  - **Long-Press (500ms)**: Cycles between modes (e.g., Random, Like). Includes `animate-outline` and `pulse` animations.
+  - **Tap**: Executes current mode action.
+  - **Visuals**: Requires dynamic `viewBox` switching if icons have different coordinate systems (e.g., 24x24 vs 960x960).
+
+### 8. `MediaRewind` (NEW)
+Standardized skip-back control with distinct kinetic feedback.
+- **Interactions**:
+  - **Animation**: Triggers `animate-rewind` on click—a sharp -25° rotation with an `ease-out` transition.
+  - **Logic**: Skips audio back exactly 10 seconds.
 
 ## Interchangeability Guidelines
 
 1. **Selector Parity**: Keep class names consistent (`.media-player__*`) even if the layout (Grid vs. Flex) changes.
 2. **Logic Separation**: Never bake audio logic into the UI HTML. All state changes must go through `MediaPlayerCore`.
-3. **Theming**: Use the `themed-background` utility class and `--themed-background` CSS variable to propagate track-derived colors across components.
+3. **Theming**: Use the `themed-background` utility class and `--themed-background` CSS variable to propagate track-derived colors.
+4. **Animation Parity**: Reusable animations like `media-pulse` and `media-outline-expand` should be consistent across variants.
 
 ## Design Tokens
 
@@ -142,3 +162,4 @@ Standardized binary state control (e.g., Shuffle, Repeat, Power).
 - **Gaps**: Standardized at `.5rem` or `.75rem`.
 - **Radius**: Large curves (`1.25rem` or `1.5rem`) for a premium "soft" feel.
 - **Icons**: Standardized at `24px` for consistency across variants.
+- **Animations**: Standard rotation for rewind is **-25°**.
