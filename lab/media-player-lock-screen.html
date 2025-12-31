@@ -321,6 +321,16 @@
         .pulse {
             animation: media-pulse 0.3s ease-in-out;
         }
+
+        @keyframes media-rewind-rotate {
+            50% {
+                transform: rotate(-25deg);
+            }
+        }
+
+        .animate-rewind {
+            animation: media-rewind-rotate 0.2s ease-out;
+        }
     </style>
 </head>
 
@@ -514,6 +524,8 @@
 
         rewindBtn.addEventListener('click', () => {
             audio.currentTime = Math.max(0, audio.currentTime - 10);
+            rewindBtn.classList.add('animate-rewind');
+            setTimeout(() => rewindBtn.classList.remove('animate-rewind'), 200);
         });
 
         // Option Button Logic
