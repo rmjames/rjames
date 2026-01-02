@@ -24,3 +24,9 @@ header {
     filter: var(--text-shadow-subtle);
     padding-bottom: var(--s);
 }
+
+/* Active state for Lab link in header */
+body:has(.lab-container) header nav a[href*="lab.html"] {
+    font-weight: 850;
+    opacity: 1;
+}
