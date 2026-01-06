@@ -162,11 +162,17 @@ body {
     0%,
     10%,
     100% {
-        box-shadow: 0 0 0px 0 oklch(from #ccc l c h / .76);
+        box-shadow:
+            0 0 0px 0 oklch(from #ccc l c h / .76),
+            inset 0 0 0 0 oklch(from #ccc l c h / 0),
+            inset 0 0 0 0 oklch(from #ccc l c h / 0);
     }
 
     4% {
-        box-shadow: 0 0 4px 0 oklch(from #ccc l c h / .76);
+        box-shadow:
+            0 0 6px 0 oklch(from #ccc l c h / .76),
+            inset 0 1px 2px 0 oklch(from #ccc l c h / 0.8),
+            inset 0 2px 2px 0 oklch(from #ccc l c h / 0.2);
     }
 }
 
@@ -181,8 +187,6 @@ body {
         opacity: 0;
     }
 }
-
-/* --- Special Functional Elements --- */
 
 /* Option/Mode Button */
 .media-player__controls__option {
