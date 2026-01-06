@@ -13,6 +13,7 @@ export class MediaPlayerCore {
     _initAudioEvents() {
         this.audio.addEventListener('play', () => this.notify('play'));
         this.audio.addEventListener('pause', () => this.notify('pause'));
+        this.audio.addEventListener('timeupdate', () => this.notify('timeupdate'));
         this.audio.addEventListener('ended', () => this.notify('ended'));
         this.audio.addEventListener('error', (e) => this.notify('error', e));
     }

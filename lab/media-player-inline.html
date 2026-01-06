@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inline Media Player Widget - Labs</title>
+    <link rel="stylesheet" href="../styles/components/media-player-inline.css">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: oklch(0.1 0 0);
+            font-family: system-ui, -apple-system, sans-serif;
+            color: white;
+            padding: 2rem;
+        }
+
+        .demo-instructions {
+            margin-bottom: 2rem;
+            text-align: center;
+            max-width: 30rem;
+        }
+
+        .demo-instructions p {
+            color: oklch(0.7 0 0);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="player-container">
+        <section class="media-player-inline">
+            <div class="media-player-inline__meta">
+                <span class="media-player-inline__title">Loading...</span>
+                <span class="media-player-inline__artist">Artist</span>
+            </div>
+
+            <div class="media-player-inline__controls">
+                <button class="media-player-inline__prev" title="Previous">
+                    <svg viewBox="0 -960 960 960">
+                        <path d="M240-240v-480h80v480h-80Zm440 0L400-480l280-240v480Z" />
+                    </svg>
+                </button>
+                <button class="media-player-inline__play" title="Play">
+                    <svg viewBox="0 -960 960 960">
+                        <path d="M320-200v-560l440 280-440 280Zm80-280Zm0 134 210-134-210-134v268Z" />
+                    </svg>
+                </button>
+                <button class="media-player-inline__next" title="Next">
+                    <svg viewBox="0 -960 960 960">
+                        <path d="M640-240v-480h80v480h-80ZM280-240v-480l280 240-280 240Z" />
+                    </svg>
+                </button>
+            </div>
+
+            <div class="media-player-inline__progress">
+                <span class="media-player-inline__time current">0:00</span>
+                <input type="range" min="0" max="100" value="0" step="0.1" class="media-player-inline__slider">
+                <span class="media-player-inline__time duration">0:00</span>
+            </div>
+
+            <div class="media-player-inline__toggle">
+                <button class="media-player-inline__option" title="Shuffle/Options">
+                    <svg viewBox="0 -960 960 960">
+                        <path
+                            d="M560-160v-80h164L531-433l56-56 193 193v-164h80v280H560Zm-344 0-56-56 193-193-193-193 56-56 193 193 193-193 56 56-193 193 193 193-56 56-193-193L216-160Z" />
+                    </svg>
+                </button>
+            </div>
+        </section>
+    </div>
+
+
+    <audio id="audio-player"></audio>
+
+    <script type="module">
+        import { MediaPlayerCore } from '../scripts/media/MediaPlayerCore.js';
+        import { UI } from '../scripts/media/MediaPlayerUI.js';
+        import { SVG_PATHS } from '../scripts/media/Constants.js';
+
+        const audio = document.getElementById('audio-player');
+        const core = new MediaPlayerCore(audio);
+
+        const playBtn = document.querySelector('.media-player-inline__play');
+        const prevBtn = document.querySelector('.media-player-inline__prev');
+        const nextBtn = document.querySelector('.media-player-inline__next');
+        const slider = document.querySelector('.media-player-inline__slider');
+        const currentTimeEl = document.querySelector('.current');
+        const durationTimeEl = document.querySelector('.duration');
+        const optionBtn = document.querySelector('.media-player-inline__option');
+        const titleEl = document.querySelector('.media-player-inline__title');
+        const artistEl = document.querySelector('.media-player-inline__artist');
+
+        // Helper to format time
+        const formatTime = (seconds) => {
+            const min = Math.floor(seconds / 60);
+            const sec = Math.floor(seconds % 60);
+            return `${min}:${sec.toString().padStart(2, '0')}`;
+        };
+
+        // Helper to update marquee state
+        const updateMarquee = (el) => {
+            el.classList.remove('is-marquee');
+            el.style.setProperty('--marquee-width', '0px');
+
+            // Wait for next frame to ensure rendering
+            requestAnimationFrame(() => {
+                const parentWidth = el.parentElement.clientWidth;
+                if (el.scrollWidth > parentWidth) {
+                    el.classList.add('is-marquee');
+                    el.style.setProperty('--marquee-width', `${parentWidth}px`);
+                }
+            });
+        };
+
+        // --- Core Subscriptions ---
+        core.subscribe((event, data) => {
+            if (event === 'play' || event === 'pause' || event === 'ended') {
+                UI.updatePlayIcon(playBtn, audio.paused);
+                if (!audio.paused) {
+                    playBtn.classList.add('is-active');
+                } else {
+                    playBtn.classList.remove('is-active');
+                }
+                // Initial duration or remaining time
+                const remaining = (audio.duration || 0) - audio.currentTime;
+                durationTimeEl.textContent = `-${formatTime(remaining)}`;
+            }
+            if (event === 'timeupdate') {
+                const progress = (audio.currentTime / audio.duration) * 100 || 0;
+                slider.value = progress;
+                currentTimeEl.textContent = formatTime(audio.currentTime);
+                const remaining = (audio.duration || 0) - audio.currentTime;
+                durationTimeEl.textContent = `-${formatTime(remaining)}`;
+            }
+            if (event === 'trackChanged') {
+                UI.updateTrackInfo({ title: titleEl, artist: artistEl }, data);
+                // Reset UI for new track
+                slider.value = 0;
+                currentTimeEl.textContent = '0:00';
+                const remaining = (audio.duration || 0) - audio.currentTime;
+                durationTimeEl.textContent = `-${formatTime(remaining)}`;
+
+                updateMarquee(titleEl);
+            }
+        });
+
+        // Ensure duration updates when audio metadata is loaded
+        audio.addEventListener('loadedmetadata', () => {
+            const remaining = (audio.duration || 0) - audio.currentTime;
+            durationTimeEl.textContent = `-${formatTime(remaining)}`;
+            updateMarquee(titleEl);
+        });
+
+        // --- Init ---
+        core.loadTrack(0);
+
+        // --- Event Handlers ---
+        playBtn.addEventListener('click', () => core.togglePlay());
+        prevBtn.addEventListener('click', () => core.prev());
+        nextBtn.addEventListener('click', () => core.next());
+
+        slider.addEventListener('input', () => {
+            const duration = audio.duration || 0;
+            const time = (slider.value / 100) * duration;
+            audio.currentTime = time;
+
+            // Immediate UI feedback while scrubbing
+            currentTimeEl.textContent = formatTime(time);
+            const remaining = duration - time;
+            durationTimeEl.textContent = `-${formatTime(remaining)}`;
+        });
+
+        // --- Multi-mode Option Button (Shuffle/Like) ---
+        const SHUFFLE_PATH = "M560-160v-80h164L531-433l56-56 193 193v-164h80v280H560Zm-344 0-56-56 193-193-193-193 56-56 193 193 193-193 56 56-193 193 193 193-56 56-193-193L216-160Z";
+        let currentMode = 'shuffle';
+        let isShuffle = false;
+        let isLiked = false;
+        let longPressTimer;
+        const LONG_PRESS_MS = 500;
+
+        const updateOptionVisuals = () => {
+            const path = optionBtn.querySelector('svg path');
+            optionBtn.classList.remove('is-active', 'is-liked');
+
+            if (currentMode === 'shuffle') {
+                path.setAttribute('d', SHUFFLE_PATH);
+                optionBtn.title = 'Shuffle';
+                if (isShuffle) optionBtn.classList.add('is-active');
+            } else {
+                path.setAttribute('d', isLiked ? SVG_PATHS.LIKE_FILLED : SVG_PATHS.LIKE);
+                optionBtn.title = 'Like';
+                if (isLiked) optionBtn.classList.add('is-liked');
+            }
+        };
+
+        const handleOptionClick = () => {
+            if (currentMode === 'shuffle') {
+                isShuffle = !isShuffle;
+                console.log('Shuffle mode:', isShuffle ? 'ON' : 'OFF');
+
+                if (isShuffle) {
+                    const track = core.shuffle();
+                    console.log('Shuffle active, track:', track.title);
+                }
+            } else {
+                isLiked = !isLiked;
+                console.log(isLiked ? 'Track Liked' : 'Track Unliked');
+            }
+            updateOptionVisuals();
+        };
+
+        const onLongPress = () => {
+            currentMode = currentMode === 'shuffle' ? 'like' : 'shuffle';
+            optionBtn.classList.add('mode-switching');
+            setTimeout(() => optionBtn.classList.remove('mode-switching'), 300);
+            updateOptionVisuals();
+            console.log('Mode switched to:', currentMode);
+        };
+
+        optionBtn.addEventListener('mousedown', () => {
+            longPressTimer = setTimeout(() => {
+                onLongPress();
+                longPressTimer = null;
+            }, LONG_PRESS_MS);
+        });
+
+        window.addEventListener('mouseup', () => {
+            if (longPressTimer) {
+                clearTimeout(longPressTimer);
+                longPressTimer = null;
+                handleOptionClick();
+            }
+        });
+
+        optionBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            longPressTimer = setTimeout(() => {
+                onLongPress();
+                longPressTimer = null;
+            }, LONG_PRESS_MS);
+        }, { passive: false });
+
+        optionBtn.addEventListener('touchend', () => {
+            if (longPressTimer) {
+                clearTimeout(longPressTimer);
+                longPressTimer = null;
+                handleOptionClick();
+            }
+        });
+    </script>
+</body>
+
+</html>
