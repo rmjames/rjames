@@ -9,10 +9,40 @@ export const UI = {
         }
     },
 
+    updateMarquee(el) {
+        if (!el) return;
+        el.classList.remove('is-marquee');
+        el.style.setProperty('--marquee-width', '0px');
+
+        // Wait for next frame to ensure rendering
+        requestAnimationFrame(() => {
+            const parentWidth = el.clientWidth;
+            const textWidth = el.scrollWidth;
+            if (textWidth > parentWidth) {
+                el.classList.add('is-marquee');
+                el.style.setProperty('--marquee-width', `${parentWidth}px`);
+                // Calculate scroll distance for alternate animation
+                // This will be used in CSS: translateX(calc(-100% + var(--marquee-width)))
+            }
+        });
+    },
+
     updateTrackInfo(elements, track) {
         const { title, artist, artBtn } = elements;
-        if (title) title.textContent = track.title;
-        if (artist) artist.textContent = track.artist;
+
+        const updateText = (el, text) => {
+            if (!el) return;
+            let span = el.querySelector('span');
+            if (!span) {
+                el.innerHTML = `<span></span>`;
+                span = el.querySelector('span');
+            }
+            span.textContent = text;
+            this.updateMarquee(el);
+        };
+
+        updateText(title, track.title);
+        updateText(artist, track.artist);
 
         if (artBtn) {
             if (track.albumArt) {

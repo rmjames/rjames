@@ -171,4 +171,72 @@ describe('MediaPlayerUI', () => {
             expect(element.style.getPropertyValue('--accent-color')).toBe('oklch(0.5 0.5 180)');
         });
     });
+
+    describe('updateMarquee', () => {
+        beforeEach(() => {
+            vi.useFakeTimers();
+            // Mock requestAnimationFrame
+            vi.stubGlobal('requestAnimationFrame', (cb) => cb());
+        });
+
+        afterEach(() => {
+            vi.useRealTimers();
+            vi.unstubAllGlobals();
+        });
+
+        it('should add is-marquee class if content overflows', () => {
+            const el = document.createElement('div');
+            el.innerHTML = '<span>Long Text</span>';
+
+            // Mock properties
+            Object.defineProperty(el, 'clientWidth', { value: 100, configurable: true });
+            Object.defineProperty(el, 'scrollWidth', { value: 200, configurable: true });
+
+            UI.updateMarquee(el);
+
+            expect(el.classList.contains('is-marquee')).toBe(true);
+            expect(el.style.getPropertyValue('--marquee-width')).toBe('100px');
+        });
+
+        it('should remove is-marquee class if content fits', () => {
+            const el = document.createElement('div');
+            el.classList.add('is-marquee');
+            el.innerHTML = '<span>Short</span>';
+
+            Object.defineProperty(el, 'clientWidth', { value: 100, configurable: true });
+            Object.defineProperty(el, 'scrollWidth', { value: 50, configurable: true });
+
+            UI.updateMarquee(el);
+
+            expect(el.classList.contains('is-marquee')).toBe(false);
+            expect(el.style.getPropertyValue('--marquee-width')).toBe('0px');
+        });
+    });
+
+    describe('updateTrackInfo (with marquee)', () => {
+        let elements;
+        const track = { title: 'T', artist: 'A' };
+
+        beforeEach(() => {
+            elements = {
+                title: document.createElement('div'),
+                artist: document.createElement('div')
+            };
+            vi.stubGlobal('requestAnimationFrame', (cb) => cb());
+        });
+
+        afterEach(() => {
+            vi.unstubAllGlobals();
+        });
+
+        it('should wrap text in span and call updateMarquee', () => {
+            const spy = vi.spyOn(UI, 'updateMarquee');
+
+            UI.updateTrackInfo(elements, track);
+
+            expect(elements.title.querySelector('span').textContent).toBe('T');
+            expect(elements.artist.querySelector('span').textContent).toBe('A');
+            expect(spy).toHaveBeenCalledTimes(2);
+        });
+    });
 });
