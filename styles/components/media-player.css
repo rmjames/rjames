@@ -43,21 +43,39 @@ body {
     text-align: left;
 }
 
-.media-player__meta__title {
+.media-player__meta__title,
+.media-player__meta__artist {
     font-weight: bold;
     white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis;
     margin: 0;
+    width: 100%;
 }
 
 .media-player__meta__artist {
     font-weight: normal;
     color: oklch(from #ccc l c h);
+}
+
+.media-player__meta span {
+    display: inline-block;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    margin: 0;
+    min-width: 100%;
+}
+
+/* Marquee Animation */
+.media-player__meta>.is-marquee span {
+    animation: marquee 8s linear infinite alternate;
+}
+
+@keyframes marquee {
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(calc(-100% + var(--marquee-width, 100%)));
+    }
 }
 
 /* --- Buttons --- */
