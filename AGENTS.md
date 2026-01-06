@@ -12,6 +12,9 @@ This document provides guidelines for agents working on this repository.
     - **Container Queries**: Use container queries where appropriate to create more resilient responsive components.
 - **Performance**: Code and solutions should be performant. This includes optimizing assets, minimizing network requests, and writing efficient code.
     - All CSS should be loaded asynchronously using the `media="print"` onload trick with noscript fallbacks
+    - All JS should be loaded asynchronously using the `defer` attribute
+    - All images should be loaded asynchronously using the `loading="lazy"` attribute
+
 
 ## References
 

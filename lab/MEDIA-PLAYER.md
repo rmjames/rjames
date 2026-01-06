@@ -110,7 +110,7 @@ Standardized 5-band frequency control.
   - Bind slider `input` events to `eq.setGain(index, value)`.
   - Use `UI.updateSliderVisuals(input)` for consistent fill/thumb rendering.
 
-### 6. `MediaToggleButton` (NEW)
+### 6. `MediaToggleButton`
 Standardized binary state control (e.g., Shuffle, Repeat, Power).
 - **Structure**:
   ```html
@@ -123,7 +123,7 @@ Standardized binary state control (e.g., Shuffle, Repeat, Power).
   - Update `aria-pressed` attribute for accessibility.
   - Use `SVG_PATHS` for standard iconography.
 
-### 7. `MediaOptionButton` (NEW)
+### 7. `MediaOptionButton`
 Standardized multi-mode control with state persistence and kinetic feedback.
 - **Structure**:
   ```html
@@ -141,6 +141,42 @@ Standardized skip-back control with distinct kinetic feedback.
 - **Interactions**:
   - **Animation**: Triggers `animate-rewind` on click—a sharp -25° rotation with an `ease-out` transition.
   - **Logic**: Skips audio back exactly 10 seconds.
+
+### 9. `MediaMarquee`
+Standardized text overflow handling for track titles.
+- **Intent**: Automatically scroll long track titles back and forth within their container while maintaining a static layout for short titles.
+- **Interactions**:
+  - **Logic**: Uses `updateMarquee(el)` helper to detect overflow and toggle functionality.
+  - **Animation**: `@keyframes marquee` back-and-forth transform with a `calc()` based on parent width.
+- **Structure**:
+  ```html
+  <div class="media-player__title">
+    <span class="media-player__title__text">Track Title</span>
+  </div>
+  ```
+- **Implementation**:
+  ```javascript
+  const updateMarquee = (el) => {
+      el.classList.remove('is-marquee');
+      el.style.setProperty('--marquee-width', '0px');
+
+      // Wait for next frame to ensure rendering
+      requestAnimationFrame(() => {
+          const parentWidth = el.parentElement.clientWidth;
+          if (el.scrollWidth > parentWidth) {
+              el.classList.add('is-marquee');
+              el.style.setProperty('--marquee-width', `${parentWidth}px`);
+          }
+      });
+  };
+  ```
+- **CSS**:
+  ```css
+  @keyframes marquee {
+      from { transform: translateX(0); }
+      to { transform: translateX(calc(-100% + var(--marquee-width, 4rem))); }
+  }
+  ```
 
 ## Interchangeability Guidelines
 

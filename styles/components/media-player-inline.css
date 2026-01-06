@@ -1,0 +1,268 @@
+/* --- Inline Media Player Design --- */
+
+:root {
+    --player-bg: oklch(0.2 0.05 240 / 0.85);
+    --player-border: oklch(0.4 0.05 240 / 0.3);
+    --player-accent: oklch(0.6 0.15 240);
+    --player-text: oklch(0.9 0.02 240);
+    --player-text-muted: oklch(0.7 0.02 240);
+}
+
+.player-container {
+    container-type: inline-size;
+    inline-size: 100%;
+    max-inline-size: 40rem;
+    padding: 1rem;
+    display: flex;
+    justify-content: center;
+
+    /* --- Container Queries for Responsiveness --- */
+
+    /* Smallest: Only Play, Progress disappears */
+    @container (max-width: 15rem) {
+
+        .media-player-inline__prev,
+        .media-player-inline__next,
+        /* .media-player-inline__progress, */
+        .media-player-inline__toggle {
+            display: none;
+        }
+    }
+
+    /* Medium Small: Hide Secondary Controls */
+    @container (min-width: 15.01rem) and (max-width: 20rem) {
+
+        .media-player-inline__prev,
+        .media-player-inline__next {
+            display: none;
+        }
+    }
+
+    /* Medium: Hide Time Labels and Artist */
+    @container (max-width: 25rem) {
+
+        .media-player-inline__time,
+        .media-player-inline__meta {
+            display: none;
+        }
+    }
+
+    @container (max-width: 30rem) {
+        .media-player-inline__artist {
+            display: none;
+        }
+    }
+}
+
+.media-player-inline {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    background: var(--player-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--player-border);
+    border-radius: 9999px;
+    box-shadow: 0 4px 24px -1px rgb(0 0 0 / 0.3);
+    inline-size: fit-content;
+    min-inline-size: 4.5rem;
+    max-inline-size: 100%;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* --- Meta Info --- */
+.media-player-inline__meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    min-inline-size: 0;
+    max-inline-size: 4rem;
+    flex-shrink: 1;
+    overflow: hidden;
+}
+
+.media-player-inline__title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--player-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.2;
+    mask-image: linear-gradient(to right, black calc(100% - 10px), transparent 100%);
+}
+
+.media-player-inline__title.is-marquee {
+    text-overflow: clip;
+    animation: marquee 8s linear infinite alternate;
+    width: max-content;
+}
+
+@keyframes marquee {
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(calc(-100% + var(--marquee-width, 4rem)));
+    }
+}
+
+.media-player-inline__artist {
+    font-size: 0.65rem;
+    color: var(--player-text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.2;
+}
+
+/* --- Controls Group --- */
+.media-player-inline__controls {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    flex-shrink: 0;
+}
+
+/* --- Buttons --- */
+.media-player-inline button {
+    appearance: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 2.25rem;
+    block-size: 2.25rem;
+    padding: 0;
+    margin: 0;
+    border: none;
+    background: transparent;
+    color: var(--player-text);
+    cursor: pointer;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+    outline: none;
+}
+
+.media-player-inline button:hover {
+    background: oklch(1 0 0 / 0.1);
+}
+
+.media-player-inline button:active {
+    transform: scale(0.92);
+}
+
+.media-player-inline button svg {
+    inline-size: 1.25rem;
+    block-size: 1.25rem;
+    fill: currentColor;
+}
+
+/* Specific button styles */
+.media-player-inline__play {
+    background: var(--player-accent) !important;
+    color: white !important;
+    box-shadow: 0 0 12px var(--player-accent);
+}
+
+.media-player-inline__play:hover {
+    filter: brightness(1.1);
+}
+
+/* --- Progress Section --- */
+.media-player-inline__progress {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 1;
+    min-inline-size: 0;
+    /* Allow shrinking */
+}
+
+.media-player-inline__progress input[type="range"] {
+    flex: 1;
+    min-inline-size: 3rem;
+    appearance: none;
+    -webkit-appearance: none;
+    background: oklch(1 0 0 / 0.1);
+    height: 4px;
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+}
+
+.media-player-inline__progress input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 50%;
+    background: var(--player-accent);
+    box-shadow: 0 0 8px var(--player-accent);
+    border: 2px solid white;
+}
+
+.media-player-inline__time {
+    font-size: 0.65rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    color: var(--player-text-muted);
+    font-variant-numeric: tabular-nums;
+}
+
+/* --- Options/Toggle --- */
+.media-player-inline__toggle {
+    flex-shrink: 0;
+}
+
+.media-player-inline__option.is-active {
+    color: var(--player-accent) !important;
+    transform: scale(1.1);
+}
+
+.media-player-inline__option.is-liked {
+    color: var(--player-accent) !important;
+}
+
+.media-player-inline__option.is-liked svg {
+    filter: drop-shadow(0 0 6px var(--player-accent));
+}
+
+.media-player-inline__option.mode-switching {
+    animation: mode-pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.media-player-inline__option.is-active svg {
+    filter: drop-shadow(0 0 4px var(--player-accent));
+}
+
+/* --- Animations --- */
+@keyframes mode-pop {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.4) rotate(15deg);
+        opacity: 0.7;
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.is-active svg {
+    /* Just a placeholder for potential active state animation */
+}
