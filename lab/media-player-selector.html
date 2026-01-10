@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Media Player Selector - Labs</title>
+    <style>
+        :root {
+            --bg-color: oklch(0.05 0 0);
+            --card-bg: oklch(0.15 0 0 / 0.5);
+            --accent-color: oklch(0.7 0.15 250);
+            --text-main: oklch(0.95 0 0);
+            --text-muted: oklch(0.7 0 0);
+            --transition-speed: 0.8s;
+            --stagger-delay: 0.12s;
+            --ease-premium: cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .header {
+            position: fixed;
+            top: 2rem;
+            text-align: center;
+            z-index: 10;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin: 0;
+            letter-spacing: -0.02em;
+            background: linear-gradient(to right, var(--text-main), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header p {
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+        }
+
+        .carousel-view {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .player-card {
+            width: 90vw;
+            max-width: 800px;
+            aspect-ratio: 16/10;
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid oklch(1 0 0 / 0.1);
+            border-radius: 2rem;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            view-transition-name: player-card;
+        }
+
+        .card-header {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid oklch(1 0 0 / 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            view-transition-name: card-header;
+        }
+
+        #player-title {
+            view-transition-name: player-title;
+        }
+
+        .card-header h2 {
+            margin: 0;
+            font-size: 1.25rem;
+            color: var(--text-main);
+        }
+
+        .player-frame {
+            flex: 1;
+            border: none;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+        }
+
+        .nav-controls {
+            position: fixed;
+            bottom: 4rem;
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .nav-btn {
+            background: oklch(1 0 0 / 0.1);
+            border: 1px solid oklch(1 0 0 / 0.2);
+            color: var(--text-main);
+            width: 3.5rem;
+            height: 3.5rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-btn:hover {
+            background: oklch(1 0 0 / 0.2);
+            transform: scale(1.1);
+        }
+
+        .nav-btn:active {
+            transform: scale(0.95);
+        }
+
+        .nav-btn svg {
+            width: 1.5rem;
+            height: 1.5rem;
+            fill: currentColor;
+        }
+
+        .pagination {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .dot {
+            width: 0.5rem;
+            height: 0.5rem;
+            border-radius: 50%;
+            background: oklch(1 0 0 / 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .dot.active {
+            background: var(--accent-color);
+            transform: scale(1.3);
+        }
+
+        /* View Transitions Customization */
+        ::view-transition-old(player-card) {
+            animation: slide-out var(--transition-speed) var(--ease-premium) forwards;
+        }
+
+        ::view-transition-new(player-card) {
+            animation: slide-in var(--transition-speed) var(--ease-premium) both;
+        }
+
+        ::view-transition-new(card-header) {
+            animation: slide-in var(--transition-speed) var(--ease-premium) both;
+            animation-delay: var(--stagger-delay);
+        }
+
+        ::view-transition-new(player-title) {
+            animation: fade-in var(--transition-speed) var(--ease-premium) both;
+            animation-delay: calc(var(--stagger-delay) * 2);
+        }
+
+        @keyframes slide-out {
+            from {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+            }
+
+            to {
+                opacity: 0;
+                transform: translateX(-20px) scale(0.99);
+            }
+        }
+
+        @keyframes slide-in {
+            from {
+                opacity: 0;
+                transform: translateX(20px) scale(0.99);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+            }
+        }
+
+        @keyframes fade-in {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Directional transitions logic */
+        .slide-right::view-transition-old(player-card),
+        .slide-right::view-transition-old(card-header),
+        .slide-right::view-transition-old(player-title) {
+            animation: slide-out-right var(--transition-speed) var(--ease-premium) both;
+        }
+
+        .slide-right::view-transition-new(player-card) {
+            animation: slide-in-right var(--transition-speed) var(--ease-premium) both;
+        }
+
+        .slide-right::view-transition-new(card-header) {
+            animation: slide-in-right var(--transition-speed) var(--ease-premium) both;
+            animation-delay: var(--stagger-delay);
+        }
+
+        .slide-right::view-transition-new(player-title) {
+            animation: fade-in var(--transition-speed) var(--ease-premium) both;
+            animation-delay: calc(var(--stagger-delay) * 2);
+        }
+
+        @keyframes slide-out-right {
+            from {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+            }
+
+            to {
+                opacity: 0;
+                transform: translateX(20px) scale(0.99);
+            }
+        }
+
+        @keyframes slide-in-right {
+            from {
+                opacity: 0;
+                transform: translateX(-20px) scale(0.99);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+            }
+        }
+
+        /* Initial Entry Stagger - Only runs once on page load */
+        .is-initial-load .player-card {
+            animation: slide-in 0.8s var(--ease-premium) both;
+        }
+
+        .is-initial-load .card-header {
+            animation: fade-in 0.8s var(--ease-premium) var(--stagger-delay) both;
+        }
+
+        .is-initial-load #player-title {
+            animation: fade-in 0.8s var(--ease-premium) calc(var(--stagger-delay) * 2) both;
+        }
+
+        /* Prevent double animation during view transitions */
+        html:active-view-transition .player-card,
+        html:active-view-transition .card-header,
+        html:active-view-transition #player-title {
+            animation: none !important;
+        }
+    </style>
+</head>
+
+<body class="is-initial-load">
+
+    <header class="header">
+        <h1>Media Player Catalog</h1>
+    </header>
+
+    <main class="carousel-view">
+        <div class="player-card">
+            <div class="card-header">
+                <h2 id="player-title">Standard Player</h2>
+            </div>
+            <iframe id="player-frame" class="player-frame" src="media-player.html"></iframe>
+        </div>
+    </main>
+
+    <nav class="nav-controls">
+        <button class="nav-btn" id="prev-btn" title="Previous">
+            <svg viewBox="0 0 24 24">
+                <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
+            </svg>
+        </button>
+
+        <div class="pagination" id="pagination">
+            <div class="dot active"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+        </div>
+
+        <button class="nav-btn" id="next-btn" title="Next">
+            <svg viewBox="0 0 24 24">
+                <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" />
+            </svg>
+        </button>
+    </nav>
+
+    <script>
+        document.body.classList.add('js-loaded');
+
+        // Remove initial load class after animation completes
+        setTimeout(() => {
+            document.body.classList.remove('is-initial-load');
+        }, 2000);
+
+        const players = [
+            {
+                title: "Standard Player",
+                url: "media-player.html"
+            },
+            {
+                title: "Inline Widget",
+                url: "media-player-inline.html"
+            },
+            {
+                title: "Lock Screen View",
+                url: "media-player-lock-screen.html"
+            },
+            {
+                title: "Compact Widget",
+                url: "media-player-widget.html"
+            }
+        ];
+
+        let currentIndex = 0;
+        const frame = document.getElementById('player-frame');
+        const titleEl = document.getElementById('player-title');
+        const dots = document.querySelectorAll('.dot');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+
+        function updateView(direction) {
+            const nextIndex = (currentIndex + (direction === 'next' ? 1 : -1) + players.length) % players.length;
+
+            const transition = document.startViewTransition(() => {
+                // Apply the switch
+                currentIndex = nextIndex;
+                const player = players[currentIndex];
+
+                frame.src = player.url;
+                titleEl.textContent = player.title;
+
+                dots.forEach((dot, i) => {
+                    dot.classList.toggle('active', i === currentIndex);
+                });
+            });
+
+            // Add class for directional animation
+            if (direction === 'prev') {
+                document.documentElement.classList.add('slide-right');
+            } else {
+                document.documentElement.classList.remove('slide-right');
+            }
+
+            transition.finished.finally(() => {
+                document.documentElement.classList.remove('slide-right');
+            });
+        }
+
+        prevBtn.addEventListener('click', () => updateView('prev'));
+        nextBtn.addEventListener('click', () => updateView('next'));
+
+        // Keyboard navigation
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') updateView('prev');
+            if (e.key === 'ArrowRight') updateView('next');
+        });
+    </script>
+</body>
+
+</html>
