@@ -12,7 +12,9 @@
             --accent-color: oklch(0.7 0.15 250);
             --text-main: oklch(0.95 0 0);
             --text-muted: oklch(0.7 0 0);
-            --transition-speed: 0.6s;
+            --transition-speed: 0.8s;
+            --stagger-delay: 0.12s;
+            --ease-premium: cubic-bezier(0.23, 1, 0.32, 1);
         }
 
         body {
@@ -81,6 +83,11 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            view-transition-name: card-header;
+        }
+
+        #player-title {
+            view-transition-name: player-title;
         }
 
         .card-header h2 {
@@ -156,11 +163,21 @@
 
         /* View Transitions Customization */
         ::view-transition-old(player-card) {
-            animation: slide-out var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            animation: slide-out var(--transition-speed) var(--ease-premium) forwards;
         }
 
         ::view-transition-new(player-card) {
-            animation: slide-in var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            animation: slide-in var(--transition-speed) var(--ease-premium) both;
+        }
+
+        ::view-transition-new(card-header) {
+            animation: slide-in var(--transition-speed) var(--ease-premium) both;
+            animation-delay: var(--stagger-delay);
+        }
+
+        ::view-transition-new(player-title) {
+            animation: fade-in var(--transition-speed) var(--ease-premium) both;
+            animation-delay: calc(var(--stagger-delay) * 2);
         }
 
         @keyframes slide-out {
@@ -171,14 +188,14 @@
 
             to {
                 opacity: 0;
-                transform: translateX(-100px) scale(0.9);
+                transform: translateX(-20px) scale(0.99);
             }
         }
 
         @keyframes slide-in {
             from {
                 opacity: 0;
-                transform: translateX(100px) scale(0.9);
+                transform: translateX(20px) scale(0.99);
             }
 
             to {
@@ -187,13 +204,35 @@
             }
         }
 
+        @keyframes fade-in {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
         /* Directional transitions logic */
-        .slide-right::view-transition-old(player-card) {
-            animation: slide-out-right var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        .slide-right::view-transition-old(player-card),
+        .slide-right::view-transition-old(card-header),
+        .slide-right::view-transition-old(player-title) {
+            animation: slide-out-right var(--transition-speed) var(--ease-premium) both;
         }
 
         .slide-right::view-transition-new(player-card) {
-            animation: slide-in-right var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            animation: slide-in-right var(--transition-speed) var(--ease-premium) both;
+        }
+
+        .slide-right::view-transition-new(card-header) {
+            animation: slide-in-right var(--transition-speed) var(--ease-premium) both;
+            animation-delay: var(--stagger-delay);
+        }
+
+        .slide-right::view-transition-new(player-title) {
+            animation: fade-in var(--transition-speed) var(--ease-premium) both;
+            animation-delay: calc(var(--stagger-delay) * 2);
         }
 
         @keyframes slide-out-right {
@@ -204,14 +243,14 @@
 
             to {
                 opacity: 0;
-                transform: translateX(100px) scale(0.9);
+                transform: translateX(20px) scale(0.99);
             }
         }
 
         @keyframes slide-in-right {
             from {
                 opacity: 0;
-                transform: translateX(-100px) scale(0.9);
+                transform: translateX(-20px) scale(0.99);
             }
 
             to {
@@ -219,21 +258,39 @@
                 transform: translateX(0) scale(1);
             }
         }
+
+        /* Initial Entry Stagger - Only runs once on page load */
+        .is-initial-load .player-card {
+            animation: slide-in 0.8s var(--ease-premium) both;
+        }
+
+        .is-initial-load .card-header {
+            animation: fade-in 0.8s var(--ease-premium) var(--stagger-delay) both;
+        }
+
+        .is-initial-load #player-title {
+            animation: fade-in 0.8s var(--ease-premium) calc(var(--stagger-delay) * 2) both;
+        }
+
+        /* Prevent double animation during view transitions */
+        html:active-view-transition .player-card,
+        html:active-view-transition .card-header,
+        html:active-view-transition #player-title {
+            animation: none !important;
+        }
     </style>
 </head>
 
-<body>
+<body class="is-initial-load">
 
     <header class="header">
-        <h1>Player Showcase</h1>
-        <p>Explore our library of premium media components</p>
+        <h1>Media Player Catalog</h1>
     </header>
 
     <main class="carousel-view">
         <div class="player-card">
             <div class="card-header">
                 <h2 id="player-title">Standard Player</h2>
-                <span id="player-index" style="color: var(--text-muted); font-size: 0.9rem;">1 of 4</span>
             </div>
             <iframe id="player-frame" class="player-frame" src="media-player.html"></iframe>
         </div>
@@ -261,6 +318,13 @@
     </nav>
 
     <script>
+        document.body.classList.add('js-loaded');
+
+        // Remove initial load class after animation completes
+        setTimeout(() => {
+            document.body.classList.remove('is-initial-load');
+        }, 2000);
+
         const players = [
             {
                 title: "Standard Player",
@@ -283,7 +347,6 @@
         let currentIndex = 0;
         const frame = document.getElementById('player-frame');
         const titleEl = document.getElementById('player-title');
-        const indexEl = document.getElementById('player-index');
         const dots = document.querySelectorAll('.dot');
         const prevBtn = document.getElementById('prev-btn');
         const nextBtn = document.getElementById('next-btn');
@@ -298,7 +361,6 @@
 
                 frame.src = player.url;
                 titleEl.textContent = player.title;
-                indexEl.textContent = `${currentIndex + 1} of ${players.length}`;
 
                 dots.forEach((dot, i) => {
                     dot.classList.toggle('active', i === currentIndex);
