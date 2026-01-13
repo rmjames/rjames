@@ -1,3 +1,5 @@
+**Before starting, make sure you have read the /AGENTS.md & file for general guidelines and best practices.**
+
 # Lab Media Player Specification
 
 This document defines the technical and design specifications for the media player variants located in the `/lab` directory.
