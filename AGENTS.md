@@ -1,3 +1,5 @@
+**Before you start please reference `/GEMINI.md` for general guidelines and best practices.**
+
 # Agent Directives
 
 This document provides guidelines for agents working on this repository.
