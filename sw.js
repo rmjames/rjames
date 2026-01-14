@@ -1,4 +1,4 @@
-const cacheName = 'v3';
+const cacheName = 'v4';
 const OFFLINE = 'offline.html';
 
 const assetsToCache = [
@@ -38,6 +38,10 @@ self.addEventListener('activate', event => self.clients.claim());
 
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') { return; }
+
+  // Ignore cross-origin requests (e.g. Cloudflare, Google Analytics)
+  if (!event.request.url.startsWith(self.location.origin)) { return; }
+
   // Only handle http/https requests
   if (!event.request.url.startsWith('http')) { return; }
 
