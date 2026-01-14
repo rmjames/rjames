@@ -1,3 +1,8 @@
+// Ensure gtag is defined even if analytics-loader.js failed or was blocked
+window.gtag = window.gtag || function() {
+  (window.dataLayer = window.dataLayer || []).push(arguments);
+};
+
 document.addEventListener("DOMContentLoaded", () => {
   // Track header navigation clicks
   const headerNav = document.querySelector("header nav");
