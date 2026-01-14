@@ -92,6 +92,18 @@ describe('analytics.js', () => {
     });
   });
 
+  it('should track custom data-analytics-link hover', () => {
+    const link = document.querySelector('[data-analytics-link]');
+    const event = new Event('mouseenter');
+    link.dispatchEvent(event);
+
+    expect(global.gtag).toHaveBeenCalledWith('event', 'mouseover', {
+      event_category: 'Link Hover',
+      event_label: 'Contact',
+      non_interaction: true,
+    });
+  });
+
   it('should track brand interaction clicks', () => {
     document.querySelector('.brand').click();
     expect(global.gtag).toHaveBeenCalledWith('event', 'click', {

@@ -73,9 +73,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  document.addEventListener("mouseover", (event) => {
-    const link = event.target.closest("[data-analytics-link]");
-    if (link) {
+  // Performance optimization: Use direct event listeners instead of global delegation.
+  // This assumes the site is an MPA (Multi-Page Application) where content is static per page load.
+  // If dynamic content is added, these listeners need to be re-attached.
+  const analyticsLinks = document.querySelectorAll("[data-analytics-link]");
+  analyticsLinks.forEach((link) => {
+    link.addEventListener("mouseenter", () => {
       const linkName = link.dataset.analyticsLink;
       const eventData = {
         event_category: "Link Hover",
@@ -83,7 +86,7 @@ document.addEventListener("DOMContentLoaded", () => {
         non_interaction: true,
       };
       gtag("event", "mouseover", eventData);
-    }
+    });
   });
 
   // Track brand interactions
