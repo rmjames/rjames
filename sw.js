@@ -1,4 +1,4 @@
-const cacheName = 'v3';
+const cacheName = 'v4';
 const OFFLINE = 'offline.html';
 
 const assetsToCache = [
@@ -40,6 +40,9 @@ self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') { return; }
   // Only handle http/https requests
   if (!event.request.url.startsWith('http')) { return; }
+
+  // Only handle same-origin requests
+  if (!event.request.url.startsWith(self.location.origin)) { return; }
 
   event.respondWith(
     caches.open(cacheName).then((cache) => {
