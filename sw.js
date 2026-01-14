@@ -1,9 +1,8 @@
-const cacheName = 'v2';
+const cacheName = 'v3';
 const OFFLINE = 'offline.html';
 
 const assetsToCache = [
   '/index.html',
-  '/work.html',
   '/resume.html',
   '/lab.html',
   '/lab/buttons-custom-properties.html',
@@ -39,16 +38,31 @@ self.addEventListener('activate', event => self.clients.claim());
 
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') { return; }
-  if (/http:/.test(event.request.url)) { return; }
+  // Only handle http/https requests
+  if (!event.request.url.startsWith('http')) { return; }
 
   event.respondWith(
     caches.open(cacheName).then((cache) => {
+      // Cache First strategy for fonts and images
+      if (event.request.destination === 'font' || event.request.destination === 'image') {
+        return cache.match(event.request).then((cachedResponse) => {
+          if (cachedResponse) {
+            return cachedResponse;
+          }
+          return fetch(event.request).then((networkResponse) => {
+            cache.put(event.request, networkResponse.clone());
+            return networkResponse;
+          });
+        });
+      }
+
+      // Network First strategy for everything else (HTML, CSS, JS)
       return fetch(event.request).then((networkResponse) => {
         cache.put(event.request, networkResponse.clone());
         return networkResponse;
       }).catch(() => {
         return cache.match(event.request);
-      })
+      });
     })
   );
 });
