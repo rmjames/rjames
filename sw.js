@@ -1,4 +1,4 @@
-const cacheName = 'v4';
+const cacheName = 'v6';
 const OFFLINE = 'offline.html';
 
 const assetsToCache = [
@@ -18,9 +18,7 @@ const assetsToCache = [
   '/lab/microsoft-logo.html',
   '/styles/fonts.css',
   '/styles/main.css',
-  '/styles/mpa.css',
   '/fonts/recursive-variable.woff2',
-  '/scripts/nav-transitions.js',
   '/images/icon.svg',
   '/images/favicon.svg',
   '/manifest.json'
