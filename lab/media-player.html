@@ -257,7 +257,11 @@
 
             if (track.albumArt) {
                 btn.classList.add('has-art');
-                btn.innerHTML = `<img src="${track.albumArt}" alt="Album art for ${track.title}" loading="lazy">`;
+                const img = document.createElement('img');
+                img.src = track.albumArt;
+                img.alt = `Album art for ${track.title}`;
+                img.loading = 'lazy';
+                btn.replaceChildren(img);
             } else {
                 btn.innerHTML = `
                     <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
