@@ -47,7 +47,10 @@ export const UI = {
         if (artBtn) {
             if (track.albumArt) {
                 artBtn.classList.add('has-art');
-                artBtn.innerHTML = `<img src="${track.albumArt}" alt="${track.title}">`;
+                const img = document.createElement('img');
+                img.src = track.albumArt;
+                img.alt = track.title;
+                artBtn.replaceChildren(img);
             } else {
                 artBtn.classList.remove('has-art');
                 artBtn.innerHTML = `
@@ -93,11 +96,24 @@ export const UI = {
         const artist = track.artist || 'Unknown Artist';
         const album = track.album || track.title || 'Unknown Album';
 
-        popoverEl.innerHTML = `
-            <div style="font-weight: bold; margin-bottom: 0.125rem;">${artist}</div>
-            <div style="font-size: 0.65rem; color: oklch(from #ccc l c h);">${album}</div>
-            <div style="font-size: 0.65rem; color: oklch(from #ccc l c h);">${track.title}</div>
-        `;
+        popoverEl.replaceChildren();
+
+        const artistDiv = document.createElement('div');
+        artistDiv.style.fontWeight = 'bold';
+        artistDiv.style.marginBottom = '0.125rem';
+        artistDiv.textContent = artist;
+
+        const albumDiv = document.createElement('div');
+        albumDiv.style.fontSize = '0.65rem';
+        albumDiv.style.color = 'oklch(from #ccc l c h)';
+        albumDiv.textContent = album;
+
+        const titleDiv = document.createElement('div');
+        titleDiv.style.fontSize = '0.65rem';
+        titleDiv.style.color = 'oklch(from #ccc l c h)';
+        titleDiv.textContent = track.title;
+
+        popoverEl.append(artistDiv, albumDiv, titleDiv);
 
         // We assume CSS Anchor Positioning or a fallback is handled via anchor-name
         anchorBtn.style.anchorName = '--active-preset';
