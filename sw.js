@@ -1,4 +1,4 @@
-const cacheName = 'v4';
+const cacheName = 'v7';
 const OFFLINE = 'offline.html';
 
 const assetsToCache = [
@@ -18,9 +18,7 @@ const assetsToCache = [
   '/lab/microsoft-logo.html',
   '/styles/fonts.css',
   '/styles/main.css',
-  '/styles/mpa.css',
   '/fonts/recursive-variable.woff2',
-  '/scripts/nav-transitions.js',
   '/images/icon.svg',
   '/images/favicon.svg',
   '/manifest.json'
@@ -38,6 +36,10 @@ self.addEventListener('activate', event => self.clients.claim());
 
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') { return; }
+
+  // Ignore cross-origin requests (e.g. Cloudflare, Google Analytics)
+  if (!event.request.url.startsWith(self.location.origin)) { return; }
+
   // Only handle http/https requests
   if (!event.request.url.startsWith('http')) { return; }
 
