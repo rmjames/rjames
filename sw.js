@@ -43,6 +43,9 @@ self.addEventListener('fetch', event => {
   // Only handle http/https requests
   if (!event.request.url.startsWith('http')) { return; }
 
+  // Only handle same-origin requests
+  if (!event.request.url.startsWith(self.location.origin)) { return; }
+
   event.respondWith(
     caches.open(cacheName).then((cache) => {
       // Cache First strategy for fonts and images
