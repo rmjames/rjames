@@ -1,4 +1,4 @@
-const cacheName = 'v7';
+const cacheName = 'v8';
 const OFFLINE = 'offline.html';
 
 const assetsToCache = [
@@ -20,7 +20,6 @@ const assetsToCache = [
   '/styles/main.css',
   '/fonts/recursive-variable.woff2',
   '/images/icon.svg',
-  '/images/favicon.svg',
   '/manifest.json'
 ];
 
