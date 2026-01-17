@@ -20,7 +20,10 @@ const assetsToCache = [
   '/styles/main.css',
   '/fonts/recursive-variable.woff2',
   '/images/icon.svg',
-  '/manifest.json'
+  '/images/favicon.svg',
+  '/manifest.json',
+  '/resume_icon.svg',
+  '/lab_icon.svg'
 ];
 
 self.addEventListener('install', event => {
