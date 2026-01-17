@@ -21,7 +21,9 @@ const assetsToCache = [
   '/fonts/recursive-variable.woff2',
   '/images/icon.svg',
   '/images/favicon.svg',
-  '/manifest.json'
+  '/manifest.json',
+  '/resume_icon.svg',
+  '/lab_icon.svg'
 ];
 
 self.addEventListener('install', event => {
