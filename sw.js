@@ -1,4 +1,4 @@
-const cacheName = 'v7';
+const cacheName = 'v8';
 const OFFLINE = 'offline.html';
 
 const assetsToCache = [
