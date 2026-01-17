@@ -28,7 +28,7 @@
     {
       "name": "Resume",
       "description": "Professional resume and experience",
-      "url": "./resume.html",
+      "url": "/resume.html",
       "icons": [
         {
           "src": "/favicon_192.png",
@@ -40,7 +40,7 @@
     {
       "name": "Lab",
       "description": "Experimental animations and designs",
-      "url": "./lab.html",
+      "url": "/lab.html",
       "icons": [
         {
           "src": "/favicon_192.png",

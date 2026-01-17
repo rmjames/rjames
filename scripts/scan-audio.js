@@ -147,8 +147,13 @@ function findAssetKey(src) {
 
 class AudioLibrary {
     constructor() {
-        const rawTracks = ${JSON.stringify(sortedTracks, null, 4)};
-        this._tracks = rawTracks.map(track => {
+        this._rawTracks = ${JSON.stringify(sortedTracks, null, 4)};
+        this._tracks = null;
+    }
+
+    _init() {
+        if (this._tracks) return;
+        this._tracks = this._rawTracks.map(track => {
             const srcKey = findAssetKey(track.src);
             const srcUrl = srcKey ? audioAssets[srcKey] : null;
 
@@ -169,11 +174,25 @@ class AudioLibrary {
                 albumArt: mappedArt || null
             };
         });
+        this._rawTracks = null; // Cleanup
     }
-    get tracks() { return this._tracks; }
-    getAll() { return this._tracks; }
-    getById(id) { return this._tracks.find(track => track.id === id); }
-    addTrack(track) { this._tracks.push(track); }
+
+    get tracks() { 
+        this._init();
+        return this._tracks; 
+    }
+    getAll() { 
+        this._init();
+        return this._tracks; 
+    }
+    getById(id) { 
+        this._init();
+        return this._tracks.find(track => track.id === id); 
+    }
+    addTrack(track) { 
+        this._init();
+        this._tracks.push(track); 
+    }
 }
 export const audioLibrary = new AudioLibrary();
 `;
