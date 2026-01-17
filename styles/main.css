@@ -8,6 +8,7 @@
 @import url('layout/header.css') layer(layout);
 @import url('layout/footer.css') layer(layout);
 
+@import url('components/skip-link.css') layer(components);
 @import url('components/lab.css') layer(components);
 @import url('components/buttons.css') layer(components);
 @import url('components/popovers.css') layer(components);
