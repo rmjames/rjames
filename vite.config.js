@@ -26,6 +26,8 @@ const copyStaticFiles = () => {
                 { src: 'scripts/register-sw.js', dest: 'scripts/register-sw.js' },
                 { src: 'scripts/analytics-loader.js', dest: 'scripts/analytics-loader.js' },
                 { src: 'scripts/copyright.js', dest: 'scripts/copyright.js' },
+                { src: 'resume_icon.svg', dest: 'resume_icon.svg' },
+                { src: 'lab_icon.svg', dest: 'lab_icon.svg' },
             ];
 
             // Add favicons
