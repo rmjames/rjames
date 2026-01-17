@@ -25,6 +25,7 @@ const copyStaticFiles = () => {
                 { src: 'sitemap.xml', dest: 'sitemap.xml' },
                 { src: 'scripts/register-sw.js', dest: 'scripts/register-sw.js' },
                 { src: 'scripts/analytics-loader.js', dest: 'scripts/analytics-loader.js' },
+                { src: 'scripts/copyright.js', dest: 'scripts/copyright.js' },
             ];
 
             // Add favicons
