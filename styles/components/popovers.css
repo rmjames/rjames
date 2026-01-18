@@ -104,6 +104,11 @@ main:has(~ .popover:popover-open) :not(.popover) {
     interest-delay: 0.24s .72s;
 }
 
+/* Utility for anchor positioning to avoid inline styles */
+.lab-link-anchor {
+    anchor-name: --lab-link;
+}
+
 @starting-style {
 
     .popover:popover-open,
