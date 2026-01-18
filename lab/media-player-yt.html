@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music - YouTube Music Recreation</title>
+    <link rel="stylesheet" href="../styles/components/media-player-yt.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings:
+                'FILL' 0,
+                'wght' 400,
+                'GRAD' 0,
+                'opsz' 24
+        }
+
+        .filled {
+            font-variation-settings: 'FILL' 1;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="yt-header">
+        <div class="yt-header__logo">
+            <span class="material-symbols-outlined" style="color: var(--yt-accent); font-size: 2rem;">play_circle</span>
+            Music
+        </div>
+        <div class="yt-header__actions">
+            <button class="yt-mini-player__btn"><span class="material-symbols-outlined">search</span></button>
+            <button class="yt-mini-player__btn"><span class="material-symbols-outlined">account_circle</span></button>
+        </div>
+    </header>
+
+    <nav class="yt-filters">
+        <button class="yt-filter-chip">Workout</button>
+        <button class="yt-filter-chip">Energize</button>
+        <button class="yt-filter-chip">Podcasts</button>
+        <button class="yt-filter-chip">Feel good</button>
+    </nav>
+
+    <main class="yt-container">
+        <!-- Listen Again -->
+        <section class="yt-section">
+            <header class="yt-section__header">
+                <div>
+                    <span class="yt-section__label">Account Profile</span>
+                    <h2 class="yt-section__title">Listen again</h2>
+                </div>
+                <button class="yt-more-btn">More</button>
+            </header>
+            <div class="yt-grid" id="listen-again-grid">
+                <!-- Tracks injected here -->
+            </div>
+        </section>
+
+        <!-- Quick Picks -->
+        <section class="yt-section">
+            <header class="yt-section__header">
+                <div>
+                    <span class="yt-section__label">Start Radio From A Song</span>
+                    <h2 class="yt-section__title">Quick Picks</h2>
+                </div>
+                <button class="yt-more-btn">Play all</button>
+            </header>
+            <div class="yt-list" id="quick-picks-list">
+                <!-- Tracks injected here -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Mini Player -->
+    <div class="yt-mini-player" id="mini-player">
+        <div class="yt-mini-player__art">
+            <img src="" alt="" id="mini-art">
+        </div>
+        <div class="yt-mini-player__info">
+            <div class="yt-mini-player__title" id="mini-title">Track Name</div>
+            <div class="yt-mini-player__artist" id="mini-artist">Artist</div>
+        </div>
+        <div class="yt-mini-player__actions">
+            <button class="yt-mini-player__btn"><span class="material-symbols-outlined">cast</span></button>
+            <button class="yt-mini-player__btn" id="play-pause-btn"><span
+                    class="material-symbols-outlined">play_arrow</span></button>
+        </div>
+        <div class="yt-mini-player__progress" id="player-progress"></div>
+    </div>
+
+    <!-- Bottom Nav -->
+    <footer class="yt-nav">
+        <button class="yt-nav-item">
+            <span class="material-symbols-outlined filled">home</span>
+            <span>Home</span>
+        </button>
+        <button class="yt-nav-item">
+            <span class="material-symbols-outlined">subscriptions</span>
+            <span>Samples</span>
+        </button>
+        <button class="yt-nav-item">
+            <span class="material-symbols-outlined">explore</span>
+            <span>Explore</span>
+        </button>
+        <button class="yt-nav-item">
+            <span class="material-symbols-outlined">library_music</span>
+            <span>Library</span>
+        </button>
+    </footer>
+
+    <audio id="audio-element"></audio>
+
+    <script type="module">
+        import { MediaPlayerCore } from '../scripts/media/MediaPlayerCore.js';
+
+        const audio = document.getElementById('audio-element');
+        const core = new MediaPlayerCore(audio);
+
+        const miniPlayer = document.getElementById('mini-player');
+        const miniArt = document.getElementById('mini-art');
+        const miniTitle = document.getElementById('mini-title');
+        const miniArtist = document.getElementById('mini-artist');
+        const playPauseBtn = document.getElementById('play-pause-btn');
+        const playerProgress = document.getElementById('player-progress');
+
+        const listenAgainGrid = document.getElementById('listen-again-grid');
+        const quickPicksList = document.getElementById('quick-picks-list');
+
+        function updateMiniPlayer(track) {
+            miniArt.src = track.albumArt || '';
+            miniTitle.textContent = track.title;
+            miniArtist.textContent = track.artist;
+        }
+
+        function updatePlayPauseIcon(isPaused) {
+            playPauseBtn.querySelector('span').textContent = isPaused ? 'play_arrow' : 'pause';
+        }
+
+        // Populate Listen Again
+        core.tracks.slice(0, 6).forEach((track, index) => {
+            const card = document.createElement('div');
+            card.className = 'yt-track-card';
+            card.innerHTML = `
+                <div class="yt-track-card__art">
+                    <img src="${track.albumArt}" alt="${track.title}">
+                    <div class="yt-track-card__play">
+                        <div class="yt-track-card__play-btn">
+                            <span class="material-symbols-outlined" style="color: black;">play_arrow</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="yt-track-card__title">${track.title}</div>
+            `;
+            card.addEventListener('click', () => {
+                core.loadTrack(index);
+                core.play();
+            });
+            listenAgainGrid.appendChild(card);
+        });
+
+        // Populate Quick Picks
+        core.tracks.slice(6, 10).forEach((track, index) => {
+            const item = document.createElement('div');
+            item.className = 'yt-list-item';
+            item.innerHTML = `
+                <div class="yt-list-item__art">
+                    <img src="${track.albumArt}" alt="${track.title}">
+                </div>
+                <div class="yt-list-item__info">
+                    <div class="yt-list-item__title">${track.title}</div>
+                    <div class="yt-list-item__artist">${track.artist}</div>
+                </div>
+                <button class="yt-list-item__more">
+                    <span class="material-symbols-outlined">more_vert</span>
+                </button>
+            `;
+            item.addEventListener('click', () => {
+                core.loadTrack(index + 6);
+                core.play();
+            });
+            quickPicksList.appendChild(item);
+        });
+
+        // Subscriptions
+        core.subscribe((event, data) => {
+            if (event === 'trackChanged') {
+                updateMiniPlayer(data);
+            }
+            if (event === 'play') {
+                updatePlayPauseIcon(false);
+            }
+            if (event === 'pause') {
+                updatePlayPauseIcon(true);
+            }
+            if (event === 'timeupdate') {
+                const pct = (audio.currentTime / audio.duration) * 100;
+                playerProgress.style.width = `${pct}%`;
+            }
+        });
+
+        playPauseBtn.addEventListener('click', () => core.togglePlay());
+
+        // Initial Load
+        if (core.tracks.length > 0) {
+            const track = core.loadTrack(0);
+            updateMiniPlayer(track);
+            updatePlayPauseIcon(true);
+        }
+    </script>
+</body>
+
+</html>
