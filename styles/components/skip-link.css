@@ -1,0 +1,22 @@
+.skip-to-content {
+    /* Hide visually by default */
+    position: absolute;
+    top: -9999px;
+    left: 0;
+    z-index: 1000;
+
+    /* Styling for when it's focused */
+    padding: var(--s) var(--m);
+    background: var(--blue-2);
+    color: var(--white-1);
+    font-weight: 700;
+    text-decoration: none;
+    border-radius: 0 0 var(--border-radius) 0;
+    transition: transform 0.2s var(--ease-3);
+}
+
+.skip-to-content:focus {
+    top: 0;
+    outline: 2px solid var(--white-1);
+    outline-offset: -2px;
+}
