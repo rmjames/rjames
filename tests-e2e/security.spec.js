@@ -50,6 +50,23 @@ test.describe('Security Headers', () => {
     expect(referrerContent).toBe('strict-origin-when-cross-origin');
   });
 
+  test('External links have rel="noopener noreferrer"', async ({ page }) => {
+    await page.goto('/');
+    const externalLinks = await page.$$('a[target="_blank"]');
+    for (const link of externalLinks) {
+      const rel = await link.getAttribute('rel');
+      expect(rel).toContain('noopener');
+      expect(rel).toContain('noreferrer');
+    }
+  });
+
+  test('CSP includes upgrade-insecure-requests directive', async ({ page }) => {
+    await page.goto('/');
+    const csp = await page.$('meta[http-equiv="Content-Security-Policy"]');
+    const cspContent = await csp.getAttribute('content');
+    expect(cspContent).toContain("upgrade-insecure-requests");
+  });
+
   test('No console errors related to CSP on index.html', async ({ page }) => {
     const errors = [];
     page.on('console', msg => {
