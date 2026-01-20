@@ -16,9 +16,25 @@ const mockIntersectionObserver = vi.fn((cb) => {
 });
 vi.stubGlobal('IntersectionObserver', mockIntersectionObserver);
 
+// Mock requestIdleCallback
+vi.stubGlobal('requestIdleCallback', (cb) => {
+  cb(); // Execute immediately
+  return 1;
+});
+
+// Since the module contains side effects (event listeners) that run on load,
+// and we can't easily re-import it with Vitest/Vite in this setup without complex config,
+// we will just import it once. 
+// However, the problem is that 'afterEach' clears the DOM, removing elements with listeners.
+// So we need to re-attach listeners.
+// Best approach: Export the init function from the module so we can call it manually in tests.
+import { initAnalytics } from './analytics.js';
 
 describe('analytics.js', () => {
   beforeEach(async () => {
+    // Reset mocks
+    vi.clearAllMocks();
+
     // Set up mock DOM
     document.body.innerHTML = `
       <header>
@@ -31,18 +47,16 @@ describe('analytics.js', () => {
         <div id="sbe-popover" popover></div>
       </main>
       <footer class="footer-menu">
-        <a href="https://github.com/rmjames">
-          <p class="icon-text">Github</p>
-        </a>
+        <li class="footer-menu--item">
+          <a href="https://github.com/rmjames">
+             <p class="icon-text">Github</p>
+          </a>
+        </li>
       </footer>
     `;
 
-    // Dynamically import the script to execute it in the test environment
-    await import('./analytics.js?t=' + new Date().getTime());
-
-    // Manually trigger DOMContentLoaded to run the script
-    const event = new Event('DOMContentLoaded');
-    document.dispatchEvent(event);
+    // Manually call init to attach listeners to the fresh DOM
+    initAnalytics();
   });
 
   afterEach(() => {
@@ -61,7 +75,8 @@ describe('analytics.js', () => {
   });
 
   it('should track footer navigation clicks', () => {
-    document.querySelector('.footer-menu a').click();
+    const link = document.querySelector('.footer-menu a');
+    link.click();
     expect(global.gtag).toHaveBeenCalledWith('event', 'click', {
       event_category: 'Footer Navigation',
       event_label: 'Github',

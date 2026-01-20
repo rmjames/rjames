@@ -79,7 +79,7 @@
 
     <section class="media-player">
         <div class="media-player__controls">
-            <button class="media-player__controls__current">
+            <button class="media-player__controls__current" data-analytics-element="Current Track">
                 <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
                     fill="#e3e3e3">
                     <path
@@ -90,14 +90,14 @@
                 <div class="media-player__meta__title"><span>Select Track</span></div>
                 <div class="media-player__meta__artist"><span>...</span></div>
             </div>
-            <button class="media-player__controls__option">
+            <button class="media-player__controls__option" data-analytics-element="Options">
                 <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
                     fill="#e3e3e3">
                     <path
                         d="M720-120H280v-520l280-280 50 50q7 7 11.5 19t4.5 23v14l-44 174h258q32 0 56 24t24 56v80q0 7-2 15t-4 15L794-168q-9 20-30 34t-44 14Zm-360-80h360l120-280v-80H480l54-220-174 174v406Zm0-406v406-406Zm-80-34v80H160v360h120v80H80v-520h200Z" />
                 </svg>
             </button>
-            <button class="media-player__controls__play">
+            <button class="media-player__controls__play" data-analytics-element="Play">
                 <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
                     fill="#e3e3e3">
                     <path d="M320-200v-560l440 280-440 280Zm80-280Zm0 134 210-134-210-134v268Z" />
@@ -110,7 +110,7 @@
 
         <div class="media-player__equalizer">
             <div class="eq-sidebar">
-                <button class="eq-sidebar__btn" id="eq-close-btn" aria-label="Close Equalizer">
+                <button class="eq-sidebar__btn" id="eq-close-btn" data-analytics-element="Close Equalizer" aria-label="Close Equalizer">
                     <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
                         fill="currentColor">
                         <path
@@ -118,7 +118,7 @@
                     </svg>
                 </button>
 
-                <button class="eq-sidebar__btn" id="eq-power-btn" aria-label="Toggle Equalizer">
+                <button class="eq-sidebar__btn" id="eq-power-btn" data-analytics-element="Toggle Equalizer" aria-label="Toggle Equalizer">
                     <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
                         fill="currentColor">
                         <path
@@ -126,14 +126,14 @@
                     </svg>
                 </button>
 
-                <button class="eq-sidebar__btn" id="eq-save-btn" aria-label="Save Settings">
+                <button class="eq-sidebar__btn" id="eq-save-btn" data-analytics-element="Save Settings" aria-label="Save Settings">
                     <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
                         fill="currentColor">
                         <path
                             d="M840-680v480q0 33-23.5 56.5T760-120H200q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h480l160 160Zm-80 34L646-760H200v560h560v-446ZM480-240q50 0 85-35t35-85q0-50-35-85t-85-35q-50 0-85 35t-35 85q0 50 35 85t85 35ZM240-560h360v-160H240v160Zm-40-86v446-560 114Z" />
                     </svg>
                 </button>
-                <button class="eq-sidebar__btn" id="eq-load-btn" aria-label="Load Settings">
+                <button class="eq-sidebar__btn" id="eq-load-btn" data-analytics-element="Load Settings" aria-label="Load Settings">
                     <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
                         fill="currentColor">
                         <path
