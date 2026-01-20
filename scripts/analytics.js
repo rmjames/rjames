@@ -3,7 +3,7 @@ window.gtag = window.gtag || function() {
   (window.dataLayer = window.dataLayer || []).push(arguments);
 };
 
-document.addEventListener("DOMContentLoaded", () => {
+export function initAnalytics() {
   // Track header navigation clicks
   const headerNav = document.querySelector("header nav");
   if (headerNav) {
@@ -147,4 +147,13 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   });
-});
+}
+
+// Defer initialization until the browser is idle
+if ("requestIdleCallback" in window) {
+  requestIdleCallback(initAnalytics);
+} else {
+  // Fallback for Safari < 2019 etc (though most support it now, or polyfill)
+  // Defer slightly to allow main thread to clear
+  setTimeout(initAnalytics, 200);
+}
