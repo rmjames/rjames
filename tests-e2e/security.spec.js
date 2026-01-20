@@ -1,4 +1,6 @@
 import { test, expect } from '@playwright/test';
+import fs from 'fs';
+import path from 'path';
 
 test.describe('Security Headers', () => {
   test('index.html has Content-Security-Policy and Referrer-Policy', async ({ page }) => {
@@ -79,5 +81,18 @@ test.describe('Security Headers', () => {
 
     const cspErrors = errors.filter(e => e.includes('Content Security Policy'));
     expect(cspErrors).toEqual([]);
+  });
+
+  test('All lab experiments have Referrer-Policy', async ({ page }) => {
+    const labDir = path.join(process.cwd(), 'lab');
+    const files = fs.readdirSync(labDir).filter(f => f.endsWith('.html'));
+
+    for (const file of files) {
+      await page.goto(`/lab/${file}`);
+      const referrer = await page.$('meta[name="referrer"]');
+      expect(referrer, `${file} should have referrer policy`).not.toBeNull();
+      const content = await referrer.getAttribute('content');
+      expect(content, `${file} referrer policy`).toBe('strict-origin-when-cross-origin');
+    }
   });
 });
