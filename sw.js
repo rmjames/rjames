@@ -1,4 +1,4 @@
-const cacheName = 'v8';
+const cacheName = 'v9'; // Bumped to v9 to remove missing favicon.svg and fix installation
 const OFFLINE = 'offline.html';
 
 const assetsToCache = [
@@ -20,7 +20,11 @@ const assetsToCache = [
   '/styles/main.css',
   '/fonts/recursive-variable.woff2',
   '/images/icon.svg',
-  '/images/favicon.svg',
+  '/images/icon-ios.svg',
+  '/favicon.png',
+  '/favicon_144.png',
+  '/favicon_192.png',
+  '/favicon_512.png',
   '/manifest.json',
   '/resume_icon.svg',
   '/lab_icon.svg'
