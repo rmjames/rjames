@@ -14,3 +14,7 @@ playwright-report/
 /playwright-report/index.html
 .last-run.json
 *.map
+
+# Security & Local Dev
+.dev.vars
+.wrangler/
