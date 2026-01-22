@@ -1,4 +1,4 @@
-const cacheName = 'v9'; // Bumped to v9 to remove missing favicon.svg and fix installation
+const cacheName = 'v10'; // Bumped to v10 to inline fonts.css and fix cache cleanup
 const OFFLINE = 'offline.html';
 
 const assetsToCache = [
@@ -16,7 +16,6 @@ const assetsToCache = [
   '/lab/headphones.html',
   '/lab/media-player.html',
   '/lab/microsoft-logo.html',
-  '/styles/fonts.css',
   '/styles/main.css',
   '/fonts/recursive-variable.woff2',
   '/images/icon.svg',
@@ -38,7 +37,15 @@ self.addEventListener('install', event => {
   );
 });
 
-self.addEventListener('activate', event => self.clients.claim());
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(keys => {
+      return Promise.all(
+        keys.filter(key => key !== cacheName).map(key => caches.delete(key))
+      );
+    }).then(() => self.clients.claim())
+  );
+});
 
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') { return; }

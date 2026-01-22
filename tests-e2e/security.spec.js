@@ -27,8 +27,8 @@ test.describe('Security Headers', () => {
     expect(csp).not.toBeNull();
     const cspContent = await csp.getAttribute('content');
     expect(cspContent).toContain("default-src 'self'");
-    // Resume uses Google Fonts
-    expect(cspContent).toContain("https://fonts.googleapis.com");
+    // Resume no longer uses Google Fonts (local fonts used)
+    expect(cspContent).not.toContain("https://fonts.googleapis.com");
 
     const referrer = await page.$('meta[name="referrer"]');
     expect(referrer).not.toBeNull();
