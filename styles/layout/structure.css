@@ -31,6 +31,6 @@ main {
     text-wrap: pretty;
 }
 
-#about {
+#main-content {
     max-width: max(48ch, 64ch);
 }
