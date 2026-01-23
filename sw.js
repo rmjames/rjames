@@ -1,4 +1,4 @@
-const cacheName = 'v10'; // Bumped to v10 to inline fonts.css and fix cache cleanup
+const cacheName = 'v11'; // Bumped to v11 to support GA4 migration and CSP updates
 const OFFLINE = 'offline.html';
 
 const assetsToCache = [
