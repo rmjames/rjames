@@ -25,7 +25,7 @@
     // Production: Load the real Google Analytics script
     const script = document.createElement('script');
     script.async = true;
-    script.src = 'https://www.googletagmanager.com/gtag/js?id=UA-51900523-1';
+    script.src = 'https://www.googletagmanager.com/gtag/js?id=G-B51Q6R96Y5';
     document.head.appendChild(script);
 
     function gtag() {
@@ -33,6 +33,6 @@
     }
     window.gtag = gtag;
     gtag('js', new Date());
-    gtag('config', 'UA-51900523-1');
+    gtag('config', 'G-B51Q6R96Y5');
   }
 })();
