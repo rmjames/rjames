@@ -54,6 +54,24 @@ details {
         position: relative;
         cursor: pointer;
         transition: text-shadow 0.32s ease-in-out;
+        padding-inline-end: 1.5rem;
+    }
+
+    >summary::after {
+        content: "";
+        position: absolute;
+        right: 0;
+        top: 50%;
+        width: 0.5rem;
+        height: 0.5rem;
+        border-right: 2px solid currentColor;
+        border-bottom: 2px solid currentColor;
+        transform: translateY(-80%) rotate(45deg);
+        transition: transform 0.32s var(--link-ease);
+    }
+
+    &[open]>summary::after {
+        transform: translateY(-20%) rotate(225deg);
     }
 
     &[open]>summary:focus {
