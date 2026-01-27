@@ -1,7 +1,7 @@
 
-(function() {
+(function () {
   const copyright = document.querySelector('.copyright');
   if (copyright) {
-    copyright.textContent = `©Robert James ${new Date().getFullYear()}`;
+    copyright.textContent = `© ${new Date().getFullYear()} Robert James`;
   }
 })();
