@@ -1,4 +1,4 @@
-const cacheName = 'v11'; // Bumped to v11 to support GA4 migration and CSP updates
+const cacheName = 'v12'; // Bumped to v12 to include resume print script
 const OFFLINE = 'offline.html';
 
 const assetsToCache = [
@@ -26,7 +26,8 @@ const assetsToCache = [
   '/favicon_512.png',
   '/manifest.json',
   '/resume_icon.svg',
-  '/lab_icon.svg'
+  '/lab_icon.svg',
+  '/scripts/resume-print.js'
 ];
 
 self.addEventListener('install', event => {
