@@ -3,7 +3,7 @@
 
 <head>
     <meta http-equiv="Content-Security-Policy"
-        content="default-src 'self'; script-src 'self' https://www.googletagmanager.com https://static.cloudflareinsights.com 'unsafe-inline'; style-src 'self' 'unsafe-inline' data:; img-src 'self' https://assets.codepen.io data:; font-src 'self'; connect-src 'self' https://www.google-analytics.com https://cloudflareinsights.com https://static.cloudflareinsights.com; object-src 'none'; frame-src 'self'; base-uri 'self';" />
+        content="default-src 'self'; script-src 'self' https://www.googletagmanager.com https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' data:; img-src 'self' https://assets.codepen.io data:; font-src 'self'; connect-src 'self' https://www.google-analytics.com https://cloudflareinsights.com https://static.cloudflareinsights.com; object-src 'none'; frame-src 'self'; base-uri 'self';" />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -176,45 +176,7 @@
         </div>
     </nav>
 
-    <script>
-        const players = [
-            { title: "Main Media Player", url: "media-player.html" },
-            { title: "Inline Widget", url: "media-player-inline.html" },
-            { title: "Lock Screen Player", url: "media-player-lock-screen.html" },
-            { title: "Media Player Widget", url: "media-player-widget.html" }
-        ];
-
-        const carousel = document.getElementById('carousel');
-        const pagination = document.getElementById('pagination');
-
-
-        players.forEach((player, index) => {
-            const card = document.createElement('div');
-            card.className = 'player-card';
-            card.style.viewTimelineName = `--card-${index}`;
-            card.innerHTML = `
-                <div class="card-header"> 
-                    <h2>${player.title}</h2>
-                </div>
-                <iframe class="player-frame" src="${player.url}" loading="lazy"></iframe>
-            `;
-            carousel.appendChild(card);
-
-            const dot = document.createElement('div');
-            dot.className = 'dot';
-            dot.style.animationTimeline = `--card-${index}`;
-
-            dot.addEventListener('click', () => {
-                card.scrollIntoView({ behavior: 'smooth', inline: 'center' });
-            });
-            pagination.appendChild(dot);
-        });
-
-        window.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowLeft') carousel.scrollBy({ left: -window.innerWidth * 0.8, behavior: 'smooth' });
-            if (e.key === 'ArrowRight') carousel.scrollBy({ left: window.innerWidth * 0.8, behavior: 'smooth' });
-        });
-    </script>
+    <script type="module" src="../scripts/media/MediaPlayerSelector.js"></script>
 </body>
 
 </html>

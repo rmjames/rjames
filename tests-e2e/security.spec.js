@@ -95,4 +95,14 @@ test.describe('Security Headers', () => {
       expect(content, `${file} referrer policy`).toBe('strict-origin-when-cross-origin');
     }
   });
+
+  test('lab/media-player-selector.html has strict CSP (no unsafe-inline in script-src)', async ({ page }) => {
+    await page.goto('/lab/media-player-selector.html');
+    const csp = await page.$('meta[http-equiv="Content-Security-Policy"]');
+    expect(csp).not.toBeNull();
+    const cspContent = await csp.getAttribute('content');
+    expect(cspContent).toContain("script-src 'self'");
+    const scriptSrc = cspContent.match(/script-src [^;]+/)[0];
+    expect(scriptSrc).not.toContain("'unsafe-inline'");
+  });
 });
