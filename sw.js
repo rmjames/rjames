@@ -1,4 +1,4 @@
-const cacheName = 'v12'; // Bumped to v11 to add page to lab
+const cacheName = 'v13'; // Bumped to v11 to add page to lab
 const OFFLINE = 'offline.html';
 
 const assetsToCache = [
@@ -25,7 +25,8 @@ const assetsToCache = [
   '/favicon_512.png',
   '/manifest.json',
   '/resume_icon.svg',
-  '/lab_icon.svg'
+  '/lab_icon.svg',
+  '/scripts/resume-print.js'
 ];
 
 self.addEventListener('install', event => {
