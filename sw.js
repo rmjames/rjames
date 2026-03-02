@@ -20,7 +20,6 @@ const assetsToCache = [
   '/fonts/recursive-variable.woff2',
   '/images/icon.svg',
   '/images/icon-ios.svg',
-  '/favicon.png',
   '/favicon_144.png',
   '/favicon_192.png',
   '/favicon_512.png',

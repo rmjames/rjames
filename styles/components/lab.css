@@ -74,8 +74,12 @@
     }
 
     & article>iframe {
-        aspect-ratio: 1;
-        block-size: 300px;
+        aspect-ratio: 6/9;
+        width: 100%;
+        border: 0;
+        border-radius: 2.5rem;
+        corner-shape: squircle;
+        overflow: hidden;
         box-shadow: 0 0 8px color-mix(in oklch, var(--blue-2) 24%, transparent 76%);
         transition: transform 0.24s var(--ease-3), box-shadow 0.28s var(--ease-3);
     }

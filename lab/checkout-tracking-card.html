@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self' https://www.googletagmanager.com https://static.cloudflareinsights.com 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com data:; img-src 'self' https://assets.codepen.io data:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://www.google-analytics.com https://cloudflareinsights.com https://static.cloudflareinsights.com; object-src 'none'; frame-src 'self'; base-uri 'self';" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout Tracking Card</title>
+    <style>
+        :root {
+            color-scheme: dark;
+            --bg-color: #202124;
+            --card-bg: #303134;
+            --text-primary: #e8eaed;
+            --text-secondary: #9aa0a6;
+            --accent-blue: #1a73e8;
+            --border-color: #5f6368;
+            --space-xs: .5rem;
+            --space-sm: 1rem;
+            --space-md: 1.5rem;
+            --space-lg: 2rem;
+            --font-family: 'Google Sans', Roboto, Arial, sans-serif;
+            --truck-speed: .76s;
+        }
+
+        body {
+            margin: 0;
+            font-family: var(--font-family);
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            display: grid;
+            place-items: center;
+            min-block-size: 100vh;
+            padding: var(--space-md);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        .tracking-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            inline-size: 100%;
+            max-inline-size: 440px;
+            box-shadow: 0 4px 6px oklch(0% 0 0 / .1);
+
+            & .card-header {
+                padding: var(--space-md) var(--space-lg);
+                background-color: transparent;
+
+                & h2 {
+                    margin: 0;
+                    font-size: 1rem;
+                    font-weight: 700;
+                    color: var(--text-primary);
+                }
+            }
+
+            & .tracking-visual {
+                padding: var(--space-md) var(--space-lg) var(--space-lg);
+                container-type: inline-size;
+                container-name: tracking;
+            }
+        }
+
+        .form-checkout {
+            display: grid;
+            grid-template-columns: repeat(7, minmax(1rem, 1fr));
+            align-items: start;
+            gap: 0;
+            inline-size: 100%;
+        }
+
+        .check {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--space-xs);
+            font-size: .85rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            text-align: center;
+            position: relative;
+            cursor: pointer;
+            z-index: 2;
+
+            & input {
+                margin: 0;
+                inline-size: 1.5rem;
+                block-size: 1.5rem;
+                appearance: none;
+                border: 2px solid var(--border-color);
+                border-radius: 50%;
+                background-color: var(--card-bg);
+                transition: all 0.2s ease;
+                cursor: pointer;
+                display: grid;
+                place-content: center;
+
+                &::before {
+                    content: '';
+                    inline-size: .7rem;
+                    block-size: .35rem;
+                    background-color: transparent;
+                    border-inline-start: 2px solid white;
+                    border-block-end: 2px solid white;
+                    transform: rotate(-45deg) scale(0);
+                    transition: 200ms transform cubic-bezier(0.4, 0.0, 0.2, 1);
+                    transform-origin: bottom left;
+                }
+
+                &:checked {
+                    background-color: var(--accent-blue);
+                    border-color: var(--accent-blue);
+
+                    &::before {
+                        transform: rotate(-45deg) scale(1) translate(1px, 4.5px);
+                    }
+                }
+            }
+
+            & .step-label {
+                margin-block-start: .5rem;
+                line-height: 1.2;
+                white-space: pre-wrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                visibility: hidden;
+            }
+
+            & .step-date {
+                font-weight: 400;
+                color: var(--text-secondary);
+                font-size: .8rem;
+                margin-block-start: .25rem;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                visibility: hidden;
+            }
+        }
+
+        .line {
+            block-size: 2px;
+            background-color: var(--border-color);
+            inline-size: 100%;
+            margin-block-start: calc(.75rem - 1px);
+            position: relative;
+            z-index: 1;
+
+            &::after {
+                content: '';
+                position: absolute;
+                inset-block-start: 0;
+                inset-inline-start: 0;
+                block-size: 100%;
+                inline-size: 0%;
+                background-color: var(--accent-blue);
+                transition: inline-size 0.2s ease;
+            }
+        }
+
+        .form-checkout:has(#prepare:checked) .l-prep-js::after {
+            inline-size: 100%;
+        }
+
+        .form-checkout:has(#ship:checked) .l-ship-js::after {
+            inline-size: 100%;
+        }
+
+        .form-checkout:has(#ship:checked) .l-prep-js::after {
+            inline-size: 100%;
+        }
+
+        .form-checkout:has(#arrive:checked) .l-arrv-js::after {
+            inline-size: 100%;
+        }
+
+        .form-checkout:has(#arrive:checked) .l-ship-js::after {
+            inline-size: 100%;
+        }
+
+        .form-checkout:has(#arrive:checked) .l-prep-js::after {
+            inline-size: 100%;
+        }
+
+
+        .icon-wrapper--truck {
+            position: absolute;
+            inset-block-end: 2.5rem;
+            inset-inline-start: 50%;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transform: translateX(-50%) translateY(100%);
+            transition: opacity 1s,
+                transform var(--truck-speed) cubic-bezier(0.68, -0.55, 0.265, 1.55),
+                visibility 1s;
+            z-index: 10;
+            color: var(--accent-blue);
+            inline-size: 24px;
+            block-size: 24px;
+
+            & svg {
+                fill: currentColor;
+                inline-size: 100%;
+                block-size: 100%;
+                display: block;
+            }
+        }
+
+        input[name="prepare"]:checked~.icon-wrapper--truck {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transform: translateX(calc(-50% + var(--truck-offset, 0px))) translateY(-3rem) scale(1.25);
+            transition: opacity 1s .28s,
+                transform var(--truck-speed) cubic-bezier(0.68, -0.24, 0.265, 1.24),
+                visibility 0s;
+        }
+
+        .form-checkout:has(input[name="ship"]:checked) .icon-wrapper--truck {
+            --truck-offset: calc(100cqw / 7 * 2);
+        }
+
+        .form-checkout:has(input[name="arrive"]:checked) .icon-wrapper--truck {
+            --truck-offset: calc(100cqw / 7 * 4);
+        }
+
+        @starting-style {
+            .icon-wrapper--truck {
+                opacity: 0;
+                visibility: hidden;
+                pointer-events: none;
+                transform: translateX(-50%) translateY(100%) scale(0);
+                transition: opacity 1s,
+                    transform var(--truck-speed) cubic-bezier(0.68, -0.55, 0.265, 1.55),
+                    visibility 1s;
+            }
+        }
+
+        @property --truck-offset {
+            syntax: "<length>";
+            initial-value: 0px;
+            inherits: true;
+        }
+
+        @container tracking (max-width: 450px) {
+            .form-checkout {
+                grid-template-columns: repeat(7, minmax(.5rem, 1fr));
+            }
+
+            .check .step-label {
+                font-size: .75rem;
+            }
+
+            .check input {
+                inline-size: 1.25rem;
+                block-size: 1.25rem;
+            }
+
+            .check input::before {
+                inline-size: .6rem;
+                block-size: .3rem;
+                margin-block-start: -.15rem;
+            }
+
+            .line {
+                margin-block-start: calc(.625rem - 1px);
+                inline-size: min(50%, 80%);
+                margin-inline: auto;
+            }
+        }
+
+        .reset-btn {
+            position: fixed;
+            bottom: 4cqi;
+            right: 4cqi;
+            background: transparent;
+            color: var(--text-primary);
+            border: none;
+            cursor: pointer;
+            font-family: sans-serif;
+            font-weight: bold;
+            opacity: 0.5;
+            transition: opacity 0.2s;
+            z-index: 100;
+
+            &:hover {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <article class="tracking-card">
+        <header class="card-header">
+
+        </header>
+        <div class="tracking-visual">
+            <form class="form-checkout">
+                <label class='check'>
+                    <input id='order' name='order' type="checkbox" disabled>
+                    <span class="step-label">Ordered</span>
+                    <span class="step-date">Oct 08</span>
+                </label>
+                <div class="line l-prep-js"></div>
+                <label class='check'>
+                    <input id='prepare' name='prepare' type="checkbox">
+                    <span class="step-label">Preparing<br>to ship</span>
+                    <div class="icon-wrapper--truck">
+                        <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"
+                            aria-hidden="true">
+                            <path
+                                d="M160-120q-33 0-56.5-23.5T80-200v-440q0-33 23.5-56.5T160-720h520v120h160l80 120v280q0 33-23.5 56.5T840-120h-45q-13-37-44.5-58.5T680-200q-38 0-69.5 21.5T566-120H394q-13-37-44.5-58.5T280-200q-38 0-69.5 21.5T165-120h-5Zm120-80q17 0 28.5-11.5T320-240q0-17-11.5-28.5T280-280q-17 0-28.5 11.5T240-240q0 17 11.5 28.5T280-200Zm400 0q17 0 28.5-11.5T720-240q0-17-11.5-28.5T680-280q-17 0-28.5 11.5T640-240q0 17 11.5 28.5T680-200ZM160-640v360h33q13-37 44.5-58.5T308-360h344q13 37 44.5 58.5T741-280h19v-160h-85l-75-110v-90H160Zm0 0v440-440Z">
+                            </path>
+                        </svg>
+                    </div>
+                </label>
+                <div class="line l-ship-js"></div>
+                <label class='check'>
+                    <input id='ship' name='ship' type="checkbox">
+                    <span class="step-label">Shipping</span>
+                </label>
+                <div class="line l-arrv-js"></div>
+                <label class='check'>
+                    <input id='arrive' name='arrive' type="checkbox">
+                    <span class="step-label">Delivers</span>
+                    <span class="step-date">Oct 13<br>- Oct 14</span>
+                </label>
+            </form>
+        </div>
+    </article>
+    <button class="reset-btn" data-analytics-element="Reset Animation" onclick="resetAnimation()">
+        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="currentColor">
+            <path
+                d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z" />
+        </svg>
+    </button>
+    <script>
+        const steps = ['order', 'prepare', 'ship', 'arrive'];
+
+        function updateCascade(index) {
+            const el = document.getElementById(steps[index]);
+            if (!el) return;
+
+            if (el.checked) {
+                for (let i = 0; i < index; i++) {
+                    const prevEl = document.getElementById(steps[i]);
+                    if (prevEl && !prevEl.checked) {
+                        prevEl.checked = true;
+                    }
+                }
+            } else {
+                for (let i = index + 1; i < steps.length; i++) {
+                    const nextEl = document.getElementById(steps[i]);
+                    if (nextEl && nextEl.checked) {
+                        nextEl.checked = false;
+                    }
+                }
+            }
+        }
+
+        steps.forEach((id, index) => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.addEventListener('command', e => {
+                    if (e.command === `--set-${id}`) {
+                        el.checked = true;
+                        el.dispatchEvent(new Event('change', { bubbles: true }));
+                        console.log(`${id} checked`);
+                    }
+                });
+
+                el.addEventListener('change', () => {
+                    updateCascade(index);
+                });
+            }
+        });
+
+        document.querySelectorAll('button[commandfor]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const id = btn.getAttribute('commandfor');
+                const el = document.getElementById(id);
+                if (el) {
+                    el.checked = true;
+                    el.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+            });
+        });
+
+        let timeoutIds = [];
+
+        function activateStep(id) {
+            const el = document.getElementById(id);
+            if (el && !el.checked) {
+                el.checked = true;
+                el.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+        }
+
+        function startAnimation() {
+            const delays = [800, 2200, 3800, 5400];
+            timeoutIds = steps.map((id, i) => {
+                return setTimeout(() => activateStep(id), delays[i]);
+            });
+        }
+
+        function resetAnimation() {
+            location.reload();
+        }
+
+        window.addEventListener('load', startAnimation);
+    </script>
+</body>
+
+</html>
