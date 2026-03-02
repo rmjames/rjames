@@ -2,34 +2,1378 @@
 <html lang="en">
 
 <head>
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self' https://www.googletagmanager.com https://static.cloudflareinsights.com 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com data:; img-src 'self' https://assets.codepen.io data:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://www.google-analytics.com https://cloudflareinsights.com https://static.cloudflareinsights.com; object-src 'none'; frame-src 'self'; base-uri 'self';" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy"
-        content="default-src 'self'; script-src 'self' https://www.googletagmanager.com https://static.cloudflareinsights.com 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com data:; img-src 'self' https://assets.codepen.io data:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://cloudflareinsights.com https://static.cloudflareinsights.com; object-src 'none'; frame-src 'self'; base-uri 'self'; upgrade-insecure-requests;" />
-    <title>Google Store Checkout (iframe)</title>
+    <title>Google Store Checkout</title>
     <style>
-        body,
-        html {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            background-color: light-dark(#f8f9fa, #202124);
-            color-scheme: light dark;
+        :root {
+            --bg-color: light-dark(#f8f9fa, #202124);
+            --card-bg: light-dark(#ffffff, #303134);
+            --text-primary: light-dark(#202124, #e8eaed);
+            --text-secondary: light-dark(#5f6368, #9aa0a6);
+            --accent-blue: #1a73e8;
+            --accent-green: #34a853;
+            --accent-yellow: #fbbc05;
+            --accent-red: #ea4335;
+            --highlight-yellow: #fce8e6;
+            --highlight-yellow-bg: light-dark(#ffd966, #fbbc04);
+            --border-color: light-dark(#dadce0, #5f6368);
+            --space-xs: .5rem;
+            --space-sm: 1rem;
+            --space-md: 1.5rem;
+            --space-lg: 2rem;
+            --space-xl: 3rem;
+            --max-width: 800px;
+            --header-height: 60px;
+            --font-family: 'Google Sans', Roboto, Arial, sans-serif;
+            --font-size-base: 16px;
+            --truck-speed: .76s;
         }
 
-        iframe {
+        html,
+        body {
+            width: 800px;
+            height: 1200px;
+            overflow: auto;
+        }
+
+        body {
+            /* Fall back to vw scaling for the iframe root */
+            transform: scale(calc(100vw / 800));
+            transform-origin: 0 0;
+            width: 800px;
+            height: 1200px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: var(--font-family);
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.5;
+            display: flex;
+            flex-direction: column;
+            transition: background-color .3s ease, color .3s ease;
+            color-scheme: light;
+        }
+
+        body.dark-mode {
+            color-scheme: dark;
+        }
+
+        .page-wrapper {
+            width: 100%;
+            max-width: var(--max-width);
+            margin: 0 auto;
+            padding: 0 var(--space-md);
+        }
+
+        .site-header {
+            height: var(--header-height);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-md) 0;
+        }
+
+        .logo-wrapper {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+            color: var(--text-secondary);
+            font-size: 1.25rem;
+        }
+
+        .google-logo {
+            height: 24px;
+            width: auto;
+        }
+
+        .icon-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-secondary);
+            padding: var(--space-xs);
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+        }
+
+        .icon-btn:hover {
+            background-color: light-dark(rgba(0, 0, 0, .05), rgba(255, 255, 255, .1));
+        }
+
+        .main-content {
+            padding-bottom: var(--space-xl);
+        }
+
+        .hero-title {
+            font-size: 2.5rem;
+            line-height: 1.2;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: var(--space-lg);
+        }
+
+        .hero-title mark {
+            background-color: var(--highlight-yellow-bg);
+            color: #202124;
+            padding: 0 0.2rem;
+            border-radius: 4px;
+        }
+
+        .shipment-status-box {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-left: 6px solid var(--text-primary);
+            padding: var(--space-md);
+            display: flex;
+            gap: var(--space-md);
+            align-items: flex-start;
+            margin-bottom: var(--space-lg);
+            border-radius: 4px;
+        }
+
+        .status-icon {
+            color: var(--text-secondary);
+            flex-shrink: 0;
+        }
+
+        .status-text p {
+            margin: 0;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .status-text .secondary-text {
+            margin-top: var(--space-xs);
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        .order-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: var(--space-lg);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: var(--space-lg);
+        }
+
+        .meta-info p {
+            margin: 0;
+            text-align: left;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-blue);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 4px;
+            font-weight: 500;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.9rem;
+            text-decoration: none;
+        }
+
+        .btn-primary:hover {
+            filter: brightness(0.9);
+        }
+
+        .tracking-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: var(--space-lg);
+        }
+
+        .card-header {
+            padding: var(--space-md) var(--space-lg);
+            background-color: transparent;
+        }
+
+        .card-header h2 {
+            margin: 0;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .tracking-visual {
+            padding: var(--space-lg) var(--space-lg) var(--space-md);
+            container-type: inline-size;
+            container-name: tracking;
+        }
+
+        .form-checkout {
+            display: grid;
+            grid-template-columns: repeat(7, minmax(2rem, 1fr));
+            align-items: start;
+            gap: 0;
+            width: 100%;
+        }
+
+        @container tracking (max-width: 450px) {
+            .form-checkout {
+                grid-template-columns: repeat(7, minmax(.5rem, 1fr));
+            }
+
+            .step-label {
+                font-size: 0.75rem;
+            }
+
+            .check input {
+                width: 1.25rem;
+                height: 1.25rem;
+            }
+
+            .check input::before {
+                width: 0.6rem;
+                height: 0.3rem;
+                margin-top: -0.15rem;
+            }
+
+            .line {
+                margin-top: calc(0.625rem - 1px);
+                width: min(50%, 80%);
+                margin-left: auto;
+                margin-right: auto;
+            }
+        }
+
+        .check {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--space-xs);
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            text-align: center;
+            position: relative;
+            cursor: pointer;
+            z-index: 2;
+        }
+
+        .check input {
+            margin: 0;
+            width: 1.5rem;
+            height: 1.5rem;
+            appearance: none;
+            border: 2px solid var(--border-color);
+            border-radius: 50%;
+            background-color: var(--card-bg);
+            transition: all 0.2s ease;
+            cursor: pointer;
+            display: grid;
+            place-content: center;
+        }
+
+        .check input::before {
+            content: '';
+            width: 0.7rem;
+            height: 0.35rem;
+            background-color: transparent;
+            border-left: 2px solid white;
+            border-bottom: 2px solid white;
+            transform: rotate(-45deg) scale(0);
+            transition: 200ms transform cubic-bezier(0.4, 0.0, 0.2, 1);
+            transform-origin: bottom left;
+        }
+
+        .check input:checked {
+            background-color: var(--accent-blue);
+            border-color: var(--accent-blue);
+        }
+
+        .check input:checked::before {
+            transform: rotate(-45deg) scale(1) translate(1px, 4.5px);
+        }
+
+        .step-label {
+            margin-top: 0.5rem;
+            line-height: 1.2;
+        }
+
+        .step-date {
+            font-weight: 400;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+
+        .line {
+            height: 2px;
+            background-color: var(--border-color);
+            width: 100%;
+            margin-top: calc(0.75rem - 1px);
+            position: relative;
+            z-index: 1;
+        }
+
+        .line::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 0%;
+            background-color: var(--accent-blue);
+            transition: width 0.2s ease;
+        }
+
+        .form-checkout:has(#prepare:checked) .l-prep-js::after {
+            width: 100%;
+        }
+
+        .form-checkout:has(#ship:checked) .l-ship-js::after {
+            width: 100%;
+        }
+
+        .form-checkout:has(#ship:checked) .l-prep-js::after {
+            width: 100%;
+        }
+
+        .form-checkout:has(#arrive:checked) .l-arrv-js::after {
+            width: 100%;
+        }
+
+        .form-checkout:has(#arrive:checked) .l-ship-js::after {
+            width: 100%;
+        }
+
+        .form-checkout:has(#arrive:checked) .l-prep-js::after {
+            width: 100%;
+        }
+
+        .product-item {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: var(--space-md);
+            padding: var(--space-lg);
+            border-top: 1px solid var(--border-color);
+            background-color: rgba(0, 0, 0, 0.02);
+            background-color: var(--card-bg);
+            align-items: center;
+        }
+
+        .product-media {
+            margin: 0;
+            width: 60px;
+            height: 60px;
+        }
+
+        .product-media img,
+        .product-media svg {
+            width: 100%;
+            height: auto;
+        }
+
+        .product-details h3 {
+            margin: 0;
+            font-size: 1rem;
+            font-weight: 400;
+            color: var(--text-primary);
+            line-height: 1.4;
+        }
+
+        .brand-highlight {
+            background-color: var(--highlight-yellow-bg);
+            font-weight: 500;
+            text-decoration: underline;
+            text-decoration-color: var(--accent-yellow);
+            text-decoration-thickness: 3px;
+            text-underline-offset: 2px;
+        }
+
+        .product-details .brand-highlight {
+            background-color: var(--highlight-yellow-bg);
+            color: #202124;
+            text-decoration: none;
+            padding: 0 4px;
+        }
+
+        .product-pricing {
+            text-align: right;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .price {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .qty {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .order-summary {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr) 1fr 1fr;
+            gap: var(--space-lg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: var(--space-lg);
+            background-color: var(--card-bg);
+            align-items: start;
+        }
+
+        .summary-col h4 {
+            margin: 0 0 var(--space-sm) 0;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+
+        .summary-col p {
+            margin: 0;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .address-block p {
+            margin-bottom: 0.1rem;
+        }
+
+        .payment-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .totals-col {
+            grid-column: 4;
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-xs);
+            border-left: none;
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .final-total {
+            margin-top: var(--space-xs);
+            padding-top: var(--space-xs);
+            border-top: 1px solid var(--border-color);
+            font-weight: 700;
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+
+
+        @media (max-width: 600px) {
+            .order-meta {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: var(--space-sm);
+            }
+
+            .btn-primary {
+                width: 100%;
+                text-align: center;
+            }
+
+            .form-checkout {
+                padding-bottom: .5rem;
+                padding-top: .5rem;
+                display: flex;
+                justify-content: space-between;
+            }
+
+            .tracking-visual {
+                overflow-x: auto;
+            }
+
+            .product-item {
+                grid-template-columns: auto 1fr;
+                grid-template-rows: auto auto;
+            }
+
+            .product-pricing {
+                grid-column: 2;
+                text-align: left;
+                flex-direction: row;
+                gap: 1rem;
+                align-items: baseline;
+            }
+
+            .order-summary {
+                grid-template-columns: 1fr;
+            }
+
+            .totals-col {
+                grid-column: 1;
+                border-top: 1px solid var(--border-color);
+                padding-top: var(--space-md);
+                margin-top: var(--space-sm);
+            }
+        }
+
+        .icon-wrapper--truck {
+            position: absolute;
+            inset-block-end: 2.5rem;
+            left: 50%;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transform: translateX(-50%) translateY(100%);
+            transition: opacity 1s,
+                transform var(--truck-speed) cubic-bezier(0.68, -0.55, 0.265, 1.55),
+                visibility 1s;
+            z-index: 10;
+            color: var(--accent-blue);
+            width: 24px;
+            height: 24px;
+        }
+
+        .icon-wrapper--truck svg {
+            fill: currentColor;
             width: 100%;
             height: 100%;
-            border: none;
             display: block;
+        }
+
+        input[name="prepare"]:checked~.icon-wrapper--truck {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transform: translateX(calc(-50% + var(--truck-offset, 0px))) translateY(-3rem) scale(1.25);
+            transition: opacity 1s .28s,
+                transform var(--truck-speed) cubic-bezier(0.68, -0.24, 0.265, 1.24),
+                visibility 0s;
+        }
+
+        .form-checkout:has(input[name="ship"]:checked) .icon-wrapper--truck {
+            --truck-offset: calc(100cqw / 7 * 2);
+        }
+
+        .form-checkout:has(input[name="arrive"]:checked) .icon-wrapper--truck {
+            --truck-offset: calc(100cqw / 7 * 4);
+        }
+
+        @starting-style {
+            .icon-wrapper--truck {
+                opacity: 0;
+                visibility: hidden;
+                pointer-events: none;
+                transform: translateX(-50%) translateY(100%) scale(0);
+                transition: opacity 1s,
+                    transform var(--truck-speed) cubic-bezier(0.68, -0.55, 0.265, 1.55),
+                    visibility 1s;
+            }
+        }
+
+        @property --truck-offset {
+            syntax: "<length>";
+            initial-value: 0px;
+            inherits: true;
+        }
+
+        :root {
+            --ec-appbar-h: 64px;
+            --ec-sidebar-w: 15ch;
+            --ec-bg: light-dark(#f6f8fc, #18191a);
+            --ec-surface: light-dark(#fff, #242526);
+            --ec-border: light-dark(#e0e0e0, #3a3b3c);
+            --ec-text: light-dark(#202124, #e8eaed);
+            --ec-text-muted: light-dark(#5f6368, #9aa0a6);
+            --ec-active-bg: light-dark(oklch(91% .08 260), oklch(35% .18 260 / .2));
+            --ec-active-color: light-dark(oklch(35% .18 260), oklch(85% .15 260));
+            --ec-blue: #1a73e8;
+            --ec-badge-bg: light-dark(oklch(30% .15 260), oklch(45% .15 260));
+        }
+
+        html,
+        body,
+        .email-client,
+        .ec-body,
+        .ec-message-pane {
+            block-size: 100%;
+        }
+
+        .email-client {
+            display: grid;
+            grid-template-rows: var(--ec-appbar-h) 1fr;
+            block-size: 100%;
+            font-size: 1rem;
+            color: var(--ec-text);
+            overflow: auto;
+        }
+
+        .ec-appbar {
+            grid-row: 1;
+            display: flex;
+            align-items: center;
+            gap: 0;
+            padding-inline: 0.5rem 1rem;
+            background: var(--ec-surface);
+            border-block-end: 1px solid var(--ec-border);
+            z-index: 10;
+        }
+
+        .ec-appbar-left {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            flex: 1;
+        }
+
+        .ec-appbar .ec-search {
+            flex: 0 1 55ch;
+            margin-inline: 1rem;
+        }
+
+        .ec-appbar-actions {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            justify-content: flex-end;
+        }
+
+        .ec-hamburger {
+            background: none;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            padding: 0.5rem;
+            border-radius: 50%;
+            align-items: center;
+
+            & span {
+                display: block;
+                inline-size: 18px;
+                block-size: 2px;
+                background: var(--ec-text-muted);
+                border-radius: 1px;
+            }
+
+            &:hover {
+                background: light-dark(oklch(95% 0 0), oklch(35% 0 0));
+            }
+        }
+
+        .ec-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 1.375rem;
+            color: var(--ec-text-muted);
+            padding-inline-start: 0.5rem;
+
+            & .ec-brand-logo {
+                block-size: 28px;
+                inline-size: 28px;
+            }
+        }
+
+        .ec-search {
+            grid-column: 2;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: var(--ec-active-bg);
+            border-radius: 24px;
+            padding: 0.5rem 1rem;
+            max-inline-size: 55ch;
+            width: 100%;
+            margin-inline: auto;
+
+            & svg {
+                block-size: 20px;
+                inline-size: 20px;
+                color: var(--ec-text-muted);
+                flex-shrink: 0;
+            }
+
+            & input {
+                background: none;
+                border: none;
+                outline: none;
+                font-size: 1rem;
+                color: var(--ec-text);
+                inline-size: 100%;
+                font-family: inherit;
+
+                &::placeholder {
+                    color: var(--ec-text-muted);
+                }
+            }
+        }
+
+        .ec-avatar {
+            inline-size: 2rem;
+            block-size: 2rem;
+            border-radius: 50%;
+            background: oklch(55% .2 25);
+            color: #fff;
+            display: grid;
+            place-items: center;
+            font-size: .875rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-inline-start: 0.25rem;
+        }
+
+        .ec-body {
+            grid-row: 2;
+            display: grid;
+            grid-template-columns: 1fr;
+            overflow: hidden;
+            /* Allow internal components to determine scrolling */
+        }
+
+        .ec-sidebar {
+            display: none;
+        }
+
+        .ec-compose {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin: 0.5rem 0.75rem 0.75rem;
+            padding: 1rem 1.25rem;
+            background: var(--ec-surface);
+            box-shadow: 0 1px 3px oklch(0% 0 0 / .18), 0 1px 2px oklch(0% 0 0 / .12);
+            border: none;
+            border-radius: 16px;
+            font-size: .875rem;
+            font-family: inherit;
+            font-weight: 500;
+            cursor: pointer;
+            color: var(--ec-text);
+            transition: box-shadow .15s;
+
+            &:hover {
+                box-shadow: 0 3px 6px oklch(0% 0 0 / .16), 0 3px 6px oklch(0% 0 0 / .12);
+            }
+        }
+
+        .ec-nav-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .ec-nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 0.75rem 0.5rem 1rem;
+            border-radius: 0 24px 24px 0;
+            font-size: .875rem;
+            cursor: pointer;
+            color: var(--ec-text);
+            transition: background .15s;
+            user-select: none;
+
+            & svg {
+                block-size: 20px;
+                inline-size: 20px;
+                flex-shrink: 0;
+                color: var(--ec-text-muted);
+            }
+
+            &:hover {
+                background: light-dark(oklch(94% 0 0), oklch(35% 0 0));
+            }
+
+            &.ec-nav-item--active {
+                background: var(--ec-active-bg);
+                font-weight: 700;
+                color: var(--ec-active-color);
+
+                & svg {
+                    color: var(--ec-active-color);
+                }
+            }
+        }
+
+        .ec-badge {
+            margin-inline-start: auto;
+            font-size: .75rem;
+            font-weight: 700;
+            color: var(--ec-text);
+        }
+
+        .ec-sidebar-label {
+            font-size: .6875rem;
+            font-weight: 500;
+            color: var(--ec-text-muted);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            padding: .75rem 1rem .25rem;
+            margin: 0;
+        }
+
+        .ec-label-dot {
+            display: inline-block;
+            inline-size: 12px;
+            block-size: 12px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .ec-message-pane {
+            display: grid;
+            grid-template-rows: auto auto 1fr auto;
+            overflow-y: auto;
+            background: var(--ec-bg);
+            min-inline-size: 0;
+            inline-size: 100%;
+        }
+
+
+        .ec-msg-toolbar {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.5rem 1rem;
+            background: var(--ec-surface);
+            border-block-end: 1px solid var(--ec-border);
+        }
+
+        .ec-icon-btn {
+            background: none;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            color: var(--ec-text-muted);
+            padding: 0.5rem;
+            display: grid;
+            place-items: center;
+            transition: background .15s;
+
+            & svg {
+                block-size: 20px;
+                inline-size: 20px;
+            }
+
+            &:hover {
+                background: light-dark(oklch(93% 0 0), oklch(35% 0 0));
+            }
+        }
+
+        .ec-msg-toolbar-spacer {
+            flex: 1;
+        }
+
+        .ec-msg-breadcrumb {
+            font-size: .875rem;
+            color: var(--ec-text-muted);
+            font-weight: 500;
+            padding-inline-start: .25rem;
+        }
+
+
+        .ec-msg-count {
+            font-size: .75rem;
+            color: var(--ec-text-muted);
+            padding-inline: 0.5rem;
+        }
+
+        .ec-msg-meta {
+            background: var(--ec-surface);
+            padding: 1rem 1.5rem 0.75rem;
+            border-block-end: 1px solid var(--ec-border);
+        }
+
+        .ec-msg-subject {
+            font-size: 1.375rem;
+            font-weight: 400;
+            margin: 0 0 0.75rem;
+            color: var(--ec-text);
+        }
+
+        .ec-msg-meta-row {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .ec-sender-avatar {
+            inline-size: 2.5rem;
+            block-size: 2.5rem;
+            border-radius: 50%;
+            background: oklch(50% .25 150);
+            color: #fff;
+            display: grid;
+            place-items: center;
+            font-size: 1rem;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .ec-sender-info {
+            flex: 1;
+        }
+
+        .ec-sender-name {
+            font-size: .875rem;
+            font-weight: 600;
+            color: var(--ec-text);
+        }
+
+        .ec-sender-email {
+            font-weight: 400;
+            color: var(--ec-text-muted);
+            font-size: .8125rem;
+        }
+
+        .ec-recipient {
+            font-size: .75rem;
+            color: var(--ec-text-muted);
+            display: flex;
+            align-items: center;
+            gap: 0.125rem;
+        }
+
+        .ec-chevron {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--ec-text-muted);
+            font-size: .75rem;
+            padding: 0;
+            line-height: 1;
+        }
+
+        .ec-msg-date {
+            font-size: .75rem;
+            color: var(--ec-text-muted);
+            white-space: nowrap;
+        }
+
+        .ec-msg-actions {
+            display: flex;
+            gap: 0;
+        }
+
+        .ec-message-pane .page-wrapper {
+            overflow-y: auto;
+            max-inline-size: 80ch;
+            inline-size: 100%;
+            margin-inline: auto;
+            padding: 1.5rem 2rem;
+            background: var(--ec-bg);
+        }
+
+        .ec-reply-bar {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem 1.5rem;
+            background: var(--ec-surface);
+            border-block-start: 1px solid var(--ec-border);
+        }
+
+        .ec-reply-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: none;
+            border: 1px solid var(--ec-border);
+            border-radius: 4px;
+            padding: 0.5rem 1.25rem;
+            font-size: .875rem;
+            font-family: inherit;
+            font-weight: 500;
+            color: var(--ec-text-muted);
+            cursor: pointer;
+            transition: background .15s, border-color .15s;
+
+            & svg {
+                block-size: 18px;
+                inline-size: 18px;
+            }
+
+            &:hover {
+                background: light-dark(oklch(95% 0 0), oklch(35% 0 0));
+                border-color: light-dark(oklch(70% 0 0), oklch(50% 0 0));
+            }
         }
     </style>
 </head>
 
 <body>
-    <iframe src="./google-store-checkout/index.html" title="Google Store Checkout"></iframe>
+    <div class="email-client">
+        <header class="ec-appbar">
+            <div class="ec-appbar-left">
+                <button class="ec-hamburger" aria-label="Main menu">
+                    <span></span><span></span><span></span>
+                </button>
+                <div class="ec-brand">
+                    <svg class="ec-brand-logo" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"
+                        aria-hidden="true">
+                        <path
+                            d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                            fill="#4285F4" />
+                        <path
+                            d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                            fill="#34A853" />
+                        <path
+                            d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.21-1.19-2.21z"
+                            fill="#FBBC05" />
+                        <path
+                            d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                            fill="#EA4335" />
+                    </svg>
+                    <span>Gmail</span>
+                </div>
+            </div>
+            <div class="ec-search">
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <path
+                        d="M20.49 19l-5.73-5.73A7 7 0 1 0 5 17a7 7 0 0 0 4.57-1.68L15.3 21l5.19-2zm-15.48-6A5 5 0 1 1 10 18a5 5 0 0 1-5-5z" />
+                </svg>
+                <input type="search" placeholder="Search mail" aria-label="Search mail">
+            </div>
+            <div class="ec-appbar-actions">
+                <div class="ec-avatar" aria-label="Account">R</div>
+            </div>
+        </header>
+
+        <div class="ec-body">
+            <div class="ec-message-pane">
+                <div class="ec-msg-toolbar">
+                    <button class="ec-icon-btn" aria-label="Back to inbox">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
+                        </svg>
+                    </button>
+                    <span class="ec-msg-breadcrumb">Inbox</span>
+                    <div class="ec-msg-toolbar-spacer"></div>
+                    <span class="ec-msg-count">1 of 47</span>
+                    <button class="ec-icon-btn" aria-label="Older"><svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
+                        </svg></button>
+                    <button class="ec-icon-btn" aria-label="Newer"><svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" />
+                        </svg></button>
+                </div>
+                <div class="ec-msg-meta">
+                    <h1 class="ec-msg-subject">Your Google Store order has been placed! 🎉</h1>
+                    <div class="ec-msg-meta-row">
+                        <div class="ec-sender-avatar">G</div>
+                        <div class="ec-sender-info">
+                            <div class="ec-sender-name">Google Store <span
+                                    class="ec-sender-email">&lt;no-reply@store.google.com&gt;</span></div>
+                            <div class="ec-recipient">to me&nbsp;<button class="ec-chevron"
+                                    aria-label="Show details">▾</button></div>
+                        </div>
+                        <div class="ec-msg-date">Oct 8, 2022, 6:42 PM</div>
+                        <button class="ec-icon-btn" aria-label="Reply">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z" />
+                            </svg>
+                        </button>
+                        <button class="ec-icon-btn" aria-label="More options">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path
+                                    d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="page-wrapper">
+                    <header class="site-header">
+                        <div class="logo-wrapper">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="google-logo">
+                                <path
+                                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                                    fill="#4285F4" />
+                                <path
+                                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                                    fill="#34A853" />
+                                <path
+                                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.21-1.19-2.21z"
+                                    fill="#FBBC05" />
+                                <path
+                                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                                    fill="#EA4335" />
+                            </svg>
+                            <span class="logo-text">Google Store</span>
+                        </div>
+                        <button id="theme-toggle" class="icon-btn" aria-label="Toggle Dark Mode">
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"
+                                fill="currentColor">
+                                <path
+                                    d="M480-120q-150 0-255-105T120-480q0-150 105-255t255-105q14 0 27.5 1t26.5 3q-41 29-65.5 75.5T444-660q0 90 63 153t153 63q55 0 101-24.5t75-65.5q2 13 3 26.5t1 27.5q0 150-105 255T480-120Zm0-80q88 0 158-48.5T740-375q-20 5-40 8t-40 3q-123 0-209.5-86.5T364-660q0-20 3-40t8-40q-78 32-126.5 102T200-480q0 116 82 198t198 82Zm-10-270Z" />
+                            </svg>
+                        </button>
+                    </header>
+
+                    <main class="main-content">
+                        <section class="hero-section">
+                            <h1 class="hero-title">
+                                Good things come in <mark>Google</mark><br>packages
+                            </h1>
+
+                            <div class="shipment-status-box">
+                                <div class="status-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960"
+                                        width="24" fill="currentColor">
+                                        <path
+                                            d="M160-120q-33 0-56.5-23.5T80-200v-440q0-33 23.5-56.5T160-720h520v120h160l80 120v280q0 33-23.5 56.5T840-120h-45q-13-37-44.5-58.5T680-200q-38 0-69.5 21.5T566-120H394q-13-37-44.5-58.5T280-200q-38 0-69.5 21.5T165-120h-5Zm120-80q17 0 28.5-11.5T320-240q0-17-11.5-28.5T280-280q-17 0-28.5 11.5T240-240q0 17 11.5 28.5T280-200Zm400 0q17 0 28.5-11.5T720-240q0-17-11.5-28.5T680-280q-17 0-28.5 11.5T640-240q0 17 11.5 28.5T680-200ZM160-640v360h33q13-37 44.5-58.5T308-360h344q13 37 44.5 58.5T741-280h19v-160h-85l-75-110v-90H160Zm0 0v440-440Z" />
+                                    </svg>
+                                </div>
+                                <div class="status-text">
+                                    <p>Your order will arrive in 1 shipment.</p>
+                                    <p class="secondary-text">You can cancel your order until it's prepared to ship.</p>
+                                </div>
+                            </div>
+
+                            <div class="order-meta">
+                                <div class="meta-info">
+                                    <p>You can view, edit, or cancel your order</p>
+                                    <p>Order number: GS.7581-0044-7119</p>
+                                </div>
+                                <button class="btn-primary">View order details</button>
+                            </div>
+                        </section>
+
+                        <section class="tracking-card">
+                            <div class="card-header">
+                                <h2>Shipment 1 of 1</h2>
+                            </div>
+
+                            <div class="tracking-visual">
+                                <form class="form-checkout">
+                                    <label class='check'>
+                                        <input id='order' name='order' type="checkbox" disabled>
+                                        <span class="step-label">Ordered</span>
+                                        <span class="step-date">Oct 08</span>
+                                    </label>
+                                    <div class="line l-prep-js"></div>
+                                    <label class='check'>
+                                        <input id='prepare' name='prepare' type="checkbox">
+                                        <span class="step-label">Preparing to ship</span>
+                                        <div class="icon-wrapper--truck">
+                                            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960"
+                                                width="24" fill="currentColor">
+                                                <path
+                                                    d="M160-120q-33 0-56.5-23.5T80-200v-440q0-33 23.5-56.5T160-720h520v120h160l80 120v280q0 33-23.5 56.5T840-120h-45q-13-37-44.5-58.5T680-200q-38 0-69.5 21.5T566-120H394q-13-37-44.5-58.5T280-200q-38 0-69.5 21.5T165-120h-5Zm120-80q17 0 28.5-11.5T320-240q0-17-11.5-28.5T280-280q-17 0-28.5 11.5T240-240q0 17 11.5 28.5T280-200Zm400 0q17 0 28.5-11.5T720-240q0-17-11.5-28.5T680-280q-17 0-28.5 11.5T640-240q0 17 11.5 28.5T680-200ZM160-640v360h33q13-37 44.5-58.5T308-360h344q13 37 44.5 58.5T741-280h19v-160h-85l-75-110v-90H160Zm0 0v440-440Z">
+                                                </path>
+                                            </svg>
+                                        </div>
+                                    </label>
+                                    <div class="line l-ship-js"></div>
+                                    <label class='check'>
+                                        <input id='ship' name='ship' type="checkbox">
+                                        <span class="step-label">Shipping</span>
+                                    </label>
+                                    <div class="line l-arrv-js"></div>
+                                    <label class='check'>
+                                        <input id='arrive' name='arrive' type="checkbox">
+                                        <span class="step-label">Delivers</span>
+                                        <span class="step-date">Oct 13 - Oct 14</span>
+                                    </label>
+                                </form>
+                            </div>
+
+                            <article class="product-item">
+                                <figure class="product-media">
+                                    <svg viewBox="0 0 100 100" role="img" aria-label="Pixel Watch black">
+                                        <circle cx="50" cy="50" r="45" fill="#111" />
+                                        <path d="M50 20v30l20 20" stroke="#fff" stroke-width="4" fill="none" />
+                                    </svg>
+                                </figure>
+                                <div class="product-details">
+                                    <h3><span class="brand-highlight">Google</span> Pixel Watch, Matte Black case /
+                                        Obsidian Active
+                                        band,
+                                        Bluetooth/Wi-Fi</h3>
+                                </div>
+                                <div class="product-pricing">
+                                    <span class="price">$349.99</span>
+                                    <span class="qty">Quantity: 1</span>
+                                </div>
+                            </article>
+                        </section>
+
+                        <section class="order-summary">
+                            <div class="summary-col">
+                                <h4>Ordered</h4>
+                                <p>October 08, 2022, 06:41 PM</p>
+                            </div>
+                            <div class="summary-col"></div>
+
+                            <div class="summary-col">
+                                <h4>Ordered from</h4>
+                                <div class="address-block">
+                                    <p><span class="brand-highlight">Google</span> LLC</p>
+                                    <p>1600 Amphitheatre Parkway</p>
+                                    <p>Mountain View, CA 94043</p>
+                                    <p>United States</p>
+                                </div>
+                            </div>
+
+                            <div class="summary-col">
+                                <h4>Shipping address</h4>
+                                <div class="address-block">
+                                    <p>Ralph Wiggums</p>
+                                    <p>101 Simpsons Town</p>
+                                    <p>Springfield, IL 62704</p>
+                                    <p>United States</p>
+                                </div>
+                            </div>
+
+                            <div class="summary-col">
+                                <h4>Payment method</h4>
+                                <p class="payment-info">
+                                    Visa ••••
+                                </p>
+                            </div>
+
+                            <div class="summary-col totals-col">
+                                <div class="total-row">
+                                    <span>Subtotal</span>
+                                    <span>$349.99</span>
+                                </div>
+                                <div class="total-row">
+                                    <span>Shipping</span>
+                                    <span>$0.00</span>
+                                </div>
+                                <div class="total-row">
+                                    <span>Estimated tax</span>
+                                    <span>$31.06</span>
+                                </div>
+                                <div class="total-row final-total">
+                                    <span>Total</span>
+                                    <span>$381.05</span>
+                                </div>
+                            </div>
+                        </section>
+
+
+                    </main>
+                </div>
+                <div class="ec-reply-bar">
+                    <button class="ec-reply-btn">
+                        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                            <path d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z" />
+                        </svg>
+                        Reply
+                    </button>
+                    <button class="ec-reply-btn">
+                        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                            <path
+                                d="M7 8V5l-7 7 7 7v-3l-4-4 4-4zm6 1V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z" />
+                        </svg>
+                        Forward
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const steps = ['order', 'prepare', 'ship', 'arrive'];
+
+        function updateCascade(index) {
+            const el = document.getElementById(steps[index]);
+            if (!el) return;
+
+            if (el.checked) {
+                for (let i = 0; i < index; i++) {
+                    const prevEl = document.getElementById(steps[i]);
+                    if (prevEl && !prevEl.checked) {
+                        prevEl.checked = true;
+                    }
+                }
+            } else {
+                for (let i = index + 1; i < steps.length; i++) {
+                    const nextEl = document.getElementById(steps[i]);
+                    if (nextEl && nextEl.checked) {
+                        nextEl.checked = false;
+                    }
+                }
+            }
+        }
+
+        steps.forEach((id, index) => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.addEventListener('command', e => {
+                    if (e.command === `--set-${id}`) {
+                        el.checked = true;
+                        el.dispatchEvent(new Event('change', { bubbles: true }));
+                        console.log(`${id} checked`);
+                    }
+                });
+
+                el.addEventListener('change', () => {
+                    updateCascade(index);
+                });
+            }
+        });
+
+        document.querySelectorAll('button[commandfor]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const id = btn.getAttribute('commandfor');
+                const el = document.getElementById(id);
+                if (el) {
+                    el.checked = true;
+                    el.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+            });
+        });
+
+        const themeToggle = document.getElementById('theme-toggle');
+        const body = document.body;
+
+        const savedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        if (savedTheme === 'dark' || (!savedTheme && systemPrefersDark)) {
+            body.classList.add('dark-mode');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+            const isDark = body.classList.contains('dark-mode');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        });
+
+        function activateStep(id) {
+            const el = document.getElementById(id);
+            if (el && !el.checked) {
+                el.checked = true;
+                el.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+        }
+
+        window.addEventListener('load', () => {
+            const delays = [800, 2200, 3800, 5400];
+            steps.forEach((id, i) => {
+                setTimeout(() => activateStep(id), delays[i]);
+            });
+        });
+    </script>
 </body>
 
 </html>
