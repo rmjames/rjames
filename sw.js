@@ -1,4 +1,4 @@
-const cacheName = 'v13'; // Bumped to v13 to fix caching of error responses
+const cacheName = 'v14'; // Bumped to v13 to fix caching of error responses
 const OFFLINE = 'offline.html';
 
 const assetsToCache = [
