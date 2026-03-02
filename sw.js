@@ -1,4 +1,4 @@
-const cacheName = 'v12'; // Bumped to v12 to include resume print script
+const cacheName = 'v13'; // Bumped to v11 to add page to lab
 const OFFLINE = 'offline.html';
 
 const assetsToCache = [
@@ -20,7 +20,6 @@ const assetsToCache = [
   '/fonts/recursive-variable.woff2',
   '/images/icon.svg',
   '/images/icon-ios.svg',
-  '/favicon.png',
   '/favicon_144.png',
   '/favicon_192.png',
   '/favicon_512.png',
