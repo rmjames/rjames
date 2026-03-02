@@ -7,3 +7,8 @@
 **Vulnerability:** 14 files in `lab/` were missing `Referrer-Policy` headers, and `index.html` had a broken CSP causing console errors.
 **Learning:** Security headers implemented via meta tags must be consistently applied across all HTML entry points, not just the main pages. Automated tests are essential to catch drift in static files.
 **Prevention:** Added `Referrer-Policy` to all `lab/*.html` files and fixed `index.html` CSP. Added dynamic E2E test to verify all `lab/` files.
+
+## 2026-01-21 - Service Worker Cache Poisoning
+**Vulnerability:** Service Worker unconditionally cached network responses, leading to caching of 404/500 errors and HTML fallbacks (SPA behavior) for missing assets.
+**Learning:** In SPA environments, `response.ok` checks are insufficient because servers often return 200 OK with `index.html` for missing assets. Strict Content-Type validation is required for asset caching.
+**Prevention:** Added `response.ok` checks and Content-Type validation (ensuring assets are not HTML) to `sw.js` cache logic.
