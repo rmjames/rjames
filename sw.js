@@ -1,4 +1,4 @@
-const cacheName = 'v13'; // Bumped to v11 to add page to lab
+const cacheName = 'v14'; // Bumped to v13 to fix caching of error responses
 const OFFLINE = 'offline.html';
 
 const assetsToCache = [
@@ -68,7 +68,14 @@ self.addEventListener('fetch', event => {
             return cachedResponse;
           }
           return fetch(event.request).then((networkResponse) => {
-            cache.put(event.request, networkResponse.clone());
+            if (networkResponse.ok) {
+              const contentType = networkResponse.headers.get('content-type');
+              const isHtml = contentType && contentType.includes('text/html');
+              // Ensure we don't cache HTML fallbacks as images/fonts
+              if (!isHtml) {
+                cache.put(event.request, networkResponse.clone());
+              }
+            }
             return networkResponse;
           });
         });
@@ -76,7 +83,16 @@ self.addEventListener('fetch', event => {
 
       // Network First strategy for everything else (HTML, CSS, JS)
       return fetch(event.request).then((networkResponse) => {
-        cache.put(event.request, networkResponse.clone());
+        if (networkResponse.ok) {
+          const contentType = networkResponse.headers.get('content-type');
+          const isHtml = contentType && contentType.includes('text/html');
+          const isAsset = /\.(png|jpg|jpeg|svg|gif|webp|woff|woff2)$/i.test(new URL(event.request.url).pathname);
+
+          // Only cache if it's not an asset receiving an HTML fallback
+          if (!(isAsset && isHtml)) {
+            cache.put(event.request, networkResponse.clone());
+          }
+        }
         return networkResponse;
       }).catch(() => {
         return cache.match(event.request);
