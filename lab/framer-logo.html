@@ -10,13 +10,13 @@
     <title>Framer Logo</title>
     <style>
         :root {
-            --color: #8DF;
+            --color: oklch(from #8DF l c h);
             --triangle: polygon(100% 0%, 100% 100%, 0% 0%);
             --dimension: 9;
         }
 
         body {
-            background: #000;
+            background: oklch(from #000 l c h);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -34,12 +34,12 @@
         }
 
         .polygon:nth-child(2) {
-            --color: #09F;
+            --color: oklch(from #09F l c h);
             background: var(--color);
         }
 
         .polygon:nth-child(3) {
-            --color: #05F;
+            --color: oklch(from #05F l c h);
             background: var(--color);
             clip-path: var(--triangle);
             transform: translate(-3em, 0);

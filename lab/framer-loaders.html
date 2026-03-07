@@ -10,8 +10,8 @@
     <title>Framer Loaders</title>
     <style>
         :root {
-            --color-primary: #00AAFF;
-            --color-secondary: #205AFF;
+            --color-primary: oklch(from #00AAFF l c h);
+            --color-secondary: oklch(from #205AFF l c h);
             --triangle: polygon(100% 0%, 100% 100%, 0% 0%);
             --dimension: 6em;
             --timing: cubic-bezier(1, 0, 1, 1.19);
@@ -20,15 +20,26 @@
         }
 
         body {
-            background: #000;
+            background: oklch(from #000 l c h);
             display: flex;
             flex-wrap: wrap;
             justify-content: space-around;
             align-items: center;
-            height: 100vh;
+            height: 100dvh;
+            transition: display .5s;
+            margin: 0;
+            padding: .5rem;
+        }
+
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            align-items: center;
             font-size: 4vmin;
             transition: all .5s;
-            margin: 0;
+            gap: 1rem;
+            height: 90dvh;
         }
 
         .block {
@@ -38,7 +49,7 @@
         }
 
         .block .bloc {
-            background: #fff;
+            background: oklch(from #fff l c h);
             height: calc(var(--dimension) / 2);
             aspect-ratio: 1;
             z-index: 1;
@@ -94,7 +105,7 @@
         .triangles .triangle:nth-child(3) {
             transform: translatex(3em);
             top: 0%;
-            background: #fff;
+            background: oklch(from #fff l c h);
             z-index: 10;
         }
 
@@ -103,6 +114,8 @@
             grid-template-columns: 6rem;
             grid-template-rows: 6rem;
             place-items: center;
+            margin: 0;
+            padding: 0;
         }
 
         .circles .circle {
@@ -128,7 +141,7 @@
         .circles .circle:nth-child(3) {
             --dimension: 2em;
             --dur: 3.4s;
-            background: #fff;
+            background: oklch(from #fff l c h);
             z-index: 3;
         }
 
@@ -147,7 +160,7 @@
             --dur: 4s;
             --delay: .1s;
             position: relative;
-            background: #fff;
+            background: oklch(from #fff l c h);
             animation: polygons var(--dur) var(--timing) forwards;
         }
 
@@ -188,7 +201,7 @@
             bottom: 4cqi;
             right: 4cqi;
             background: transparent;
-            color: #fff;
+            color: oklch(from #fff l c h);
             border: none;
             cursor: pointer;
             font-family: sans-serif;
@@ -265,28 +278,30 @@
 </head>
 
 <body>
-    <div class='block'>
-        <div class="half-circle"></div>
-        <div class="bloc"></div>
-        <div class="bloc"></div>
-    </div>
+    <div class="container">
+        <div class='block'>
+            <div class="half-circle"></div>
+            <div class="bloc"></div>
+            <div class="bloc"></div>
+        </div>
 
-    <div class='triangles'>
-        <div class='triangle'></div>
-        <div class='triangle'></div>
-        <div class='triangle'></div>
-    </div>
+        <div class='triangles'>
+            <div class='triangle'></div>
+            <div class='triangle'></div>
+            <div class='triangle'></div>
+        </div>
 
-    <div class='circles'>
-        <div class='circle'></div>
-        <div class='circle'></div>
-        <div class='circle'></div>
-    </div>
+        <div class='circles'>
+            <div class='circle'></div>
+            <div class='circle'></div>
+            <div class='circle'></div>
+        </div>
 
-    <div class='polygon-F'>
-        <div class='polygon top'></div>
-        <div class='polygon mid'></div>
-        <div class='polygon bottom'></div>
+        <div class='polygon-F'>
+            <div class='polygon top'></div>
+            <div class='polygon mid'></div>
+            <div class='polygon bottom'></div>
+        </div>
     </div>
 
     <button class="reset-btn" data-analytics-element="Reset Animation" onclick="resetAnimation()">
