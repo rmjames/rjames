@@ -30,14 +30,14 @@
         }
 
         button {
-            --color: hsl(calc(var(--h) * 1), calc(var(--s) * 1%), calc(var(--l) * 1%));
+            --color: oklch(from hsl(calc(var(--h) l c h) * 1), calc(var(--s) * 1%), calc(var(--l) * 1%));
             --shadow-x: 4px;
             --shadow-y: 5px;
             --shadow-blur: 16px;
             background: transparent;
             padding: 1.1em;
             margin: 1.4em;
-            border: .01em solid hsla(0, 0%, 90%, .76);
+            border: .01em solid oklch(from hsla(0, 0%, 90%, .76) l c h);
             outline: none;
             color: var(--color);
             transition: all .244s ease-in-out;

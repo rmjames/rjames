@@ -11,12 +11,12 @@
     <style>
         :root {
             color-scheme: dark;
-            --bg-color: #202124;
-            --card-bg: #303134;
-            --text-primary: #e8eaed;
-            --text-secondary: #9aa0a6;
-            --accent-blue: #1a73e8;
-            --border-color: #5f6368;
+            --bg-color: oklch(from #202124 l c h);
+            --card-bg: oklch(from #303134 l c h);
+            --text-primary: oklch(from #e8eaed l c h);
+            --text-secondary: oklch(from #9aa0a6 l c h);
+            --accent-blue: oklch(from #1a73e8 l c h);
+            --border-color: oklch(from #5f6368 l c h);
             --space-xs: .5rem;
             --space-sm: 1rem;
             --space-md: 1.5rem;
@@ -107,8 +107,8 @@
                     inline-size: .7rem;
                     block-size: .35rem;
                     background-color: transparent;
-                    border-inline-start: 2px solid white;
-                    border-block-end: 2px solid white;
+                    border-inline-start: 2px solid oklch(from white l c h);
+                    border-block-end: 2px solid oklch(from white l c h);
                     transform: rotate(-45deg) scale(0);
                     transition: 200ms transform cubic-bezier(0.4, 0.0, 0.2, 1);
                     transform-origin: bottom left;
@@ -134,6 +134,7 @@
             }
 
             & .step-date {
+                display: none;
                 font-weight: 400;
                 color: var(--text-secondary);
                 font-size: .8rem;

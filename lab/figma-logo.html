@@ -10,7 +10,7 @@
     <title>Figma Logo</title>
     <style>
         :root {
-            --color: #000;
+            --color: oklch(from #000 l c h);
             --dimension: 4.44;
         }
 
@@ -36,30 +36,30 @@
 
         .arc:first-of-type,
         .arc:nth-child(3) {
-            --color: #f24e1e;
+            --color: oklch(from #f24e1e l c h);
             background: var(--color);
             border-radius: 50px 0 0 50px;
         }
 
         .arc:nth-child(2) {
-            --color: #ff7262;
+            --color: oklch(from #ff7262 l c h);
             background: var(--color);
             border-radius: 0 50px 50px 0;
         }
 
         .arc:nth-child(3) {
-            --color: #a259ff;
+            --color: oklch(from #a259ff l c h);
             background: var(--color)
         }
 
         .circle {
-            --color: #1abcfe;
+            --color: oklch(from #1abcfe l c h);
             background: var(--color);
             border-radius: 50%
         }
 
         .drop {
-            --color: #0acf83;
+            --color: oklch(from #0acf83 l c h);
             background: var(--color);
             border-radius: 50px 0 50px 50px
         }

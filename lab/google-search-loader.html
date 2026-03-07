@@ -18,6 +18,9 @@
             --item-dimension: .2em;
             --initState: translate3d(-10%, 30%, 0) scale(2.5);
             --initShadow: 0 0 0 0;
+            --initShadow: inset 0 .32em 2em oklch(from hsl(0 10% 66% /.8) l c h / .4),
+                -1em -.52em 4.5em .1em oklch(from hsl(0 0% 0% /.3) l c h / .2),
+                0 1em 3em oklch(from hsl(0 0% 0% /.1) l c h / .1);
             --animation: '';
             --equalizer: equalizer 1.5s ease-in-out forwards;
             --levitate: levitate 1.4s ease-in-out 4 forwards;
@@ -30,11 +33,12 @@
             margin: 0;
             height: 100vh;
             align-items: center;
+            background: oklch(.52 0 0 / 0.12);
         }
 
         .container {
-            background: hsla(360, 100%, 100%, .9);
-            font-size: 2vmin;
+            background: oklch(from hsla(360, 100%, 100%, .9) l c h / .9);
+            font-size: 3vmin;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -48,12 +52,13 @@
             will-change: transform, box-shadow;
             padding: 0;
             margin: 0;
+            contain: layout style paint;
         }
 
         .item {
             height: var(--item-dimension);
             width: var(--item-dimension);
-            background: blue;
+            background: oklch(from blue l c h);
             margin: .244em;
             padding: .051em;
             border-radius: 50%;
@@ -67,17 +72,17 @@
         }
 
         .item:nth-child(2) {
-            background: red;
+            background: oklch(from red l c h);
             animation-delay: var(--dur-med);
         }
 
         .item:nth-child(3) {
-            background: orange;
+            background: oklch(from orange l c h);
             animation-delay: var(--dur-reg);
         }
 
         .item:nth-child(4) {
-            background: green;
+            background: oklch(from green l c h);
             animation-delay: var(--dur-slow);
         }
 
@@ -87,8 +92,7 @@
         }
 
         .talkState {
-            --initState: translate3d(calc(50vw - 12vmin), -14em, 0) scale(1.1);
-            --initShadow: inset 0 .32em 2em hsla(0, 10%, 66%, .4), -1em -.52em 4.5em .1em hsla(0, 0%, 0%, .1);
+            --initState: translate3d(calc(50vw - 24vmin), -10em, 0) scale(1.1);
         }
 
         .reset-btn {
@@ -96,7 +100,7 @@
             bottom: 4cqi;
             right: 4cqi;
             background: transparent;
-            color: #33333a;
+            color: oklch(from #33333a l c h / .75);
             border: none;
             cursor: pointer;
             font-family: sans-serif;
@@ -309,15 +313,15 @@
 
         @keyframes colorShift {
             0% {
-                background: hsla(10, 80%, 79%, .4);
+                background: oklch(from hsla(10, 80%, 79%, .4) l c h / .4);
             }
 
             50% {
-                background: orange;
+                background: oklch(from orange l c h);
             }
 
             100% {
-                background: hsla(50, 80%, 79%, .5);
+                background: oklch(from hsla(50, 80%, 79%, .5) l c h / .5);
             }
         }
 
