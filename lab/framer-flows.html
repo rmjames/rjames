@@ -20,7 +20,7 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background: #000;
+            background: oklch(from #000 l c h);
             margin: 0;
             font-size: 4vmin;
         }
@@ -31,7 +31,7 @@
             --timing: cubic-bezier(.25, 1, 0, 1);
             height: 5em;
             width: 5em;
-            background: #1359FF;
+            background: oklch(from #1359FF l c h);
             position: relative;
             transition: all 190ms, opacity 110ms;
             opacity: 0;
@@ -49,7 +49,7 @@
             --dur: 982ms;
             height: 3.33em;
             width: 3.33em;
-            background: #00AAFF;
+            background: oklch(from #00AAFF l c h);
             transition: transform 175ms;
             transform-origin: 0 3.33em;
             transform: scale(0);
@@ -65,7 +65,7 @@
             --dur: 749.71ms;
             height: 1.65em;
             width: 1.65em;
-            background: #fff;
+            background: oklch(from #fff l c h);
             transition: transform 140ms;
             transform-origin: 0 1.65em;
             transform: scale(0);
@@ -100,7 +100,7 @@
             bottom: 4cqi;
             right: 4cqi;
             background: transparent;
-            color: #fff;
+            color: oklch(from #fff l c h);
             border: none;
             cursor: pointer;
             font-family: sans-serif;

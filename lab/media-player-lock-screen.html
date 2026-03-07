@@ -38,7 +38,7 @@
             backdrop-filter: blur(10px);
             border-radius: 1.5rem;
             border: 1px solid oklch(from #444 l c h / 0.5);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 8px 32px oklch(from rgba(0, 0, 0, 0.4) l c h);
             transition: background-image 0.5s ease-in-out;
             overflow: clip;
         }
@@ -70,7 +70,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            color: #fff;
+            color: oklch(from #fff l c h);
             flex-shrink: 0;
         }
 
@@ -201,7 +201,7 @@
             background: transparent;
             border: none;
             border-radius: 0.75rem;
-            color: white;
+            color: oklch(from white l c h);
             padding: 0.5rem;
             display: flex;
             align-items: center;
@@ -222,7 +222,7 @@
         .media-player__meta__title {
             font-size: 0.875rem;
             font-weight: 600;
-            color: #fff;
+            color: oklch(from #fff l c h);
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -230,7 +230,7 @@
 
         .media-player__meta__artist {
             font-size: 0.75rem;
-            color: #aaa;
+            color: oklch(from #aaa l c h);
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -251,7 +251,7 @@
         .progress-slider::-webkit-slider-runnable-track {
             width: 100%;
             height: 4px;
-            background: #444;
+            background: oklch(from #444 l c h);
             border-radius: 2px;
             border: none;
         }
@@ -341,13 +341,15 @@
 
     <section class="media-player-grid">
         <article class="media-player-grid__row">
-            <button class="grid-item--eq icon-btn--brand themed-background" title="Equalizer" data-analytics-element="Equalizer">
+            <button class="grid-item--eq icon-btn--brand themed-background" title="Equalizer"
+                data-analytics-element="Equalizer">
                 <svg viewBox="0 -960 960 960" xmlns="http://www.w3.org/2000/svg">
                     <path
                         d="M280-240v-480h80v480h-80ZM440-80v-800h80v800h-80ZM120-400v-160h80v160h-80Zm480 160v-480h80v480h-80Zm160-160v-160h80v160h-80Z" />
                 </svg>
             </button>
-            <button class="grid-item--phone icon-btn--brand themed-background" title="This Phone" data-analytics-element="This Phone">
+            <button class="grid-item--phone icon-btn--brand themed-background" title="This Phone"
+                data-analytics-element="This Phone">
                 <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path
                         d="M17 1H7c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-2-2-2zm0 18H7V5h10v14z" />
@@ -453,12 +455,12 @@
                 optionSvg.setAttribute('viewBox', '0 0 24 24');
                 optionPath.setAttribute('d', MODE_ICONS.random);
                 optionBtn.title = 'Random (Mode)';
-                optionBtn.style.color = isRandom ? 'oklch(0.6 0.2 260 / 0.8)' : 'white';
+                optionBtn.style.color = isRandom ? 'oklch(0.6 0.2 260 / 0.8)' : 'oklch(from white l c h)';
             } else {
                 optionSvg.setAttribute('viewBox', '0 -960 960 960');
                 optionPath.setAttribute('d', isLiked ? MODE_ICONS.likeFilled : MODE_ICONS.like);
                 optionBtn.title = 'Like (Mode)';
-                optionBtn.style.color = isLiked ? 'oklch(0.6 0.2 260 / 0.8)' : 'white';
+                optionBtn.style.color = isLiked ? 'oklch(0.6 0.2 260 / 0.8)' : 'oklch(from white l c h)';
             }
         };
 

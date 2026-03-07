@@ -82,7 +82,7 @@
         <div class="media-player__controls">
             <button class="media-player__controls__current" data-analytics-element="Current Track">
                 <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
-                    fill="#e3e3e3">
+                    fill="oklch(from #e3e3e3 l c h)">
                     <path
                         d="M360-400h400L622-580l-92 120-62-80-108 140Zm-40 160q-33 0-56.5-23.5T240-320v-480q0-33 23.5-56.5T320-880h480q33 0 56.5 23.5T880-800v480q0 33-23.5 56.5T800-240H320Zm0-80h480v-480H320v480ZM160-80q-33 0-56.5-23.5T80-160v-560h80v560h560v80H160Zm160-720v480-480Z" />
                 </svg>
@@ -93,14 +93,14 @@
             </div>
             <button class="media-player__controls__option" data-analytics-element="Options">
                 <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
-                    fill="#e3e3e3">
+                    fill="oklch(from #e3e3e3 l c h)">
                     <path
                         d="M720-120H280v-520l280-280 50 50q7 7 11.5 19t4.5 23v14l-44 174h258q32 0 56 24t24 56v80q0 7-2 15t-4 15L794-168q-9 20-30 34t-44 14Zm-360-80h360l120-280v-80H480l54-220-174 174v406Zm0-406v406-406Zm-80-34v80H160v360h120v80H80v-520h200Z" />
                 </svg>
             </button>
             <button class="media-player__controls__play" data-analytics-element="Play">
                 <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
-                    fill="#e3e3e3">
+                    fill="oklch(from #e3e3e3 l c h)">
                     <path d="M320-200v-560l440 280-440 280Zm80-280Zm0 134 210-134-210-134v268Z" />
                 </svg>
             </button>
@@ -194,7 +194,7 @@
         <!-- Preset Popover -->
         <div id="preset-popover" popover="hint">
             <div style="font-weight: bold; margin-bottom: 0.125rem;">Artist Name</div>
-            <div style="font-size: 0.65rem; color: #ccc;">Album Name</div>
+            <div style="font-size: 0.65rem; color: oklch(from #ccc l c h);">Album Name</div>
         </div>
         </div>
 
@@ -266,7 +266,7 @@
                 btn.replaceChildren(img);
             } else {
                 btn.innerHTML = `
-                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="oklch(from #e3e3e3 l c h)">
                         <path d="M360-400h400L622-580l-92 120-62-80-108 140Zm-40 160q-33 0-56.5-23.5T240-320v-480q0-33 23.5-56.5T320-880h480q33 0 56.5 23.5T880-800v480q0 33-23.5 56.5T800-240H320Zm0-80h480v-480H320v480ZM160-80q-33 0-56.5-23.5T80-160v-560h80v560h560v80H160Zm160-720v480-480Z" />
                     </svg>
                 `;

@@ -28,7 +28,7 @@
             bottom: 3cqi;
             right: 3cqi;
             background: transparent;
-            color: #33333a;
+            color: oklch(from #33333a l c h);
             border: none;
             cursor: pointer;
             font-family: sans-serif;
@@ -50,13 +50,14 @@
 <body>
     <div class="container"></div>
     <button class="reset-btn" data-analytics-element="Reset Animation" onclick="resetAnimation()">
-        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="currentColor">
+        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
+            fill="currentColor">
             <path
                 d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z" />
         </svg>
     </button>
     <script>
-        const colors = ['blue', 'red', 'orange', 'blue', 'green', 'red'];
+        const colors = ['oklch(from blue l c h)', 'oklch(from red l c h)', 'oklch(from orange l c h)', 'oklch(from blue l c h)', 'oklch(from green l c h)', 'oklch(from red l c h)'];
 
         function split(text) {
             const container = document.querySelector('.container');
