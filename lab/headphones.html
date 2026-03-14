@@ -134,8 +134,27 @@
             z-index: 10;
         }
 
+        .toggle-btn.pulse {
+            animation: pulse-btn 1.5s infinite alternate;
+            opacity: 1;
+        }
+
+        @keyframes pulse-btn {
+            0% {
+                transform: scale(1);
+            }
+            100% {
+                transform: scale(1.2);
+            }
+        }
+
         .toggle-btn:hover {
             opacity: 1;
+        }
+
+        /* Start animations paused */
+        .headphone, .note, .notes {
+            animation-play-state: paused;
         }
     </style>
 </head>
@@ -144,13 +163,15 @@
     <div class='headphone'>🎧</div>
     <div class='note'>🎶</div>
     <div class='notes'>🎶</div>
-    <button class="toggle-btn" data-analytics-element="Toggle Animation" aria-label="Pause animation">
+    <button class="toggle-btn pulse" data-analytics-element="Toggle Animation" aria-label="Play animation">
         <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor">
             <path
-                d="M528-192v-576h240v576H528Zm-336 0v-576h240v576H192Zm408-72h96v-432h-96v432Zm-336 0h96v-432h-96v432Zm0-432v432-432Zm336 0v432-432Z" />
+                d="M320-200v-560l440 280-440 280Zm80-280Zm0 134 210-134-210-134v268Z" />
         </svg>
     </button>
-    <script>
+    <script type="module">
+        import { audioLibrary } from '../scripts/AudioLibrary.js';
+
         const btn = document.querySelector('.toggle-btn');
         const iconPath = btn.querySelector('path');
         const animatedElements = document.querySelectorAll('.headphone, .note, .notes');
@@ -158,14 +179,39 @@
         const playPath = "M320-200v-560l440 280-440 280Zm80-280Zm0 134 210-134-210-134v268Z";
         const pausePath = "M528-192v-576h240v576H528Zm-336 0v-576h240v576H192Zm408-72h96v-432h-96v432Zm-336 0h96v-432h-96v432Zm0-432v432-432Zm336 0v432-432Z";
 
-        let isPlaying = true;
+        let isPlaying = false;
+        let audio = null;
+        let isFirstInteraction = true;
 
         btn.addEventListener('click', () => {
+            if (isFirstInteraction) {
+                isFirstInteraction = false;
+                btn.classList.remove('pulse');
+                const tracks = audioLibrary.tracks;
+                const randomTrack = tracks[Math.floor(Math.random() * tracks.length)];
+                audio = new Audio(randomTrack.src);
+                audio.addEventListener('ended', () => {
+                    isPlaying = false;
+                    animatedElements.forEach(el => el.style.animationPlayState = 'paused');
+                    iconPath.setAttribute('d', playPath);
+                    btn.setAttribute('aria-label', 'Play animation');
+                    audio.currentTime = 0;
+                });
+            }
+
             isPlaying = !isPlaying;
-            const state = isPlaying ? 'running' : 'paused';
-            animatedElements.forEach(el => el.style.animationPlayState = state);
-            iconPath.setAttribute('d', isPlaying ? pausePath : playPath);
-            btn.setAttribute('aria-label', isPlaying ? 'Pause animation' : 'Play animation');
+
+            if (isPlaying) {
+                audio.play();
+                animatedElements.forEach(el => el.style.animationPlayState = 'running');
+                iconPath.setAttribute('d', pausePath);
+                btn.setAttribute('aria-label', 'Pause animation');
+            } else {
+                audio.pause();
+                animatedElements.forEach(el => el.style.animationPlayState = 'paused');
+                iconPath.setAttribute('d', playPath);
+                btn.setAttribute('aria-label', 'Play animation');
+            }
         });
     </script>
 </body>
