@@ -172,6 +172,9 @@
     <script type="module">
         import { audioLibrary } from '../scripts/AudioLibrary.js';
 
+        const PREVIEW_DURATION_SEC = 20;
+        const FADE_DURATION_SEC = 3;
+
         const btn = document.querySelector('.toggle-btn');
         const iconPath = btn.querySelector('path');
         const animatedElements = document.querySelectorAll('.headphone, .note, .notes');
@@ -183,31 +186,62 @@
         let audio = null;
         let isFirstInteraction = true;
 
+        function stopAudio() {
+            isPlaying = false;
+            animatedElements.forEach(el => el.style.animationPlayState = 'paused');
+            iconPath.setAttribute('d', playPath);
+            btn.setAttribute('aria-label', 'Play animation');
+            if (audio) {
+                audio.pause();
+                audio.currentTime = 0;
+                audio = null;
+            }
+        }
+
         btn.addEventListener('click', () => {
             if (isFirstInteraction) {
                 isFirstInteraction = false;
                 btn.classList.remove('pulse');
-                const tracks = audioLibrary.tracks;
-                const randomTrack = tracks[Math.floor(Math.random() * tracks.length)];
-                audio = new Audio(randomTrack.src);
-                audio.addEventListener('ended', () => {
-                    isPlaying = false;
-                    animatedElements.forEach(el => el.style.animationPlayState = 'paused');
-                    iconPath.setAttribute('d', playPath);
-                    btn.setAttribute('aria-label', 'Play animation');
-                    audio.currentTime = 0;
-                });
             }
 
             isPlaying = !isPlaying;
 
             if (isPlaying) {
+                if (!audio) {
+                    const tracks = audioLibrary.tracks;
+                    const randomTrack = tracks[Math.floor(Math.random() * tracks.length)];
+                    audio = new Audio(randomTrack.src);
+
+                    audio.addEventListener('timeupdate', (e) => {
+                        const currentAudio = e.target;
+                        if (currentAudio.currentTime >= PREVIEW_DURATION_SEC) {
+                            stopAudio();
+                            return;
+                        }
+
+                        const fadeStart = PREVIEW_DURATION_SEC - FADE_DURATION_SEC;
+                        if (currentAudio.currentTime > fadeStart) {
+                            const timeRemaining = PREVIEW_DURATION_SEC - currentAudio.currentTime;
+                            // Calculate volume proportion (e.g. at fadeStart, volume is 1, at PREVIEW_DURATION_SEC, volume is 0)
+                            let newVolume = timeRemaining / FADE_DURATION_SEC;
+                            newVolume = Math.max(0, Math.min(1, newVolume));
+                            currentAudio.volume = newVolume;
+                        } else {
+                            currentAudio.volume = 1;
+                        }
+                    });
+
+                    audio.addEventListener('ended', stopAudio);
+                }
+
                 audio.play();
                 animatedElements.forEach(el => el.style.animationPlayState = 'running');
                 iconPath.setAttribute('d', pausePath);
                 btn.setAttribute('aria-label', 'Pause animation');
             } else {
-                audio.pause();
+                if (audio) {
+                    audio.pause();
+                }
                 animatedElements.forEach(el => el.style.animationPlayState = 'paused');
                 iconPath.setAttribute('d', playPath);
                 btn.setAttribute('aria-label', 'Play animation');
