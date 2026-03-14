@@ -6,20 +6,21 @@ test.describe('Lab Animations Control', () => {
 
     const toggleBtn = page.locator('.toggle-btn');
     await expect(toggleBtn).toBeVisible();
-    await expect(toggleBtn).toHaveAttribute('aria-label', 'Pause animation');
+    await expect(toggleBtn).toHaveAttribute('aria-label', 'Play animation');
 
     const headphone = page.locator('.headphone');
+    await expect(headphone).toHaveCSS('animation-play-state', 'paused');
+
+    // Click play
+    // Force click since the element is pulsating and Playwright considers it not stable
+    await toggleBtn.click({ force: true });
     await expect(headphone).toHaveCSS('animation-play-state', 'running');
+    await expect(toggleBtn).toHaveAttribute('aria-label', 'Pause animation');
 
     // Click pause
     await toggleBtn.click();
     await expect(headphone).toHaveCSS('animation-play-state', 'paused');
     await expect(toggleBtn).toHaveAttribute('aria-label', 'Play animation');
-
-    // Click play
-    await toggleBtn.click();
-    await expect(headphone).toHaveCSS('animation-play-state', 'running');
-    await expect(toggleBtn).toHaveAttribute('aria-label', 'Pause animation');
   });
 
   test('Emoji Speaker animation can be paused and played', async ({ page }) => {
