@@ -27,21 +27,46 @@ async function parseTrackInfo(filePath, mm) {
     const relativePath = path.relative(__dirname, filePath);
     const fileName = path.basename(filePath);
     const dirName = path.dirname(filePath);
-    const albumName = path.basename(dirName);
+    const albumDir = path.basename(dirName);
 
-    let title = fileName.replace(/\.[^/.]+$/, "");
-    title = title.replace(/^\d+\s*[-.]\s*/, '');
-    title = title.replace(/\([^)]*\.com\)/i, '').trim();
-    title = title.replace(/\(DatPiff Exclusive\)/i, '').trim();
-
-    let artist = 'Unknown Artist';
-    let album = albumName;
-
-    if (albumName.includes(' - ')) {
-        const parts = albumName.split(' - ');
-        artist = parts[0].trim();
-        album = parts.slice(1).join(' - ').trim();
+    let metadata = null;
+    try {
+        metadata = await mm.parseFile(filePath);
+    } catch (err) {
+        console.warn(`Could not parse metadata for ${fileName}:`, err.message);
     }
+
+    // 1. Start with metadata from ID3 tags
+    let title = metadata?.common?.title;
+    let artist = metadata?.common?.artist;
+    let album = metadata?.common?.album;
+    let genre = metadata?.common?.genre?.[0] || 'Hip Hop';
+    let duration = metadata?.format?.duration || null;
+
+    // 2. Fallback to filename/directory parsing if metadata is missing
+    if (!title) {
+        title = fileName.replace(/\.[^/.]+$/, "");
+        title = title.replace(/^\d+\s*[-.]\s*/, ''); // Remove leading track numbers
+        title = title.replace(/\([^)]*\.com\)/i, '').trim();
+        title = title.replace(/\(DatPiff Exclusive\)/i, '').trim();
+    }
+
+    if (!artist || !album) {
+        let dirArtist = 'Unknown Artist';
+        let dirAlbum = albumDir;
+
+        // More robust directory parsing: handle "Artist - Album", "Artist-Album", etc.
+        const parts = albumDir.split(/\s*-\s*/);
+        if (parts.length >= 2) {
+            dirArtist = parts[0].trim();
+            dirAlbum = parts.slice(1).join(' - ').trim();
+        }
+
+        if (!artist) artist = dirArtist;
+        if (!album) album = dirAlbum;
+    }
+
+    // Clean up album name
     album = album.replace(/\([^)]*\.com\)/i, '').trim();
 
     let albumArt = null;
@@ -57,36 +82,22 @@ async function parseTrackInfo(filePath, mm) {
     }
 
     if (artFullPath) {
-        // Relative to THIS script
         albumArt = toForwardSlashes(path.relative(__dirname, artFullPath));
     }
 
-    let duration = null;
-    let metadata = null;
-    try {
-        metadata = await mm.parseFile(filePath);
-        if (metadata && metadata.format && metadata.format.duration) {
-            duration = metadata.format.duration;
-        }
-    } catch (err) {
-        console.warn(`Could not parse metadata for ${fileName}:`, err.message);
-    }
-
-    // Attempt to extract embedded art if no file art found
-    if (!albumArt && metadata && metadata.common && metadata.common.picture && metadata.common.picture.length > 0) {
+    // 3. Attempt to extract embedded art if no file art found
+    if (!albumArt && metadata?.common?.picture?.[0]) {
         try {
             const pic = metadata.common.picture[0];
             const ext = pic.format === 'image/jpeg' ? '.jpg' : (pic.format === 'image/png' ? '.png' : '.jpg');
-            const coverName = `extracted_cover${ext}`;
+            const coverName = `extracted_cover_${album.toLowerCase().replace(/[^a-z0-9]+/g, '-')}${ext}`;
             const coverPath = path.join(dirName, coverName);
 
-            // Only write if it doesn't exist to avoid constant rewrites (and watcher loops)
             if (!fs.existsSync(coverPath)) {
                 fs.writeFileSync(coverPath, pic.data);
                 console.log(`Extracted album art for ${album} to ${coverName}`);
             }
 
-            // Relative to THIS script
             albumArt = toForwardSlashes(path.relative(__dirname, coverPath));
         } catch (e) {
             console.warn(`Failed to extract art for ${fileName}:`, e.message);
@@ -96,7 +107,7 @@ async function parseTrackInfo(filePath, mm) {
     const id = (artist + '-' + title).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 
     return {
-        id, title, artist, src: toForwardSlashes(relativePath), genre: 'Hip Hop', album, duration, albumArt
+        id, title, artist, src: toForwardSlashes(relativePath), genre, album, duration, albumArt
     };
 }
 
