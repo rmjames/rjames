@@ -52,7 +52,7 @@
         }
 
         .notes {
-            animation: notes 2.48s .25s infinite;
+            animation: notes 2.48s -.125s infinite;
         }
 
         @keyframes shake {
@@ -143,6 +143,7 @@
             0% {
                 transform: scale(1);
             }
+
             100% {
                 transform: scale(1.2);
             }
@@ -153,7 +154,9 @@
         }
 
         /* Start animations paused */
-        .headphone, .note, .notes {
+        .headphone,
+        .note,
+        .notes {
             animation-play-state: paused;
         }
     </style>
@@ -165,15 +168,14 @@
     <div class='notes'>🎶</div>
     <button class="toggle-btn pulse" data-analytics-element="Toggle Animation" aria-label="Play animation">
         <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor">
-            <path
-                d="M320-200v-560l440 280-440 280Zm80-280Zm0 134 210-134-210-134v268Z" />
+            <path d="M320-200v-560l440 280-440 280Zm80-280Zm0 134 210-134-210-134v268Z" />
         </svg>
     </button>
     <script type="module">
         import { audioLibrary } from '../scripts/AudioLibrary.js';
 
-        const PREVIEW_DURATION_SEC = 20;
-        const FADE_DURATION_SEC = 3;
+        const PREVIEW_DURATION_SEC = 44;
+        const FADE_DURATION_SEC = 8;
 
         const btn = document.querySelector('.toggle-btn');
         const iconPath = btn.querySelector('path');
@@ -208,7 +210,8 @@
 
             if (isPlaying) {
                 if (!audio) {
-                    const tracks = audioLibrary.tracks;
+                    const dillaTracks = audioLibrary.tracks.filter(t => t.artist && t.artist.toLowerCase().includes('dilla'));
+                    const tracks = dillaTracks.length > 0 ? dillaTracks : audioLibrary.tracks;
                     const randomTrack = tracks[Math.floor(Math.random() * tracks.length)];
                     audio = new Audio(randomTrack.src);
 
