@@ -18,6 +18,8 @@
             background-color: oklch(from hsl(210 32% 12%) l c h);
             margin: 0;
             overflow: hidden;
+            container-type: inline-size;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont;
         }
 
         body>* {
@@ -34,17 +36,98 @@
             cursor: default;
         }
 
-        :where(.note, .notes) {
-            @starting-style {
-                opacity: 0;
-            }
+        select,
+        ::picker(select) {
+            appearance: base-select;
+        }
 
+        select::picker-icon {
+            display: none;
+        }
+
+        selectedcontent {
+            display: block;
+            white-space: nowrap;
+            max-inline-size: max-content;
+        }
+
+        option {
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+            padding: .5rem 1rem;
+            font-size: .875rem;
+            transition: font-size .2s cubic-bezier(.25, .46, .45, .94), opacity .2s cubic-bezier(.25, .46, .45, .94), font-weight .2s cubic-bezier(.25, .46, .45, .94);
+            transform-origin: left 48%;
+            opacity: .7;
+        }
+
+        option:hover,
+        option:focus {
+            font-size: .95rem;
+            opacity: 1;
+            font-weight: 500;
+        }
+
+        option:has(+ option:hover),
+        option:hover+option {
+            font-size: .9rem;
+            opacity: .9;
+            font-weight: 400;
+        }
+
+        option:has(+ option + option:hover),
+        option:hover+option+option {
+            font-size: .875rem;
+            opacity: .8;
+            font-weight: 400;
+        }
+
+        option:has(+ option + option + option:hover),
+        option:hover+option+option+option {
+            font-size: .875rem;
+            opacity: .75;
+            font-weight: 400;
+        }
+
+        optgroup {
+            contain: layout;
+        }
+
+        ::picker(select) {
+            opacity: 0;
+            transform: translateY(-1rem);
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+                display 0.3s allow-discrete,
+                overlay 0.32s allow-discrete;
+        }
+
+        :open::picker(select) {
+            opacity: 1;
+            transform: translateY(1.5rem);
+            inline-size: 100vw;
+            block-size: 100vh;
+            background-color: color-mix(in oklch, var(--base), transparent 56%);
+        }
+
+        @starting-style {
+            :open::picker(select) {
+                opacity: 0;
+                transform: translateY(-1rem);
+            }
+        }
+
+        :where(.note, .notes) {
             font-size: 12cqi;
             background: linear-gradient(180deg, var(--base) 2%, var(--accent));
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
             pointer-events: none;
+
+            @starting-style {
+                opacity: 0;
+            }
         }
 
         .note {
@@ -53,6 +136,146 @@
 
         .notes {
             animation: notes 2.48s -.125s infinite;
+        }
+
+        .toggle-btn {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            color: var(--accent);
+            opacity: 0.5;
+            transition: opacity 0.2s;
+            padding: 0;
+            display: grid;
+            place-items: center;
+
+            &:hover {
+                opacity: 1;
+            }
+
+            & path {
+                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                transform-box: fill-box;
+                transform-origin: center;
+            }
+
+            & .pause-path {
+                opacity: 0;
+                transform: scale(0.5) rotate(90deg);
+            }
+
+            &.pulse {
+                animation: pulse-btn 1.5s infinite alternate;
+                opacity: 1;
+            }
+        }
+
+        .toggle-btn.playing {
+            color: var(--accent);
+            opacity: 1;
+
+            & .play-path {
+                opacity: 0;
+                transform: scale(0.5) rotate(-90deg);
+            }
+
+            & .pause-path {
+                opacity: 1;
+                transform: scale(1) rotate(0deg);
+            }
+        }
+
+        .filter-container {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 10;
+            display: flex;
+            gap: .35rem;
+            align-items: center;
+            padding: 0.5rem .5rem;
+            border: 1px solid oklch(from var(--accent) l c h / 0.3);
+            border-radius: .5rem;
+            backdrop-filter: blur(.5rem);
+            inline-size: min(8rem, calc(100cqi - 2rem));
+            container-type: inline-size;
+
+            @supports (corner-shape: squircle) {
+                corner-shape: squircle;
+                border-radius: 1.5rem;
+            }
+
+            &.playing {
+                color: var(--accent);
+                border-color: var(--accent);
+            }
+        }
+
+        .filter-select {
+            background: oklch(from var(--base) l c h / 0.45);
+            color: var(--accent);
+            border: 1px solid oklch(from var(--accent) l c h / 0.3);
+            border-radius: .75rem;
+            padding: 0.65rem 0.75rem;
+            font-size: 0.875rem;
+            outline: none;
+            cursor: pointer;
+            backdrop-filter: blur(.5rem);
+            transition: border-color 0.2s, background 0.2s;
+            inline-size: 10rem;
+            max-block-size: 2.4rem;
+            overflow: hidden;
+
+            & button {
+                container-type: inline-size;
+                inline-size: 100%;
+                overflow: hidden;
+                display: flex;
+                align-items: center;
+            }
+
+            & option {
+                color: var(--accent);
+            }
+
+            & optgroup {
+                color: oklch(from var(--accent) l c h / .7);
+                font-style: normal;
+                font-weight: 600;
+            }
+
+            @supports (corner-shape: squircle) {
+                corner-shape: squircle;
+                border-radius: .75rem;
+            }
+        }
+
+        .filter-select:focus,
+        .filter-container:focus-within,
+        .filter-container:active {
+            border-color: var(--accent);
+        }
+
+        .filter-container:hover selectedcontent,
+        .filter-select:focus-within selectedcontent {
+            animation: text-scroll-reveal 16s linear infinite alternate;
+            animation-delay: 0.5s;
+        }
+
+        .artist-label {
+            display: none;
+            color: var(--accent);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            opacity: 0.7;
+            align-self: flex-start;
+        }
+
+        .headphone,
+        .note,
+        .notes {
+            animation-play-state: paused;
         }
 
         @keyframes shake {
@@ -118,27 +341,6 @@
             }
         }
 
-        .toggle-btn {
-            position: fixed;
-            bottom: 1rem;
-            right: 1rem;
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            color: var(--accent);
-            opacity: 0.5;
-            transition: opacity 0.2s;
-            padding: 0;
-            display: grid;
-            place-items: center;
-            z-index: 10;
-        }
-
-        .toggle-btn.pulse {
-            animation: pulse-btn 1.5s infinite alternate;
-            opacity: 1;
-        }
-
         @keyframes pulse-btn {
             0% {
                 transform: scale(1);
@@ -149,15 +351,17 @@
             }
         }
 
-        .toggle-btn:hover {
-            opacity: 1;
-        }
+        @keyframes text-scroll-reveal {
 
-        /* Start animations paused */
-        .headphone,
-        .note,
-        .notes {
-            animation-play-state: paused;
+            0%,
+            20% {
+                transform: translateX(0);
+            }
+
+            80%,
+            100% {
+                transform: translateX(min(0px, calc(100cqi - 100%)));
+            }
         }
     </style>
 </head>
@@ -166,39 +370,89 @@
     <div class='headphone'>🎧</div>
     <div class='note'>🎶</div>
     <div class='notes'>🎶</div>
-    <button class="toggle-btn pulse" data-analytics-element="Toggle Animation" aria-label="Play animation">
-        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor">
-            <path d="M320-200v-560l440 280-440 280Zm80-280Zm0 134 210-134-210-134v268Z" />
-        </svg>
-    </button>
+
+    <div class="filter-container">
+        <label for="track-select" class="artist-label">Select Audio</label>
+        <select id="track-select" class="filter-select">
+            <button>
+                <selectedcontent></selectedcontent>
+            </button>
+            <option value="">J. Dilla</option>
+        </select>
+        <button class="toggle-btn pulse" data-analytics-element="Toggle Animation" aria-label="Play animation">
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
+                fill="currentColor">
+                <path class="play-path" d="M320-200v-560l440 280-440 280Zm80-280Zm0 134 210-134-210-134v268Z" />
+                <path class="pause-path"
+                    d="M528-192v-576h240v576H528Zm-336 0v-576h240v576H192Zm408-72h96v-432h-96v432Zm-336 0h96v-432h-96v432Zm0-432v432-432Zm336 0v432-432Z" />
+            </svg>
+        </button>
+    </div>
     <script type="module">
         import { audioLibrary } from '../scripts/AudioLibrary.js';
 
-        const PREVIEW_DURATION_SEC = 90;
-        const FADE_DURATION_SEC = 12;
+        const PREVIEW_DURATION_SEC = 44;
+        const FADE_DURATION_SEC = 8;
 
         const btn = document.querySelector('.toggle-btn');
-        const iconPath = btn.querySelector('path');
         const animatedElements = document.querySelectorAll('.headphone, .note, .notes');
-
-        const playPath = "M320-200v-560l440 280-440 280Zm80-280Zm0 134 210-134-210-134v268Z";
-        const pausePath = "M528-192v-576h240v576H528Zm-336 0v-576h240v576H192Zm408-72h96v-432h-96v432Zm-336 0h96v-432h-96v432Zm0-432v432-432Zm336 0v432-432Z";
+        const trackSelect = document.getElementById('track-select');
+        const filterContainer = document.querySelector('.filter-container');
 
         let isPlaying = false;
         let audio = null;
         let isFirstInteraction = true;
 
+        // Helper to strip track numbers (e.g., "01 - Title", "01. Title", "01 Title")
+        const cleanTitle = (title) => title ? title.replace(/^\d+[\s.-]*/, '').trim() : '';
+
+        // Collect unique artists, albums, and cleaned titles for search suggestions
+        const groupedByArtist = {};
+
+        audioLibrary.tracks.forEach(track => {
+            const artist = track.artist && track.artist.toLowerCase() !== 'unknown artist' ? track.artist : 'Other';
+            const title = cleanTitle(track.title) || 'Unknown Title';
+            if (!groupedByArtist[artist]) {
+                groupedByArtist[artist] = [];
+            }
+            if (!groupedByArtist[artist].includes(title)) {
+                groupedByArtist[artist].push(title);
+            }
+        });
+
+        const sortedArtists = Object.keys(groupedByArtist).sort();
+
+        sortedArtists.forEach(artist => {
+            const optgroup = document.createElement('optgroup');
+            optgroup.label = artist;
+
+            groupedByArtist[artist].sort().forEach(title => {
+                const option = document.createElement('option');
+                option.value = title;
+                option.textContent = title;
+                optgroup.appendChild(option);
+            });
+
+            trackSelect.appendChild(optgroup);
+        });
+
         function stopAudio() {
             isPlaying = false;
             animatedElements.forEach(el => el.style.animationPlayState = 'paused');
-            iconPath.setAttribute('d', playPath);
             btn.setAttribute('aria-label', 'Play animation');
+            filterContainer.classList.remove('playing');
+            btn.classList.remove('playing');
             if (audio) {
                 audio.pause();
                 audio.currentTime = 0;
                 audio = null;
             }
         }
+
+        trackSelect.addEventListener('change', () => {
+            if (isPlaying) stopAudio();
+            btn.click();
+        });
 
         btn.addEventListener('click', () => {
             if (isFirstInteraction) {
@@ -209,9 +463,26 @@
             isPlaying = !isPlaying;
 
             if (isPlaying) {
+                filterContainer.classList.add('playing');
+                btn.classList.add('playing');
                 if (!audio) {
-                    const dillaTracks = audioLibrary.tracks.filter(t => t.artist && t.artist.toLowerCase().includes('dilla'));
-                    const tracks = dillaTracks.length > 0 ? dillaTracks : audioLibrary.tracks;
+                    const searchTerm = trackSelect.value.toLowerCase();
+                    let tracks = audioLibrary.tracks;
+
+                    if (searchTerm) {
+                        tracks = tracks.filter(t =>
+                            (t.title && cleanTitle(t.title).toLowerCase().startsWith(searchTerm)) ||
+                            (t.artist && t.artist.toLowerCase().startsWith(searchTerm)) ||
+                            (t.album && t.album.toLowerCase().startsWith(searchTerm))
+                        );
+                    } else {
+                        // Default to J. Dilla if no search term is entered
+                        const dillaTracks = tracks.filter(t => t.artist && t.artist.toLowerCase().includes('dilla'));
+                        if (dillaTracks.length > 0) tracks = dillaTracks;
+                    }
+
+                    if (tracks.length === 0) tracks = audioLibrary.tracks;
+
                     const randomTrack = tracks[Math.floor(Math.random() * tracks.length)];
                     audio = new Audio(randomTrack.src);
 
@@ -225,7 +496,6 @@
                         const fadeStart = PREVIEW_DURATION_SEC - FADE_DURATION_SEC;
                         if (currentAudio.currentTime > fadeStart) {
                             const timeRemaining = PREVIEW_DURATION_SEC - currentAudio.currentTime;
-                            // Calculate volume proportion (e.g. at fadeStart, volume is 1, at PREVIEW_DURATION_SEC, volume is 0)
                             let newVolume = timeRemaining / FADE_DURATION_SEC;
                             newVolume = Math.max(0, Math.min(1, newVolume));
                             currentAudio.volume = newVolume;
@@ -239,14 +509,14 @@
 
                 audio.play();
                 animatedElements.forEach(el => el.style.animationPlayState = 'running');
-                iconPath.setAttribute('d', pausePath);
                 btn.setAttribute('aria-label', 'Pause animation');
             } else {
+                filterContainer.classList.remove('playing');
+                btn.classList.remove('playing');
                 if (audio) {
                     audio.pause();
                 }
                 animatedElements.forEach(el => el.style.animationPlayState = 'paused');
-                iconPath.setAttribute('d', playPath);
                 btn.setAttribute('aria-label', 'Play animation');
             }
         });
