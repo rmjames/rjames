@@ -1065,6 +1065,87 @@ class AudioLibrary {
         "album": "Kendrick Lamar-Section.80",
         "duration": 279.8759183673469,
         "albumArt": "../assets/audio/Kendrick Lamar-Section.80/extracted_cover.jpg"
+    },
+    {
+        "id": "j-dilla-01-intro",
+        "title": "01 Intro",
+        "artist": "J. Dilla",
+        "src": "../assets/audio/J. Dilla - Ruff Draft - 2007/01 - Intro.mp3",
+        "genre": "Hip Hop",
+        "album": "Ruff Draft",
+        "duration": 21.0
+    },
+    {
+        "id": "j-dilla-02-let-s-take-it-back",
+        "title": "02 Let's Take It Back",
+        "artist": "J. Dilla",
+        "src": "../assets/audio/J. Dilla - Ruff Draft - 2007/02 - Let's Take It Back.mp3",
+        "genre": "Hip Hop",
+        "album": "Ruff Draft",
+        "duration": 133.0
+    },
+    {
+        "id": "j-dilla-03-reckless-driving",
+        "title": "03 Reckless Driving",
+        "artist": "J. Dilla",
+        "src": "../assets/audio/J. Dilla - Ruff Draft - 2007/03 - Reckless Driving.mp3",
+        "genre": "Hip Hop",
+        "album": "Ruff Draft",
+        "duration": 164.0
+    },
+    {
+        "id": "j-dilla-04-nothing-like-this",
+        "title": "04 Nothing Like This",
+        "artist": "J. Dilla",
+        "src": "../assets/audio/J. Dilla - Ruff Draft - 2007/04 - Nothing Like This.mp3",
+        "genre": "Hip Hop",
+        "album": "Ruff Draft",
+        "duration": 155.0
+    },
+    {
+        "id": "j-dilla-05-the-sh-t-lately",
+        "title": "05 The $",
+        "artist": "J. Dilla",
+        "src": "../assets/audio/J. Dilla - Ruff Draft - 2007/05 - The $.mp3",
+        "genre": "Hip Hop",
+        "album": "Ruff Draft",
+        "duration": 212.0
+    },
+    {
+        "id": "j-dilla-06-interlude",
+        "title": "06 Interlude",
+        "artist": "J. Dilla",
+        "src": "../assets/audio/J. Dilla - Ruff Draft - 2007/06 - Interlude.mp3",
+        "genre": "Hip Hop",
+        "album": "Ruff Draft",
+        "duration": 145.0
+    },
+    {
+        "id": "j-dilla-07-make-em-nv",
+        "title": "07 Make'em NV",
+        "artist": "J. Dilla",
+        "src": "../assets/audio/J. Dilla - Ruff Draft - 2007/07 - Make’em NV.mp3",
+        "genre": "Hip Hop",
+        "album": "Ruff Draft",
+        "duration": 48.0
+    },
+    {
+        "id": "j-dilla-08-interlude-2",
+        "title": "08 Interlude",
+        "artist": "J. Dilla",
+        "src": "../assets/audio/J. Dilla - Ruff Draft - 2007/08 - Interlude.mp3",
+        "genre": "Hip Hop",
+        "album": "Ruff Draft",
+        "duration": 210.0
+    },
+    {
+        "id": "j-dilla-09-crushin",
+        "title": "09 Crushin’ (Yeeeeaah!)",
+        "artist": "J. Dilla",
+        "src": "../assets/audio/J. Dilla - Ruff Draft - 2007/09 - Crushin’ (Yeeeeaah!).mp3",
+        "genre": "Hip Hop",
+        "album": "Ruff Draft",
+        "duration": 210.0
     }
 ];
         this._tracks = null;

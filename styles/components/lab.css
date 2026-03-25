@@ -78,12 +78,16 @@
         aspect-ratio: 6/9;
         width: 100%;
         border: 0;
-        border-radius: 1.5rem;
-        corner-shape: squircle;
+        border-radius: .5rem;
         overflow: hidden;
         outline: 1px solid lch(96 1 18 / .12);
         box-shadow: 0 0 8px color-mix(in oklch, var(--blue-2) 24%, transparent 76%);
         transition: transform 0.24s var(--ease-3), box-shadow 0.28s var(--ease-3);
+
+        @supports (corner-shape: squircle) {
+            corner-shape: squircle;
+            border-radius: 1.5rem;
+        }
     }
 
     & article:hover>iframe,
