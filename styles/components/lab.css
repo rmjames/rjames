@@ -75,7 +75,7 @@
     }
 
     & article>iframe {
-        aspect-ratio: 6/9;
+        aspect-ratio: 1;
         width: 100%;
         border: 0;
         border-radius: .5rem;
