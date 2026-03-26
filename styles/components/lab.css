@@ -11,9 +11,10 @@
     margin-block: 20cqi;
 
     & article {
-        animation: enter 0.6s var(--ease-3) forwards;
+        position: relative;
+        animation: enter .6s var(--ease-3) forwards;
         opacity: 0;
-        transition: transform 0.24s var(--ease-3), box-shadow 0.32s var(--ease-3);
+        transition: transform .24s var(--ease-3), box-shadow .32s var(--ease-3);
         outline: none;
         /* Hide default focus ring as we have custom elevation */
         cursor: pointer;
@@ -75,7 +76,7 @@
     }
 
     & article>iframe {
-        aspect-ratio: 1;
+        aspect-ratio: 6/9;
         width: 100%;
         border: 0;
         border-radius: .5rem;
@@ -94,6 +95,37 @@
     & article:focus-within>iframe {
         transform: scale(1.01);
         box-shadow: 0 0 16px color-mix(in oklch, var(--blue-2) 36%, transparent 64%);
+    }
+
+    & .demo-link {
+        position: absolute;
+        z-index: 20;
+        inset-block-start: 1rem;
+        inset-inline-start: 1rem;
+        padding: .25rem;
+        border-radius: .25rem;
+        color: light-dark(oklch(0 none none), oklch(1 none none));
+        background: light-dark(oklch(1 none none / .6), oklch(0 none none / .6));
+        backdrop-filter: blur(4px);
+        opacity: 0;
+        transition: opacity .2s var(--ease-3), outline-offset .2s var(--ease-3);
+        outline: 1px solid lch(96 1 18 / .12);
+
+        &:focus-visible {
+            opacity: 1;
+            outline-offset: .125rem;
+        }
+    }
+
+    & .external-icon {
+        inline-size: 1.5rem;
+        block-size: 1.5rem;
+        display: block;
+    }
+
+    & article:hover .demo-link,
+    & article:focus-within .demo-link {
+        opacity: 1;
     }
 }
 
