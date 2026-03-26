@@ -60,6 +60,10 @@
             transition: font-size .2s cubic-bezier(.25, .46, .45, .94), opacity .2s cubic-bezier(.25, .46, .45, .94), font-weight .2s cubic-bezier(.25, .46, .45, .94);
             transform-origin: left 48%;
             opacity: .7;
+
+            &::checkmark {
+                content: '💿'
+            }
         }
 
         option:hover,
@@ -96,15 +100,24 @@
 
         ::picker(select) {
             opacity: 0;
-            transform: translateY(-1rem);
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
-                display 0.3s allow-discrete,
-                overlay 0.32s allow-discrete;
+            clip-path: circle(0% at top right);
+            position: fixed;
+            position-anchor: none;
+            position-area: none;
+            inset-area: none;
+            inset: 0;
+            margin: 0;
+            border: 0;
+            padding: 0;
+            border-radius: 0;
+            transition: clip-path .72s cubic-bezier(.34, 1.56, .64, 1),
+                display .5s allow-discrete,
+                overlay .5s allow-discrete;
         }
 
         :open::picker(select) {
             opacity: 1;
-            transform: translateY(1.5rem);
+            clip-path: circle(150% at top right);
             inline-size: 100vw;
             block-size: 100vh;
             background-color: color-mix(in oklch, var(--base), transparent 56%);
@@ -113,7 +126,7 @@
         @starting-style {
             :open::picker(select) {
                 opacity: 0;
-                transform: translateY(-1rem);
+                clip-path: circle(0% at top right);
             }
         }
 
@@ -391,8 +404,8 @@
     <script type="module">
         import { audioLibrary } from '../scripts/AudioLibrary.js';
 
-        const PREVIEW_DURATION_SEC = 44;
-        const FADE_DURATION_SEC = 8;
+        const PREVIEW_DURATION_SEC = 90;
+        const FADE_DURATION_SEC = 12;
 
         const btn = document.querySelector('.toggle-btn');
         const animatedElements = document.querySelectorAll('.headphone, .note, .notes');
