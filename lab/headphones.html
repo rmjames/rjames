@@ -110,9 +110,9 @@
             border: 0;
             padding: 0;
             border-radius: 0;
-            transition: all .5s cubic-bezier(.34, 1.56, .64, 1),
-                display .85s allow-discrete,
-                overlay .85s allow-discrete;
+            transition: clip-path .72s cubic-bezier(.34, 1.56, .64, 1),
+                display .5s allow-discrete,
+                overlay .5s allow-discrete;
         }
 
         :open::picker(select) {
@@ -404,8 +404,8 @@
     <script type="module">
         import { audioLibrary } from '../scripts/AudioLibrary.js';
 
-        const PREVIEW_DURATION_SEC = 44;
-        const FADE_DURATION_SEC = 8;
+        const PREVIEW_DURATION_SEC = 90;
+        const FADE_DURATION_SEC = 12;
 
         const btn = document.querySelector('.toggle-btn');
         const animatedElements = document.querySelectorAll('.headphone, .note, .notes');
