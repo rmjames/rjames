@@ -212,6 +212,7 @@
             backdrop-filter: blur(.5rem);
             inline-size: min(8rem, calc(100cqi - 2rem));
             container-type: inline-size;
+            transition: opacity .4s cubic-bezier(.34, 1.56, .64, 1), border-color .3s;
 
             @supports (corner-shape: squircle) {
                 corner-shape: squircle;
@@ -221,6 +222,11 @@
             &.playing {
                 color: var(--accent);
                 border-color: var(--accent);
+            }
+
+            &:has(select:open),
+            &:has(select:popover-open) {
+                opacity: .125;
             }
         }
 
