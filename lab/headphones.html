@@ -210,6 +210,7 @@
             border: 1px solid oklch(from var(--accent) l c h / 0.3);
             border-radius: .5rem;
             backdrop-filter: blur(.5rem);
+            background-color: oklch(.34 0 0 / .64);
             inline-size: min(8rem, calc(100cqi - 2rem));
             container-type: inline-size;
             transition: opacity .4s cubic-bezier(.34, 1.56, .64, 1), border-color .3s;
@@ -231,19 +232,19 @@
         }
 
         .filter-select {
-            background: oklch(from var(--base) l c h / 0.45);
-            color: var(--accent);
+            inline-size: 10rem;
+            max-block-size: 2.4rem;
+            padding: 0.65rem 0.75rem;
             border: 1px solid oklch(from var(--accent) l c h / 0.3);
             border-radius: .75rem;
-            padding: 0.65rem 0.75rem;
+            background: oklch(from var(--base) l c h / 0.45);
+            backdrop-filter: blur(.5rem);
+            color: var(--accent);
             font-size: 0.875rem;
             outline: none;
             cursor: pointer;
-            backdrop-filter: blur(.5rem);
-            transition: border-color 0.2s, background 0.2s;
-            inline-size: 10rem;
-            max-block-size: 2.4rem;
             overflow: hidden;
+            transition: border-color 0.2s, background 0.2s;
 
             & button {
                 container-type: inline-size;
