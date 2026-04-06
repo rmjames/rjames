@@ -9,8 +9,8 @@
     --xxxl: 3rem;
     --f-base: 14px;
     --font-base: clamp(var(--f-base), calc(var(--f-base) + 1.92vmin), 1.5rem);
-    --white-1: hsl(200, 8%, 88%);
-    --white-2: hsl(0, 0%, 88%);
+    --white-1: hsl(0, 0%, 100%);
+    --white-2: hsl(0, 0%, 98%);
     --black-1: hsl(360 0% 0%);
     --black-2: hsl(46 94% 119%);
     --black-3: hsl(200 16% 16%);
@@ -52,8 +52,8 @@
     color-scheme: light dark;
 
     @supports (color: rgb(from white r g b)) {
-        --white-1: oklch(from hsl(200 8%, 88%) l c h);
-        --white-2: oklch(from hsl(0, 0%, 88%) l c h);
+        --white-1: oklch(from hsl(0 0% 100%) l c h);
+        --white-2: oklch(from hsl(0, 0%, 98%) l c h);
         --black-1: oklch(from hsl(360 0% 0%) l c h);
         --black-2: oklch(from hsl(46 94% 119%) l c h);
         --black-3: oklch(from hsl(200 16% 16%) l c h);
