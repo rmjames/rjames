@@ -60,7 +60,6 @@
     // Stage 1: Playback from Cache (Zero CPU math)
     if (isCacheComplete) {
       const idx = Math.floor(t / PAINT_INTERVAL);
-      if (idx === 0) console.log("🚀 Playing Flow morph from Zero-CPU Cache");
       
       if (idx >= framesCache.length) {
         favicon.href = framesCache[framesCache.length - 1];
@@ -72,8 +71,6 @@
     }
 
     // Stage 2: Initial Render & Cache Recording
-    if (t === 0) console.log("🎨 Recording Math to Cache (One-time CPU load)...");
-
     if (t >= totalDuration) {
       current.set(circle); // Final state is Circle
       isCacheComplete = true;
@@ -108,7 +105,6 @@
     framesCache.push(dataUrl);
 
     if (isCacheComplete) {
-      console.log("✨ Cache Complete. Math Engine Disabled.");
       stop();
     }
   }
