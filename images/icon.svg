@@ -1,73 +1,68 @@
-<!-- <svg width="192" height="192" viewbox='0 0 192 192'>
-  <circle cx="96" cy="96" r="96" fill="hsl(0 0% 20%)"/>
-  <circle cx="96" cy="96" r="48"  fill="hsl(0 0% 20%)" stroke='orange' stroke-width='8'/>
-</svg> -->
-
-
-
-<svg width="192" height="192" viewbox='0 0 192 192'>
-  <def>
-    <filter id="displacementFilter">
+<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    :root {
+      --bg-color: transparent;
+      --stroke-color: oklch(from hsl(36, 92%, 52%) l c h);
+    }
+    .main-circle {
+      fill: none;
+    }
+    .accent-path {
+      fill: none;
+      stroke: var(--stroke-color);
+      stroke-width: 16;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+  </style>
+  <defs>
+    <!-- Filter kept in defs in case needed later, but currently disabled as per user edits -->
+    <filter id="displacementFilter" x="-20%" y="-20%" width="140%" height="140%">
       <feTurbulence
         type="turbulence"
-        baseFrequency="0.105"
-        numOctaves="48"
-        result="turbulence"
-        stitchTiles='stich'
-        seed='48'/> 
+        baseFrequency="0.02"
+        numOctaves="2"
+        result="turbulence">
+        <animate 
+          begin="0s"
+          attributeName="baseFrequency"
+          values="0.02;0.04;0.02"
+          dur="8s"
+          repeatCount="indefinite" />
+      </feTurbulence>
       <feDisplacementMap
-        in2="turbulence"
         in="SourceGraphic"
-        scale="48"
-        xChannelSelector="R"
-        yChannelSelector="G" />
-      <feTurbulence
-        id='anim-turb'
-        type="turbulence"
-        baseFrequency="0.0195 0.195"
-        numOctaves="82"
-        result="turbulence"
-        seed='24'
-        stitchTiles='stich'/>   
-      <feDisplacementMap
         in2="turbulence"
-        in="SourceGraphic"
-        id="anim-scale"
-        scale="48"
+        scale="20"
         xChannelSelector="R"
-        yChannelSelector="G" />
-    </filter> 
-    
+        yChannelSelector="G">
+        <animate 
+          begin="0s"
+          attributeName="scale"
+          values="20;40;20"
+          dur="6s"
+          repeatCount="indefinite" />
+      </feDisplacementMap>
+    </filter>
+  </defs>
+  <!-- Background circle for structural integrity -->
+  <circle class="main-circle" cx="64" cy="64" r="60"/>
+  
+  <!-- Timed Morphing Path: Circle (2s) -> Morph (0.5s) -> Hold Home (1.5s) -> Return (0.5s) -->
+  <path class="accent-path">
     <animate 
-      xlink:href="#anim-scale"
-      id="anim-dialiate" 
-      attributeName="scale"
-      values="8;16;8"
-      dur="32s"
-      repeatCount='indefinite'
+      begin="0s"
+      attributeName="d"
+      dur="4.5s"
+      repeatCount="1"
       fill="freeze"
-    />
-
-    <animate 
-      xlink:href="#anim-turb"
-      id="anim-turb" 
-      attributeName="numOctaves"
-      values="4;8;4"
-      dur="32s"
-      repeatCount='indefinite'
-      fill="freeze"
-    />
-    
-    <animate 
-      xlink:href="#anim-turb"
-      id="anim-turb" 
-      attributeName="baseFrequency"
-      values="0.0195 0.196;.019 .048;0.0195 0.196"
-      dur="32s"
-      repeatCount="indefinite" 
-      fill="freeze"
-    />
-  </def>
-  <circle cx="64" cy="64" r="64" fill="hsl(0 0% 20%)" filter='url(#displacementFilter)'/>
-  <circle cx="64" cy="64" r="52" fill="hsl(0 0% 20%)" stroke='hsl(36 92% 52%)' stroke-width='4' filter='url(#displacementFilter)'/>
+      values="
+        M 64,16 C 90.5,16 112,37.5 112,64 C 112,90.5 90.5,112 64,112 C 37.5,112 16,90.5 16,64 C 16,37.5 37.5,16 64,16 Z;
+        M 64,16 C 90.5,16 112,37.5 112,64 C 112,90.5 90.5,112 64,112 C 37.5,112 16,90.5 16,64 C 16,37.5 37.5,16 64,16 Z;
+        M 64,20 C 108,60 108,60 100,60 C 100,108 100,108 64,108 C 28,108 28,108 28,60 C 20,60 20,60 64,20 Z;
+        M 64,20 C 108,60 108,60 100,60 C 100,108 100,108 64,108 C 28,108 28,108 28,60 C 20,60 20,60 64,20 Z;
+        M 64,16 C 90.5,16 112,37.5 112,64 C 112,90.5 90.5,112 64,112 C 37.5,112 16,90.5 16,64 C 16,37.5 37.5,16 64,16 Z
+      "
+      keyTimes="0; 0.4444; 0.5556; 0.8889; 1" />
+  </path>
 </svg>
