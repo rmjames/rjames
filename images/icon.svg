@@ -2,19 +2,21 @@
   <style>
     :root {
       --bg-color: transparent;
-      --stroke-color: oklch(from hsl(36, 92%, 52%) l c h); 
+      --stroke-color: oklch(from hsl(36, 92%, 52%) l c h);
     }
     .main-circle {
       fill: none;
     }
-    .accent-circle {
+    .accent-path {
       fill: none;
       stroke: var(--stroke-color);
-      stroke-width: 16; 
+      stroke-width: 16;
       stroke-linecap: round;
+      stroke-linejoin: round;
     }
   </style>
   <defs>
+    <!-- Filter kept in defs in case needed later, but currently disabled as per user edits -->
     <filter id="displacementFilter" x="-20%" y="-20%" width="140%" height="140%">
       <feTurbulence
         type="turbulence"
@@ -43,8 +45,24 @@
       </feDisplacementMap>
     </filter>
   </defs>
-  <!-- Main circle defines the hit area if needed, but we keep it transparent as requested -->
-  <circle class="main-circle" cx="64" cy="64" r="60" filter="url(#displacementFilter)"/>
-  <!-- Accent circle with thick stroke to show the animation clearly -->
-  <circle class="accent-circle" cx="64" cy="64" r="48" filter="url(#displacementFilter)"/>
+  <!-- Background circle for structural integrity -->
+  <circle class="main-circle" cx="64" cy="64" r="60"/>
+  
+  <!-- Timed Morphing Path: Circle (2s) -> Morph (0.5s) -> Hold Home (1.5s) -> Return (0.5s) -->
+  <path class="accent-path">
+    <animate 
+      begin="0s"
+      attributeName="d"
+      dur="4.5s"
+      repeatCount="1"
+      fill="freeze"
+      values="
+        M 64,16 C 90.5,16 112,37.5 112,64 C 112,90.5 90.5,112 64,112 C 37.5,112 16,90.5 16,64 C 16,37.5 37.5,16 64,16 Z;
+        M 64,16 C 90.5,16 112,37.5 112,64 C 112,90.5 90.5,112 64,112 C 37.5,112 16,90.5 16,64 C 16,37.5 37.5,16 64,16 Z;
+        M 64,20 C 108,60 108,60 100,60 C 100,108 100,108 64,108 C 28,108 28,108 28,60 C 20,60 20,60 64,20 Z;
+        M 64,20 C 108,60 108,60 100,60 C 100,108 100,108 64,108 C 28,108 28,108 28,60 C 20,60 20,60 64,20 Z;
+        M 64,16 C 90.5,16 112,37.5 112,64 C 112,90.5 90.5,112 64,112 C 37.5,112 16,90.5 16,64 C 16,37.5 37.5,16 64,16 Z
+      "
+      keyTimes="0; 0.4444; 0.5556; 0.8889; 1" />
+  </path>
 </svg>
