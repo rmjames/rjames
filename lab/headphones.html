@@ -8,10 +8,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Headphones Knock</title>
+    <link rel="apple-touch-icon" href="../images/icon-ios.svg" />
+    <link rel="icon" type="image/svg+xml" sizes="any" href="../images/icon.svg" id="favicon-svg" />
+    <link rel="icon" type="image/png" href="../favicon_144.png" sizes="144x144" />
+    <link rel="icon" type="image/png" href="../favicon_512.png" sizes="512x512" />
+    <link rel="icon" type="image/png" href="../favicon_192.png" sizes="192x192" />
+    <link rel="manifest" href="../manifest.json" />
+    <script src="../scripts/favicon-animator.js" async></script>
     <style>
         body {
-            --base: oklch(from hsl(210 4% 4%) l c h);
-            --accent: oklch(from hsl(210 96% 96%) l c h);
             display: grid;
             place-items: center;
             block-size: 100vh;
@@ -20,6 +25,13 @@
             overflow: hidden;
             container-type: inline-size;
             font-family: system-ui, -apple-system, BlinkMacSystemFont;
+
+            --base: oklch(from hsl(210 4% 4%) l c h);
+            --accent: oklch(from hsl(210 96% 96%) l c h);
+            /* Frequency response variables */
+            --low: 0;
+            --mid: 0;
+            --high: 0;
         }
 
         body>* {
@@ -28,12 +40,15 @@
 
         .headphone {
             font-size: 20cqi;
-            animation: shake .64s infinite;
-            background: linear-gradient(180deg, var(--base) 2%, var(--accent));
+            background: linear-gradient(in oklab, var(--base) 2%, var(--accent));
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
             cursor: default;
+            scale: calc(1 + var(--low) * .5);
+            filter: drop-shadow(0 0 calc(var(--mid) * 10px) oklch(from var(--accent) l c h / .1));
+            contain: layout paint;
+            transition: scale .3s cubic-bezier(0.19, 1, 0.22, 1);
         }
 
         select,
@@ -94,7 +109,7 @@
             font-weight: 400;
         }
 
-        optgroup {
+        :is(optgroup, .headphone, .note, .notes) {
             contain: layout;
         }
 
@@ -132,11 +147,12 @@
 
         :where(.note, .notes) {
             font-size: 12cqi;
-            background: linear-gradient(180deg, var(--base) 2%, var(--accent));
+            background: linear-gradient(in oklch, var(--base) 2%, var(--accent));
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
             pointer-events: none;
+            opacity: calc(.2 + var(--high) * .8);
 
             @starting-style {
                 opacity: 0;
@@ -167,7 +183,7 @@
             }
 
             & path {
-                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.1s cubic-bezier(0.4, 0, 0.2, 1);
                 transform-box: fill-box;
                 transform-origin: center;
             }
@@ -351,7 +367,7 @@
             }
 
             32% {
-                opacity: .48;
+                opacity: .16;
             }
 
             100% {
@@ -411,134 +427,202 @@
     <script type="module">
         import { audioLibrary } from '../scripts/AudioLibrary.js';
 
-        const PREVIEW_DURATION_SEC = 90;
-        const FADE_DURATION_SEC = 12;
+        const PREVIEW_DURATION_SEC = 52;
+        const FADE_DURATION_SEC = 2;
 
-        const btn = document.querySelector('.toggle-btn');
-        const animatedElements = document.querySelectorAll('.headphone, .note, .notes');
-        const trackSelect = document.getElementById('track-select');
-        const filterContainer = document.querySelector('.filter-container');
+        const els = {
+            btn: document.querySelector('.toggle-btn'),
+            trackSelect: document.getElementById('track-select'),
+            filterContainer: document.querySelector('.filter-container'),
+            animated: document.querySelectorAll('.headphone, .note, .notes'),
+            root: document.body
+        };
 
-        let isPlaying = false;
-        let audio = null;
-        let isFirstInteraction = true;
+        const Utils = {
+            cleanTitle: (title) => title ? title.replace(/^\d+[\s.-]*/, '').trim() : '',
 
-        // Helper to strip track numbers (e.g., "01 - Title", "01. Title", "01 Title")
-        const cleanTitle = (title) => title ? title.replace(/^\d+[\s.-]*/, '').trim() : '';
+            normalizeFrequency: (data, binStart, binCount, exponent = 1.0) => {
+                let sum = 0;
+                for (let i = binStart; i < binStart + binCount; i++) sum += data[i];
+                return Math.pow((sum / binCount) / 255, exponent);
+            },
 
-        // Collect unique artists, albums, and cleaned titles for search suggestions
-        const groupedByArtist = {};
+            getRandomTrack: (tracks, filterTerm = '') => {
+                const term = filterTerm.toLowerCase();
+                let filtered = tracks;
 
-        audioLibrary.tracks.forEach(track => {
-            const artist = track.artist && track.artist.toLowerCase() !== 'unknown artist' ? track.artist : 'Other';
-            const title = cleanTitle(track.title) || 'Unknown Title';
-            if (!groupedByArtist[artist]) {
-                groupedByArtist[artist] = [];
+                if (term) {
+                    filtered = tracks.filter(t =>
+                        (t.title && Utils.cleanTitle(t.title).toLowerCase().startsWith(term)) ||
+                        (t.artist && t.artist.toLowerCase().startsWith(term)) ||
+                        (t.album && t.album.toLowerCase().startsWith(term))
+                    );
+                } else {
+                    const dillaTracks = tracks.filter(t => t.artist?.toLowerCase().includes('dilla'));
+                    if (dillaTracks.length > 0) filtered = dillaTracks;
+                }
+
+                if (filtered.length === 0) filtered = tracks;
+                return filtered[Math.floor(Math.random() * filtered.length)];
             }
-            if (!groupedByArtist[artist].includes(title)) {
-                groupedByArtist[artist].push(title);
-            }
-        });
+        };
 
-        const sortedArtists = Object.keys(groupedByArtist).sort();
+        let state = {
+            isPlaying: false,
+            isFirstInteraction: true,
+            audioCtx: null,
+            analyser: null,
+            dataArray: null,
+            audio: new Audio(),
+            source: null
+        };
 
-        sortedArtists.forEach(artist => {
-            const optgroup = document.createElement('optgroup');
-            optgroup.label = artist;
+        function setState(updates) {
+            state = { ...state, ...updates };
+            renderUI(state);
+        }
 
-            groupedByArtist[artist].sort().forEach(title => {
-                const option = document.createElement('option');
-                option.value = title;
-                option.textContent = title;
-                optgroup.appendChild(option);
-            });
+        function renderUI(s) {
+            els.btn.classList.toggle('playing', s.isPlaying);
+            els.btn.classList.toggle('pulse', s.isFirstInteraction);
+            els.filterContainer.classList.toggle('playing', s.isPlaying);
+            els.btn.setAttribute('aria-label', s.isPlaying ? 'Pause animation' : 'Play animation');
+            els.animated.forEach(el => el.style.animationPlayState = s.isPlaying ? 'running' : 'paused');
 
-            trackSelect.appendChild(optgroup);
-        });
-
-        function stopAudio() {
-            isPlaying = false;
-            animatedElements.forEach(el => el.style.animationPlayState = 'paused');
-            btn.setAttribute('aria-label', 'Play animation');
-            filterContainer.classList.remove('playing');
-            btn.classList.remove('playing');
-            if (audio) {
-                audio.pause();
-                audio.currentTime = 0;
-                audio = null;
+            if (!s.isPlaying) {
+                s.audio.pause();
+                els.root.style.setProperty('--low', 0);
+                els.root.style.setProperty('--mid', 0);
+                els.root.style.setProperty('--high', 0);
             }
         }
 
-        trackSelect.addEventListener('change', () => {
-            if (isPlaying) stopAudio();
-            btn.click();
+        const AudioEngine = {
+            init: () => {
+                if (state.audioCtx) return;
+
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const analyser = audioCtx.createAnalyser();
+                analyser.fftSize = 256;
+                analyser.smoothingTimeConstant = 0.36;
+
+                const dataArray = new Uint8Array(analyser.frequencyBinCount);
+                const source = audioCtx.createMediaElementSource(state.audio);
+
+                source.connect(analyser);
+                analyser.connect(audioCtx.destination);
+
+                setState({ audioCtx, analyser, dataArray, source });
+                requestAnimationFrame(updateVisuals);
+            },
+
+            handleTimeUpdate: (e) => {
+                const { currentTime, volume } = e.target;
+                if (currentTime >= PREVIEW_DURATION_SEC) {
+                    AudioEngine.stop(true);
+                    return;
+                }
+
+                const fadeStart = PREVIEW_DURATION_SEC - FADE_DURATION_SEC;
+                if (currentTime > fadeStart) {
+                    const newVolume = Math.max(0, Math.min(1, (PREVIEW_DURATION_SEC - currentTime) / FADE_DURATION_SEC));
+                    state.audio.volume = newVolume;
+                } else if (state.audio.volume !== 1) {
+                    state.audio.volume = 1;
+                }
+            },
+
+            stop: (fullReset = false) => {
+                state.audio.pause();
+                state.audio.currentTime = 0;
+                if (fullReset) els.trackSelect.value = '';
+                setState({ isPlaying: false, isFirstInteraction: fullReset });
+            },
+
+            play: async (track) => {
+                AudioEngine.init();
+
+                if (state.audioCtx.state === 'suspended') {
+                    await state.audioCtx.resume();
+                }
+
+                const targetSrc = new URL(track.src, window.location.href).href;
+                if (state.audio.src !== targetSrc) {
+                    state.audio.src = track.src;
+                    state.audio.load();
+                } else {
+                    state.audio.currentTime = 0;
+                }
+
+                state.audio.volume = 1;
+                state.audio.muted = false;
+                try {
+                    await state.audio.play();
+                    setState({ isPlaying: true });
+                } catch (err) {
+                    AudioEngine.stop();
+                }
+            }
+        };
+
+        function updateVisuals() {
+            if (!state.isPlaying) {
+                els.root.style.setProperty('--low', 0);
+                els.root.style.setProperty('--mid', 0);
+                els.root.style.setProperty('--high', 0);
+            } else {
+                state.analyser.getByteFrequencyData(state.dataArray);
+
+                const low = Utils.normalizeFrequency(state.dataArray, 0, 2, 1.8);
+                const mid = Utils.normalizeFrequency(state.dataArray, 4, 11, 2.0);
+                const high = Utils.normalizeFrequency(state.dataArray, 40, 88, 1.2);
+
+                els.root.style.setProperty('--low', low.toFixed(3));
+                els.root.style.setProperty('--mid', mid.toFixed(3));
+                els.root.style.setProperty('--high', high.toFixed(3));
+            }
+            requestAnimationFrame(updateVisuals);
+        }
+
+        // --- Initialization ---
+        state.audio.ontimeupdate = AudioEngine.handleTimeUpdate;
+        state.audio.onended = () => AudioEngine.stop(true);
+        state.audio.volume = 1;
+
+        const populateDropdown = () => {
+            const grouped = audioLibrary.tracks.reduce((acc, track) => {
+                const artist = track.artist && track.artist.toLowerCase() !== 'unknown artist' ? track.artist : 'Other';
+                const title = Utils.cleanTitle(track.title) || 'Unknown Title';
+                acc[artist] = acc[artist] || [];
+                if (!acc[artist].includes(title)) acc[artist].push(title);
+                return acc;
+            }, {});
+
+            Object.keys(grouped).sort().forEach(artist => {
+                const optgroup = document.createElement('optgroup');
+                optgroup.label = artist;
+                grouped[artist].sort().forEach(title => {
+                    const option = document.createElement('option');
+                    option.value = title;
+                    option.textContent = title;
+                    optgroup.appendChild(option);
+                });
+                els.trackSelect.appendChild(optgroup);
+            });
+        };
+
+        populateDropdown();
+
+        els.trackSelect.addEventListener('change', () => {
+            const selection = els.trackSelect.value;
+            AudioEngine.stop(true);
+            els.trackSelect.value = selection;
+            AudioEngine.play(Utils.getRandomTrack(audioLibrary.tracks, selection));
         });
 
-        btn.addEventListener('click', () => {
-            if (isFirstInteraction) {
-                isFirstInteraction = false;
-                btn.classList.remove('pulse');
-            }
-
-            isPlaying = !isPlaying;
-
-            if (isPlaying) {
-                filterContainer.classList.add('playing');
-                btn.classList.add('playing');
-                if (!audio) {
-                    const searchTerm = trackSelect.value.toLowerCase();
-                    let tracks = audioLibrary.tracks;
-
-                    if (searchTerm) {
-                        tracks = tracks.filter(t =>
-                            (t.title && cleanTitle(t.title).toLowerCase().startsWith(searchTerm)) ||
-                            (t.artist && t.artist.toLowerCase().startsWith(searchTerm)) ||
-                            (t.album && t.album.toLowerCase().startsWith(searchTerm))
-                        );
-                    } else {
-                        // Default to J. Dilla if no search term is entered
-                        const dillaTracks = tracks.filter(t => t.artist && t.artist.toLowerCase().includes('dilla'));
-                        if (dillaTracks.length > 0) tracks = dillaTracks;
-                    }
-
-                    if (tracks.length === 0) tracks = audioLibrary.tracks;
-
-                    const randomTrack = tracks[Math.floor(Math.random() * tracks.length)];
-                    audio = new Audio(randomTrack.src);
-
-                    audio.addEventListener('timeupdate', (e) => {
-                        const currentAudio = e.target;
-                        if (currentAudio.currentTime >= PREVIEW_DURATION_SEC) {
-                            stopAudio();
-                            return;
-                        }
-
-                        const fadeStart = PREVIEW_DURATION_SEC - FADE_DURATION_SEC;
-                        if (currentAudio.currentTime > fadeStart) {
-                            const timeRemaining = PREVIEW_DURATION_SEC - currentAudio.currentTime;
-                            let newVolume = timeRemaining / FADE_DURATION_SEC;
-                            newVolume = Math.max(0, Math.min(1, newVolume));
-                            currentAudio.volume = newVolume;
-                        } else {
-                            currentAudio.volume = 1;
-                        }
-                    });
-
-                    audio.addEventListener('ended', stopAudio);
-                }
-
-                audio.play();
-                animatedElements.forEach(el => el.style.animationPlayState = 'running');
-                btn.setAttribute('aria-label', 'Pause animation');
-            } else {
-                filterContainer.classList.remove('playing');
-                btn.classList.remove('playing');
-                if (audio) {
-                    audio.pause();
-                }
-                animatedElements.forEach(el => el.style.animationPlayState = 'paused');
-                btn.setAttribute('aria-label', 'Play animation');
-            }
+        els.btn.addEventListener('click', () => {
+            if (state.isFirstInteraction) setState({ isFirstInteraction: false });
+            state.isPlaying ? AudioEngine.stop() : AudioEngine.play(Utils.getRandomTrack(audioLibrary.tracks, els.trackSelect.value));
         });
     </script>
 </body>
