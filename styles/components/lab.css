@@ -1,6 +1,6 @@
 .lab-container {
     container-type: inline-size;
-    width: 100%;
+    inline-size: 100%;
 }
 
 .demo-examples {
@@ -13,6 +13,7 @@
     & article {
         position: relative;
         animation: enter .6s var(--ease-3) forwards;
+        animation-delay: calc(.55s + (sibling-index() * .05s));
         opacity: 0;
         transition: transform .24s var(--ease-3), box-shadow .32s var(--ease-3);
         outline: none;
@@ -27,57 +28,9 @@
         }
     }
 
-    & article:nth-child(1) {
-        animation-delay: 0.6s;
-    }
-
-    & article:nth-child(2) {
-        animation-delay: 0.65s;
-    }
-
-    & article:nth-child(3) {
-        animation-delay: 0.7s;
-    }
-
-    & article:nth-child(4) {
-        animation-delay: 0.75s;
-    }
-
-    & article:nth-child(5) {
-        animation-delay: 0.8s;
-    }
-
-    & article:nth-child(6) {
-        animation-delay: 0.85s;
-    }
-
-    & article:nth-child(7) {
-        animation-delay: 0.9s;
-    }
-
-    & article:nth-child(8) {
-        animation-delay: 0.95s;
-    }
-
-    & article:nth-child(9) {
-        animation-delay: 1s;
-    }
-
-    & article:nth-child(10) {
-        animation-delay: 1.05s;
-    }
-
-    & article:nth-child(11) {
-        animation-delay: 1.1s;
-    }
-
-    & article:nth-child(12) {
-        animation-delay: 1.15s;
-    }
-
     & article>iframe {
         aspect-ratio: 6/9;
-        width: 100%;
+        inline-size: 100%;
         border: 0;
         border-radius: .5rem;
         overflow: hidden;
