@@ -13,11 +13,10 @@
     & article {
         position: relative;
         animation: enter .6s var(--ease-3) forwards;
-        animation-delay: calc(.55s + (sibling-index() * .05s));
+        animation-delay: calc((.60 + (sibling-index() * .05)) *1s);
         opacity: 0;
         transition: transform .24s var(--ease-3), box-shadow .32s var(--ease-3);
         outline: none;
-        /* Hide default focus ring as we have custom elevation */
         cursor: pointer;
 
         &:hover,
