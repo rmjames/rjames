@@ -14,115 +14,112 @@
             --color-secondary: oklch(from #205AFF l c h);
             --triangle: polygon(100% 0%, 100% 100%, 0% 0%);
             --dimension: 6em;
-            --timing: cubic-bezier(1, 0, 1, 1.19);
-            --dur: 1s;
+            --timing: cubic-bezier(1, 0, .8, 1.24);
+            --dur: 1.56s;
             --delay: .02s;
         }
 
         body {
             background: oklch(from #000 l c h);
             display: flex;
-            flex-wrap: wrap;
-            justify-content: space-around;
             align-items: center;
-            height: 100dvh;
-            transition: display .5s;
-            margin: 0;
-            padding: .5rem;
+            block-size: 100dvh;
         }
 
         .container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-around;
-            align-items: center;
-            font-size: 4vmin;
+            display: grid;
+            grid-template-columns: repeat(4, minmax(auto, 1fr));
+            font-size: 4cqi;
             transition: all .5s;
-            gap: 1rem;
-            height: 90dvh;
+            gap: 2cqi;
+            container-type: inline-size;
+            inline-size: 100%;
         }
 
         .block {
-            height: var(--dimension);
-            width: var(--dimension);
+            block-size: var(--dimension);
+            inline-size: var(--dimension);
             position: relative;
-        }
+            contain: layout paint;
 
-        .block .bloc {
-            background: oklch(from #fff l c h);
-            height: calc(var(--dimension) / 2);
-            aspect-ratio: 1;
-            z-index: 1;
-            animation: reveal var(--dur) var(--timing) forwards;
-        }
+            .bloc {
+                background: oklch(from #fff l c h);
+                block-size: calc(var(--dimension) / 2);
+                aspect-ratio: 1;
+                animation: reveal var(--dur) var(--timing) forwards;
+            }
 
-        .block .bloc:nth-child(2) {
-            background: var(--color-primary);
-            z-index: 2;
-            animation: reveal-1 var(--dur) var(--timing) forwards;
-        }
+            :nth-child(2) {
+                --delay: .24s;
+                background: var(--color-primary);
+                animation: reveal-1 var(--dur) var(--timing) forwards;
+            }
 
-        .block .half-circle {
-            --timing: ease-in;
-            --dur: 1.1s;
-            position: absolute;
-            width: var(--dimension);
-            aspect-ratio: 1;
-            opacity: 0;
-            background: linear-gradient(to right, transparent 50%, var(--color-secondary) 0%);
-            border-radius: 0% 50% 50% 0%;
-            translate: -25px;
-            animation: half-circle-enter var(--dur) var(--timing) forwards;
+            .half-circle {
+                --dur: 1.64s;
+                --delay: .12s;
+                position: absolute;
+                inline-size: var(--dimension);
+                aspect-ratio: 1;
+                opacity: 0;
+                background: linear-gradient(to right, transparent 50%, var(--color-secondary) 0%);
+                border-radius: 0% 50% 50% 0%;
+                translate: -2em;
+                animation: half-circle-enter var(--dur) var(--timing) forwards;
+            }
         }
 
         .triangles {
-            height: var(--dimension);
-            width: var(--dimension);
+            block-size: var(--dimension);
+            inline-size: var(--dimension);
             position: relative;
+            contain: layout paint;
         }
 
         .triangles .triangle {
-            height: var(--dimension);
-            width: var(--dimension);
             --dimension: 3em;
-            --dur: 2s;
-            --delay: .06s;
+            --dur: 2.24s;
+            --delay: .24s;
+            block-size: var(--dimension);
+            inline-size: var(--dimension);
             position: absolute;
-            bottom: 0;
+            inset-block-end: 6px;
             background: var(--color-secondary);
             clip-path: var(--triangle);
             animation: triangle-enter var(--dur) var(--timing) forwards;
         }
 
         .triangles .triangle:nth-child(2) {
-            --dimension: 5.8em;
-            left: 2%;
-            bottom: 3%;
+            --dimension: 5.86em;
+            inset-inline-start: 2%;
+            inset-block-end: 3%;
             background: var(--color-primary);
-            /* animation: triangle-1 var(--dur) var(--timing) forwards; */
         }
 
         .triangles .triangle:nth-child(3) {
-            transform: translatex(3em);
-            top: 0%;
+            transform: translateX(3em);
+            inset-block-start: 0%;
             background: oklch(from #fff l c h);
             z-index: 10;
         }
 
         .circles {
+            --delay: .02s;
             display: grid;
-            grid-template-columns: 6rem;
-            grid-template-rows: 6rem;
+            grid-template-columns: var(--dimension);
+            grid-template-rows: var(--dimension);
             place-items: center;
             margin: 0;
             padding: 0;
+            contain: layout;
+            place-content: center;
         }
 
         .circles .circle {
-            height: var(--dimension);
-            width: var(--dimension);
             --dimension: 6em;
-            --dur: 3s;
+            --dur: 2.88s;
+            block-size: var(--dimension);
+            inline-size: var(--dimension);
             grid-area: 1/1;
             border-radius: 50%;
             background: var(--color-secondary);
@@ -140,31 +137,33 @@
 
         .circles .circle:nth-child(3) {
             --dimension: 2em;
-            --dur: 3.4s;
+            --dur: 3.24s;
             background: oklch(from #fff l c h);
             z-index: 3;
         }
 
         .polygon-F {
-            height: var(--dimension);
-            width: var(--dimension);
+            block-size: var(--dimension);
+            inline-size: var(--dimension);
             display: flex;
             flex-flow: column;
             align-items: center;
+            contain: layout paint;
         }
 
         .polygon-F .polygon {
-            height: var(--dimension);
-            width: var(--dimension);
             --dimension: 2em;
-            --dur: 4s;
+            --dur: 3.36s;
             --delay: .1s;
+            block-size: var(--dimension);
+            inline-size: var(--dimension);
             position: relative;
             background: oklch(from #fff l c h);
             animation: polygons var(--dur) var(--timing) forwards;
         }
 
         .polygon-F .polygon:nth-child(2) {
+            --delay: .4s;
             background: var(--color-primary);
         }
 
@@ -172,16 +171,17 @@
             background: var(--color-secondary);
             clip-path: var(--triangle);
             transform: translate(-2em, 0);
+
         }
 
         .top:before,
         .mid:before {
-            height: var(--dimension);
-            width: var(--dimension);
             --dimension: 2em;
+            block-size: var(--dimension);
+            inline-size: var(--dimension);
             content: '';
             position: absolute;
-            top: 0;
+            inset-block-start: 0;
             clip-path: var(--triangle);
             transform: translate(-2em, 0);
             background: inherit;
@@ -218,11 +218,13 @@
             0% {
                 clip-path: polygon(100% 100%, 100% 100%, 100% 100%, 100% 100%);
                 opacity: 0;
+                filter: blur(12px);
             }
 
             100% {
                 clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
                 opacity: 1;
+                filter: blur(0px);
             }
         }
 
@@ -230,11 +232,13 @@
             0% {
                 clip-path: polygon(0 100%, 0 100%, 0 100%, 0 100%);
                 opacity: 0;
+                filter: blur(12px);
             }
 
             100% {
                 clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
                 opacity: 1;
+                filter: blur(0px);
             }
         }
 
@@ -242,12 +246,14 @@
             from {
                 60% {
                     opacity: 0;
+                    filter: blur(12px);
                 }
             }
 
             to {
                 opacity: 1;
                 translate: 0px;
+                filter: blur(0px);
             }
         }
 
@@ -256,6 +262,7 @@
                 opacity: 0;
                 scale: .5;
                 translate: -1rem .5rem;
+                filter: blur(2px);
             }
         }
 
@@ -264,6 +271,7 @@
                 opacity: 0;
                 scale: .5;
                 translate: -1rem .5rem;
+                filter: blur(2px);
             }
         }
 
@@ -272,6 +280,7 @@
                 opacity: 0;
                 scale: .5;
                 translate: -1rem .5rem;
+                filter: blur(2px);
             }
         }
     </style>
@@ -291,34 +300,28 @@
             <div class="bloc"></div>
             <div class="bloc"></div>
         </div>
-
         <div class='triangles'>
             <div class='triangle'></div>
             <div class='triangle'></div>
             <div class='triangle'></div>
         </div>
-
         <div class='circles'>
             <div class='circle'></div>
             <div class='circle'></div>
             <div class='circle'></div>
         </div>
-
         <div class='polygon-F'>
             <div class='polygon top'></div>
             <div class='polygon mid'></div>
             <div class='polygon bottom'></div>
         </div>
     </div>
-
     <button class="reset-btn" data-analytics-element="Reset Animation" onclick="resetAnimation()">
         <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="currentColor">
             <path
                 d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z" />
         </svg>
     </button>
-
-
     <script>
         function resetAnimation() {
             const elements = document.querySelectorAll('.bloc, .triangle, .circle, .half-circle, .polygon');
