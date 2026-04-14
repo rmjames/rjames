@@ -1,4 +1,4 @@
-const cacheName = 'v14'; // Bumped to v13 to fix caching of error responses
+const cacheName = 'v15'; // Bumped to v15 to cache lab subresources
 const OFFLINE = 'offline.html';
 
 const assetsToCache = [
@@ -26,7 +26,13 @@ const assetsToCache = [
   '/manifest.json',
   '/resume_icon.svg',
   '/lab_icon.svg',
-  '/scripts/resume-print.js'
+  '/scripts/resume-print.js',
+  '/scripts/favicon-animator.js',
+  '/scripts/AudioLibrary.js',
+  '/scripts/lab-analytics.js',
+  '/scripts/analytics.js',
+  '/scripts/analytics-loader.js',
+  '/scripts/copyright.js'
 ];
 
 self.addEventListener('install', event => {
