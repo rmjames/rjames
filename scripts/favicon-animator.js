@@ -3,6 +3,9 @@
  * Animation sequence: Circle (2s) -> Target (0.5s) -> Target (1.5s) -> Circle (0.5s) -> STOP.
  */
 (function () {
+  if (window.self !== window.top) {
+    document.documentElement.classList.add('in-iframe');
+  }
   const FPS_TARGET = 30;
   const PAINT_INTERVAL = 1000 / FPS_TARGET;
 
