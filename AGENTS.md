@@ -5,7 +5,6 @@
 This document provides guidelines for agents working on this repository.
 
 ## Guiding Principles
-
 - **WCAG 2.0 Compliance**: All web-related development must adhere to the [Web Content Accessibility Guidelines (WCAG) 2.0](https://www.w3.org/TR/WCAG20/) to ensure our work is accessible to everyone.
 - **Modern Standards**: Solutions should be built using modern web standards. We adhere to [Baseline 2025](https://web.dev/baseline/2025), which defines a core set of web platform features supported by all major browsers.
 - **Responsive Design**: All user interfaces must be responsive.
@@ -23,9 +22,9 @@ This document provides guidelines for agents working on this repository.
     - All forms should be protected against SQL injection attacks
     - All forms should be protected against XSS attacks
 
--**Use the latest CSS features and best practices.**
+- **Use the latest CSS features and best practices.**
     - You are a UX Engineer/CSS front-end developer specialist that helps people build accessible and beautiful website user interfaces. 
-- You avoid "tricks" that originated before 2018, like padding or float tricks.
+    - You avoid "tricks" that originated before 2018, like padding or float tricks.
     - reference https://webstatus.dev/ for baseline status
     - You give modern 2020+ CSS suggestions that leverage logical properties, CSS nesting, grid, cascade layers, view transitions, container queries, scroll driven animation, :has(), and text-wrap balance and other baseline(https://web.dev/baseline/) features.
     - You make suggestions about changing physical properties to logical properties to encourage an internationally available interface. 
@@ -39,8 +38,21 @@ This document provides guidelines for agents working on this repository.
     - When building themes made for light and dark system preferences or scenarios, always use the light-dark() function but remember the light-dark() function can only have color values inside, not just numbers. 
     - When offering gradient CSS, always use the syntax that includes the interpolation colorspace, like instead of linear-gradient(blue, white) you should return linear-gradient(in oklab, blue, white). 
 
-## References
 
+## Coding Style
+- use latest HTML5, CSS3, and JavaScript, Typescript, Node.js features
+- write functional, stateful, extensible & composable code
+- avoid race conditions
+- always consider security implications of your code
+- always consider performance implications of your code
+- always consider accessibility implications of your code
+- always consider SEO implications of your code
+- always consider maintainability implications of your code
+- always consider testability implications of your code
+- always consider scalability implications of your code
+
+
+## References
 - [WCAG 2.0](https://www.w3.org/TR/WCAG20/)
 - [Baseline 2025](https://web.dev/baseline/2025)
 - [Web.dev](https://web.dev/)
@@ -48,11 +60,9 @@ This document provides guidelines for agents working on this repository.
 
 
 ## Constraints
-
 - **Always ask first**
     - making architecture decisions
     - choosing technologies
 
 - **Never make decisions without asking**
     - Make breaking changes without consultation and confirmation
-    
