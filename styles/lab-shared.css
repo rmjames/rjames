@@ -63,3 +63,7 @@
         left: 1rem;
     }
 }
+
+html.in-iframe .back-link {
+    display: none !important;
+}
