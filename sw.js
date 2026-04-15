@@ -1,4 +1,4 @@
-const cacheName = 'v15'; // Bumped to v15 to cache lab subresources
+const cacheName = 'v16'; // Bumped to v16 to cache lab-shared.css
 const OFFLINE = 'offline.html';
 
 const assetsToCache = [
@@ -17,6 +17,7 @@ const assetsToCache = [
   '/lab/media-player.html',
   '/lab/microsoft-logo.html',
   '/styles/main.css',
+  '/styles/lab-shared.css',
   '/fonts/recursive-variable.woff2',
   '/images/icon.svg',
   '/images/icon-ios.svg',
