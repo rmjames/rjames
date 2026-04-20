@@ -1,4 +1,4 @@
-const cacheName = 'v16'; // Bumped to v16 to cache lab-shared.css
+const cacheName = 'v17'; // Bumped to v17 to cache media player scripts
 const OFFLINE = 'offline.html';
 
 const assetsToCache = [
@@ -33,7 +33,13 @@ const assetsToCache = [
   '/scripts/lab-analytics.js',
   '/scripts/analytics.js',
   '/scripts/analytics-loader.js',
-  '/scripts/copyright.js'
+  '/scripts/copyright.js',
+  '/scripts/media/ColorExtractor.js',
+  '/scripts/media/Constants.js',
+  '/scripts/media/Equalizer.js',
+  '/scripts/media/MediaPlayerCore.js',
+  '/scripts/media/MediaPlayerSelector.js',
+  '/scripts/media/MediaPlayerUI.js'
 ];
 
 self.addEventListener('install', event => {
