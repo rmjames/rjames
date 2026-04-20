@@ -1,3 +1,5 @@
+const colorCache = new Map();
+
 export const ColorExtractor = {
     /**
      * Converts RGB to OKLCH color string.
@@ -46,17 +48,42 @@ export const ColorExtractor = {
 
         if (!imageUrl) return DEFAULT_COLOR;
 
-        return new Promise((resolve) => {
+        // Security check: only allow relative paths
+        try {
+            new URL(imageUrl);
+            // If it parses successfully without a base URL, it is an absolute URL.
+            return DEFAULT_COLOR;
+        } catch {
+            // It threw an error, meaning it's likely a relative URL.
+            // However, `new URL('//domain.com')` also throws. We must check for protocol-relative paths.
+            if (imageUrl.startsWith('//')) {
+                return DEFAULT_COLOR;
+            }
+        }
+
+        // Cache check: return the Promise directly
+        if (colorCache.has(imageUrl)) {
+            return colorCache.get(imageUrl);
+        }
+
+        const colorPromise = new Promise((resolve) => {
             const img = new Image();
             img.crossOrigin = "Anonymous";
             img.src = imageUrl;
 
             img.onload = () => {
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
+                let canvas, ctx;
 
-                canvas.width = 10;
-                canvas.height = 10;
+                if (typeof OffscreenCanvas !== 'undefined') {
+                    canvas = new OffscreenCanvas(10, 10);
+                    ctx = canvas.getContext('2d', { willReadFrequently: true });
+                } else {
+                    canvas = document.createElement('canvas');
+                    canvas.width = 10;
+                    canvas.height = 10;
+                    ctx = canvas.getContext('2d', { willReadFrequently: true });
+                }
+
                 ctx.drawImage(img, 0, 0, 10, 10);
 
                 const data = ctx.getImageData(0, 0, 10, 10).data;
@@ -81,10 +108,23 @@ export const ColorExtractor = {
                 const avgG = g / count;
                 const avgB = b / count;
 
-                resolve(this.rgbToOklch(avgR, avgG, avgB));
+                const finalColor = this.rgbToOklch(avgR, avgG, avgB);
+                resolve(finalColor);
             };
 
-            img.onerror = () => resolve(DEFAULT_COLOR);
+            img.onerror = () => {
+                resolve(DEFAULT_COLOR);
+            };
         });
+
+        colorCache.set(imageUrl, colorPromise);
+        return colorPromise;
+    },
+
+    /**
+     * Clears the color cache.
+     */
+    clearCache() {
+        colorCache.clear();
     }
 };
