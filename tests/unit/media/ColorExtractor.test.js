@@ -52,11 +52,21 @@ describe('ColorExtractor', () => {
         afterEach(() => {
             global.Image = originalImage;
             mockGetContext.mockRestore();
+            ColorExtractor.clearCache();
         });
 
         it('should return default color if no imageUrl provided', async () => {
             const color = await ColorExtractor.getAccentColor(null);
             expect(color).toBe('oklch(0.623 0.214 259.415)');
+        });
+
+        it('should reject absolute URLs and return default color', async () => {
+            expect(await ColorExtractor.getAccentColor('http://example.com/img.jpg')).toBe('oklch(0.623 0.214 259.415)');
+            expect(await ColorExtractor.getAccentColor('https://example.com/img.jpg')).toBe('oklch(0.623 0.214 259.415)');
+            expect(await ColorExtractor.getAccentColor('data:image/png;base64,iVBORw0KGgo')).toBe('oklch(0.623 0.214 259.415)');
+            expect(await ColorExtractor.getAccentColor('//example.com/img.jpg')).toBe('oklch(0.623 0.214 259.415)');
+            expect(await ColorExtractor.getAccentColor('ftp://example.com/img.jpg')).toBe('oklch(0.623 0.214 259.415)');
+            expect(await ColorExtractor.getAccentColor('blob:http://localhost/something')).toBe('oklch(0.623 0.214 259.415)');
         });
 
         it('should return default color on image error', async () => {
@@ -81,6 +91,31 @@ describe('ColorExtractor', () => {
             // We expect a valid oklch string
             expect(color).toContain('oklch(');
             expect(mockContext.drawImage).toHaveBeenCalled();
+        });
+
+        it('should cache and return the same color for the same URL', async () => {
+            const redPixel = [255, 0, 0, 255];
+            const data = new Uint8ClampedArray(400); // 100 pixels * 4
+            for (let i = 0; i < 400; i += 4) {
+                data[i] = redPixel[0];
+                data[i+1] = redPixel[1];
+                data[i+2] = redPixel[2];
+                data[i+3] = redPixel[3];
+            }
+
+            mockContext.getImageData.mockReturnValue({ data });
+
+            const color1 = await ColorExtractor.getAccentColor('test-cache.jpg');
+
+            // clear mock data to ensure next call isn't processing again
+            mockContext.getImageData.mockClear();
+            mockContext.drawImage.mockClear();
+
+            const color2 = await ColorExtractor.getAccentColor('test-cache.jpg');
+
+            expect(color1).toBe(color2);
+            expect(mockContext.drawImage).not.toHaveBeenCalled();
+            expect(mockContext.getImageData).not.toHaveBeenCalled();
         });
 
         it('should ignore very dark or very bright pixels', async () => {
