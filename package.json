@@ -13,7 +13,8 @@
     "gen-audio": "node scripts/scan-audio.js",
     "watch-audio": "node scripts/scan-audio.js --watch",
     "lint": "eslint . --ext .js",
-    "prepare": "git config core.hooksPath .githooks"
+    "prepare": "git config core.hooksPath .githooks",
+    "test:judge": "node scripts/judge.js"
   },
   "author": "",
   "license": "ISC",

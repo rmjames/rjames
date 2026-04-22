@@ -18,3 +18,4 @@ playwright-report/
 # Security & Local Dev
 .dev.vars
 .wrangler/
+.env
