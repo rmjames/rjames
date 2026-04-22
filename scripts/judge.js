@@ -50,8 +50,19 @@ async function run() {
     const prompt = `You are an expert security and performance code reviewer acting as a judge.
 Review the following HTML, CSS, and JS files from a web project.
 Identify any clear security vulnerabilities (like XSS, CSRF, insecure configurations) or major performance issues.
-If there are any security or performance issues that would fail a strict review, output a JSON object with "pass": false and a "reasons" array.
-If the codebase is secure and performant, output a JSON object with "pass": true and a "reasons" array explaining why.
+
+CRITICAL INSTRUCTIONS:
+1. You MUST provide at least 5 detailed reasons/suggestions in your output. Do not provide fewer than 5.
+2. Be extremely critical and biased towards finding flaws. Do not just hand out good scores. Scrutinize the codebase for any sub-optimal practices, and provide strict, actionable suggestions to make the project better.
+
+If there are any security or performance issues that would fail a strict review, output a JSON object with "pass": false and a "reasons" array of objects.
+If the codebase is secure and performant, output a JSON object with "pass": true and a "reasons" array of objects explaining why.
+Each object in the "reasons" array MUST have the following keys:
+- "secRating": A string rating (e.g., "A", "B", "C", "F")
+- "perfRating": A string rating (e.g., "A", "B", "C", "F")
+- "passFail": "Pass" or "Fail"
+- "suggestions": A single string containing a distinct and actionable suggestion.
+
 Return ONLY valid JSON. No markdown formatting around the JSON, just the JSON string itself.
 
 Codebase:
@@ -61,7 +72,7 @@ ${codebaseContent}
     console.log("Sending codebase to Gemini API for evaluation...");
 
     try {
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -108,13 +119,51 @@ ${codebaseContent}
             process.exit(1);
         }
 
+        function printTable(reasons) {
+            if (!reasons || reasons.length === 0) return;
+            const wrapText = (text, maxLen) => {
+                const words = String(text || '').split(' ');
+                const lines = [];
+                let currentLine = '';
+                for (const word of words) {
+                    if ((currentLine + word).length > maxLen) {
+                        if (currentLine) lines.push(currentLine.trim());
+                        currentLine = word + ' ';
+                    } else {
+                        currentLine += word + ' ';
+                    }
+                }
+                if (currentLine) lines.push(currentLine.trim());
+                return lines.length ? lines : [''];
+            };
+
+            const pad = (str, len) => String(str || '').padEnd(len, ' ');
+            const secW = 10, perfW = 11, passW = 10, suggW = 60;
+            const separator = `+-${'-'.repeat(secW)}-+-${'-'.repeat(perfW)}-+-${'-'.repeat(passW)}-+-${'-'.repeat(suggW)}-+`;
+            
+            console.log(separator);
+            console.log(`| ${pad('secRating', secW)} | ${pad('perfRating', perfW)} | ${pad('passFail', passW)} | ${pad('suggestions', suggW)} |`);
+            console.log(separator);
+
+            reasons.forEach(r => {
+                const suggLines = wrapText(r.suggestions, suggW);
+                for (let i = 0; i < suggLines.length; i++) {
+                    const sec = i === 0 ? r.secRating : '';
+                    const perf = i === 0 ? r.perfRating : '';
+                    const pass = i === 0 ? r.passFail : '';
+                    console.log(`| ${pad(sec, secW)} | ${pad(perf, perfW)} | ${pad(pass, passW)} | ${pad(suggLines[i], suggW)} |`);
+                }
+                console.log(separator);
+            });
+        }
+
         if (result.pass) {
             console.log("\n✅ Codebase PASSED the security and performance review!");
-            console.log("Reasons:", result.reasons);
+            printTable(result.reasons);
             process.exit(0);
         } else {
             console.error("\n❌ Codebase FAILED the security and performance review.");
-            console.error("Issues found:", JSON.stringify(result.reasons, null, 2));
+            printTable(result.reasons);
             process.exit(1);
         }
 

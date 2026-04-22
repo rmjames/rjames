@@ -77,4 +77,35 @@ test.describe('Service Worker Caching Security', () => {
 
     expect(statusOffline).toBe(200);
   });
+
+  test('should install successfully and cache other assets even if one install asset 404s', async ({ page, context }) => {
+    // Intercept one of the pre-cached assets to force a 404
+    await context.route('/lab/framer-logo.html', route => {
+      route.fulfill({ status: 404, contentType: 'text/html', body: 'Not Found' });
+    });
+
+    await page.goto('/');
+
+    // Wait for the service worker to become activated
+    await page.waitForFunction(async () => {
+      const reg = await navigator.serviceWorker.ready;
+      return reg.active?.state === 'activated';
+    });
+
+    // Go offline
+    await context.setOffline(true);
+
+    // Fetch another asset from the pre-cache list that should have succeeded
+    const offlineStatus = await page.evaluate(async () => {
+        try {
+            const res = await fetch('/resume.html');
+            return res.status;
+        } catch (e) {
+            return e.toString();
+        }
+    });
+
+    // Expect the other asset to be successfully cached and retrievable
+    expect(offlineStatus).toBe(200);
+  });
 });

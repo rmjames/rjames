@@ -51,6 +51,44 @@ This document provides guidelines for agents working on this repository.
 - always consider testability implications of your code
 - always consider scalability implications of your code
 
+## Tests
+- always adhere to best practices for testing
+- run tests after every change
+- fix tests if they fail
+- always test your code and its implications
+
+## ESlint Rules
+adhere to the following linting rules:
+```json
+{
+  "env": {
+    "browser": true,
+    "es2021": true,
+    "node": true
+  },
+  "extends": "eslint:recommended",
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "sourceType": "module"
+  },
+  "rules": {
+    "no-unused-vars": "warn",
+    "no-inner-declarations": "warn",
+    "no-empty": "warn",
+    "no-useless-escape": "warn"
+  },
+  "globals": {
+    "dataLayer": true,
+    "gtag": true
+  }
+}
+```
+
+## Version Control
+adhere to the following version control rules:
+- Use conventional commits
+- Use detailed commit messages
+- Use proper commit message formatting
 
 ## References
 - [WCAG 2.0](https://www.w3.org/TR/WCAG20/)
