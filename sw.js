@@ -45,7 +45,16 @@ const assetsToCache = [
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(cacheName)
-      .then(cache => cache.addAll(assetsToCache))
+      .then(cache => {
+        // Cache assets individually so a single 404 doesn't fail the entire installation
+        return Promise.all(
+          assetsToCache.map(url => 
+            cache.add(url).catch(error => {
+              console.warn(`Failed to cache ${url} during install:`, error);
+            })
+          )
+        );
+      })
       .then(() => self.skipWaiting())
   );
 });
