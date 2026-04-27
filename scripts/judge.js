@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const IGNORED_DIRS = new Set(['node_modules', '.git', 'build', 'dist', 'public', '.jules', '.claude', 'images', 'fonts', 'assets']);
+const IGNORED_DIRS = new Set(['node_modules', '.git', 'build', 'dist', 'public', '.jules', '.claude', 'images', 'fonts', 'assets', 'tests', 'lab', 'evals']);
 const ALLOWED_EXTENSIONS = new Set(['.js', '.html', '.css']);
 const TASKS_FILE = path.join(__dirname, '..', 'tasks.md');
 
@@ -293,31 +293,7 @@ function printTable(reasons) {
     }
 }
 
-async function run() {
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) {
-        console.error("Error: GEMINI_API_KEY environment variable is not set.");
-        process.exit(1);
-    }
-
-    const existingTasks = loadTasks();
-    if (existingTasks.length > 0) {
-        console.log(`Loaded ${existingTasks.length} existing tasks from tasks.md`);
-    }
-
-    const files = getAllFiles(path.join(__dirname, '..'));
-
-    let codebaseContent = "";
-    for (const file of files) {
-        try {
-            const content = fs.readFileSync(file, 'utf-8');
-            codebaseContent += `\n\n--- File: ${path.relative(path.join(__dirname, '..'), file)} ---\n`;
-            codebaseContent += content;
-        } catch (e) {
-            console.warn(`Could not read file ${file}: ${e.message}`);
-        }
-    }
-
+async function scanCodebase(apiKey, codebaseContent, existingTasks) {
     const secPrompt = getAgentPrompt("Security", codebaseContent, existingTasks);
     const perfPrompt = getAgentPrompt("Performance", codebaseContent, existingTasks);
 
@@ -330,35 +306,16 @@ async function run() {
     const perfResult = results[1].status === 'fulfilled' ? results[1].value : null;
 
     let allReasons = [];
-    let overallPass = true;
+    if (secResult && secResult.reasons) allReasons = allReasons.concat(secResult.reasons);
+    if (perfResult && perfResult.reasons) allReasons = allReasons.concat(perfResult.reasons);
 
-    if (secResult) {
-        if (secResult.reasons && secResult.reasons.length > 0) {
-            allReasons = allReasons.concat(secResult.reasons);
-        }
-        if (!secResult.pass) overallPass = false;
-    }
+    return {
+        allReasons,
+        pass: (secResult?.pass !== false) && (perfResult?.pass !== false)
+    };
+}
 
-    if (perfResult) {
-        if (perfResult.reasons && perfResult.reasons.length > 0) {
-            allReasons = allReasons.concat(perfResult.reasons);
-        }
-        if (!perfResult.pass) overallPass = false;
-    }
-
-    // Print summary of existing tasks
-    const openTasksCount = existingTasks.filter(t => t.status === 'Open').length;
-    if (openTasksCount > 0) {
-        console.log(`\nℹ️  Note: There are ${openTasksCount} existing open tasks in tasks.md.`);
-    }
-
-    if (allReasons.length === 0) {
-        console.log("\n✅ No new issues found in this scan.");
-    } else {
-        printTable(allReasons);
-    }
-
-    // Merge logic: Add new suggestions to tasks
+function mergeFindings(existingTasks, allReasons) {
     const newTasks = [...existingTasks];
     const addedTasks = [];
 
@@ -383,6 +340,50 @@ async function run() {
         }
     });
 
+    return { newTasks, addedTasks };
+}
+
+async function run() {
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+        console.error("Error: GEMINI_API_KEY environment variable is not set.");
+        process.exit(1);
+    }
+
+    const existingTasks = loadTasks();
+    if (existingTasks.length > 0) {
+        console.log(`Loaded ${existingTasks.length} existing tasks from tasks.md`);
+    }
+
+    const files = getAllFiles(path.join(__dirname, '..'));
+    let codebaseContent = "";
+    for (const file of files) {
+        try {
+            const content = fs.readFileSync(file, 'utf-8');
+            codebaseContent += `\n\n--- File: ${path.relative(path.join(__dirname, '..'), file)} ---\n`;
+            codebaseContent += content;
+        } catch (e) {
+            console.warn(`Could not read file ${file}: ${e.message}`);
+        }
+    }
+
+    console.log("🚀 Starting codebase analysis...");
+    const { allReasons, pass } = await scanCodebase(apiKey, codebaseContent, existingTasks);
+
+    // Print summary of existing tasks
+    const openTasksCount = existingTasks.filter(t => t.status === 'Open').length;
+    if (openTasksCount > 0) {
+        console.log(`\nℹ️  Note: There are ${openTasksCount} existing open tasks in tasks.md.`);
+    }
+
+    if (allReasons.length === 0) {
+        console.log("\n✅ No new issues found in this scan.");
+    } else {
+        printTable(allReasons);
+    }
+
+    const { newTasks, addedTasks } = mergeFindings(existingTasks, allReasons);
+
     if (addedTasks.length > 0) {
         console.log(`\n🆕 Proposed ${addedTasks.length} new task(s) for tasks.md:`);
         addedTasks.forEach(t => {
@@ -402,7 +403,7 @@ async function run() {
         }
     }
 
-    if (!overallPass) {
+    if (!pass) {
         console.error("\n❌ Codebase FAILED the scan.");
         if (require.main === module) process.exit(1);
         return false;
@@ -420,6 +421,8 @@ module.exports = {
     getAgentPrompt,
     callGemini,
     printTable,
+    scanCodebase,
+    mergeFindings,
     run
 };
 
