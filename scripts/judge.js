@@ -404,11 +404,25 @@ async function run() {
 
     if (!overallPass) {
         console.error("\n❌ Codebase FAILED the scan.");
-        process.exit(1);
+        if (require.main === module) process.exit(1);
+        return false;
     } else {
         console.log("\n✅ Codebase PASSED the scan!");
-        process.exit(0);
+        if (require.main === module) process.exit(0);
+        return true;
     }
 }
 
-run();
+module.exports = {
+    loadTasks,
+    saveTasks,
+    getAllFiles,
+    getAgentPrompt,
+    callGemini,
+    printTable,
+    run
+};
+
+if (require.main === module) {
+    run();
+}
