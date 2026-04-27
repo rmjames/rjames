@@ -93,59 +93,86 @@
 
   const framesCache = [];
   let isCacheComplete = false;
+  let isGenerating = false;
   let rafId = null;
   let startTime = null;
   let lastPaintTime = 0;
 
-  function render(t) {
-    // Stage 1: Playback from Cache
-    if (isCacheComplete) {
-      const idx = Math.floor(t / PAINT_INTERVAL);
-      if (idx >= framesCache.length) {
-        favicon.href = framesCache[framesCache.length - 1];
-        stop();
-        return;
+  function pregenerateFrames() {
+    if (isCacheComplete || isGenerating) return;
+    isGenerating = true;
+
+    let t = 0;
+    const generateChunk = (deadline) => {
+      // Process as many frames as possible in the idle period
+      while ((!deadline || deadline.timeRemaining() > 1) && t <= totalDuration) {
+        let progress = 0;
+        if (t < timing.hold1) {
+          current.set(circle);
+        } else if (t < timing.hold1 + timing.morph1) {
+          progress = (t - timing.hold1) / timing.morph1;
+          for (let i = 0; i < current.length; i++) current[i] = circle[i] + (target[i] - circle[i]) * progress;
+        } else if (t < timing.hold1 + timing.morph1 + timing.hold2) {
+          current.set(target);
+        } else if (t < timing.hold1 + timing.morph1 + timing.hold2 + timing.morph2) {
+          progress = (t - (timing.hold1 + timing.morph1 + timing.hold2)) / timing.morph2;
+          for (let i = 0; i < current.length; i++) current[i] = target[i] + (circle[i] - target[i]) * progress;
+        } else {
+          current.set(circle);
+        }
+
+        ctx.clearRect(0, 0, 32, 32);
+        ctx.strokeStyle = '#f59e0b'; ctx.lineWidth = 4; ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(current[0] * 32, current[1] * 32);
+        for (let i = 0; i < 12; i++) {
+          const o = i * 6 + 2;
+          ctx.bezierCurveTo(current[o] * 32, current[o + 1] * 32, current[o + 2] * 32, current[o + 3] * 32, current[o + 4] * 32, current[o + 5] * 32);
+        }
+        ctx.closePath();
+        ctx.stroke();
+
+        framesCache.push(canvas.toDataURL('image/png'));
+        t += PAINT_INTERVAL;
       }
-      favicon.href = framesCache[idx];
+
+      if (t <= totalDuration) {
+        if (window.requestIdleCallback) {
+          requestIdleCallback(generateChunk);
+        } else {
+          setTimeout(() => generateChunk(), 16);
+        }
+      } else {
+        isCacheComplete = true;
+        isGenerating = false;
+        // If we were waiting for the cache to start, start now
+        if (document.hasFocus() && !document.hidden) {
+          start();
+        }
+      }
+    };
+
+    if (window.requestIdleCallback) {
+      requestIdleCallback(generateChunk);
+    } else {
+      generateChunk();
+    }
+  }
+
+  function render(t) {
+    if (!isCacheComplete) return;
+
+    const idx = Math.floor(t / PAINT_INTERVAL);
+    if (idx >= framesCache.length) {
+      favicon.href = framesCache[framesCache.length - 1];
+      stop();
       return;
     }
-
-    // Stage 2: Initial Render & Cache Recording
-    if (t >= totalDuration) {
-      current.set(circle);
-      isCacheComplete = true;
-    } else {
-      let progress = 0;
-      if (t < timing.hold1) {
-        current.set(circle);
-      } else if (t < timing.hold1 + timing.morph1) {
-        progress = (t - timing.hold1) / timing.morph1;
-        for (let i = 0; i < current.length; i++) current[i] = circle[i] + (target[i] - circle[i]) * progress;
-      } else if (t < timing.hold1 + timing.morph1 + timing.hold2) {
-        current.set(target);
-      } else if (t < timing.hold1 + timing.morph1 + timing.hold2 + timing.morph2) {
-        progress = (t - (timing.hold1 + timing.morph1 + timing.hold2)) / timing.morph2;
-        for (let i = 0; i < current.length; i++) current[i] = target[i] + (circle[i] - target[i]) * progress;
-      }
-    }
-
-    ctx.clearRect(0, 0, 32, 32);
-    ctx.strokeStyle = '#f59e0b'; ctx.lineWidth = 4; ctx.lineJoin = 'round'; ctx.lineCap = 'round';
-    ctx.beginPath();
-    ctx.moveTo(current[0] * 32, current[1] * 32);
-    for (let i = 0; i < 12; i++) {
-      const o = i * 6 + 2;
-      ctx.bezierCurveTo(current[o] * 32, current[o + 1] * 32, current[o + 2] * 32, current[o + 3] * 32, current[o + 4] * 32, current[o + 5] * 32);
-    }
-    ctx.closePath();
-    ctx.stroke();
-
-    const dataUrl = canvas.toDataURL('image/png');
-    favicon.href = dataUrl;
-    framesCache.push(dataUrl);
-
-    if (isCacheComplete) {
-      stop();
+    
+    // Only update DOM if the frame actually changed
+    const nextHref = framesCache[idx];
+    if (favicon.getAttribute('href') !== nextHref) {
+      favicon.href = nextHref;
     }
   }
 
@@ -165,16 +192,13 @@
   }
 
   function start() {
+    if (!isCacheComplete) {
+      pregenerateFrames();
+      return;
+    }
     stop();
     startTime = null;
     lastPaintTime = 0;
-
-    // If we haven't finished the first full recording yet, 
-    // clear any partial frames so the next attempt starts clean.
-    if (!isCacheComplete) {
-      framesCache.length = 0;
-    }
-
     rafId = requestAnimationFrame(animate);
   }
 
@@ -188,9 +212,7 @@
   // Visibility & Focus Logic: Re-trigger full loop on focus
   const handleFocus = () => {
     if (document.hidden) return;
-
     // 100ms buffer gives the browser UI thread a moment to foreground
-    // before we start pushing dense favicon updates.
     setTimeout(start, 100);
   };
 
@@ -198,6 +220,6 @@
   window.addEventListener('pageshow', handleFocus);
   window.addEventListener('focus', handleFocus);
 
-  if (document.readyState === 'complete') start();
-  else window.addEventListener('load', start);
+  if (document.readyState === 'complete') pregenerateFrames();
+  else window.addEventListener('load', pregenerateFrames);
 })();

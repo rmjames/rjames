@@ -15,6 +15,7 @@
 - **Tech Stack**: Use latest HTML5, CSS3, ESNext, TypeScript, and Node.js.
 - **Quality**: Write functional, composable, and stateful code. Avoid race conditions.
 - **Testing**: Run tests after every change and fix failures immediately.
+  - Any change to a file should result in tests being run against that file. Test should be updated to reflect the change. 
 - **Linting**: Follow the defined ESLint rules (see below).
 - **Version Control**: Use conventional commits and detailed messages.
 
@@ -42,3 +43,4 @@
 ## References
 - [Baseline 2025](https://web.dev/baseline/2025) | [Webstatus.dev](https://webstatus.dev/)
 - [WCAG 2.0](https://www.w3.org/TR/WCAG20/) | [Web.dev](https://web.dev/) | [MDN](https://developer.mozilla.org/en-US/)
+
