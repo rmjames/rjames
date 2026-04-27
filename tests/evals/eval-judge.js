@@ -1,0 +1,88 @@
+const fs = require('fs');
+const path = require('path');
+const { callGemini, getAgentPrompt } = require('../../scripts/judge.js');
+
+const MANIFEST_PATH = path.join(__dirname, 'manifest.json');
+const API_KEY = process.env.GEMINI_API_KEY;
+
+async function runEvals() {
+    if (!API_KEY) {
+        console.error("Error: GEMINI_API_KEY environment variable is not set.");
+        process.exit(1);
+    }
+
+    if (!fs.existsSync(MANIFEST_PATH)) {
+        console.error("Error: manifest.json not found.");
+        process.exit(1);
+    }
+
+    const manifest = JSON.parse(fs.readFileSync(MANIFEST_PATH, 'utf-8'));
+    const results = [];
+
+    console.log(`\n🔍 Starting Evaluation of judge.js using ${manifest.length} fixtures...\n`);
+
+    for (const test of manifest) {
+        console.log(`Testing: ${test.name} (${test.file})...`);
+        
+        try {
+            const absolutePath = path.join(__dirname, '..', '..', test.file);
+            const content = fs.readFileSync(absolutePath, 'utf-8');
+            const codebaseContext = `--- File: ${test.file} ---\n${content}`;
+            
+            const prompt = getAgentPrompt(test.agentType, codebaseContext, []);
+            const response = await callGemini(API_KEY, prompt, test.agentType);
+
+            if (!response) {
+                console.error(`  ❌ Failed to get response for ${test.name}`);
+                results.push({ ...test, passed: false, error: 'No response' });
+                continue;
+            }
+
+            const foundExpected = test.expectedIssue 
+                ? response.reasons.some(r => r.suggestions.toLowerCase().includes(test.expectedIssue.toLowerCase()))
+                : response.pass === true;
+
+            const isFalsePositive = !test.expectedIssue && response.pass === false;
+
+            if (foundExpected && !isFalsePositive) {
+                console.log(`  ✅ Passed`);
+                results.push({ ...test, passed: true });
+            } else {
+                console.log(`  ❌ Failed`);
+                results.push({ ...test, passed: false, actual: response.reasons.map(r => r.suggestions) });
+            }
+        } catch (e) {
+            console.error(`  ❌ Error processing ${test.name}: ${e.message}`);
+            results.push({ ...test, passed: false, error: e.message });
+        }
+    }
+
+    printSummary(results);
+}
+
+function printSummary(results) {
+    const total = results.length;
+    const passed = results.filter(r => r.passed).length;
+    const recall = (passed / total) * 100;
+
+    console.log("\n" + "=".repeat(40));
+    console.log("📊 EVALUATION SUMMARY");
+    console.log("=".repeat(40));
+    console.log(`Total Tests: ${total}`);
+    console.log(`Passed:      ${passed}`);
+    console.log(`Recall:      ${recall.toFixed(2)}%`);
+    console.log("=".repeat(40));
+
+    if (passed < total) {
+        console.log("\nFailures:");
+        results.filter(r => !r.passed).forEach(r => {
+            console.log(`- ${r.name}: ${r.error || 'Issue not found in reasons'}`);
+            if (r.actual) {
+                console.log(`  Found instead: ${r.actual.join(', ').substring(0, 100)}...`);
+            }
+        });
+    }
+    console.log("\n");
+}
+
+runEvals();
