@@ -15,20 +15,32 @@ function loadTasks() {
         sections.forEach(section => {
             const lines = section.split('\n');
             const status = lines[0].includes('[x]') ? 'Resolved' : 'Open';
-            lines.slice(1).forEach(line => {
-                // Regex to match the task format
+            for (let i = 1; i < lines.length; i++) {
+                const line = lines[i];
+                // Match the main task line
                 const match = line.match(/- \[([ x])\] \*\*(SEC|PERF)-(\w+)\*\*: (.*?) \(File: (.*?), Line: (.*?)\)/);
                 if (match) {
-                    tasks.push({
+                    const task = {
                         status: match[1] === 'x' ? 'Resolved' : 'Open',
                         id: `${match[2]}-${match[3]}`,
                         suggestions: match[4],
                         file: match[5],
                         line: match[6],
+                        suggestedFix: null,
                         agentType: match[2] === 'SEC' ? 'Security' : 'Performance'
-                    });
+                    };
+
+                    // Look ahead for the fix line
+                    if (i + 1 < lines.length && lines[i + 1].trim().startsWith('- **Fix**:')) {
+                        const fixMatch = lines[i + 1].match(/- \*\*Fix\*\*: (.*)/);
+                        if (fixMatch) {
+                            task.suggestedFix = fixMatch[1];
+                            i++; // Skip the next line since we've processed it
+                        }
+                    }
+                    tasks.push(task);
                 }
-            });
+            }
         });
         return tasks;
     } catch (e) {
@@ -47,6 +59,9 @@ function saveTasks(tasks) {
         const prefix = t.agentType === 'Security' ? 'SEC' : 'PERF';
         const idPart = t.id.includes('-') ? t.id.split('-')[1] : t.id;
         content += `- [ ] **${prefix}-${idPart}**: ${t.suggestions} (File: ${t.file}, Line: ${t.line})\n`;
+        if (t.suggestedFix) {
+            content += `  - **Fix**: ${t.suggestedFix.replace(/\n/g, ' ')}\n`;
+        }
     });
 
     content += "\n## [x] Resolved Tasks\n";
@@ -54,6 +69,9 @@ function saveTasks(tasks) {
         const prefix = t.agentType === 'Security' ? 'SEC' : 'PERF';
         const idPart = t.id.includes('-') ? t.id.split('-')[1] : t.id;
         content += `- [x] **${prefix}-${idPart}**: ${t.suggestions} (File: ${t.file}, Line: ${t.line})\n`;
+        if (t.suggestedFix) {
+            content += `  - **Fix**: ${t.suggestedFix.replace(/\n/g, ' ')}\n`;
+        }
     });
 
     fs.writeFileSync(TASKS_FILE, content);
@@ -87,17 +105,29 @@ function getAgentPrompt(agentType, codebaseContent, existingTasks = []) {
     const taskContext = openTasks.length > 0
         ? `\nKNOWN ISSUES (Do not repeat these unless providing new critical context):\n${openTasks.map(t => `- ${t.suggestions} (File: ${t.file})`).join('\n')}\n`
         : "";
+    const references = ["https://csrc.nist.gov/projects/supply-chain-risk-management", "https://osv.dev/", "https://owasp.org/Top10/", "https://cwe.mitre.org/"];
 
     if (agentType === "Security") {
+        const refContext = `\nSECURITY STANDARDS & REFERENCES:\n${references.map(r => `- ${r}`).join('\n')}\n`;
         return `You are an expert security code reviewer acting as a judge.
-Review the following HTML, CSS, and JS files from a web project.
+Review the following HTML, CSS, and JS files from a web project. Look at all possible attack vectors.
 Identify any clear security vulnerabilities (like XSS, CSRF, insecure configurations, etc).
-${taskContext}
+${taskContext}${refContext}
 CRITICAL INSTRUCTIONS:
 1. You MUST provide at least 5 detailed reasons/suggestions in your output.
-2. For each issue, specify the exact FILE and approximate LINE NUMBER.
-3. For each issue, provide a "suggestedFix" which includes a code example or specific implementation step.
-4. Be extremely critical and biased towards finding flaws. Scrutinize the codebase for any security risks.
+2. Rank vulnerabilities by Risk Score (Likelihood × Impact) from highest to lowest.
+3. For each issue, you MUST provide:
+   - Likelihood (1-5, where 5 is almost certain).
+   - Impact (1-5, where 5 is critical/total compromise).
+   - The exact vulnerable code snippet from the file.
+   - A Proof-of-Concept (PoC) payload or curl command to demonstrate the vulnerability.
+   - A detailed "suggestedFix" with a secure code example.
+4. Deep Analysis Requirements:
+   - Analyze Data, User, and Business Flows: Look for logic flaws or insecure transitions between states.
+   - Scrutinize Auth Boundaries: Check how sensitive data is protected and where access controls might be bypassed.
+   - Identify Entry Points: Map all inputs (URL params, form data, API endpoints, etc.) and verify they are sanitized and validated.
+5. Your analysis and suggestions should be informed by the security standards and databases listed in the REFERENCES section above.
+6. Be extremely critical and biased towards finding flaws. Scrutinize the codebase for any security risks.
 
 If there are any security issues that would fail a strict review, output a JSON object with "pass": false and a "reasons" array of objects.
 If the codebase is secure, output a JSON object with "pass": true and a "reasons" array of objects explaining why.
@@ -105,6 +135,11 @@ Each object in the "reasons" array MUST have the following keys:
 - "rating": A string rating (e.g., "A", "B", "C", "F")
 - "passFail": "Pass" or "Fail"
 - "suggestions": A single string containing a distinct and actionable description of the issue.
+- "likelihood": (Number 1-5)
+- "impact": (Number 1-5)
+- "riskScore": (Number, likelihood * impact)
+- "vulnerableCode": A string containing the exact vulnerable snippet.
+- "poc": A string containing the PoC payload or curl command.
 - "file": The relative path of the file where the issue exists.
 - "line": The line number where the issue exists.
 - "suggestedFix": A detailed fix with code examples and explanation.
@@ -180,11 +215,13 @@ async function callGemini(apiKey, prompt, agentType) {
         let result;
         try {
             let cleanText = textResponse.trim();
-            if (cleanText.startsWith('```json')) cleanText = cleanText.substring(7);
-            if (cleanText.startsWith('```')) cleanText = cleanText.substring(3);
-            if (cleanText.endsWith('```')) cleanText = cleanText.substring(0, cleanText.length - 3);
+            // Try to extract JSON if it's wrapped in markdown or has preamble
+            const jsonMatch = cleanText.match(/\{[\s\S]*\}/);
+            if (jsonMatch) {
+                cleanText = jsonMatch[0];
+            }
 
-            result = JSON.parse(cleanText.trim());
+            result = JSON.parse(cleanText);
 
             if (result.reasons && Array.isArray(result.reasons)) {
                 result.reasons = result.reasons.map(r => ({ ...r, agentType }));
@@ -192,7 +229,9 @@ async function callGemini(apiKey, prompt, agentType) {
             return result;
         } catch (e) {
             console.error(`Failed to parse Gemini response as JSON for ${agentType} Agent:`);
+            console.error("--- RAW RESPONSE START ---");
             console.error(textResponse);
+            console.error("--- RAW RESPONSE END ---");
             return null;
         }
     } catch (e) {
@@ -220,30 +259,38 @@ function printTable(reasons) {
     };
 
     const pad = (str, len) => String(str || '').padEnd(len, ' ');
-    const agentW = 10, locW = 25, ratingW = 6, passW = 8, suggW = 50, fixW = 60;
-    const separator = `+-${'-'.repeat(agentW)}-+-${'-'.repeat(locW)}-+-${'-'.repeat(ratingW)}-+-${'-'.repeat(passW)}-+-${'-'.repeat(suggW)}-+-${'-'.repeat(fixW)}-+`;
+    const agentW = 10, locW = 25, ratingW = 6, passW = 8, riskW = 6, suggW = 45, fixW = 55;
+    const separator = `+-${'-'.repeat(agentW)}-+-${'-'.repeat(locW)}-+-${'-'.repeat(ratingW)}-+-${'-'.repeat(passW)}-+-${'-'.repeat(riskW)}-+-${'-'.repeat(suggW)}-+-${'-'.repeat(fixW)}-+`;
 
     console.log(separator);
-    console.log(`| ${pad('Agent', agentW)} | ${pad('Location', locW)} | ${pad('Rate', ratingW)} | ${pad('Status', passW)} | ${pad('Issue', suggW)} | ${pad('Suggested Fix', fixW)} |`);
+    console.log(`| ${pad('Agent', agentW)} | ${pad('Location', locW)} | ${pad('Rate', ratingW)} | ${pad('Status', passW)} | ${pad('Risk', riskW)} | ${pad('Issue', suggW)} | ${pad('Suggested Fix', fixW)} |`);
     console.log(separator);
 
     reasons.forEach(r => {
-        const loc = `${r.file}:${r.line}`;
-        const suggLines = wrapText(r.suggestions, suggW);
-        const fixLines = wrapText(r.suggestedFix, fixW);
+        const loc = `${r.file || 'unknown'}:${r.line || '?'}`;
+        const risk = r.riskScore ? r.riskScore.toString() : '-';
+        const suggLines = wrapText(r.suggestions || 'No description', suggW);
+        const fixLines = wrapText(r.suggestedFix || 'No fix provided', fixW);
         const maxLines = Math.max(suggLines.length, fixLines.length);
 
         for (let i = 0; i < maxLines; i++) {
-            const agent = i === 0 ? r.agentType.substring(0, 3) : '';
+            const agent = (i === 0 && r.agentType) ? r.agentType.substring(0, 3) : '';
             const location = i === 0 ? loc.substring(0, locW) : '';
-            const rating = i === 0 ? r.rating : '';
-            const pass = i === 0 ? r.passFail : '';
+            const rating = i === 0 ? (r.rating || '-') : '';
+            const pass = i === 0 ? (r.passFail || '-') : '';
+            const riskStr = i === 0 ? risk : '';
             const sugg = suggLines[i] || '';
             const fix = fixLines[i] || '';
-            console.log(`| ${pad(agent, agentW)} | ${pad(location, locW)} | ${pad(rating, ratingW)} | ${pad(pass, passW)} | ${pad(sugg, suggW)} | ${pad(fix, fixW)} |`);
+            console.log(`| ${pad(agent, agentW)} | ${pad(location, locW)} | ${pad(rating, ratingW)} | ${pad(pass, passW)} | ${pad(riskStr, riskW)} | ${pad(sugg, suggW)} | ${pad(fix, fixW)} |`);
         }
         console.log(separator);
     });
+
+    if (reasons.length > 0) {
+        console.log(`\nFound ${reasons.length} total issues (new and existing).`);
+    } else {
+        console.log("\nNo issues found.");
+    }
 }
 
 async function run() {
@@ -258,7 +305,6 @@ async function run() {
         console.log(`Loaded ${existingTasks.length} existing tasks from tasks.md`);
     }
 
-    console.log("Gathering codebase files...");
     const files = getAllFiles(path.join(__dirname, '..'));
 
     let codebaseContent = "";
@@ -271,8 +317,6 @@ async function run() {
             console.warn(`Could not read file ${file}: ${e.message}`);
         }
     }
-
-    console.log("Sending codebase to Gemini API for Security and Performance evaluations concurrently...");
 
     const secPrompt = getAgentPrompt("Security", codebaseContent, existingTasks);
     const perfPrompt = getAgentPrompt("Performance", codebaseContent, existingTasks);
@@ -289,45 +333,96 @@ async function run() {
     let overallPass = true;
 
     if (secResult) {
-        allReasons = allReasons.concat(secResult.reasons || []);
+        if (secResult.reasons && secResult.reasons.length > 0) {
+            allReasons = allReasons.concat(secResult.reasons);
+        }
         if (!secResult.pass) overallPass = false;
     }
 
     if (perfResult) {
-        allReasons = allReasons.concat(perfResult.reasons || []);
+        if (perfResult.reasons && perfResult.reasons.length > 0) {
+            allReasons = allReasons.concat(perfResult.reasons);
+        }
         if (!perfResult.pass) overallPass = false;
+    }
+
+    // Print summary of existing tasks
+    const openTasksCount = existingTasks.filter(t => t.status === 'Open').length;
+    if (openTasksCount > 0) {
+        console.log(`\nℹ️  Note: There are ${openTasksCount} existing open tasks in tasks.md.`);
+    }
+
+    if (allReasons.length === 0) {
+        console.log("\n✅ No new issues found in this scan.");
+    } else {
+        printTable(allReasons);
     }
 
     // Merge logic: Add new suggestions to tasks
     const newTasks = [...existingTasks];
+    const addedTasks = [];
+
     allReasons.forEach(reason => {
-        const exists = existingTasks.some(t =>
-            t.file === reason.file &&
-            t.suggestions === reason.suggestions &&
-            t.status === 'Open'
+        const existing = existingTasks.find(t => 
+            t.file === reason.file && 
+            t.line === reason.line && 
+            t.agentType === reason.agentType
         );
-        if (!exists) {
-            newTasks.push({
-                status: 'Open',
-                id: `${reason.agentType.substring(0, 3).toUpperCase()}-${Math.random().toString(36).substr(2, 5)}`,
-                suggestions: reason.suggestions,
+        if (!existing) {
+            const newTask = {
+                id: (newTasks.length + 1).toString(),
+                agentType: reason.agentType,
                 file: reason.file,
                 line: reason.line,
-                agentType: reason.agentType
-            });
+                suggestions: reason.suggestions,
+                suggestedFix: reason.suggestedFix,
+                status: 'Open'
+            };
+            newTasks.push(newTask);
+            addedTasks.push(newTask);
         }
     });
 
-    if (overallPass) {
-        console.log("\n✅ Codebase PASSED the reviews!");
-    } else {
-        console.error("\n❌ Codebase FAILED the reviews.");
+    if (addedTasks.length > 0) {
+        console.log(`\n🆕 Proposed ${addedTasks.length} new task(s) for tasks.md:`);
+        addedTasks.forEach(t => {
+            console.log(`- [${t.agentType}] ${t.file}:${t.line} - ${t.suggestions.substring(0, 80)}...`);
+        });
+
+        try {
+            saveTasks(newTasks);
+            console.log("\n✅ Successfully updated tasks.md with new findings.");
+        } catch (e) {
+            if (e.code === 'EPERM') {
+                console.warn("\n⚠️  Permission denied (EPERM) while trying to update tasks.md.");
+                console.warn("Please update tasks.md manually with the new findings listed above.");
+            } else {
+                console.error(`\n❌ Error updating tasks.md: ${e.message}`);
+            }
+        }
     }
 
-    printTable(allReasons);
-    saveTasks(newTasks);
-
-    process.exit(0);
+    if (!overallPass) {
+        console.error("\n❌ Codebase FAILED the scan.");
+        if (require.main === module) process.exit(1);
+        return false;
+    } else {
+        console.log("\n✅ Codebase PASSED the scan!");
+        if (require.main === module) process.exit(0);
+        return true;
+    }
 }
 
-run();
+module.exports = {
+    loadTasks,
+    saveTasks,
+    getAllFiles,
+    getAgentPrompt,
+    callGemini,
+    printTable,
+    run
+};
+
+if (require.main === module) {
+    run();
+}
