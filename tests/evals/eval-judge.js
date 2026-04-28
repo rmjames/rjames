@@ -76,9 +76,15 @@ function printSummary(results) {
     if (passed < total) {
         console.log("\nFailures:");
         results.filter(r => !r.passed).forEach(r => {
-            console.log(`- ${r.name}: ${r.error || 'Issue not found in reasons'}`);
-            if (r.actual) {
-                console.log(`  Found instead: ${r.actual.join(', ').substring(0, 100)}...`);
+            const status = r.expectedIssue ? "False Negative (Missing Issue)" : "False Positive (Unexpected Issue)";
+            console.log(`\n[${status}] - ${r.name}`);
+            if (r.error) {
+                console.log(`  Error: ${r.error}`);
+            } else if (r.expectedIssue) {
+                console.log(`  Expected keyword: "${r.expectedIssue}"`);
+                console.log(`  Actual findings:\n    ${r.actual.join('\n    ')}`);
+            } else {
+                console.log(`  Unexpected findings in "clean" file:\n    ${r.actual.join('\n    ')}`);
             }
         });
     }

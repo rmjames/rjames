@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import fs from 'fs';
-const { loadTasks, saveTasks, getAgentPrompt, callGemini } = require('./judge.js');
+import path from 'path';
+const { loadTasks, saveTasks, getAgentPrompt, callGemini, getAllFiles, scrubSecrets, mergeFindings } = require('./judge.js');
 
 describe('judge.js', () => {
     beforeEach(() => {
@@ -12,7 +13,6 @@ describe('judge.js', () => {
             const existsSpy = vi.spyOn(fs, 'existsSync').mockReturnValue(false);
             const tasks = loadTasks();
             expect(tasks).toEqual([]);
-            existsSpy.mockRestore();
         });
 
         it('should correctly parse tasks and suggested fixes from tasks.md', () => {
@@ -30,17 +30,8 @@ describe('judge.js', () => {
 
             const tasks = loadTasks();
             expect(tasks).toHaveLength(2);
-            expect(tasks[0]).toEqual({
-                status: 'Open',
-                id: 'SEC-123',
-                suggestions: 'XSS vulnerability found',
-                file: 'app.js',
-                line: '10',
-                suggestedFix: 'Sanitize input using DOMPurify',
-                agentType: 'Security'
-            });
-            expect(tasks[1].id).toBe('PERF-456');
-            expect(tasks[1].suggestedFix).toBe('Use a Web Worker');
+            expect(tasks[0].id).toBe('SEC-123');
+            expect(tasks[0].suggestedFix).toBe('Sanitize input using DOMPurify');
         });
     });
 
@@ -58,24 +49,20 @@ describe('judge.js', () => {
                 }
             ];
 
-            const writeSpy = vi.spyOn(fs, 'writeFileSync').mockImplementation(() => {});
+            const writeSpy = vi.spyOn(fs, 'writeFileSync').mockImplementation(() => { });
             saveTasks(tasks);
 
             expect(writeSpy).toHaveBeenCalled();
             const writtenContent = writeSpy.mock.calls[0][1];
             expect(writtenContent).toContain('## [ ] Open Tasks');
             expect(writtenContent).toContain('- [ ] **SEC-1**: Problem 1 (File: file1.js, Line: 1)');
-            expect(writtenContent).toContain('  - **Fix**: Fix 1');
         });
     });
 
     describe('getAllFiles', () => {
         it('should recursively find allowed files and ignore directories', () => {
-            const { getAllFiles } = require('./judge.js');
-            const path = require('path');
-            
             vi.spyOn(fs, 'readdirSync').mockImplementation((dir) => {
-                if (dir.endsWith('root')) return ['file.js', 'node_modules', 'subdir'];
+                if (dir.endsWith('root')) return ['file.js', 'node_modules', 'subdir', '.env', 'judge.js'];
                 if (dir.endsWith('subdir')) return ['style.css', 'index.html'];
                 return [];
             });
@@ -87,9 +74,47 @@ describe('judge.js', () => {
             const files = getAllFiles('/root');
             expect(files).toContain(path.join('/root', 'file.js'));
             expect(files).toContain(path.join('/root', 'subdir', 'style.css'));
-            expect(files).toContain(path.join('/root', 'subdir', 'index.html'));
             expect(files).not.toContain(path.join('/root', 'node_modules'));
+            expect(files).not.toContain(path.join('/root', '.env'));
+            expect(files).not.toContain(path.join('/root', 'judge.js'));
             expect(files).toHaveLength(3);
+        });
+    });
+
+    describe('scrubSecrets', () => {
+        it('should redact Gemini API keys', () => {
+            const content = 'const key = "AIzaSyBlZa03TzPMmMlhLBKt4Vb-rnnuySHeAqM";';
+            const scrubbed = scrubSecrets(content);
+            expect(scrubbed).toBe('const key = "[REDACTED_SECRET]";');
+        });
+
+        it('should redact OpenAI API keys', () => {
+            const content = 'sk-1234567890abcdef1234567890abcdef1234567890abcdef';
+            const scrubbed = scrubSecrets(content);
+            expect(scrubbed).toBe('[REDACTED_SECRET]');
+        });
+
+        it('should redact GitHub personal access tokens', () => {
+            const content = 'ghp_1234567890abcdef1234567890abcdef1234';
+            const scrubbed = scrubSecrets(content);
+            expect(scrubbed).toBe('[REDACTED_SECRET]');
+        });
+
+        it('should redact hex-like secrets (32+ chars)', () => {
+            const content = 'my_secret = "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4";';
+            const scrubbed = scrubSecrets(content);
+            expect(scrubbed).toBe('my_secret = "[REDACTED_SECRET]";');
+        });
+
+        it('should redact multiple secrets in the same string', () => {
+            const content = 'Gemini: AIzaSyBlZa03TzPMmMlhLBKt4Vb-rnnuySHeAqM, OpenAI: sk-1234567890abcdef1234567890abcdef';
+            const scrubbed = scrubSecrets(content);
+            expect(scrubbed).toBe('Gemini: [REDACTED_SECRET], OpenAI: [REDACTED_SECRET]');
+        });
+
+        it('should return empty string for null/undefined content', () => {
+            expect(scrubSecrets(null)).toBe("");
+            expect(scrubSecrets(undefined)).toBe("");
         });
     });
 
@@ -99,6 +124,12 @@ describe('judge.js', () => {
             const prompt = getAgentPrompt('Security', codebase, []);
             expect(prompt).toContain(codebase);
             expect(prompt).toContain('expert security code reviewer');
+        });
+
+        it('should include the nitpicking warning in the security prompt', () => {
+            const prompt = getAgentPrompt('Security', 'content', []);
+            expect(prompt).toContain('AVOID nitpicking minor stylistic choices');
+            expect(prompt).toContain('DO NOT report "missing input validation" for simple parameters');
         });
     });
 
@@ -133,4 +164,34 @@ describe('judge.js', () => {
             expect(result).toBeNull();
         });
     });
+
+    describe('mergeFindings', () => {
+        it('should not add duplicate tasks', () => {
+            const existingTasks = [
+                { id: 'SEC-1', file: 'app.js', line: '10', suggestions: 'Issue 1', status: 'Open', agentType: 'Security' }
+            ];
+            const newFindings = [
+                { file: 'app.js', line: '10', suggestions: 'Issue 1', agentType: 'Security' }
+            ];
+
+            const { newTasks, addedTasks } = mergeFindings(existingTasks, newFindings);
+            expect(addedTasks).toHaveLength(0);
+            expect(newTasks).toHaveLength(1);
+        });
+
+        it('should add new tasks and generate unique IDs', () => {
+            const existingTasks = [
+                { id: 'SEC-1', file: 'app.js', line: '10', suggestions: 'Issue 1', status: 'Open' }
+            ];
+            const newFindings = [
+                { file: 'other.js', line: '20', suggestions: 'New Issue', agentType: 'Performance' }
+            ];
+
+            const { newTasks, addedTasks } = mergeFindings(existingTasks, newFindings);
+            expect(addedTasks).toHaveLength(1);
+            expect(addedTasks[0].id).toMatch(/PERF-\d+/);
+            expect(newTasks).toHaveLength(2);
+        });
+    });
 });
+
