@@ -1,8 +1,9 @@
 const fs = require('fs');
 const path = require('path');
 
-const IGNORED_DIRS = new Set(['node_modules', '.git', 'build', 'dist', 'public', '.jules', '.claude', 'images', 'fonts', 'assets', 'tests', 'lab', 'evals']);
-const ALLOWED_EXTENSIONS = new Set(['.js', '.html', '.css']);
+const IGNORED_DIRS = new Set(['node_modules', '.git', 'build', 'dist', 'public', '.jules', '.claude', 'images', 'fonts', 'assets', 'tests', 'lab', 'evals', '.github', '.vscode']);
+const IGNORED_FILES = new Set(['.env', 'package-lock.json', 'yarn.lock', '.DS_Store', 'judge.js']); // Don't scan the judge itself
+const ALLOWED_EXTENSIONS = new Set(['.js', '.html', '.css', '.ts', '.tsx']);
 const TASKS_FILE = path.join(__dirname, '..', 'tasks.md');
 
 function loadTasks() {
@@ -85,11 +86,14 @@ function getAllFiles(dirPath, arrayOfFiles) {
 
     files.forEach(function (file) {
         const fullPath = path.join(dirPath, file);
+        const fileName = path.basename(file);
+        
         if (fs.statSync(fullPath).isDirectory()) {
-            if (!IGNORED_DIRS.has(file)) {
+            if (!IGNORED_DIRS.has(fileName)) {
                 arrayOfFiles = getAllFiles(fullPath, arrayOfFiles);
             }
         } else {
+            if (IGNORED_FILES.has(fileName)) return;
             const ext = path.extname(file);
             if (ALLOWED_EXTENSIONS.has(ext)) {
                 arrayOfFiles.push(fullPath);
@@ -127,7 +131,8 @@ CRITICAL INSTRUCTIONS:
    - Scrutinize Auth Boundaries: Check how sensitive data is protected and where access controls might be bypassed.
    - Identify Entry Points: Map all inputs (URL params, form data, API endpoints, etc.) and verify they are sanitized and validated.
 5. Your analysis and suggestions should be informed by the security standards and databases listed in the REFERENCES section above.
-6. Be extremely critical and biased towards finding flaws. Scrutinize the codebase for any security risks.
+6. Be extremely critical and biased towards finding flaws, but AVOID nitpicking minor stylistic choices or lack of defensive programming in non-critical utility functions unless they present a high-risk vulnerability (e.g., ReDoS, Prototype Pollution).
+7. DO NOT report "missing input validation" for simple parameters (like timeout durations or colors) unless it leads to a specific, exploitable security bypass or resource exhaustion.
 
 If there are any security issues that would fail a strict review, output a JSON object with "pass": false and a "reasons" array of objects.
 If the codebase is secure, output a JSON object with "pass": true and a "reasons" array of objects explaining why.
@@ -326,8 +331,10 @@ function mergeFindings(existingTasks, allReasons) {
             t.agentType === reason.agentType
         );
         if (!existing) {
+            const prefix = reason.agentType === 'Security' ? 'SEC' : 
+                          reason.agentType === 'Performance' ? 'PERF' : 'TASK';
             const newTask = {
-                id: (newTasks.length + 1).toString(),
+                id: `${prefix}-${newTasks.length + 1}`,
                 agentType: reason.agentType,
                 file: reason.file,
                 line: reason.line,
@@ -343,6 +350,14 @@ function mergeFindings(existingTasks, allReasons) {
     return { newTasks, addedTasks };
 }
 
+// Secret Scrubbing Regex
+const SECRET_REGEX = /(AIza[a-z0-9_-]{35}|sk-[a-z0-9-]{20,}|ghp_[a-z0-9]{36}|[a-f0-9]{32,})/gi;
+
+function scrubSecrets(content) {
+    if (!content) return "";
+    return content.replace(SECRET_REGEX, "[REDACTED_SECRET]");
+}
+
 async function run() {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
@@ -356,10 +371,16 @@ async function run() {
     }
 
     const files = getAllFiles(path.join(__dirname, '..'));
+    console.log("📂 Preparing codebase for analysis...");
     let codebaseContent = "";
+    
     for (const file of files) {
         try {
-            const content = fs.readFileSync(file, 'utf-8');
+            let content = fs.readFileSync(file, 'utf-8');
+            
+            // Scrub potential secrets before sending to AI
+            content = scrubSecrets(content);
+
             codebaseContent += `\n\n--- File: ${path.relative(path.join(__dirname, '..'), file)} ---\n`;
             codebaseContent += content;
         } catch (e) {
@@ -423,6 +444,7 @@ module.exports = {
     printTable,
     scanCodebase,
     mergeFindings,
+    scrubSecrets,
     run
 };
 
