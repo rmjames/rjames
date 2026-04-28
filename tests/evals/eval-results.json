@@ -4,20 +4,26 @@
     "file": "tests/evals/fixtures/xss.js",
     "agentType": "Security",
     "expectedIssue": "XSS",
-    "severity": "High"
+    "severity": "High",
+    "passed": true
   },
   {
     "name": "Sync Canvas toDataURL in Animation",
     "file": "tests/evals/fixtures/perf-sync.js",
     "agentType": "Performance",
-    "expectedIssue": "data URL",
-    "severity": "Medium"
+    "expectedIssue": "toDataURL",
+    "severity": "Medium",
+    "passed": false,
+    "actual": [
+      "Synchronous canvas-to-dataURL conversion and DOM manipulation inside a requestAnimationFrame loop."
+    ]
   },
   {
     "name": "Clean File (No Issues)",
     "file": "tests/evals/fixtures/clean.js",
     "agentType": "Security",
     "expectedIssue": null,
-    "severity": "None"
+    "severity": "None",
+    "passed": true
   }
 ]
