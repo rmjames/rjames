@@ -1,0 +1,103 @@
+*,
+*:before,
+*:after {
+    box-sizing: border-box;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: oklch(from #000 l c h);
+    margin: 0;
+    font-size: 4vmin;
+}
+
+.box {
+    --delay: 250ms;
+    --dur: 1300ms;
+    --timing: cubic-bezier(.25, 1, 0, 1);
+    height: 5em;
+    width: 5em;
+    background: oklch(from #1359FF l c h);
+    position: relative;
+    transition: all 190ms, opacity 110ms;
+    opacity: 0;
+    transform: scale(0) rotate(-45deg);
+    animation: rotateIn var(--dur) var(--delay) 2 alternate forwards var(--timing);
+}
+
+.box-m {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    animation: enterScene var(--dur) var(--delay) 2 alternate forwards var(--timing);
+
+    --delay: 555.5ms;
+    --dur: 982ms;
+    height: 3.33em;
+    width: 3.33em;
+    background: oklch(from #00AAFF l c h);
+    transition: transform 175ms;
+    transform-origin: 0 3.33em;
+    transform: scale(0);
+}
+
+.box-s {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    animation: enterScene var(--dur) var(--delay) 2 alternate forwards var(--timing);
+
+    --delay: 756.5ms;
+    --dur: 749.71ms;
+    height: 1.65em;
+    width: 1.65em;
+    background: oklch(from #fff l c h);
+    transition: transform 140ms;
+    transform-origin: 0 1.65em;
+    transform: scale(0);
+}
+
+@keyframes enterScene {
+    0% {
+        transform: scale(0);
+    }
+
+    76%,
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes rotateIn {
+    0% {
+        transform: scale(0) rotate(0);
+        opacity: 0;
+    }
+
+    95%,
+    100% {
+        transform: scale(1) rotate(45deg);
+        opacity: 1;
+    }
+}
+
+.reset-btn {
+    position: fixed;
+    bottom: 4cqi;
+    right: 4cqi;
+    background: transparent;
+    color: oklch(from #fff l c h);
+    border: none;
+    cursor: pointer;
+    font-family: sans-serif;
+    font-weight: bold;
+    opacity: 0.5;
+    transition: opacity 0.2s;
+
+    &:hover {
+        opacity: 1;
+    }
+}

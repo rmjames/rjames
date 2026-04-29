@@ -129,7 +129,9 @@ export const UI = {
         if (popoverEl) {
             try {
                 popoverEl.hidePopover();
-            } catch (e) { }
+            } catch (e) {
+                console.debug('Failed to hide popover', e);
+            }
         }
         if (anchorBtn) {
             anchorBtn.style.removeProperty('anchor-name');
@@ -138,8 +140,15 @@ export const UI = {
 
     updateBackgroundArt(element, track) {
         if (!element || !track) return;
-        const bgValue = track.albumArt ? `url("${track.albumArt}")` : 'none';
-        element.style.setProperty('--bg-image', bgValue);
+        // SEC-7: Sanitize URL to prevent CSS injection
+        const rawArtUrl = track.albumArt || '';
+        if (rawArtUrl) {
+            // Remove characters that could break out of url("") and then encode
+            const sanitizedUrl = encodeURI(rawArtUrl.replace(/["'()]/g, ''));
+            element.style.setProperty('--bg-image', `url("${sanitizedUrl}")`);
+        } else {
+            element.style.setProperty('--bg-image', 'none');
+        }
     },
 
     async applyAccentColor(element, track, cssVarName) {

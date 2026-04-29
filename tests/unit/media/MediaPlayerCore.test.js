@@ -121,7 +121,7 @@ describe('MediaPlayerCore', () => {
 
     it('should shuffle to a random track', () => {
         // With 3 tracks, shuffle should pick a different index
-        const track = mediaPlayer.shuffle();
+        mediaPlayer.shuffle();
         expect(mediaPlayer.currentIndex).not.toBe(0); // Assuming it starts at 0 and changes
         expect(audioElement.play).toHaveBeenCalled();
     });

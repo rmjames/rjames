@@ -1,4 +1,6 @@
 const colorCache = new Map();
+let sharedCanvas = null;
+let sharedCtx = null;
 
 export const ColorExtractor = {
     /**
@@ -48,17 +50,9 @@ export const ColorExtractor = {
 
         if (!imageUrl) return DEFAULT_COLOR;
 
-        // Security check: only allow relative paths
-        try {
-            new URL(imageUrl);
-            // If it parses successfully without a base URL, it is an absolute URL.
+        // Security check: only allow relative paths (PERF-22: lightweight check)
+        if (imageUrl.includes('://') || imageUrl.startsWith('//')) {
             return DEFAULT_COLOR;
-        } catch {
-            // It threw an error, meaning it's likely a relative URL.
-            // However, `new URL('//domain.com')` also throws. We must check for protocol-relative paths.
-            if (imageUrl.startsWith('//')) {
-                return DEFAULT_COLOR;
-            }
         }
 
         // Cache check: return the Promise directly
@@ -72,21 +66,21 @@ export const ColorExtractor = {
             img.src = imageUrl;
 
             img.onload = () => {
-                let canvas, ctx;
-
-                if (typeof OffscreenCanvas !== 'undefined') {
-                    canvas = new OffscreenCanvas(10, 10);
-                    ctx = canvas.getContext('2d', { willReadFrequently: true });
-                } else {
-                    canvas = document.createElement('canvas');
-                    canvas.width = 10;
-                    canvas.height = 10;
-                    ctx = canvas.getContext('2d', { willReadFrequently: true });
+                if (!sharedCanvas) {
+                    if (typeof OffscreenCanvas !== 'undefined') {
+                        sharedCanvas = new OffscreenCanvas(10, 10);
+                    } else {
+                        sharedCanvas = document.createElement('canvas');
+                        sharedCanvas.width = 10;
+                        sharedCanvas.height = 10;
+                    }
+                    sharedCtx = sharedCanvas.getContext('2d', { willReadFrequently: true });
                 }
 
-                ctx.drawImage(img, 0, 0, 10, 10);
+                sharedCtx.clearRect(0, 0, 10, 10);
+                sharedCtx.drawImage(img, 0, 0, 10, 10);
 
-                const data = ctx.getImageData(0, 0, 10, 10).data;
+                const data = sharedCtx.getImageData(0, 0, 10, 10).data;
                 let r = 0, g = 0, b = 0, count = 0;
 
                 for (let i = 0; i < data.length; i += 4) {
@@ -126,5 +120,14 @@ export const ColorExtractor = {
      */
     clearCache() {
         colorCache.clear();
+    },
+
+    /**
+     * Internal helper to reset shared canvas/context for testing.
+     * @private
+     */
+    _resetSharedCanvas() {
+        sharedCanvas = null;
+        sharedCtx = null;
     }
 };

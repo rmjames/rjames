@@ -1,0 +1,128 @@
+:root {
+  --app-bg: hsl(0 4% 16%);
+  --white: oklch(from hsl(0 0% 90%) l c h);
+  --system-color: light-dark(var(--white), hsl(0 0% 10%));
+  --checkbox-bg-color: #1a73e8;
+  --checkbox-color: var(--checkbox-bg-color);
+  --starting-position: 1ch;
+
+  /* Common Theme Variables */
+  --theme-bg: light-dark(oklch(from #f8f9fa l c h), oklch(from #202124 l c h));
+  --theme-surface: light-dark(oklch(from #ffffff l c h), oklch(from #303134 l c h));
+  --theme-text: light-dark(oklch(from #202124 l c h), oklch(from #e8eaed l c h));
+  --theme-text-muted: light-dark(oklch(from #5f6368 l c h), oklch(from #9aa0a6 l c h));
+  --theme-border: light-dark(oklch(from #dadce0 l c h), oklch(from #5f6368 l c h));
+  
+  --theme-blue: oklch(from #1a73e8 l c h);
+  --theme-green: oklch(from #34a853 l c h);
+  --theme-yellow: oklch(from #fbbc05 l c h);
+  --theme-red: oklch(from #ea4335 l c h);
+  
+  --theme-font: 'Google Sans', Roboto, Arial, sans-serif;
+
+  /* Spacing Tokens */
+  --xxs: 0.125rem;
+  --xs: 0.25rem;
+  --s: 0.5rem;
+  --m: 1rem;
+  --l: 1.25rem;
+  --xl: 1.5rem;
+  --xxl: 2rem;
+  --xxxl: 3rem;
+}
+
+.checkout-variant-container {
+  color-scheme: light dark;
+  display: grid;
+  place-items: center;
+  block-size: 100%;
+  inline-size: 100%;
+  margin: 0;
+  padding: 0;
+  color: var(--system-color);
+  container-type: inline-size;
+  overflow-x: hidden;
+  background-color: var(--app-bg);
+}
+
+@media (prefers-color-scheme: dark) {
+  .checkout-variant-container {
+    background: var(--app-bg);
+  }
+}
+
+.checkout-variant-container input[type="checkbox"] {
+  display: grid;
+  place-content: center;
+  appearance: none;
+  background-color: transparent;
+  margin: 0;
+  font: inherit;
+  color: currentColor;
+  width: 1.15em;
+  height: 1.15em;
+  border: 0.1em solid currentColor;
+  border-radius: 50%;
+  transform: translateY(-0.075em);
+}
+
+.checkout-variant-container input[type="checkbox"]::before {
+  content: '';
+  width: .65em;
+  height: .65em;
+  background-color: CanvasText;
+  box-shadow: inset 1em 1em var(--app-bg);
+  clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+  transform: scale(0);
+  transform-origin: bottom left;
+  transition: 200ms transform ease-in-out;
+}
+
+.checkout-variant-container input[type="checkbox"]:checked::before {
+  transform: scale(1);
+  background-color: red;
+}
+
+.checkout-variant-container input[type="checkbox"]:focus {
+  outline: max(2px, 0.15em) solid currentColor;
+  outline-offset: max(2px, 0.15em);
+}
+
+.checkout-variant-container .form-checkout {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(2.75rem, .75fr));
+  gap: 1vmin;
+  inline-size: max(22rem, 20rem);
+  border-radius: .125rem;
+  padding: 1.25rem;
+  color: var(--system-color);
+}
+
+.checkout-variant-container .check {
+  display: inline-grid;
+  gap: 1rem;
+  font-family: system-ui;
+  font-size: 1rem;
+  position: relative;
+}
+
+.checkout-variant-container .line {
+  block-size: .125rem;
+  inline-size: var(--line-length, 3.75rem);
+  background: linear-gradient(to right, var(--background-color, var(--checkbox-bg-color)) 50%, var(--backround-color, var(--system-color))0%) no-repeat;
+  background-size: 200% 100%;
+  background-position: 100% 100%;
+  animation: progress .2s linear forwards;
+  animation-play-state: paused;
+  transform: translate(var(--x-axis, -1.25rem), .45rem);
+}
+
+.checkout-variant-container .l-run {
+  animation-play-state: running;
+}
+
+@keyframes progress {
+  to {
+    background-position: 0% 100%;
+  }
+}

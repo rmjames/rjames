@@ -1,12 +1,12 @@
 /**
- * Favicon Animator: Option A (Full Loop Once)
+ * Favicon Animator: Full Loop Once
  * Animation sequence: Circle (2s) -> Target (0.5s) -> Target (1.5s) -> Circle (0.5s) -> STOP.
  */
 (function () {
   if (window.self !== window.top) {
     document.documentElement.classList.add('in-iframe');
   }
-  const FPS_TARGET = 30;
+  const FPS_TARGET = 15; // Reduced from 30 to 5 to avoid UI thread starvation (PERF-18)
   const PAINT_INTERVAL = 1000 / FPS_TARGET;
 
   const timing = {
@@ -168,7 +168,7 @@
       stop();
       return;
     }
-    
+
     // Only update DOM if the frame actually changed
     const nextHref = framesCache[idx];
     if (favicon.getAttribute('href') !== nextHref) {

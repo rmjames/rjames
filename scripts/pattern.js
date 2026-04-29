@@ -1,6 +1,5 @@
 const playState = document.querySelector('.button-state')
 const motionItem = document.querySelector('.motion-item')
-const playStateOn = motionItem.classList.contains('pause')
 
 
 playState.addEventListener('click', () => {  

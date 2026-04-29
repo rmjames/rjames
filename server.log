@@ -1,0 +1,11 @@
+
+> rjames@1.0.0 start /app
+> vite
+
+
+  VITE v7.1.7  ready in 244 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: http://192.168.0.2:5173/
+3:41:16 PM [vite] (client) page reload lab/media-player-lock-screen.html
+3:41:24 PM [vite] (client) page reload lab/media-player-widget.html
