@@ -1,5 +1,4 @@
-const cacheName = 'v17'; // Bumped to v17 to cache media player scripts
-const OFFLINE = 'offline.html';
+const cacheName = 'v18'; // Bumped to v18 to cache new lab assets and externalized scripts
 
 const assetsToCache = [
   '/index.html',
@@ -15,9 +14,18 @@ const assetsToCache = [
   '/lab/google-search-loader.html',
   '/lab/headphones.html',
   '/lab/media-player.html',
+  '/lab/media-player-inline.html',
+  '/lab/media-player-lock-screen.html',
+  '/lab/media-player-selector.html',
+  '/lab/media-player-widget.html',
+  '/lab/google-store-checkout.html',
+  '/lab/checkout-tracking-card.html',
   '/lab/microsoft-logo.html',
   '/styles/main.css',
   '/styles/lab-shared.css',
+  '/styles/lab/headphones.css',
+  '/styles/lab/framer-flows.css',
+  '/styles/lab/framer-loaders.css',
   '/fonts/recursive-variable.woff2',
   '/images/icon.svg',
   '/images/icon-ios.svg',
@@ -39,7 +47,10 @@ const assetsToCache = [
   '/scripts/media/Equalizer.js',
   '/scripts/media/MediaPlayerCore.js',
   '/scripts/media/MediaPlayerSelector.js',
-  '/scripts/media/MediaPlayerUI.js'
+  '/scripts/media/MediaPlayerUI.js',
+  '/scripts/lab/headphones.js',
+  '/scripts/lab/framer-flows.js',
+  '/scripts/lab/framer-loaders.js'
 ];
 
 self.addEventListener('install', event => {
@@ -83,6 +94,27 @@ self.addEventListener('fetch', event => {
 
   event.respondWith(
     caches.open(cacheName).then((cache) => {
+      // SEC-5: Enhanced security check for response validity
+      const isValidResponse = (request, response) => {
+        if (!response.ok) return false;
+        const contentType = response.headers.get('content-type') || '';
+        const destination = request.destination;
+
+        // Prevent caching HTML fallbacks for assets (Cache Poisoning protection)
+        if (contentType.includes('text/html') && 
+            ['script', 'style', 'image', 'font', 'audio', 'video'].includes(destination)) {
+          return false;
+        }
+
+        // Destination-specific validation
+        if (destination === 'script' && !contentType.includes('javascript')) return false;
+        if (destination === 'style' && !contentType.includes('css')) return false;
+        if (destination === 'image' && !contentType.includes('image')) return false;
+        if (destination === 'font' && !contentType.includes('font')) return false;
+
+        return true;
+      };
+
       // Cache First strategy for fonts and images
       if (event.request.destination === 'font' || event.request.destination === 'image') {
         return cache.match(event.request).then((cachedResponse) => {
@@ -90,13 +122,8 @@ self.addEventListener('fetch', event => {
             return cachedResponse;
           }
           return fetch(event.request).then((networkResponse) => {
-            if (networkResponse.ok) {
-              const contentType = networkResponse.headers.get('content-type');
-              const isHtml = contentType && contentType.includes('text/html');
-              // Ensure we don't cache HTML fallbacks as images/fonts
-              if (!isHtml) {
-                cache.put(event.request, networkResponse.clone());
-              }
+            if (isValidResponse(event.request, networkResponse)) {
+              cache.put(event.request, networkResponse.clone());
             }
             return networkResponse;
           });
@@ -105,15 +132,8 @@ self.addEventListener('fetch', event => {
 
       // Network First strategy for everything else (HTML, CSS, JS)
       return fetch(event.request).then((networkResponse) => {
-        if (networkResponse.ok) {
-          const contentType = networkResponse.headers.get('content-type');
-          const isHtml = contentType && contentType.includes('text/html');
-          const isAsset = /\.(png|jpg|jpeg|svg|gif|webp|woff|woff2)$/i.test(new URL(event.request.url).pathname);
-
-          // Only cache if it's not an asset receiving an HTML fallback
-          if (!(isAsset && isHtml)) {
-            cache.put(event.request, networkResponse.clone());
-          }
+        if (isValidResponse(event.request, networkResponse)) {
+          cache.put(event.request, networkResponse.clone());
         }
         return networkResponse;
       }).catch(() => {

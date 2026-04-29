@@ -241,10 +241,9 @@ const main = async () => {
             process.exit(1);
         }
     }
-
     if (isWatchMode) {
         const watcher = chokidar.watch(ASSETS_DIR, {
-            ignored: /(^|[\/\\])\../,
+            ignored: /(^|[/\\])\../,
             persistent: true,
             ignoreInitial: false
         });

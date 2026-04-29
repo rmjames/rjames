@@ -26,11 +26,12 @@
     const script = document.createElement('script');
     script.async = true;
     script.src = 'https://www.googletagmanager.com/gtag/js?id=G-B51Q6R96Y5';
+    script.crossOrigin = 'anonymous'; // SEC-17: Ensure cross-origin requests are handled securely
     document.head.appendChild(script);
 
-    function gtag() {
+    const gtag = function() {
       dataLayer.push(arguments);
-    }
+    };
     window.gtag = gtag;
     gtag('js', new Date());
     gtag('config', 'G-B51Q6R96Y5');

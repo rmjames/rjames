@@ -1,0 +1,11 @@
+{
+  "prefetch": [
+    {
+      "source": "document",
+      "where": {
+        "selector_matches": ".demo-link"
+      },
+      "eagerness": "conservative"
+    }
+  ]
+}

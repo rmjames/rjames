@@ -18,18 +18,22 @@ describe('ColorExtractor', () => {
     describe('getAccentColor', () => {
         let originalImage;
         let mockContext;
-        let mockGetContext;
 
         beforeEach(() => {
             // Mock Canvas Context
             mockContext = {
                 drawImage: vi.fn(),
+                clearRect: vi.fn(),
                 getImageData: vi.fn().mockReturnValue({
                     data: new Uint8ClampedArray(400) // 10x10 * 4
                 })
             };
 
-            mockGetContext = vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(mockContext);
+            vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(mockContext);
+            // Also mock OffscreenCanvas if it exists in the test environment
+            if (typeof OffscreenCanvas !== 'undefined') {
+                vi.spyOn(OffscreenCanvas.prototype, 'getContext').mockReturnValue(mockContext);
+            }
 
             // Mock Image
             originalImage = global.Image;
@@ -51,8 +55,11 @@ describe('ColorExtractor', () => {
 
         afterEach(() => {
             global.Image = originalImage;
-            mockGetContext.mockRestore();
+            vi.restoreAllMocks();
             ColorExtractor.clearCache();
+            if (ColorExtractor._resetSharedCanvas) {
+                ColorExtractor._resetSharedCanvas();
+            }
         });
 
         it('should return default color if no imageUrl provided', async () => {

@@ -1,10 +1,55 @@
 const fs = require('fs');
 const path = require('path');
 
-const IGNORED_DIRS = new Set(['node_modules', '.git', 'build', 'dist', 'public', '.jules', '.claude', 'images', 'fonts', 'assets', 'tests', 'lab', 'evals', '.github', '.vscode']);
-const IGNORED_FILES = new Set(['.env', 'package-lock.json', 'yarn.lock', '.DS_Store', 'judge.js']); // Don't scan the judge itself
+const IGNORED_DIRS = new Set([
+    'node_modules', '.git', 'build', 'dist', 'public', '.jules', '.claude', 
+    'images', 'fonts', 'assets', 'tests', 'lab', 'evals', '.github', '.vscode',
+    'playwright-report', 'test-results', 'verification', 'work'
+]);
+const IGNORED_FILES = new Set([
+    '.env', '.env.local', '.env.development', '.env.production',
+    'package-lock.json', 'yarn.lock', 'pnpm-lock.yaml', '.DS_Store', 
+    'judge.js', 'judge.test.js', 'server.log', 'lighthouse-report.json'
+]);
 const ALLOWED_EXTENSIONS = new Set(['.js', '.html', '.css', '.ts', '.tsx']);
+const MAX_FILE_SIZE = 100 * 1024; // 100KB per file limit
+const MAX_TOTAL_SIZE = 500 * 1024; // 500KB total limit
 const TASKS_FILE = path.join(__dirname, '..', 'tasks.md');
+
+// Updated Secret Scrubbing Regex
+const SECRET_PATTERNS = [
+    /AIza[a-z0-9_-]{35}/gi,              // Gemini
+    /sk-[a-z0-9-]{20,}/gi,                // OpenAI/Anthropic
+    /ghp_[a-z0-9]{36}/gi,                 // GitHub
+    /sk_live_[0-9a-zA-Z]{24}/gi,          // Stripe
+    /AKIA[0-9A-Z]{16}/gi,                 // AWS Access Key
+    /-----BEGIN [A-Z ]+ PRIVATE KEY-----[\s\S]*?-----END [A-Z ]+ PRIVATE KEY-----/gi, // Private Keys
+    /(password|secret|key|auth|token|passwd)\s*[:=]\s*["']([^"']+)["']/gi, // Generic Key-Value secrets
+    /[a-f0-9]{32,}/gi                     // Generic Hex secrets (32+ chars)
+];
+
+/**
+ * Redacts secrets from a string using predefined patterns and an optional dynamic key.
+ */
+function scrubSecrets(content, apiKeyToRedact = null) {
+    if (!content) return "";
+    let scrubbed = content;
+
+    // Explicitly redact the current API key if it exists in the content
+    if (apiKeyToRedact && apiKeyToRedact.length > 5) {
+        scrubbed = scrubbed.split(apiKeyToRedact).join("[REDACTED_CURRENT_KEY]");
+    }
+
+    SECRET_PATTERNS.forEach(pattern => {
+        if (pattern.source.includes('["\']')) {
+            // Special handling for key-value pairs to keep the key
+            scrubbed = scrubbed.replace(pattern, (match, p1) => `${p1}: "[REDACTED_SECRET]"`);
+        } else {
+            scrubbed = scrubbed.replace(pattern, "[REDACTED_SECRET]");
+        }
+    });
+    return scrubbed;
+}
 
 function loadTasks() {
     if (!fs.existsSync(TASKS_FILE)) return [];
@@ -15,7 +60,6 @@ function loadTasks() {
 
         sections.forEach(section => {
             const lines = section.split('\n');
-            const status = lines[0].includes('[x]') ? 'Resolved' : 'Open';
             for (let i = 1; i < lines.length; i++) {
                 const line = lines[i];
                 // Match the main task line
@@ -163,7 +207,11 @@ CRITICAL INSTRUCTIONS:
 1. You MUST provide at least 5 detailed reasons/suggestions in your output.
 2. For each issue, specify the exact FILE and approximate LINE NUMBER.
 3. For each issue, provide a "suggestedFix" which includes a code example or specific implementation step.
-4. Be extremely critical.
+4. Specific Anti-Patterns to Detect:
+   - Forced Synchronous Layout (Reflow): Watch out for code that accesses layout properties like \`offsetHeight\`, \`offsetWidth\`, \`scrollHeight\`, etc., specifically to trigger a reflow for resetting CSS animations. This causes "jank".
+   - Unoptimized Canvas/Graphics: Look for synchronous, blocking operations in high-frequency loops (like \`toDataURL\` in an animation frame).
+   - Memory Bloat: Identify excessive object allocation or DOM mutation in animations.
+5. Be extremely critical.
 
 If there are any performance issues that would fail a strict review, output a JSON object with "pass": false and a "reasons" array of objects.
 If the codebase is performant, output a JSON object with "pass": true and a "reasons" array of objects explaining why.
@@ -185,10 +233,11 @@ ${codebaseContent}
 
 async function callGemini(apiKey, prompt, agentType) {
     try {
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`, {
+        const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'x-goog-api-key': apiKey
             },
             body: JSON.stringify({
                 contents: [{
@@ -205,7 +254,7 @@ async function callGemini(apiKey, prompt, agentType) {
         if (!response.ok) {
             const errBody = await response.text();
             console.error(`Gemini API Error for ${agentType} Agent: ${response.status} ${response.statusText}`);
-            console.error(errBody);
+            console.error(scrubSecrets(errBody, apiKey));
             return null;
         }
 
@@ -350,14 +399,6 @@ function mergeFindings(existingTasks, allReasons) {
     return { newTasks, addedTasks };
 }
 
-// Secret Scrubbing Regex
-const SECRET_REGEX = /(AIza[a-z0-9_-]{35}|sk-[a-z0-9-]{20,}|ghp_[a-z0-9]{36}|[a-f0-9]{32,})/gi;
-
-function scrubSecrets(content) {
-    if (!content) return "";
-    return content.replace(SECRET_REGEX, "[REDACTED_SECRET]");
-}
-
 async function run() {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
@@ -373,16 +414,35 @@ async function run() {
     const files = getAllFiles(path.join(__dirname, '..'));
     console.log("📂 Preparing codebase for analysis...");
     let codebaseContent = "";
+    let currentTotalSize = 0;
     
     for (const file of files) {
+        if (currentTotalSize >= MAX_TOTAL_SIZE) {
+            console.warn("⚠️  Max total size reached, skipping remaining files.");
+            break;
+        }
+
         try {
+            const stats = fs.statSync(file);
+            if (stats.size > MAX_FILE_SIZE) {
+                console.warn(`⚠️  Skipping ${path.basename(file)} (too large: ${Math.round(stats.size/1024)}KB)`);
+                continue;
+            }
+
             let content = fs.readFileSync(file, 'utf-8');
             
             // Scrub potential secrets before sending to AI
-            content = scrubSecrets(content);
+            content = scrubSecrets(content, apiKey);
 
-            codebaseContent += `\n\n--- File: ${path.relative(path.join(__dirname, '..'), file)} ---\n`;
+            const fileHeader = `\n\n--- File: ${path.relative(path.join(__dirname, '..'), file)} ---\n`;
+            if (currentTotalSize + content.length + fileHeader.length > MAX_TOTAL_SIZE) {
+                console.warn(`⚠️  Max total size reached while processing ${path.basename(file)}`);
+                break;
+            }
+
+            codebaseContent += fileHeader;
             codebaseContent += content;
+            currentTotalSize += content.length + fileHeader.length;
         } catch (e) {
             console.warn(`Could not read file ${file}: ${e.message}`);
         }

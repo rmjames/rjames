@@ -11,7 +11,7 @@ self.addEventListener("load", () => {
 
 console.log("This Portfolio is an open design");
 
-document.addEventListener("DOMContentLoaded", async (e) => {
+document.addEventListener("DOMContentLoaded", async () => {
   const coverElement = document.querySelector(".cover");
   if (coverElement) {
     coverElement.style.viewTransitionName = "cover";

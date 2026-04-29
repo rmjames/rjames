@@ -1,0 +1,35 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    block-size: 100vh;
+    margin: 0;
+}
+
+span {
+    font-size: 15vmin;
+    font-family: system-ui;
+    opacity: 0;
+}
+
+.reset-btn {
+    position: fixed;
+    bottom: 3cqi;
+    right: 3cqi;
+    background: transparent;
+    color: oklch(from #33333a l c h);
+    border: none;
+    cursor: pointer;
+    font-family: sans-serif;
+    font-weight: bold;
+    opacity: 0.5;
+    transition: opacity 0.2s;
+
+    span {
+        opacity: 1;
+    }
+
+    &:hover {
+        opacity: 1;
+    }
+}

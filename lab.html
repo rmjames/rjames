@@ -12,7 +12,7 @@
   <meta name="Description"
     content="Robert James - A UX Engineer who designs and builds digital experiences and products" />
   <meta http-equiv="Content-Security-Policy"
-    content="default-src 'self'; script-src 'self' https://www.googletagmanager.com https://static.cloudflareinsights.com 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com data:; img-src 'self' https://assets.codepen.io data:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://cloudflareinsights.com https://static.cloudflareinsights.com; object-src 'none'; frame-src 'self'; base-uri 'self'; upgrade-insecure-requests;" />
+    content="default-src 'self'; script-src 'self' https://www.googletagmanager.com https://static.cloudflareinsights.com; style-src 'self' https://fonts.googleapis.com data:; img-src 'self' https://assets.codepen.io data:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://cloudflareinsights.com https://static.cloudflareinsights.com; object-src 'none'; frame-src 'self'; frame-ancestors 'self'; base-uri 'self'; upgrade-insecure-requests;" />
   <meta name="referrer" content="strict-origin-when-cross-origin" />
   <title>Lab | Portfolio</title>
   <meta property="og:title" content="Robert James" />
@@ -32,19 +32,7 @@
   <link rel="icon" type="image/png" href="/favicon_192.png" sizes="192x192">
   <link rel="manifest" href="manifest.json">
   <script src="scripts/favicon-animator.js" async></script>
-  <script type="speculationrules">
-    {
-      "prefetch": [
-        {
-          "source": "document",
-          "where": {
-            "selector_matches": ".demo-link"
-          },
-          "eagerness": "moderate"
-        }
-      ]
-    }
-  </script>
+  <script type="speculationrules" src="scripts/speculation-rules-lab.json"></script>
 </head>
 
 <body>
@@ -100,7 +88,7 @@
             <line x1="10" y1="14" x2="21" y2="3"></line>
           </svg>
         </a>
-        <iframe src="/lab/microsoft-logo.html" title="Microsoft Logo Proto" loading="lazy" fetchpriority="low"></iframe>
+        <iframe sandbox="allow-scripts allow-forms allow-same-origin" src="/lab/microsoft-logo.html" title="Microsoft Logo Proto" loading="lazy" fetchpriority="low"></iframe>
       </article>
       <article tabindex="0" aria-label="Headphones Knock">
         <a href="/lab/headphones.html" target="_blank" class="demo-link"
@@ -112,7 +100,7 @@
             <line x1="10" y1="14" x2="21" y2="3"></line>
           </svg>
         </a>
-        <iframe src="/lab/headphones.html" title="Headphones Knock" loading="lazy" fetchpriority="low"></iframe>
+        <iframe sandbox="allow-scripts allow-forms allow-same-origin" src="/lab/headphones.html" title="Headphones Knock" loading="lazy" fetchpriority="low"></iframe>
       </article>
       <article tabindex="0" aria-label="Emoji Speaker Animation">
         <a href="/lab/emoji-speaker.html" target="_blank" class="demo-link"
@@ -124,7 +112,7 @@
             <line x1="10" y1="14" x2="21" y2="3"></line>
           </svg>
         </a>
-        <iframe src="/lab/emoji-speaker.html" title="Emoji Speaker Animation" loading="lazy" fetchpriority="low"></iframe>
+        <iframe sandbox="allow-scripts allow-forms allow-same-origin" src="/lab/emoji-speaker.html" title="Emoji Speaker Animation" loading="lazy" fetchpriority="low"></iframe>
       </article>
       <article tabindex="0" aria-label="Framer Loaders Animation">
         <a href="/lab/framer-loaders.html" target="_blank" class="demo-link"
@@ -136,7 +124,7 @@
             <line x1="10" y1="14" x2="21" y2="3"></line>
           </svg>
         </a>
-        <iframe src="/lab/framer-loaders.html" title="Framer Loaders Animation" loading="lazy" fetchpriority="low"></iframe>
+        <iframe sandbox="allow-scripts allow-forms allow-same-origin" src="/lab/framer-loaders.html" title="Framer Loaders Animation" loading="lazy" fetchpriority="low"></iframe>
       </article>
       <article tabindex="0" aria-label="Google Loader Animation">
         <a href="/lab/google-loader.html" target="_blank" class="demo-link"
@@ -148,7 +136,7 @@
             <line x1="10" y1="14" x2="21" y2="3"></line>
           </svg>
         </a>
-        <iframe src="/lab/google-loader.html" title="Google Loader Animation" loading="lazy" fetchpriority="low"></iframe>
+        <iframe sandbox="allow-scripts allow-forms allow-same-origin" src="/lab/google-loader.html" title="Google Loader Animation" loading="lazy" fetchpriority="low"></iframe>
       </article>
       <article tabindex="0" aria-label="Framer Flows Animation">
         <a href="/lab/framer-flows.html" target="_blank" class="demo-link"
@@ -160,7 +148,7 @@
             <line x1="10" y1="14" x2="21" y2="3"></line>
           </svg>
         </a>
-        <iframe src="/lab/framer-flows.html" title="Framer Flows Animation" loading="lazy" fetchpriority="low"></iframe>
+        <iframe sandbox="allow-scripts allow-forms allow-same-origin" src="/lab/framer-flows.html" title="Framer Flows Animation" loading="lazy" fetchpriority="low"></iframe>
       </article>
       <article tabindex="0" aria-label="Google Search Loader Animation">
         <a href="/lab/google-search-loader.html" target="_blank" class="demo-link"
@@ -172,7 +160,7 @@
             <line x1="10" y1="14" x2="21" y2="3"></line>
           </svg>
         </a>
-        <iframe src="/lab/google-search-loader.html" title="Google Search Loader Animation" loading="lazy" fetchpriority="low"></iframe>
+        <iframe sandbox="allow-scripts allow-forms allow-same-origin" src="/lab/google-search-loader.html" title="Google Search Loader Animation" loading="lazy" fetchpriority="low"></iframe>
       </article>
       <article tabindex="0" aria-label="Framer Logo Animation">
         <a href="/lab/framer-logo.html" target="_blank" class="demo-link"
@@ -184,7 +172,7 @@
             <line x1="10" y1="14" x2="21" y2="3"></line>
           </svg>
         </a>
-        <iframe src="/lab/framer-logo.html" title="Framer Logo Animation" loading="lazy" fetchpriority="low"></iframe>
+        <iframe sandbox="allow-scripts allow-forms allow-same-origin" src="/lab/framer-logo.html" title="Framer Logo Animation" loading="lazy" fetchpriority="low"></iframe>
       </article>
       <article tabindex="0" aria-label="Figma Logo Animation">
         <a href="/lab/figma-logo.html" target="_blank" class="demo-link"
@@ -196,7 +184,7 @@
             <line x1="10" y1="14" x2="21" y2="3"></line>
           </svg>
         </a>
-        <iframe src="/lab/figma-logo.html" title="Figma Logo Animation" loading="lazy" fetchpriority="low"></iframe>
+        <iframe sandbox="allow-scripts allow-forms allow-same-origin" src="/lab/figma-logo.html" title="Figma Logo Animation" loading="lazy" fetchpriority="low"></iframe>
       </article>
       <article tabindex="0" aria-label="Buttons with Custom Properties Animation">
         <a href="/lab/buttons-custom-properties.html" target="_blank" class="demo-link"
@@ -208,7 +196,7 @@
             <line x1="10" y1="14" x2="21" y2="3"></line>
           </svg>
         </a>
-        <iframe src="/lab/buttons-custom-properties.html" title="Buttons with Custom Properties Animation"
+        <iframe sandbox="allow-scripts allow-forms allow-same-origin" src="/lab/buttons-custom-properties.html" title="Buttons with Custom Properties Animation"
           loading="lazy" fetchpriority="low"></iframe>
       </article>
       <article tabindex="0" aria-label="Google Store Checkout">
@@ -221,7 +209,7 @@
             <line x1="10" y1="14" x2="21" y2="3"></line>
           </svg>
         </a>
-        <iframe src="/lab/checkout-tracking-card.html" title="Google Store Checkout" loading="lazy" fetchpriority="low"></iframe>
+        <iframe sandbox="allow-scripts allow-forms allow-same-origin" src="/lab/checkout-tracking-card.html" title="Google Store Checkout" loading="lazy" fetchpriority="low"></iframe>
       </article>
     </section>
   </main>

@@ -3,287 +3,12 @@
 
 <head>
     <meta http-equiv="Content-Security-Policy"
-        content="default-src 'self'; script-src 'self' https://www.googletagmanager.com https://static.cloudflareinsights.com 'unsafe-inline'; style-src 'self' 'unsafe-inline' data:; img-src 'self' https://assets.codepen.io data:; font-src 'self'; connect-src 'self' https://www.google-analytics.com https://cloudflareinsights.com https://static.cloudflareinsights.com; object-src 'none'; frame-src 'self'; base-uri 'self';" />
+        content="default-src 'self'; script-src 'self' https://www.googletagmanager.com https://static.cloudflareinsights.com; style-src 'self' data:; img-src 'self' https://assets.codepen.io data:; font-src 'self'; connect-src 'self' https://www.google-analytics.com https://cloudflareinsights.com https://static.cloudflareinsights.com; object-src 'none'; frame-src 'self'; frame-ancestors 'self'; base-uri 'self';" />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Framer Loaders</title>
-    <style>
-        :root {
-            --color-primary: oklch(from #00AAFF l c h);
-            --color-secondary: oklch(from #205AFF l c h);
-            --triangle: polygon(100% 0%, 100% 100%, 0% 0%);
-            --dimension: 6em;
-            --timing: cubic-bezier(1, 0, .8, 1.24);
-            --dur: 1.56s;
-            --delay: .02s;
-        }
-
-        body {
-            background: oklch(from #000 l c h);
-            display: flex;
-            align-items: center;
-            block-size: 100dvh;
-        }
-
-        .container {
-            display: grid;
-            grid-template-columns: repeat(4, minmax(auto, 1fr));
-            font-size: 4cqi;
-            transition: all .5s;
-            gap: 2cqi;
-            container-type: inline-size;
-            inline-size: 100%;
-        }
-
-        .block {
-            block-size: var(--dimension);
-            inline-size: var(--dimension);
-            position: relative;
-            contain: layout paint;
-
-            .bloc {
-                background: oklch(from #fff l c h);
-                block-size: calc(var(--dimension) / 2);
-                aspect-ratio: 1;
-                animation: reveal var(--dur) var(--timing) forwards;
-            }
-
-            :nth-child(2) {
-                --delay: .24s;
-                background: var(--color-primary);
-                animation: reveal-1 var(--dur) var(--timing) forwards;
-            }
-
-            .half-circle {
-                --dur: 1.64s;
-                --delay: .12s;
-                position: absolute;
-                inline-size: var(--dimension);
-                aspect-ratio: 1;
-                opacity: 0;
-                background: linear-gradient(to right, transparent 50%, var(--color-secondary) 0%);
-                border-radius: 0% 50% 50% 0%;
-                translate: -2em;
-                animation: half-circle-enter var(--dur) var(--timing) forwards;
-            }
-        }
-
-        .triangles {
-            block-size: var(--dimension);
-            inline-size: var(--dimension);
-            position: relative;
-            contain: layout paint;
-        }
-
-        .triangles .triangle {
-            --dimension: 3em;
-            --dur: 2.24s;
-            --delay: .24s;
-            block-size: var(--dimension);
-            inline-size: var(--dimension);
-            position: absolute;
-            inset-block-end: 6px;
-            background: var(--color-secondary);
-            clip-path: var(--triangle);
-            animation: triangle-enter var(--dur) var(--timing) forwards;
-        }
-
-        .triangles .triangle:nth-child(2) {
-            --dimension: 5.86em;
-            inset-inline-start: 2%;
-            inset-block-end: 3%;
-            background: var(--color-primary);
-        }
-
-        .triangles .triangle:nth-child(3) {
-            transform: translateX(3em);
-            inset-block-start: 0%;
-            background: oklch(from #fff l c h);
-            z-index: 10;
-        }
-
-        .circles {
-            --delay: .02s;
-            display: grid;
-            grid-template-columns: var(--dimension);
-            grid-template-rows: var(--dimension);
-            place-items: center;
-            margin: 0;
-            padding: 0;
-            contain: layout;
-            place-content: center;
-        }
-
-        .circles .circle {
-            --dimension: 6em;
-            --dur: 2.88s;
-            block-size: var(--dimension);
-            inline-size: var(--dimension);
-            grid-area: 1/1;
-            border-radius: 50%;
-            background: var(--color-secondary);
-            transform-origin: center center;
-            animation: circles var(--dur) var(--timing) forwards;
-            z-index: 1;
-        }
-
-        .circles .circle:nth-child(2) {
-            --dimension: 4em;
-            --dur: 3.2s;
-            background: var(--color-primary);
-            z-index: 2;
-        }
-
-        .circles .circle:nth-child(3) {
-            --dimension: 2em;
-            --dur: 3.4s;
-            background: oklch(from #fff l c h);
-            z-index: 3;
-        }
-
-        .polygon-F {
-            block-size: var(--dimension);
-            inline-size: var(--dimension);
-            display: flex;
-            flex-flow: column;
-            align-items: center;
-            contain: layout paint;
-        }
-
-        .polygon-F .polygon {
-            --dimension: 2em;
-            --dur: 3.36s;
-            --delay: .1s;
-            block-size: var(--dimension);
-            inline-size: var(--dimension);
-            position: relative;
-            background: oklch(from #fff l c h);
-            animation: polygons var(--dur) var(--timing) forwards;
-        }
-
-        .polygon-F .polygon:nth-child(2) {
-            --delay: .4s;
-            background: var(--color-primary);
-        }
-
-        .polygon-F .polygon:nth-child(3) {
-            background: var(--color-secondary);
-            clip-path: var(--triangle);
-            transform: translate(-2em, 0);
-
-        }
-
-        .top:before,
-        .mid:before {
-            --dimension: 2em;
-            block-size: var(--dimension);
-            inline-size: var(--dimension);
-            content: '';
-            position: absolute;
-            inset-block-start: 0;
-            clip-path: var(--triangle);
-            transform: translate(-2em, 0);
-            background: inherit;
-        }
-
-        .mid {
-            transform: translate(-2em, 0);
-        }
-
-        .mid:before {
-            transform: translate(2em, 0);
-            clip-path: polygon(0% 0%, 100% 100%, 0% 100%);
-        }
-
-        .reset-btn {
-            position: fixed;
-            bottom: 4cqi;
-            right: 4cqi;
-            background: transparent;
-            color: oklch(from #fff l c h);
-            border: none;
-            cursor: pointer;
-            font-family: sans-serif;
-            font-weight: bold;
-            opacity: 0.5;
-            transition: opacity 0.2s;
-
-            &:hover {
-                opacity: 1;
-            }
-        }
-
-        @keyframes reveal {
-            0% {
-                clip-path: polygon(100% 100%, 100% 100%, 100% 100%, 100% 100%);
-                opacity: 0;
-                filter: blur(12px);
-            }
-
-            100% {
-                clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
-                opacity: 1;
-                filter: blur(0px);
-            }
-        }
-
-        @keyframes reveal-1 {
-            0% {
-                clip-path: polygon(0 100%, 0 100%, 0 100%, 0 100%);
-                opacity: 0;
-                filter: blur(12px);
-            }
-
-            100% {
-                clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
-                opacity: 1;
-                filter: blur(0px);
-            }
-        }
-
-        @keyframes half-circle-enter {
-            from {
-                60% {
-                    opacity: 0;
-                    filter: blur(12px);
-                }
-            }
-
-            to {
-                opacity: 1;
-                translate: 0px;
-                filter: blur(0px);
-            }
-        }
-
-        @keyframes triangle-enter {
-            from {
-                opacity: 0;
-                scale: .5;
-                translate: -1rem .5rem;
-                filter: blur(2px);
-            }
-        }
-
-        @keyframes circles {
-            from {
-                opacity: 0;
-                scale: .5;
-                translate: -1rem .5rem;
-                filter: blur(2px);
-            }
-        }
-
-        @keyframes polygons {
-            from {
-                opacity: 0;
-                scale: .5;
-                translate: -1rem .5rem;
-                filter: blur(2px);
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="../styles/lab/framer-loaders.css">
     <link rel="apple-touch-icon" href="../images/icon-ios.svg" />
     <link rel="icon" type="image/svg+xml" sizes="any" href="../images/icon.svg" id="favicon-svg" />
     <link rel="icon" type="image/png" href="../favicon_144.png" sizes="144x144" />
@@ -292,6 +17,7 @@
     <link rel="manifest" href="../manifest.json" />
     <link rel="stylesheet" href="../styles/lab-shared.css">
     <script src="../scripts/favicon-animator.js" async></script>
+    <script src="../scripts/lab/framer-loaders.js" type="module"></script>
 </head>
 
 <body>
@@ -324,22 +50,12 @@
             <div class='polygon bottom'></div>
         </div>
     </div>
-    <button class="reset-btn" data-analytics-element="Reset Animation" onclick="resetAnimation()">
+    <button class="reset-btn" data-analytics-element="Reset Animation">
         <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="currentColor">
             <path
                 d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z" />
         </svg>
     </button>
-    <script>
-        function resetAnimation() {
-            const elements = document.querySelectorAll('.bloc, .triangle, .circle, .half-circle, .polygon');
-            elements.forEach(el => {
-                el.style.animation = 'none';
-                el.offsetHeight; /* trigger reflow */
-                el.style.animation = null;
-            });
-        }
-    </script>
 </body>
 
 </html>

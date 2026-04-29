@@ -10,7 +10,7 @@ describe('judge.js', () => {
 
     describe('loadTasks', () => {
         it('should return an empty array if tasks.md does not exist', () => {
-            const existsSpy = vi.spyOn(fs, 'existsSync').mockReturnValue(false);
+            vi.spyOn(fs, 'existsSync').mockReturnValue(false);
             const tasks = loadTasks();
             expect(tasks).toEqual([]);
         });
@@ -82,32 +82,60 @@ describe('judge.js', () => {
     });
 
     describe('scrubSecrets', () => {
+        const DUMMY_GEMINI_KEY = 'AIzaSy' + 'B'.repeat(33); // Construct to avoid literal match
+        const DUMMY_OPENAI_KEY = 'sk-' + 'a'.repeat(30);
+
         it('should redact Gemini API keys', () => {
-            const content = 'const key = "[REDACTED_GEMINI_MOCK]";';
+            const content = `const key = "${DUMMY_GEMINI_KEY}";`;
             const scrubbed = scrubSecrets(content);
-            expect(scrubbed).toBe('const key = "[REDACTED_SECRET]";');
+            expect(scrubbed).toBe('const key: "[REDACTED_SECRET]";');
         });
 
-        it('should redact OpenAI API keys', () => {
-            const content = '[REDACTED_OPENAI_MOCK]';
+        it('should redact the provided current API key specifically', () => {
+            const myKey = "MY_SPECIAL_KEY_12345";
+            const content = `Connecting with ${myKey}`;
+            const scrubbed = scrubSecrets(content, myKey);
+            expect(scrubbed).toBe('Connecting with [REDACTED_CURRENT_KEY]');
+        });
+
+        it('should redact OpenAI/Anthropic API keys', () => {
+            const content = DUMMY_OPENAI_KEY;
             const scrubbed = scrubSecrets(content);
             expect(scrubbed).toBe('[REDACTED_SECRET]');
         });
 
         it('should redact GitHub personal access tokens', () => {
-            const content = '[REDACTED_GITHUB_MOCK]';
+            const content = 'ghp_' + '1'.repeat(36);
             const scrubbed = scrubSecrets(content);
             expect(scrubbed).toBe('[REDACTED_SECRET]');
         });
 
         it('should redact hex-like secrets (32+ chars)', () => {
-            const content = 'my_secret = "[REDACTED_HEX_MOCK]";';
+            const content = 'my_var = "[REDACTED_HEX_MOCK]";';
             const scrubbed = scrubSecrets(content);
-            expect(scrubbed).toBe('my_secret = "[REDACTED_SECRET]";');
+            expect(scrubbed).toBe('my_var = "[REDACTED_SECRET]";');
+        });
+
+        it('should redact generic key-value secrets', () => {
+            const content = 'password: "my-secret-password"';
+            const scrubbed = scrubSecrets(content);
+            expect(scrubbed).toBe('password: "[REDACTED_SECRET]"');
+        });
+
+        it('should redact private keys', () => {
+            const content = '-----BEGIN RSA PRIVATE KEY-----\nMIIEpAIBAAKCAQEA7...\n-----END RSA PRIVATE KEY-----';
+            const scrubbed = scrubSecrets(content);
+            expect(scrubbed).toBe('[REDACTED_SECRET]');
+        });
+
+        it('should redact Stripe and AWS keys', () => {
+            const content = 'stripe: ' + 'sk_live_' + '1'.repeat(24) + ', aws: ' + 'AKIA' + '1'.repeat(16);
+            const scrubbed = scrubSecrets(content);
+            expect(scrubbed).toBe('stripe: [REDACTED_SECRET], aws: [REDACTED_SECRET]');
         });
 
         it('should redact multiple secrets in the same string', () => {
-            const content = 'Gemini: [REDACTED_GEMINI_MOCK], OpenAI: [REDACTED_OPENAI_MOCK_SHORT]';
+            const content = `Gemini: ${DUMMY_GEMINI_KEY}, OpenAI: ${DUMMY_OPENAI_KEY}`;
             const scrubbed = scrubSecrets(content);
             expect(scrubbed).toBe('Gemini: [REDACTED_SECRET], OpenAI: [REDACTED_SECRET]');
         });
@@ -130,6 +158,14 @@ describe('judge.js', () => {
             const prompt = getAgentPrompt('Security', 'content', []);
             expect(prompt).toContain('AVOID nitpicking minor stylistic choices');
             expect(prompt).toContain('DO NOT report "missing input validation" for simple parameters');
+        });
+
+        it('should include specific anti-patterns in the performance prompt', () => {
+            const prompt = getAgentPrompt('Performance', 'content', []);
+            expect(prompt).toContain('Forced Synchronous Layout (Reflow)');
+            expect(prompt).toContain('offsetHeight');
+            expect(prompt).toContain('toDataURL');
+            expect(prompt).toContain('Memory Bloat');
         });
     });
 

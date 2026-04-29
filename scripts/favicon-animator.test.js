@@ -78,7 +78,7 @@ describe('Favicon Animator Performance', () => {
 
     // 1. Verify pre-generation
     // We need to advance timers to allow the recursive requestIdleCallback to complete
-    // The animation is ~4.5s at 30fps = ~135 frames.
+    // The animation is ~4.5s at 15fps (reduced for PERF-18) = ~68 frames.
     // Each frame takes 1ms in our mock.
     for (let i = 0; i < 150; i++) {
       await vi.advanceTimersByTimeAsync(1);
@@ -86,7 +86,7 @@ describe('Favicon Animator Performance', () => {
 
     expect(canvasMock.toDataURL).toHaveBeenCalled();
     const generationCount = canvasMock.toDataURL.mock.calls.length;
-    expect(generationCount).toBeGreaterThanOrEqual(135);
+    expect(generationCount).toBeGreaterThanOrEqual(65);
 
     // 2. Start animation
     // Clear the mock calls to start fresh for the animation phase
@@ -98,9 +98,9 @@ describe('Favicon Animator Performance', () => {
     // Handle the 100ms timeout in handleFocus
     await vi.advanceTimersByTimeAsync(110);
     
-    // Run for 1 second of animation (~30 frames)
-    for (let i = 0; i < 30; i++) {
-      await vi.advanceTimersByTimeAsync(33);
+    // Run for 1 second of animation (~15 frames)
+    for (let i = 0; i < 15; i++) {
+      await vi.advanceTimersByTimeAsync(67);
     }
 
     // 3. Verify performance optimizations

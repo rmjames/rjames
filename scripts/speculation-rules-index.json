@@ -1,0 +1,11 @@
+{
+  "prefetch": [
+    {
+      "source": "document",
+      "where": {
+        "href_matches": "*/lab.html*"
+      },
+      "eagerness": "conservative"
+    }
+  ]
+}

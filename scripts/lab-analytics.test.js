@@ -59,7 +59,6 @@ describe('lab-analytics.js', () => {
     initLabAnalytics();
     
     const wrapper = document.querySelector('article');
-    const iframe = wrapper.querySelector('iframe');
     
     const event = new Event('mouseenter');
     wrapper.dispatchEvent(event);
@@ -75,7 +74,6 @@ describe('lab-analytics.js', () => {
     initLabAnalytics();
     
     const wrapper = document.querySelector('article');
-    const iframe = wrapper.querySelector('iframe');
     
     const event = new Event('focus');
     wrapper.dispatchEvent(event);
