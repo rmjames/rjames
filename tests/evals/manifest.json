@@ -19,5 +19,19 @@
     "agentType": "Security",
     "expectedIssue": null,
     "severity": "None"
+  },
+  {
+    "name": "Command Injection (exec)",
+    "file": "tests/evals/fixtures/cmd-injection.js",
+    "agentType": "Security",
+    "expectedIssue": "injection",
+    "severity": "Critical"
+  },
+  {
+    "name": "Layout Thrashing (Read-Write loop)",
+    "file": "tests/evals/fixtures/layout-thrashing.js",
+    "agentType": "Performance",
+    "expectedIssue": "layout",
+    "severity": "Medium"
   }
 ]
