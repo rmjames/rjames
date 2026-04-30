@@ -2,6 +2,7 @@
   {
     "name": "DOM XSS via URL Params",
     "file": "tests/evals/fixtures/xss.js",
+    "type": "detection",
     "agentType": "Security",
     "expectedIssue": "XSS",
     "severity": "High"
@@ -9,6 +10,7 @@
   {
     "name": "Sync Canvas toDataURL in Animation",
     "file": "tests/evals/fixtures/perf-sync.js",
+    "type": "detection",
     "agentType": "Performance",
     "expectedIssue": "data URL",
     "severity": "Medium"
@@ -16,6 +18,7 @@
   {
     "name": "Clean File (No Issues)",
     "file": "tests/evals/fixtures/clean.js",
+    "type": "detection",
     "agentType": "Security",
     "expectedIssue": null,
     "severity": "None"
@@ -23,6 +26,7 @@
   {
     "name": "Command Injection (exec)",
     "file": "tests/evals/fixtures/cmd-injection.js",
+    "type": "detection",
     "agentType": "Security",
     "expectedIssue": "injection",
     "severity": "Critical"
@@ -30,8 +34,17 @@
   {
     "name": "Layout Thrashing (Read-Write loop)",
     "file": "tests/evals/fixtures/layout-thrashing.js",
+    "type": "detection",
     "agentType": "Performance",
     "expectedIssue": "layout",
     "severity": "Medium"
+  },
+  {
+    "name": "Refactor Sync XHR to Fetch",
+    "file": "tests/evals/fixtures/refactor-xhr.js",
+    "type": "capability",
+    "agentType": "Performance",
+    "task": "Refactor this synchronous XHR request to use modern Fetch API with async/await. Return only the code.",
+    "validator": "tests/evals/validators/check-refactor.js"
   }
 ]

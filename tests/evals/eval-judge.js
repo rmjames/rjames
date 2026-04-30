@@ -29,7 +29,10 @@ async function runEvals() {
             const content = fs.readFileSync(absolutePath, 'utf-8');
             const codebaseContext = `--- File: ${test.file} ---\n${content}`;
             
-            const prompt = getAgentPrompt(test.agentType, codebaseContext, []);
+            const prompt = test.type === 'capability' 
+                ? `${test.task}\n\nCode:\n${content}`
+                : getAgentPrompt(test.agentType, codebaseContext, []);
+            
             const response = await callGemini(API_KEY, prompt, test.agentType);
 
             if (!response) {
@@ -38,18 +41,36 @@ async function runEvals() {
                 continue;
             }
 
-            const foundExpected = test.expectedIssue 
-                ? response.reasons.some(r => r.suggestions.toLowerCase().includes(test.expectedIssue.toLowerCase()))
-                : response.pass === true;
+            let testPassed = false;
+            let failureDetail = '';
 
-            const isFalsePositive = !test.expectedIssue && response.pass === false;
+            if (test.type === 'capability') {
+                // Capability Eval: Run the validator
+                const validatorPath = path.join(__dirname, '..', '..', test.validator);
+                const { validate } = require(validatorPath);
+                // We assume for capability, we might need the raw text if response.reasons is for detection
+                // But if our judge.js always returns JSON, we might need a raw mode or extract from suggestions
+                const llmCode = response.reasons ? response.reasons.map(r => r.suggestions).join('\n') : response;
+                const validation = validate(llmCode);
+                testPassed = validation.passed;
+                failureDetail = validation.reason;
+            } else {
+                // Detection Eval: Check for expected keywords
+                const foundExpected = test.expectedIssue 
+                    ? response.reasons.some(r => r.suggestions.toLowerCase().includes(test.expectedIssue.toLowerCase()))
+                    : response.pass === true;
 
-            if (foundExpected && !isFalsePositive) {
+                const isFalsePositive = !test.expectedIssue && response.pass === false;
+                testPassed = foundExpected && !isFalsePositive;
+                failureDetail = response.reasons ? response.reasons.map(r => r.suggestions).join(', ') : 'No reasons';
+            }
+
+            if (testPassed) {
                 console.log(`  ✅ Passed`);
                 results.push({ ...test, passed: true });
             } else {
                 console.log(`  ❌ Failed`);
-                results.push({ ...test, passed: false, actual: response.reasons.map(r => r.suggestions) });
+                results.push({ ...test, passed: false, actual: failureDetail });
             }
         } catch (e) {
             console.error(`  ❌ Error processing ${test.name}: ${e.message}`);
