@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { callGemini, getAgentPrompt } = require('../../scripts/judge.js');
+const { callGemini, getAgentPrompt } = require('../scripts/judge.js');
 
 const MANIFEST_PATH = path.join(__dirname, 'manifest.json');
 const API_KEY = process.env.GEMINI_API_KEY;
@@ -25,7 +25,7 @@ async function runEvals() {
         console.log(`Testing: ${test.name} (${test.file})...`);
         
         try {
-            const absolutePath = path.join(__dirname, '..', '..', test.file);
+            const absolutePath = path.join(__dirname, '..', test.file);
             const content = fs.readFileSync(absolutePath, 'utf-8');
             const codebaseContext = `--- File: ${test.file} ---\n${content}`;
             
@@ -46,7 +46,7 @@ async function runEvals() {
 
             if (test.type === 'capability') {
                 // Capability Eval: Run the validator
-                const validatorPath = path.join(__dirname, '..', '..', test.validator);
+                const validatorPath = path.join(__dirname, '..', test.validator);
                 const { validate } = require(validatorPath);
                 // We assume for capability, we might need the raw text if response.reasons is for detection
                 // But if our judge.js always returns JSON, we might need a raw mode or extract from suggestions
