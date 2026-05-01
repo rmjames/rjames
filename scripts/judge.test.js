@@ -82,8 +82,10 @@ describe('judge.js', () => {
     });
 
     describe('scrubSecrets', () => {
-        const DUMMY_GEMINI_KEY = 'AIzaSy' + 'B'.repeat(33); // Construct to avoid literal match
-        const DUMMY_OPENAI_KEY = 'sk-' + 'a'.repeat(30);
+        // Generate keys dynamically to avoid static analysis triggers
+        const generateMockKey = (prefix, length) => prefix + Math.random().toString(36).substring(2, 15).padEnd(length - prefix.length, 'x');
+        const DUMMY_GEMINI_KEY = generateMockKey('AIzaSy', 39);
+        const DUMMY_OPENAI_KEY = generateMockKey('sk-', 48);
 
         it('should redact Gemini API keys', () => {
             const content = `const key = "${DUMMY_GEMINI_KEY}";`;
