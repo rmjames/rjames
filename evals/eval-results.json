@@ -1,7 +1,7 @@
 [
   {
     "name": "DOM XSS via URL Params",
-    "file": "tests/evals/fixtures/xss.js",
+    "file": "evals/fixtures/xss.js",
     "agentType": "Security",
     "expectedIssue": "XSS",
     "severity": "High",
@@ -9,7 +9,7 @@
   },
   {
     "name": "Sync Canvas toDataURL in Animation",
-    "file": "tests/evals/fixtures/perf-sync.js",
+    "file": "evals/fixtures/perf-sync.js",
     "agentType": "Performance",
     "expectedIssue": "toDataURL",
     "severity": "Medium",
@@ -20,7 +20,7 @@
   },
   {
     "name": "Clean File (No Issues)",
-    "file": "tests/evals/fixtures/clean.js",
+    "file": "evals/fixtures/clean.js",
     "agentType": "Security",
     "expectedIssue": null,
     "severity": "None",

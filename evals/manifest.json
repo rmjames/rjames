@@ -1,0 +1,50 @@
+[
+  {
+    "name": "DOM XSS via URL Params",
+    "file": "evals/fixtures/xss.js",
+    "type": "detection",
+    "agentType": "Security",
+    "expectedIssue": "XSS",
+    "severity": "High"
+  },
+  {
+    "name": "Sync Canvas toDataURL in Animation",
+    "file": "evals/fixtures/perf-sync.js",
+    "type": "detection",
+    "agentType": "Performance",
+    "expectedIssue": "data URL",
+    "severity": "Medium"
+  },
+  {
+    "name": "Clean File (No Issues)",
+    "file": "evals/fixtures/clean.js",
+    "type": "detection",
+    "agentType": "Security",
+    "expectedIssue": null,
+    "severity": "None"
+  },
+  {
+    "name": "Command Injection (exec)",
+    "file": "evals/fixtures/cmd-injection.js",
+    "type": "detection",
+    "agentType": "Security",
+    "expectedIssue": "injection",
+    "severity": "Critical"
+  },
+  {
+    "name": "Layout Thrashing (Read-Write loop)",
+    "file": "evals/fixtures/layout-thrashing.js",
+    "type": "detection",
+    "agentType": "Performance",
+    "expectedIssue": "layout",
+    "severity": "Medium"
+  },
+  {
+    "name": "Refactor Sync XHR to Fetch",
+    "file": "evals/fixtures/refactor-xhr.js",
+    "type": "capability",
+    "agentType": "Performance",
+    "task": "Refactor this synchronous XHR request to use modern Fetch API with async/await. Return only the code.",
+    "validator": "evals/validators/check-refactor.js"
+  }
+]
