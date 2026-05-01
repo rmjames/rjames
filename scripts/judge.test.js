@@ -113,7 +113,7 @@ describe('judge.js', () => {
         });
 
         it('should redact hex-like secrets (32+ chars)', () => {
-            const content = 'my_var = "[REDACTED_HEX_MOCK]";';
+            const content = 'my_var = "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4";';
             const scrubbed = scrubSecrets(content);
             expect(scrubbed).toBe('my_var = "[REDACTED_SECRET]";');
         });

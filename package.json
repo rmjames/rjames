@@ -15,7 +15,7 @@
     "lint": "eslint . --ext .js",
     "prepare": "git config core.hooksPath .githooks",
     "test:judge": "node --env-file-if-exists=.env scripts/judge.js",
-    "test:eval": "node --env-file-if-exists=.env tests/evals/eval-judge.js"
+    "test:eval": "node --env-file-if-exists=.env evals/eval-judge.js"
   },
   "author": "",
   "license": "ISC",
