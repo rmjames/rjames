@@ -12,6 +12,7 @@
 - **Accessibility**: Use semantic HTML5 and follow best practices for interactive elements.
 
 ## Coding Style & Workflow
+- **Self-Improvement**: All agents must follow the workflow outlined in `SELF_IMPROVEMENT.md` (using `scratchpad.md` and `knowledge.md`) to plan tasks and retain knowledge.
 - **Tech Stack**: Use latest HTML5, CSS3, ESNext, TypeScript, and Node.js.
 - **Quality**: Write functional, composable, and stateful code. Avoid race conditions.
 - **Testing**: Run tests after every change and fix failures immediately.

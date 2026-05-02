@@ -19,3 +19,6 @@ playwright-report/
 .dev.vars
 .wrangler/
 .env
+
+# Agent temporary workspace
+scratchpad.md
