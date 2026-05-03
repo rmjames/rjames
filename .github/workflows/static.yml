@@ -47,6 +47,26 @@ jobs:
         run: npm ci
       - name: Build
         run: npm run build
+      - name: Minify Assets
+        run: |
+          # Minify CSS
+          for file in dist/styles/*.css; do
+            if [ -f "$file" ]; then
+              npx esbuild "$file" --minify --outfile="${file%.css}.min.css"
+              rm "$file"
+            fi
+          done
+          
+          # Minify JS
+          for file in dist/scripts/*.js; do
+            if [ -f "$file" ]; then
+              npx esbuild "$file" --minify --outfile="${file%.js}.min.js"
+              rm "$file"
+            fi
+          done
+          
+          # Apply HTML replacement patterns
+          find dist -type f -name "*.html" -exec sed -i -f .github/workflows/minify-patterns.txt {} +
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Upload artifact
