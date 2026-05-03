@@ -12,7 +12,7 @@
 - **Accessibility**: Use semantic HTML5 and follow best practices for interactive elements.
 
 ## Coding Style & Workflow
-- **Self-Improvement**: All agents must follow the workflow outlined in `SELF_IMPROVEMENT.md` (using `scratchpad.md` and `knowledge.md`) to plan tasks and retain knowledge.
+- **Self-Improvement**: All agents must follow the workflow outlined in `.fact/self_improvement.md` (using `scratchpad.md` and `knowledge.md`) to plan tasks and retain knowledge.
 - **Tech Stack**: Use latest HTML5, CSS3, ESNext, TypeScript, and Node.js.
 - **Quality**: Write functional, composable, and stateful code. Avoid race conditions.
 - **Testing**: Run tests after every change and fix failures immediately.
@@ -44,4 +44,3 @@
 ## References
 - [Baseline 2025](https://web.dev/baseline/2025) | [Webstatus.dev](https://webstatus.dev/)
 - [WCAG 2.0](https://www.w3.org/TR/WCAG20/) | [Web.dev](https://web.dev/) | [MDN](https://developer.mozilla.org/en-US/)
-
