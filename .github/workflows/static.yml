@@ -67,6 +67,9 @@ jobs:
           
           # Apply HTML replacement patterns
           find dist -type f -name "*.html" -exec sed -i -f .github/workflows/minify-patterns.txt {} +
+
+          # Minify HTML
+          npx html-minifier-terser --input-dir dist --output-dir dist --file-ext html --collapse-whitespace --remove-comments --minify-css true --minify-js true
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Upload artifact
