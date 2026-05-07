@@ -78,11 +78,28 @@
     [0.18, 0.25, 0.28, 0.15, 0.5, 0.15] // Arch L
   ]);
 
+  const file = flatten([
+    [0.30, 0.12],
+    [0.30, 0.12, 0.45, 0.12, 0.60, 0.12], // 1. Top edge (Crease Start at 0.60)
+    [0.60, 0.12, 0.58, 0.18, 0.56, 0.25], // 2. Fold Start (A) to Apex (C)
+    [0.56, 0.25, 0.65, 0.23, 0.73, 0.21], // 3. Apex (C) to Fold End (B)
+    [0.73, 0.21, 0.68, 0.16, 0.60, 0.12], // 4. Flap Edge (B to A)
+    [0.60, 0.12, 0.66, 0.16, 0.73, 0.21], // 5. Crease Line (A to B)
+    [0.73, 0.21, 0.73, 0.40, 0.73, 0.60], // 6. Right edge mid
+    [0.73, 0.60, 0.73, 0.80, 0.73, 0.88], // 7. Right edge bot
+    [0.73, 0.88, 0.73, 0.94, 0.67, 0.94], // 8. BR Corner (Smoother)
+    [0.67, 0.94, 0.50, 0.94, 0.33, 0.94], // 9. Bottom edge
+    [0.33, 0.94, 0.27, 0.94, 0.27, 0.88], // 10. BL Corner (Smoother)
+    [0.27, 0.88, 0.27, 0.50, 0.27, 0.18], // 11. Left edge
+    [0.27, 0.18, 0.27, 0.12, 0.30, 0.12]  // 12. TL Corner (Smoother)
+  ]);
+
   const path = window.location.pathname;
   const isHeadphones = path.includes('headphones.html');
+  const isResume = path.includes('resume.html') || document.title.toLowerCase().includes('resume');
   const isLab = path.includes('/lab.html') || path.includes('/lab/') || document.title.toLowerCase().includes('lab');
 
-  const target = isHeadphones ? headphone : (isLab ? flask : house);
+  const target = isHeadphones ? headphone : (isResume ? file : (isLab ? flask : house));
   const current = new Float32Array(circle.length);
 
   const canvas = document.createElement('canvas');
