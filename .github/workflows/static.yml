@@ -49,25 +49,12 @@ jobs:
         run: npm run build
       - name: Minify Assets
         run: |
-          # Minify CSS
-          for file in dist/styles/*.css; do
-            if [ -f "$file" ]; then
-              npx esbuild "$file" --minify --outfile="${file%.css}.min.css"
-              rm "$file"
-            fi
-          done
+          # Minify CSS in-place recursively
+          find dist/styles -type f -name "*.css" -exec npx esbuild {} --minify --allow-overwrite --outfile={} \;
           
-          # Minify JS
-          for file in dist/scripts/*.js; do
-            if [ -f "$file" ]; then
-              npx esbuild "$file" --minify --outfile="${file%.js}.min.js"
-              rm "$file"
-            fi
-          done
+          # Minify JS in-place recursively
+          find dist/scripts -type f -name "*.js" -exec npx esbuild {} --minify --allow-overwrite --outfile={} \;
           
-          # Apply HTML replacement patterns
-          find dist -type f -name "*.html" -exec sed -i -f .github/workflows/minify-patterns.txt {} +
-
           # Minify HTML
           npx html-minifier-terser --input-dir dist --output-dir dist --file-ext html --collapse-whitespace --remove-comments --minify-css true --minify-js true
       - name: Setup Pages

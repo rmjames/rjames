@@ -1,6 +1,1 @@
-# HTML Link Replacement Patterns
-# Pattern 1: CSS links - exclude http URLs
-/href="http/!s/\(<link[^>]*href="\)\([^"]*\)\.css\("\)/\1\2.min.css\3/g
-
-# Pattern 2: JS scripts - exclude http URLs
-/src="http/!s/\(<script[^>]*src="\)\([^"]*\)\.js\("\)/\1\2.min.js\3/g
+# Obsolete: We now use in-place minification so sed replacement is not needed.
