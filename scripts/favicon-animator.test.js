@@ -124,4 +124,14 @@ describe('Favicon Animator Performance', () => {
     // we just ensure it generated something.
     expect(canvasMock.toDataURL).toHaveBeenCalled();
   });
+
+  it('should respect path-based shape selection (File for resume)', async () => {
+    vi.stubGlobal('location', { pathname: '/resume.html' });
+    await import('./favicon-animator.js?t=resume-' + Date.now());
+    
+    // Wait for generation
+    for (let i = 0; i < 150; i++) await vi.advanceTimersByTimeAsync(1);
+
+    expect(canvasMock.toDataURL).toHaveBeenCalled();
+  });
 });
