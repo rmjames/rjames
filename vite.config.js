@@ -40,7 +40,7 @@ const copyStaticFiles = () => {
             });
 
             // Add directories to copy
-            const dirsToCopy = ['images', 'fonts', 'styles'];
+            const dirsToCopy = ['images', 'fonts', 'styles', 'scripts'];
 
             filesToCopy.forEach(({ src, dest }) => {
                 const srcPath = resolve(__dirname, src);
@@ -57,7 +57,13 @@ const copyStaticFiles = () => {
                 const srcDir = resolve(__dirname, dir);
                 const destDir = resolve(__dirname, 'dist', dir);
                 if (fs.existsSync(srcDir)) {
-                    fs.cpSync(srcDir, destDir, { recursive: true });
+                    fs.cpSync(srcDir, destDir, { 
+                        recursive: true,
+                        filter: (src) => {
+                            // Exclude test files and node scripts from production build
+                            return !src.includes('.test.js') && !src.includes('scan-audio.js');
+                        }
+                    });
                     console.log(`Copied directory ${dir} to dist/${dir}`);
                 }
             });

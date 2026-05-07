@@ -1,4 +1,4 @@
-const cacheName = 'v18'; // Bumped to v18 to cache new lab assets and externalized scripts
+const cacheName = 'v19'; // Bumped to v19 to fix 404s by ensuring all scripts are available and cached correctly
 
 const assetsToCache = [
   '/index.html',
