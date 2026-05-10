@@ -50,7 +50,7 @@ async function runEvals() {
                 const { validate } = require(validatorPath);
                 // We assume for capability, we might need the raw text if response.reasons is for detection
                 // But if our judge.js always returns JSON, we might need a raw mode or extract from suggestions
-                const llmCode = response.reasons ? response.reasons.map(r => r.suggestions).join('\n') : response;
+                const llmCode = response.reasons ? response.reasons.map(r => r.suggestions).join('\n') : (typeof response === 'string' ? response : JSON.stringify(response));
                 const validation = validate(llmCode);
                 testPassed = validation.passed;
                 failureDetail = validation.reason;
@@ -103,9 +103,9 @@ function printSummary(results) {
                 console.log(`  Error: ${r.error}`);
             } else if (r.expectedIssue) {
                 console.log(`  Expected keyword: "${r.expectedIssue}"`);
-                console.log(`  Actual findings:\n    ${r.actual.join('\n    ')}`);
+                console.log(`  Actual findings:\n    ${Array.isArray(r.actual) ? r.actual.join('\n    ') : r.actual}`);
             } else {
-                console.log(`  Unexpected findings in "clean" file:\n    ${r.actual.join('\n    ')}`);
+                console.log(`  Unexpected findings in "clean" file:\n    ${Array.isArray(r.actual) ? r.actual.join('\n    ') : r.actual}`);
             }
         });
     }

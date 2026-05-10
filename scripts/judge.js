@@ -132,16 +132,20 @@ function getAllFiles(dirPath, arrayOfFiles) {
         const fullPath = path.join(dirPath, file);
         const fileName = path.basename(file);
         
-        if (fs.statSync(fullPath).isDirectory()) {
-            if (!IGNORED_DIRS.has(fileName)) {
-                arrayOfFiles = getAllFiles(fullPath, arrayOfFiles);
+        try {
+            if (fs.statSync(fullPath).isDirectory()) {
+                if (!IGNORED_DIRS.has(fileName)) {
+                    arrayOfFiles = getAllFiles(fullPath, arrayOfFiles);
+                }
+            } else {
+                if (IGNORED_FILES.has(fileName)) return;
+                const ext = path.extname(file);
+                if (ALLOWED_EXTENSIONS.has(ext)) {
+                    arrayOfFiles.push(fullPath);
+                }
             }
-        } else {
-            if (IGNORED_FILES.has(fileName)) return;
-            const ext = path.extname(file);
-            if (ALLOWED_EXTENSIONS.has(ext)) {
-                arrayOfFiles.push(fullPath);
-            }
+        } catch (err) {
+            // Skip unreadable files or broken symlinks
         }
     });
 

@@ -130,7 +130,31 @@ self.addEventListener('fetch', event => {
         });
       }
 
-      // Network First strategy for everything else (HTML, CSS, JS)
+      // Stale-While-Revalidate for script and style
+      if (event.request.destination === 'script' || event.request.destination === 'style') {
+        return cache.match(event.request).then((cachedResponse) => {
+          const fetchPromise = fetch(event.request).then((networkResponse) => {
+            if (isValidResponse(event.request, networkResponse)) {
+              cache.put(event.request, networkResponse.clone());
+            }
+            return networkResponse;
+          });
+
+          // Return cached response immediately if available, 
+          // while fetchPromise updates the cache in the background.
+          if (cachedResponse) {
+            fetchPromise.catch(() => {
+              // Silently ignore background fetch errors
+            });
+            return cachedResponse;
+          }
+
+          // If not in cache, wait for network
+          return fetchPromise;
+        });
+      }
+
+      // Network First strategy for everything else (HTML, etc.)
       return fetch(event.request).then((networkResponse) => {
         if (isValidResponse(event.request, networkResponse)) {
           cache.put(event.request, networkResponse.clone());
