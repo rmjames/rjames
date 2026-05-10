@@ -10,6 +10,18 @@ vi.stubGlobal('requestIdleCallback', (cb) => {
   return 1;
 });
 
+// Mock IntersectionObserver
+vi.stubGlobal('IntersectionObserver', class {
+  constructor(callback) {
+    this.callback = callback;
+  }
+  observe(element) {
+    this.callback([{ isIntersecting: true, target: element }]);
+  }
+  unobserve() {}
+  disconnect() {}
+});
+
 describe('lab-analytics.js', () => {
   beforeEach(() => {
     // Set up mock DOM
@@ -50,6 +62,7 @@ describe('lab-analytics.js', () => {
   });
 
   afterEach(() => {
+    vi.clearAllTimers();
     document.body.innerHTML = '';
     vi.clearAllMocks();
     vi.useRealTimers();

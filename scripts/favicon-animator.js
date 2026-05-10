@@ -1,23 +1,24 @@
 /**
  * Favicon Animator: Full Loop Once
  * Animation sequence: Circle (2s) -> Target (0.5s) -> Target (1.5s) -> Circle (0.5s) -> STOP.
+ * Refactored to use SVG data URIs for zero-jank performance (PERF-18).
  */
 (function () {
   if (window.self !== window.top) {
     document.documentElement.classList.add('in-iframe');
   }
-  const FPS_TARGET = 15; // Reduced from 30 to 5 to avoid UI thread starvation (PERF-18)
+
+  const FPS_TARGET = 10; // 10 FPS is plenty for a favicon and saves CPU
   const PAINT_INTERVAL = 1000 / FPS_TARGET;
 
   const timing = {
-    hold1: 2000,   // Circle hold
-    morph1: 500,   // Morph to House/Flask
-    hold2: 1500,   // Target hold
-    morph2: 500    // Morph back to Circle
+    hold1: 2000,
+    morph1: 500,
+    hold2: 1500,
+    morph2: 500
   };
   const totalDuration = timing.hold1 + timing.morph1 + timing.hold2 + timing.morph2;
 
-  // Shapes (8-segment topology)
   function flatten(pts) {
     const flat = new Float32Array(pts.length * 6 - 4);
     flat[0] = pts[0][0]; flat[1] = pts[0][1];
@@ -42,56 +43,56 @@
 
   const house = flatten([
     [0.5, 0.156],
-    [0.6, 0.26, 0.7, 0.36, 0.781, 0.469], [0.781, 0.469, 0.781, 0.469, 0.781, 0.469], [0.781, 0.469, 0.781, 0.469, 0.781, 0.469], // R Eave
-    [0.781, 0.6, 0.781, 0.72, 0.781, 0.844], [0.781, 0.844, 0.781, 0.844, 0.781, 0.844], [0.781, 0.844, 0.781, 0.844, 0.5, 0.844], // R Wall to Bot
-    [0.4, 0.844, 0.3, 0.844, 0.219, 0.844], [0.219, 0.844, 0.219, 0.844, 0.219, 0.844], [0.219, 0.844, 0.219, 0.844, 0.219, 0.469], // Bot to L Wall
-    [0.219, 0.469, 0.219, 0.469, 0.219, 0.469], [0.25, 0.36, 0.4, 0.26, 0.5, 0.156], [0.5, 0.156, 0.5, 0.156, 0.5, 0.156] // L Eave to Peak
+    [0.6, 0.26, 0.7, 0.36, 0.781, 0.469], [0.781, 0.469, 0.781, 0.469, 0.781, 0.469], [0.781, 0.469, 0.781, 0.469, 0.781, 0.469],
+    [0.781, 0.6, 0.781, 0.72, 0.781, 0.844], [0.781, 0.844, 0.781, 0.844, 0.781, 0.844], [0.781, 0.844, 0.781, 0.844, 0.5, 0.844],
+    [0.4, 0.844, 0.3, 0.844, 0.219, 0.844], [0.219, 0.844, 0.219, 0.844, 0.219, 0.844], [0.219, 0.844, 0.219, 0.844, 0.219, 0.469],
+    [0.219, 0.469, 0.219, 0.469, 0.219, 0.469], [0.25, 0.36, 0.4, 0.26, 0.5, 0.156], [0.5, 0.156, 0.5, 0.156, 0.5, 0.156]
   ]);
 
   const flask = flatten([
     [0.41, 0.06],
-    [0.45, 0.06, 0.55, 0.06, 0.59, 0.06], // Rim
-    [0.59, 0.15, 0.59, 0.22, 0.59, 0.31], // R Neck
-    [0.59, 0.4, 0.7, 0.5, 0.8, 0.6], // R Shoulder
-    [0.9, 0.75, 0.97, 0.85, 0.97, 0.94], // R Bulb
-    [0.8, 0.94, 0.65, 0.94, 0.5, 0.94], // R Bot
-    [0.35, 0.94, 0.2, 0.94, 0.03, 0.94], // L Bot
-    [0.03, 0.85, 0.1, 0.7, 0.2, 0.6], // L Bulb
-    [0.25, 0.5, 0.35, 0.4, 0.41, 0.31], // L Shoulder
-    [0.41, 0.22, 0.41, 0.15, 0.41, 0.06], // L Neck
+    [0.45, 0.06, 0.55, 0.06, 0.59, 0.06],
+    [0.59, 0.15, 0.59, 0.22, 0.59, 0.31],
+    [0.59, 0.4, 0.7, 0.5, 0.8, 0.6],
+    [0.9, 0.75, 0.97, 0.85, 0.97, 0.94],
+    [0.8, 0.94, 0.65, 0.94, 0.5, 0.94],
+    [0.35, 0.94, 0.2, 0.94, 0.03, 0.94],
+    [0.03, 0.85, 0.1, 0.7, 0.2, 0.6],
+    [0.25, 0.5, 0.35, 0.4, 0.41, 0.31],
+    [0.41, 0.22, 0.41, 0.15, 0.41, 0.06],
     [0.41, 0.06, 0.41, 0.06, 0.41, 0.06], [0.41, 0.06, 0.41, 0.06, 0.41, 0.06], [0.41, 0.06, 0.41, 0.06, 0.41, 0.06]
   ]);
 
   const headphone = flatten([
     [0.5, 0.15],
-    [0.72, 0.15, 0.82, 0.25, 0.82, 0.42], // Arch R
-    [0.82, 0.45, 0.85, 0.48, 0.85, 0.52], // Neck R
-    [0.95, 0.55, 0.95, 0.7, 0.95, 0.85], // Pad R Outer
-    [0.95, 0.93, 0.75, 0.93, 0.75, 0.85], // Pad R Bot
-    [0.75, 0.75, 0.7, 0.65, 0.7, 0.55], // Pad R Inner
-    [0.7, 0.42, 0.65, 0.38, 0.5, 0.38], // Bridge R
-    [0.35, 0.38, 0.3, 0.42, 0.3, 0.55], // Bridge L
-    [0.3, 0.65, 0.25, 0.75, 0.25, 0.85], // Pad L Inner
-    [0.25, 0.93, 0.05, 0.93, 0.05, 0.85], // Pad L Bot
-    [0.05, 0.7, 0.05, 0.55, 0.15, 0.52], // Pad L Outer
-    [0.15, 0.48, 0.18, 0.45, 0.18, 0.42], // Neck L
-    [0.18, 0.25, 0.28, 0.15, 0.5, 0.15] // Arch L
+    [0.72, 0.15, 0.82, 0.25, 0.82, 0.42],
+    [0.82, 0.45, 0.85, 0.48, 0.85, 0.52],
+    [0.95, 0.55, 0.95, 0.7, 0.95, 0.85],
+    [0.95, 0.93, 0.75, 0.93, 0.75, 0.85],
+    [0.75, 0.75, 0.7, 0.65, 0.7, 0.55],
+    [0.7, 0.42, 0.65, 0.38, 0.5, 0.38],
+    [0.35, 0.38, 0.3, 0.42, 0.3, 0.55],
+    [0.3, 0.65, 0.25, 0.75, 0.25, 0.85],
+    [0.25, 0.93, 0.05, 0.93, 0.05, 0.85],
+    [0.05, 0.7, 0.05, 0.55, 0.15, 0.52],
+    [0.15, 0.48, 0.18, 0.45, 0.18, 0.42],
+    [0.18, 0.25, 0.28, 0.15, 0.5, 0.15]
   ]);
 
   const file = flatten([
     [0.30, 0.12],
-    [0.30, 0.12, 0.45, 0.12, 0.60, 0.12], // 1. Top edge (Crease Start at 0.60)
-    [0.60, 0.12, 0.58, 0.18, 0.56, 0.25], // 2. Fold Start (A) to Apex (C)
-    [0.56, 0.25, 0.65, 0.23, 0.73, 0.21], // 3. Apex (C) to Fold End (B)
-    [0.73, 0.21, 0.68, 0.16, 0.60, 0.12], // 4. Flap Edge (B to A)
-    [0.60, 0.12, 0.66, 0.16, 0.73, 0.21], // 5. Crease Line (A to B)
-    [0.73, 0.21, 0.73, 0.40, 0.73, 0.60], // 6. Right edge mid
-    [0.73, 0.60, 0.73, 0.80, 0.73, 0.88], // 7. Right edge bot
-    [0.73, 0.88, 0.73, 0.94, 0.67, 0.94], // 8. BR Corner (Smoother)
-    [0.67, 0.94, 0.50, 0.94, 0.33, 0.94], // 9. Bottom edge
-    [0.33, 0.94, 0.27, 0.94, 0.27, 0.88], // 10. BL Corner (Smoother)
-    [0.27, 0.88, 0.27, 0.50, 0.27, 0.18], // 11. Left edge
-    [0.27, 0.18, 0.27, 0.12, 0.30, 0.12]  // 12. TL Corner (Smoother)
+    [0.30, 0.12, 0.45, 0.12, 0.60, 0.12],
+    [0.60, 0.12, 0.58, 0.18, 0.56, 0.25],
+    [0.56, 0.25, 0.65, 0.23, 0.73, 0.21],
+    [0.73, 0.21, 0.68, 0.16, 0.60, 0.12],
+    [0.60, 0.12, 0.66, 0.16, 0.73, 0.21],
+    [0.73, 0.21, 0.73, 0.40, 0.73, 0.60],
+    [0.73, 0.60, 0.73, 0.80, 0.73, 0.88],
+    [0.73, 0.88, 0.73, 0.94, 0.67, 0.94],
+    [0.67, 0.94, 0.50, 0.94, 0.33, 0.94],
+    [0.33, 0.94, 0.27, 0.94, 0.27, 0.88],
+    [0.27, 0.88, 0.27, 0.50, 0.27, 0.18],
+    [0.27, 0.18, 0.27, 0.12, 0.30, 0.12]
   ]);
 
   const path = window.location.pathname;
@@ -102,9 +103,6 @@
   const target = isHeadphones ? headphone : (isResume ? file : (isLab ? flask : house));
   const current = new Float32Array(circle.length);
 
-  const canvas = document.createElement('canvas');
-  canvas.width = canvas.height = 32;
-  const ctx = canvas.getContext('2d');
   const favicon = document.getElementById('favicon-svg') || document.querySelector("link[rel*='icon']");
   if (!favicon) return;
 
@@ -115,13 +113,22 @@
   let startTime = null;
   let lastPaintTime = 0;
 
+  function generateSVGDataURI(pts) {
+    let d = `M${pts[0].toFixed(3)} ${pts[1].toFixed(3)}`;
+    for (let i = 0; i < 12; i++) {
+      const o = i * 6 + 2;
+      d += `C${pts[o].toFixed(3)} ${pts[o+1].toFixed(3)} ${pts[o+2].toFixed(3)} ${pts[o+3].toFixed(3)} ${pts[o+4].toFixed(3)} ${pts[o+5].toFixed(3)}`;
+    }
+    // Using %23 for # to avoid issues in some browsers
+    return `data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 1 1%22><path d=%22${d}Z%22 fill=%22none%22 stroke=%22%23f59e0b%22 stroke-width=%220.125%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22/></svg>`;
+  }
+
   function pregenerateFrames() {
     if (isCacheComplete || isGenerating) return;
     isGenerating = true;
 
     let t = 0;
     const generateChunk = (deadline) => {
-      // Process as many frames as possible in the idle period
       while ((!deadline || deadline.timeRemaining() > 1) && t <= totalDuration) {
         let progress = 0;
         if (t < timing.hold1) {
@@ -138,18 +145,7 @@
           current.set(circle);
         }
 
-        ctx.clearRect(0, 0, 32, 32);
-        ctx.strokeStyle = '#f59e0b'; ctx.lineWidth = 4; ctx.lineJoin = 'round'; ctx.lineCap = 'round';
-        ctx.beginPath();
-        ctx.moveTo(current[0] * 32, current[1] * 32);
-        for (let i = 0; i < 12; i++) {
-          const o = i * 6 + 2;
-          ctx.bezierCurveTo(current[o] * 32, current[o + 1] * 32, current[o + 2] * 32, current[o + 3] * 32, current[o + 4] * 32, current[o + 5] * 32);
-        }
-        ctx.closePath();
-        ctx.stroke();
-
-        framesCache.push(canvas.toDataURL('image/png'));
+        framesCache.push(generateSVGDataURI(current));
         t += PAINT_INTERVAL;
       }
 
@@ -162,7 +158,6 @@
       } else {
         isCacheComplete = true;
         isGenerating = false;
-        // If we were waiting for the cache to start, start now
         if (document.hasFocus() && !document.hidden) {
           start();
         }
@@ -186,7 +181,6 @@
       return;
     }
 
-    // Only update DOM if the frame actually changed
     const nextHref = framesCache[idx];
     if (favicon.getAttribute('href') !== nextHref) {
       favicon.href = nextHref;
@@ -202,7 +196,6 @@
       lastPaintTime = timestamp;
     }
 
-    // Only schedule the next frame if we haven't stopped
     if (rafId) {
       rafId = requestAnimationFrame(animate);
     }
@@ -226,10 +219,8 @@
     }
   }
 
-  // Visibility & Focus Logic: Re-trigger full loop on focus
   const handleFocus = () => {
     if (document.hidden) return;
-    // 100ms buffer gives the browser UI thread a moment to foreground
     setTimeout(start, 100);
   };
 

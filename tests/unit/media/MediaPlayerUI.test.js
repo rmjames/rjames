@@ -10,6 +10,16 @@ vi.mock('../../../scripts/media/ColorExtractor.js', () => ({
     }
 }));
 
+// Mock ResizeObserver
+vi.stubGlobal('ResizeObserver', class {
+  constructor(callback) {
+    this.callback = callback;
+  }
+  observe(element) {}
+  unobserve() {}
+  disconnect() {}
+});
+
 describe('MediaPlayerUI', () => {
     describe('updatePlayIcon', () => {
         it('should update icon to play when paused', () => {

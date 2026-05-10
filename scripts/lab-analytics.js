@@ -60,6 +60,23 @@ export function initLabAnalytics() {
         }
     };
 
+    // IntersectionObserver for lazy-loading and analytics attachment (PERF-29, PERF-31)
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const iframe = entry.target;
+                if (iframe.dataset.src) {
+                    iframe.src = iframe.dataset.src;
+                    // Don't delete dataset.src yet, so we can check if it's already loading
+                }
+                // Try attaching immediately in case it's already loaded or fast
+                attachIframeListener(iframe);
+            }
+        });
+    }, {
+        rootMargin: '200px' // Load slightly before they enter the viewport
+    });
+
     iframes.forEach((iframe) => {
         // Track hover on the iframe container (parent article)
         const wrapper = iframe.closest("article");
@@ -88,24 +105,11 @@ export function initLabAnalytics() {
             });
         }
 
-        // Track clicks inside the iframe
-        // Try immediately
-        attachIframeListener(iframe);
-
-        // Try on load
+        // Attach listener on load
         iframe.addEventListener("load", () => attachIframeListener(iframe));
 
-        // Fallback polling to catch cases where load fired before script ran
-        const pollId = setInterval(() => {
-            if (iframe.dataset.analyticsAttached) {
-                clearInterval(pollId);
-            } else {
-                attachIframeListener(iframe);
-            }
-        }, 500);
-
-        // Stop polling after 5 seconds
-        setTimeout(() => clearInterval(pollId), 5000);
+        // Start observing for lazy loading
+        observer.observe(iframe);
     });
 }
 
