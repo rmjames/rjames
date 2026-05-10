@@ -2,12 +2,18 @@ const fs = require('fs');
 const path = require('path');
 
 const ASSETS_DIR = path.join(__dirname, '../assets/audio');
+const DATA_DIR = path.join(__dirname, '../public/data');
+const JSON_FILE = path.join(DATA_DIR, 'tracks.json');
 const OUTPUT_FILE = path.join(__dirname, 'AudioLibrary.js');
+
+// Ensure data directory exists
+if (!fs.existsSync(DATA_DIR)) {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+}
 
 // Helper to check if file is audio
 const isAudioFile = (filename) => /\.(mp3|ogg|wav|m4a|flac)$/i.test(filename);
-
-// Helper to find art in a directory
+// ... [REST OF HELPERS REMAIN SAME] ...
 const findArtInDir = (dir) => {
     try {
         const files = fs.readdirSync(dir);
@@ -18,12 +24,9 @@ const findArtInDir = (dir) => {
     } catch { return null; }
 };
 
-// Helper to separate path normalization
 const toForwardSlashes = (p) => p.split(path.sep).join('/');
 
-// Helper to parse a single track
 async function parseTrackInfo(filePath, mm) {
-    // Calculate path relative to THIS script (which is where AudioLibrary.js will live)
     const relativePath = path.relative(__dirname, filePath);
     const fileName = path.basename(filePath);
     const dirName = path.dirname(filePath);
@@ -36,17 +39,15 @@ async function parseTrackInfo(filePath, mm) {
         console.warn(`Could not parse metadata for ${fileName}:`, err.message);
     }
 
-    // 1. Start with metadata from ID3 tags
     let title = metadata?.common?.title;
     let artist = metadata?.common?.artist;
     let album = metadata?.common?.album;
     let genre = metadata?.common?.genre?.[0] || 'Hip Hop';
     let duration = metadata?.format?.duration || null;
 
-    // 2. Fallback to filename/directory parsing if metadata is missing
     if (!title) {
         title = fileName.replace(/\.[^/.]+$/, "");
-        title = title.replace(/^\d+\s*[-.]\s*/, ''); // Remove leading track numbers
+        title = title.replace(/^\d+\s*[-.]\s*/, '');
         title = title.replace(/\([^)]*\.com\)/i, '').trim();
         title = title.replace(/\(DatPiff Exclusive\)/i, '').trim();
     }
@@ -54,26 +55,21 @@ async function parseTrackInfo(filePath, mm) {
     if (!artist || !album) {
         let dirArtist = 'Unknown Artist';
         let dirAlbum = albumDir;
-
-        // More robust directory parsing: handle "Artist - Album", "Artist-Album", etc.
         const parts = albumDir.split(/\s*-\s*/);
         if (parts.length >= 2) {
             dirArtist = parts[0].trim();
             dirAlbum = parts.slice(1).join(' - ').trim();
         }
-
         if (!artist) artist = dirArtist;
         if (!album) album = dirAlbum;
     }
 
-    // Clean up album name
     album = album.replace(/\([^)]*\.com\)/i, '').trim();
 
     let albumArt = null;
     let artFullPath = findArtInDir(dirName);
 
     if (!artFullPath) {
-        // Try parent directory
         const parentDir = path.dirname(dirName);
         const relParent = path.relative(ASSETS_DIR, parentDir);
         if (!relParent.startsWith('..') && parentDir !== dirName) {
@@ -85,19 +81,15 @@ async function parseTrackInfo(filePath, mm) {
         albumArt = toForwardSlashes(path.relative(__dirname, artFullPath));
     }
 
-    // 3. Attempt to extract embedded art if no file art found
     if (!albumArt && metadata?.common?.picture?.[0]) {
         try {
             const pic = metadata.common.picture[0];
             const ext = pic.format === 'image/jpeg' ? '.jpg' : (pic.format === 'image/png' ? '.png' : '.jpg');
             const coverName = `extracted_cover_${album.toLowerCase().replace(/[^a-z0-9]+/g, '-')}${ext}`;
             const coverPath = path.join(dirName, coverName);
-
             if (!fs.existsSync(coverPath)) {
                 fs.writeFileSync(coverPath, pic.data);
-                console.log(`Extracted album art for ${album} to ${coverName}`);
             }
-
             albumArt = toForwardSlashes(path.relative(__dirname, coverPath));
         } catch (e) {
             console.warn(`Failed to extract art for ${fileName}:`, e.message);
@@ -105,22 +97,23 @@ async function parseTrackInfo(filePath, mm) {
     }
 
     const id = (artist + '-' + title).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-
     return {
         id, title, artist, src: toForwardSlashes(relativePath), genre, album, duration, albumArt
     };
 }
 
-// Global Cache
 const trackCache = new Map();
 let isWatchMode = process.argv.includes('--watch');
 let debounceTimer = null;
-let mmVal = null; // Music Metadata instance
+let mmVal = null;
 
 const saveLibrary = () => {
-    // Sort tracks by ID for consistency
     const sortedTracks = Array.from(trackCache.values()).sort((a, b) => a.id.localeCompare(b.id));
 
+    // 1. Write JSON data (PERF-19)
+    fs.writeFileSync(JSON_FILE, JSON.stringify(sortedTracks, null, 4));
+
+    // 2. Write AudioLibrary.js with fetch logic
     const fileContent = `
 const audioAssets = import.meta.glob('../assets/audio/**/*', { eager: true, query: '?url', import: 'default' });
 
@@ -128,18 +121,10 @@ const audioAssets = import.meta.glob('../assets/audio/**/*', { eager: true, quer
 function findAssetKey(src) {
     if (!src) return null;
     if (audioAssets[src]) return src;
-
-    // Try verifying path normalization quirks
-    // Vite glob keys are exactly as written in the pattern prefix + file path
-    // Sometimes spaces or special chars might be issue.
     
     const keys = Object.keys(audioAssets);
     const fileName = src.split('/').pop();
     const lowerFileName = fileName.toLowerCase();
-
-    // 1. Try URI encoded version (Vite sometimes encodes keys?)
-    // 2. Try looking for exact ending match (file name)
-    // 3. Case insensitive suffix match
 
     const match = keys.find(k => 
         k.endsWith('/' + fileName) || 
@@ -152,78 +137,89 @@ function findAssetKey(src) {
         console.debug('Fuzzy matched asset:', src, '->', match);
         return match;
     }
-    
     return null;
 }
 
 class AudioLibrary {
     constructor() {
-        this._rawTracks = ${JSON.stringify(sortedTracks, null, 4)};
         this._tracks = null;
+        this._loadingPromise = null;
     }
 
-    _init() {
+    async load() {
         if (this._tracks) return;
-        this._tracks = this._rawTracks.map(track => {
-            const srcKey = findAssetKey(track.src);
-            const srcUrl = srcKey ? audioAssets[srcKey] : null;
+        if (this._loadingPromise) return this._loadingPromise;
 
-            const artKey = findAssetKey(track.albumArt);
-            const mappedArt = artKey ? audioAssets[artKey] : null;
+        this._loadingPromise = (async () => {
+            try {
+                // Fetch the static track data (PERF-19)
+                const response = await fetch('/data/tracks.json');
+                const rawTracks = await response.json();
 
-            if (!srcUrl) { 
-                console.warn('Audio asset not found in build:', track.src);
+                this._tracks = rawTracks.map(track => {
+                    const srcKey = findAssetKey(track.src);
+                    const srcUrl = srcKey ? audioAssets[srcKey] : null;
+
+                    const artKey = findAssetKey(track.albumArt);
+                    const mappedArt = artKey ? audioAssets[artKey] : null;
+
+                    if (!srcUrl) { 
+                        console.warn('Audio asset not found in build:', track.src);
+                    }
+
+                    return {
+                        ...track,
+                        src: srcUrl || track.src,
+                        albumArt: mappedArt || null
+                    };
+                });
+            } catch (err) {
+                console.error('Failed to load AudioLibrary metadata:', err);
+                this._tracks = [];
             }
+        })();
 
-            if (track.albumArt && !mappedArt) {
-                 console.warn('Album art asset not found in build:', track.albumArt);
-            }
-
-            return {
-                ...track,
-                src: srcUrl || track.src,
-                albumArt: mappedArt || null
-            };
-        });
-        this._rawTracks = null; // Cleanup
+        return this._loadingPromise;
     }
 
     get tracks() { 
-        this._init();
+        if (!this._tracks) {
+            console.warn('AudioLibrary tracks accessed before load. Returning empty array.');
+            return [];
+        }
         return this._tracks; 
     }
     getAll() { 
-        this._init();
-        return this._tracks; 
+        return this.tracks; 
     }
     getById(id) { 
-        this._init();
-        return this._tracks.find(track => track.id === id); 
+        return this.tracks.find(track => track.id === id); 
     }
     addTrack(track) { 
-        this._init();
-        this._tracks.push(track); 
+        this.tracks.push(track); 
     }
 }
+
 export const audioLibrary = new AudioLibrary();
+
+// Top-level await for seamless integration in modern browsers/Vite
+await audioLibrary.load();
 `;
     fs.writeFileSync(OUTPUT_FILE, fileContent);
-    console.log(`[${new Date().toLocaleTimeString()}] Updated AudioLibrary.js with ${sortedTracks.length} tracks.`);
+    console.log(`[${new Date().toLocaleTimeString()}] Updated AudioLibrary.js and tracks.json with ${sortedTracks.length} tracks.`);
 };
 
-// Debounced Save
 const triggerSave = () => {
     if (debounceTimer) clearTimeout(debounceTimer);
     debounceTimer = setTimeout(() => {
         saveLibrary();
-    }, 1000); // 1 second debounce
+    }, 1000);
 };
 
-// Main Scanner / Watcher
 const main = async () => {
-    console.log(`Starting Audio Scanner${isWatchMode ? ' in WATCH mode' : ''}...`);
+    console.log(`Starting Audio Scanner\${isWatchMode ? ' in WATCH mode' : ''}...`);
     if (!fs.existsSync(ASSETS_DIR)) {
-        console.error(`Directory not found: ${ASSETS_DIR}`);
+        console.error(`Directory not found: \${ASSETS_DIR}`);
         return;
     }
 

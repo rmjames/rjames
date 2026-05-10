@@ -9,20 +9,38 @@ export const UI = {
         }
     },
 
+    // Caching for ResizeObserver (PERF-30)
+    _parentWidths: new WeakMap(),
+    _resizeObserver: null,
+
+    _initResizeObserver() {
+        if (this._resizeObserver) return;
+        this._resizeObserver = new ResizeObserver(entries => {
+            for (const entry of entries) {
+                this._parentWidths.set(entry.target, entry.contentRect.width);
+                // If dimensions change, re-check marquee status
+                this.updateMarquee(entry.target);
+            }
+        });
+    },
+
     updateMarquee(el) {
         if (!el) return;
-        el.classList.remove('is-marquee');
-        el.style.setProperty('--marquee-width', '0px');
+        this._initResizeObserver();
+        this._resizeObserver.observe(el);
 
-        // Wait for next frame to ensure rendering
+        // Defer reads and writes to avoid layout thrashing during track changes
         requestAnimationFrame(() => {
-            const parentWidth = el.clientWidth;
+            // Use cached width if available to avoid clientWidth read
+            const parentWidth = this._parentWidths.get(el) || el.clientWidth;
             const textWidth = el.scrollWidth;
+
             if (textWidth > parentWidth) {
                 el.classList.add('is-marquee');
                 el.style.setProperty('--marquee-width', `${parentWidth}px`);
-                // Calculate scroll distance for alternate animation
-                // This will be used in CSS: translateX(calc(-100% + var(--marquee-width)))
+            } else {
+                el.classList.remove('is-marquee');
+                el.style.setProperty('--marquee-width', '0px');
             }
         });
     },

@@ -84,13 +84,9 @@ describe('Favicon Animator Performance', () => {
       await vi.advanceTimersByTimeAsync(1);
     }
 
-    expect(canvasMock.toDataURL).toHaveBeenCalled();
-    const generationCount = canvasMock.toDataURL.mock.calls.length;
-    expect(generationCount).toBeGreaterThanOrEqual(65);
-
+    // The refactored version uses SVG data URIs, so canvas.toDataURL is no longer used.
     // 2. Start animation
     // Clear the mock calls to start fresh for the animation phase
-    canvasMock.toDataURL.mockClear();
 
     // Trigger focus to start the animation
     window.dispatchEvent(new Event('focus'));
@@ -104,13 +100,8 @@ describe('Favicon Animator Performance', () => {
     }
 
     // 3. Verify performance optimizations
-    // Favicon should have been updated multiple times
-    expect(faviconMock.href).toContain('data:image/png');
+    expect(faviconMock.href).toContain('data:image/svg+xml');
     expect(faviconMock.href).not.toBe('initial-state');
-
-    // CRITICAL: toDataURL MUST NOT be called during the animation loop
-    // If this fails, the performance optimization is broken.
-    expect(canvasMock.toDataURL).not.toHaveBeenCalled();
   });
 
   it('should respect path-based shape selection (House for root)', async () => {
@@ -121,8 +112,11 @@ describe('Favicon Animator Performance', () => {
     for (let i = 0; i < 150; i++) await vi.advanceTimersByTimeAsync(1);
 
     // In a real test we'd verify the path data, but since it's an IIFE and private,
-    // we just ensure it generated something.
-    expect(canvasMock.toDataURL).toHaveBeenCalled();
+    // we just ensure it generated something by verifying the animation can start.
+    window.dispatchEvent(new Event('focus'));
+    await vi.advanceTimersByTimeAsync(110);
+    await vi.advanceTimersByTimeAsync(67);
+    expect(faviconMock.href).toContain('data:image/svg+xml');
   });
 
   it('should respect path-based shape selection (File for resume)', async () => {
@@ -131,7 +125,9 @@ describe('Favicon Animator Performance', () => {
     
     // Wait for generation
     for (let i = 0; i < 150; i++) await vi.advanceTimersByTimeAsync(1);
-
-    expect(canvasMock.toDataURL).toHaveBeenCalled();
+    window.dispatchEvent(new Event('focus'));
+    await vi.advanceTimersByTimeAsync(110);
+    await vi.advanceTimersByTimeAsync(67);
+    expect(faviconMock.href).toContain('data:image/svg+xml');
   });
 });
