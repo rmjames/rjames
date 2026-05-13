@@ -29,13 +29,14 @@
 
 h1 {
     --recursive-wght: 700;
-    --recursive-CASL: 0.64;
+    --recursive-CASL: 0.8;
     font-family: "Recursive", sans-serif, system-ui;
     font-size: clamp(var(--f-base), calc(var(--f-base) + 0.4cqi), 1.5rem);
     line-height: 1.1;
     text-transform: uppercase;
     transition: font-variation-settings 0.48s;
     filter: drop-shadow(0.5px 0.5px 1px var(--text-shadow));
+    contain: layout paint;
 
     &:hover {
         --recursive-wght: 800;

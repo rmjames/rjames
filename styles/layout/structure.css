@@ -19,6 +19,8 @@ body {
 
 main {
     margin: auto;
+    perspective: 500px;
+    transform-style: preserve-3d;
 }
 
 .cover {
@@ -29,6 +31,7 @@ main {
     padding: var(--m);
     position: relative;
     text-wrap: pretty;
+    transform: translateZ(50px);
 }
 
 #main-content {
