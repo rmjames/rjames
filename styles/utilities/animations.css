@@ -9,3 +9,48 @@
         transform: scale(1);
     }
 }
+
+@keyframes slide-in-left {
+    from {
+        opacity: 0;
+        scale: 0.96;
+        letter-spacing: .04rem;
+        --recursive-CASL: 1;
+    }
+
+    to {
+        opacity: 1;
+        scale: 1;
+        letter-spacing: .12rem;
+        --recursive-CASL: 0.8;
+    }
+}
+
+.animate-letter {
+    opacity: 0;
+    animation: slide-in-left 0.24s var(--ease-3) both;
+    animation-delay: calc(var(--letter-index) * .024s);
+}
+
+@supports (animation-delay: random(0s, 1s)) {
+    @keyframes slide-in-left-random {
+        from {
+            opacity: 0;
+            scale: random(0.24, 0.64);
+            letter-spacing: .04rem;
+            --recursive-CASL: random(0, 1);
+        }
+
+        to {
+            opacity: 1;
+            scale: 1;
+            letter-spacing: .12rem;
+            --recursive-CASL: random(0, 1);
+        }
+    }
+
+    .animate-letter {
+        animation: slide-in-left-random 0.24s var(--ease-3) both;
+        animation-delay: random(.04s, .28s);
+    }
+}
