@@ -40,31 +40,40 @@ const copyStaticFiles = () => {
             });
 
             // Add directories to copy
-            const dirsToCopy = ['images', 'fonts', 'styles', 'scripts'];
+            const dirsToCopy = ['images', 'fonts', 'styles', 'scripts', 'assets'];
 
             filesToCopy.forEach(({ src, dest }) => {
                 const srcPath = resolve(__dirname, src);
-                const destPath = resolve(__dirname, 'dist', dest);
+                const destPath = resolve(__dirname, 'build', dest);
 
                 if (fs.existsSync(srcPath)) {
-                    fs.mkdirSync(path.dirname(destPath), { recursive: true });
-                    fs.copyFileSync(srcPath, destPath);
-                    console.log(`Copied ${src} to ${dest}`);
+                    try {
+                        fs.mkdirSync(path.dirname(destPath), { recursive: true });
+                        fs.copyFileSync(srcPath, destPath);
+                        console.log(`Copied ${src} to ${dest}`);
+                    } catch (err) {
+                        console.warn(`Failed to copy ${src} to ${dest}: ${err.message}`);
+                    }
                 }
             });
 
             dirsToCopy.forEach(dir => {
                 const srcDir = resolve(__dirname, dir);
-                const destDir = resolve(__dirname, 'dist', dir);
+                const destDir = resolve(__dirname, 'build', dir);
                 if (fs.existsSync(srcDir)) {
-                    fs.cpSync(srcDir, destDir, { 
-                        recursive: true,
-                        filter: (src) => {
-                            // Exclude test files and node scripts from production build
-                            return !src.includes('.test.js') && !src.includes('scan-audio.js');
-                        }
-                    });
-                    console.log(`Copied directory ${dir} to dist/${dir}`);
+                    try {
+                        fs.cpSync(srcDir, destDir, { 
+                            recursive: true,
+                            force: true,
+                            filter: (src) => {
+                                // Exclude test files and node scripts from production build
+                                return !src.includes('.test.js') && !src.includes('scan-audio.js');
+                            }
+                        });
+                        console.log(`Copied directory ${dir} to dist/${dir}`);
+                    } catch (err) {
+                        console.warn(`Failed to copy directory ${dir} to dist/${dir}: ${err.message}`);
+                    }
                 }
             });
         }
@@ -74,6 +83,8 @@ const copyStaticFiles = () => {
 export default defineConfig({
     plugins: [copyStaticFiles()],
     build: {
+        outDir: 'build',
+        emptyOutDir: false,
         rollupOptions: {
             input: {
                 main: resolve(__dirname, 'index.html'),
