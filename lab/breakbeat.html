@@ -3,7 +3,8 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self'; media-src 'self'; object-src 'none'; frame-ancestors 'self'; base-uri 'self';">
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self'; media-src 'self'; object-src 'none'; frame-ancestors 'self'; base-uri 'self';">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>BreakBeat - Technics SL-1210MK2</title>
@@ -52,8 +53,8 @@
       </filter>
 
       <!-- Red glow for strobe -->
-      <filter id='red-glow'>
-        <feGaussianBlur stdDeviation='4' result='blur' />
+      <filter id='red-glow' x="-100%" y="-100%" width="300%" height="300%">
+        <feGaussianBlur stdDeviation='3' result='blur' />
         <feComposite in='SourceGraphic' in2='blur' operator='over' />
       </filter>
 
@@ -114,46 +115,67 @@
     </g>
 
     <!-- Power Switch & Strobe -->
-    <g transform="translate(60, 480)">
+    <g id="power-switch" style="cursor: pointer;" transform="translate(80, 480)">
       <!-- Base -->
-      <circle cx="0" cy="0" r="30" fill="var(--black-0)" />
-      <!-- Power Dial -->
-      <circle cx="0" cy="0" r="22" fill="var(--gray-2)" />
-      <circle cx="0" cy="0" r="18" fill="var(--gray-0)" />
-      <circle cx="0" cy="0" r="14" fill="var(--black-0)" />
-      <!-- Dial grip dots -->
-      <circle cx="0" cy="-10" r="1.5" fill="var(--white-0)" />
+      <circle cx="0" cy="0" r="32" fill="var(--black-0)" />
 
       <!-- Strobe tower -->
-      <g transform="translate(30, -30) rotate(30)">
-        <rect x="-10" y="-15" width="20" height="30" rx="3" fill="var(--gray-0)" />
-        <!-- Red Light Glow -->
-        <ellipse cx="0" cy="15" rx="8" ry="12" fill="lch(50% 100 40)" filter="url(#red-glow)" />
+      <g transform="translate(22, -18) rotate(-30)">
+        <rect x="-12" y="-15" width="24" height="30" rx="2" fill="var(--black-0)" />
+        <!-- Red Light -->
+        <rect id="strobe-red-light" x="10" y="-8" width="3" height="16" rx="1.5" fill="lch(20% 50 45)" />
+        <rect id="strobe-white-light" x="10" y="-8" width="3" height="16" rx="1.5" fill="var(--white-0)" opacity="0.1" />
       </g>
+
+      <!-- Power Dial -->
+      <g id="power-dial" style="transform-origin: 0px 0px; transition: transform 0.2s;">
+        <circle cx="0" cy="0" r="24" fill="var(--gray-2)" />
+        <!-- Dial grip dots -->
+        <circle cx="0" cy="0" r="23" fill="none" stroke="var(--gray-0)" stroke-width="1.5" stroke-dasharray="2 4" />
+
+        <!-- Top surface -->
+        <circle cx="0" cy="0" r="21" fill="var(--black-0)" />
+
+        <!-- Indicator mark -->
+        <circle cx="-13" cy="9" r="1.5" fill="var(--gray-0)" />
+      </g>
+
+      <!-- Text and arrows -->
+      <path d="M -10 -9 Q 0 -14 10 -9" fill="none" stroke="var(--gray-0)" stroke-width="1" />
+      <path d="M -10 -9 L -6 -10 M -10 -9 L -9 -5" fill="none" stroke="var(--gray-0)" stroke-width="1" />
+      <path d="M 10 -9 L 6 -10 M 10 -9 L 9 -5" fill="none" stroke="var(--gray-0)" stroke-width="1" />
+
+      <text x="-14" y="-1" font-size="6" fill="var(--white-0)" text-anchor="middle">off</text>
+      <text x="14" y="-1" font-size="6" fill="var(--white-0)" text-anchor="middle">on</text>
+      <text x="0" y="14" font-size="6" fill="var(--gray-0)" text-anchor="middle">power</text>
     </g>
 
     <!-- Start/Stop Button -->
-    <g transform="translate(40, 540)" id="start-stop-btn" style="cursor: pointer;">
+    <g transform="translate(40, 560)" id="start-stop-btn" style="cursor: pointer;">
       <rect x="0" y="0" width="80" height="60" rx="2" fill="var(--black-0)" />
       <rect x="5" y="5" width="70" height="50" rx="4" fill="var(--gray-0)" stroke="var(--gray-1)" stroke-width="2" />
-      <text x="40" y="30" font-size="11" fill="var(--black-0)" text-anchor="middle" font-weight="bold">start ·
-        stop</text>
+      <text x="40" y="30" font-size="10" fill="var(--black-0)" text-anchor="middle" dominant-baseline="middle"
+        font-weight="bold">start - stop</text>
     </g>
 
     <!-- 33 / 45 Buttons -->
-    <g transform="translate(140, 565)">
+    <g transform="translate(135, 595)">
       <!-- 33 Base -->
       <g id="btn-33" style="cursor: pointer;">
-        <rect x="0" y="-5" width="40" height="30" rx="2" fill="var(--black-0)" />
-        <rect id="btn-33-cap" x="2.5" y="0" width="35" height="20" rx="2" fill="var(--gray-0)" />
-        <text x="20" y="14" font-size="11" fill="var(--black-0)" text-anchor="middle" font-weight="bold">33</text>
+        <rect x="0" y="0" width="46" height="22" rx="2" fill="var(--black-0)" />
+        <rect id="btn-33-cap" x="2" y="2" width="42" height="18" rx="2" fill="var(--gray-0)" />
+        <text x="16" y="12" font-size="10" fill="var(--black-0)" text-anchor="middle" dominant-baseline="middle"
+          font-weight="bold">33</text>
+        <rect id="btn-33-led" x="30" y="9" width="8" height="4" rx="1" fill="var(--black-0)" />
       </g>
 
       <!-- 45 Base -->
       <g id="btn-45" style="cursor: pointer;">
-        <rect x="50" y="-5" width="40" height="30" rx="2" fill="var(--black-0)" />
-        <rect id="btn-45-cap" x="52.5" y="0" width="35" height="20" rx="2" fill="var(--gray-0)" />
-        <text x="70" y="14" font-size="11" fill="var(--black-0)" text-anchor="middle" font-weight="bold">45</text>
+        <rect x="48" y="0" width="46" height="22" rx="2" fill="var(--black-0)" />
+        <rect id="btn-45-cap" x="50" y="2" width="42" height="18" rx="2" fill="var(--gray-0)" />
+        <text x="64" y="12" font-size="10" fill="var(--black-0)" text-anchor="middle" dominant-baseline="middle"
+          font-weight="bold">45</text>
+        <rect id="btn-45-led" x="78" y="9" width="8" height="4" rx="1" fill="var(--black-0)" />
       </g>
     </g>
 
@@ -190,24 +212,49 @@
     </g>
 
     <!-- Pitch Slider -->
-    <g transform="translate(680, 250)">
-      <rect x="0" y="0" width="40" height="250" rx="4" fill="var(--black-0)" />
-      <rect x="2" y="2" width="36" height="246" rx="3" fill="var(--gray-2)" />
+    <g transform="translate(670, 250)">
+      <!-- Label -->
+      <text x="32" y="262" font-size="8" fill="var(--gray-0)" text-anchor="middle" font-weight="bold">pitch adj.</text>
 
-      <!-- Slot -->
-      <rect x="18" y="15" width="4" height="220" fill="var(--black-0)" />
+      <!-- Track Base -->
+      <rect x="14" y="0" width="36" height="250" rx="4" fill="var(--black-0)" />
+      <rect x="16" y="2" width="32" height="246" rx="3" fill="var(--gray-2)" />
 
-      <!-- Scale markings -->
-      <path d="M 5 125 L 15 125 M 10 70 L 15 70 M 10 180 L 15 180" stroke="var(--white-0)" stroke-width="1.5" />
-      <path d="M 12 95 L 15 95 M 12 155 L 15 155" stroke="var(--white-0)" stroke-width="1" />
+      <!-- Slot with dust flaps -->
+      <rect x="30" y="15" width="4" height="220" fill="var(--black-0)" />
+      <rect x="30" y="15" width="1" height="220" fill="var(--gray-1)" opacity="0.3" />
+      <rect x="33" y="15" width="1" height="220" fill="var(--gray-1)" opacity="0.3" />
 
-      <!-- Zero pitch LED -->
-      <circle cx="2" cy="125" r="3" fill="lch(80% 100 135)" />
+      <!-- Scale Markings & Text -->
+      <g id="pitch-scale" transform="translate(-16, 0)">
+        <!-- Scale Text -->
+        <text x="6" y="35" font-size="8" fill="var(--white-0)" text-anchor="end" dominant-baseline="middle">-8</text>
+        <text x="6" y="80" font-size="8" fill="var(--white-0)" text-anchor="end" dominant-baseline="middle">-4</text>
+        <rect id="pitch-zero-led" x="2" y="122" width="4" height="6" rx="1" fill="var(--black-0)" />
+        <text x="6" y="170" font-size="8" fill="var(--white-0)" text-anchor="end" dominant-baseline="middle">+4</text>
+        <text x="6" y="215" font-size="8" fill="var(--white-0)" text-anchor="end" dominant-baseline="middle">+8</text>
+
+        <!-- Major Scale Markings -->
+        <path d="M 12 35 L 26 35 M 12 80 L 26 80 M 12 125 L 26 125 M 12 170 L 26 170 M 12 215 L 26 215" stroke="var(--white-0)" stroke-width="1.5" />
+        
+        <!-- Minor Scale Markings (2, 6) -->
+        <path d="M 16 57.5 L 26 57.5 M 16 102.5 L 26 102.5 M 16 147.5 L 26 147.5 M 16 192.5 L 26 192.5" stroke="var(--white-0)" stroke-width="1" />
+
+        <!-- Ticks -->
+        <path d="M 22 46.25 L 26 46.25 M 22 68.75 L 26 68.75 M 22 91.25 L 26 91.25 M 22 113.75 L 26 113.75 M 22 136.25 L 26 136.25 M 22 158.75 L 26 158.75 M 22 181.25 L 26 181.25 M 22 203.75 L 26 203.75" stroke="var(--white-0)" stroke-width="0.5" />
+      </g>
+
 
       <!-- Slider Knob -->
-      <g id="pitch-slider-knob" transform="translate(0, 125)" style="cursor: grab;">
-        <rect x="5" y="-20" width="30" height="40" rx="3" fill="var(--gray-0)" />
-        <rect x="5" y="-2" width="30" height="4" fill="var(--black-0)" />
+      <g id="pitch-slider-knob" transform="translate(14, 125)" style="cursor: grab;">
+        <rect x="0" y="-18" width="36" height="36" rx="2" fill="var(--black-0)" />
+        <rect x="2" y="-16" width="32" height="32" rx="1" fill="var(--gray-0)" />
+        <!-- Bevel highlights -->
+        <rect x="2" y="-16" width="32" height="2" fill="var(--white-0)" opacity="0.5" />
+        <rect x="2" y="14" width="32" height="2" fill="var(--black-0)" opacity="0.3" />
+        <rect x="2" y="-16" width="2" height="32" fill="var(--white-0)" opacity="0.3" />
+        <!-- Center groove line -->
+        <rect x="2" y="-1" width="32" height="2" fill="var(--black-0)" />
       </g>
     </g>
 
@@ -259,14 +306,16 @@
   </svg>
 
   <!-- Loading Overlay -->
-  <div id="loading" style="position: absolute; inset: 0; background: rgba(0,0,0,0.85); display: flex; flex-direction: column; justify-content: center; align-items: center; color: var(--white-0); font-family: sans-serif; font-size: 24px; z-index: 10;">
+  <div id="loading"
+    style="position: absolute; inset: 0; background: rgba(0,0,0,0.85); display: flex; flex-direction: column; justify-content: center; align-items: center; color: var(--white-0); font-family: sans-serif; font-size: 24px; z-index: 10;">
     <div>Loading Audio Buffer...</div>
-    <div style="font-size: 14px; color: var(--gray-0); margin-top: 10px;">Decoding high-quality vinyl scratch assets</div>
+    <div style="font-size: 14px; color: var(--gray-0); margin-top: 10px;">Decoding high-quality vinyl scratch assets
+    </div>
   </div>
 
   <script type="module">
     import { TurntableController } from './js/TurntableController.js';
-    
+
     document.addEventListener('DOMContentLoaded', () => {
       const controller = new TurntableController();
       controller.initAudio('../assets/audio/J. Dilla - Ruff Draft - 2007/04 - Nothing Like This.mp3');
