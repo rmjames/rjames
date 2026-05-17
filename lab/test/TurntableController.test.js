@@ -20,6 +20,13 @@ describe('TurntableController', () => {
       'btn-45': { addEventListener: vi.fn() },
       'btn-33-cap': { setAttribute: vi.fn() },
       'btn-45-cap': { setAttribute: vi.fn() },
+      'btn-33-led': { setAttribute: vi.fn() },
+      'btn-45-led': { setAttribute: vi.fn() },
+      'pitch-zero-led': { setAttribute: vi.fn() },
+      'power-switch': { addEventListener: vi.fn() },
+      'power-dial': { style: {} },
+      'strobe-red-light': { setAttribute: vi.fn(), removeAttribute: vi.fn() },
+      'strobe-white-light': { setAttribute: vi.fn() },
       'lp': { 
         addEventListener: vi.fn(),
         setPointerCapture: vi.fn(),
@@ -151,7 +158,7 @@ describe('TurntableController', () => {
     const moveEvent = { clientY: 150 };
     controller.onPitchPointerMove(moveEvent);
     // 125 + 50 = 175
-    expect(mockElements['pitch-slider-knob'].setAttribute).toHaveBeenCalledWith('transform', 'translate(0, 175)');
+    expect(mockElements['pitch-slider-knob'].setAttribute).toHaveBeenCalledWith('transform', 'translate(14, 175)');
     expect(controller.state.applyPitch).toHaveBeenCalled();
     expect(controller.audioEngine.updatePitch).toHaveBeenCalled();
 

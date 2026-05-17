@@ -16,10 +16,20 @@ export class TurntableController {
     this.btn45 = document.getElementById('btn-45');
     this.btn33Cap = document.getElementById('btn-33-cap');
     this.btn45Cap = document.getElementById('btn-45-cap');
+    this.btn33Led = document.getElementById('btn-33-led');
+    this.btn45Led = document.getElementById('btn-45-led');
     this.lp = document.getElementById('lp');
     this.pitchKnob = document.getElementById('pitch-slider-knob');
     this.loadingDiv = document.getElementById('loading');
 
+    this.powerSwitch = document.getElementById('power-switch');
+    this.powerDial = document.getElementById('power-dial');
+    this.strobeRedLight = document.getElementById('strobe-red-light');
+    this.strobeWhiteLight = document.getElementById('strobe-white-light');
+    this.pitchZeroLed = document.getElementById('pitch-zero-led');
+
+    this.isPowerOn = false;
+    this.currentRpm = 33;
     this.isDraggingPitch = false;
     this.pitchStartY = 0;
     this.currentPitchY = 125;
@@ -47,6 +57,7 @@ export class TurntableController {
     this.btn45.addEventListener('click', () => this.setSpeed(45));
     
     this.btn.addEventListener('click', () => this.togglePlayback());
+    this.powerSwitch.addEventListener('click', () => this.togglePower());
 
     // Scratching events
     this.lp.addEventListener('pointerdown', (e) => this.onLpPointerDown(e));
@@ -59,7 +70,54 @@ export class TurntableController {
     this.pitchKnob.addEventListener('pointerup', (e) => this.onPitchPointerUp(e));
   }
 
+  togglePower() {
+    this.isPowerOn = !this.isPowerOn;
+    if (this.isPowerOn) {
+      this.powerDial.style.transform = 'rotate(45deg)';
+    } else {
+      this.powerDial.style.transform = 'rotate(0deg)';
+      if (this.state.isPlaying) {
+        this.togglePlayback();
+      }
+    }
+    this.updateLights();
+  }
+
+  updateLights(pitchY = this.currentPitchY) {
+    if (this.isPowerOn) {
+      // 33/45 Buttons
+      if (this.currentRpm === 33) {
+        this.btn33Led.setAttribute('fill', 'lch(60% 100 45)');
+        this.btn45Led.setAttribute('fill', 'var(--black-0)');
+      } else {
+        this.btn33Led.setAttribute('fill', 'var(--black-0)');
+        this.btn45Led.setAttribute('fill', 'lch(60% 100 45)');
+      }
+      
+      // Pitch LED
+      if (Math.abs(pitchY - 125) < 5) {
+        this.pitchZeroLed.setAttribute('fill', 'lch(80% 100 135)');
+      } else {
+        this.pitchZeroLed.setAttribute('fill', 'var(--black-0)');
+      }
+      
+      // Strobe
+      this.strobeRedLight.setAttribute('fill', 'lch(60% 100 45)');
+      this.strobeRedLight.setAttribute('filter', 'url(#red-glow)');
+      this.strobeWhiteLight.setAttribute('opacity', '0.6');
+    } else {
+      this.btn33Led.setAttribute('fill', 'var(--black-0)');
+      this.btn45Led.setAttribute('fill', 'var(--black-0)');
+      this.pitchZeroLed.setAttribute('fill', 'var(--black-0)');
+      
+      this.strobeRedLight.setAttribute('fill', 'lch(20% 50 45)');
+      this.strobeRedLight.removeAttribute('filter');
+      this.strobeWhiteLight.setAttribute('opacity', '0.1');
+    }
+  }
+
   setSpeed(rpm) {
+    this.currentRpm = rpm;
     this.state.setSpeed(rpm);
     if (rpm === 33) {
       this.btn33Cap.setAttribute('fill', 'var(--white-0)');
@@ -68,6 +126,7 @@ export class TurntableController {
       this.btn33Cap.setAttribute('fill', 'var(--gray-0)');
       this.btn45Cap.setAttribute('fill', 'var(--white-0)');
     }
+    this.updateLights();
     
     this.audioEngine.updatePitch(this.state.effectivePlaybackRate);
     this.state.applyPitch(this.state.pitchMultiplier, this.audioEngine.getCurrentTime());
@@ -78,6 +137,8 @@ export class TurntableController {
     this.audioEngine.resume();
 
     if (!this.state.isPlaying) {
+      if (!this.isPowerOn) return; // Don't play if power is off
+
       this.tonearm.style.transition = 'transform 0.6s cubic-bezier(0.34, 1.489, 0.64, 1)';
       this.tonearm.style.transform = 'rotate(22deg)';
 
@@ -120,12 +181,14 @@ export class TurntableController {
     this.lp.setPointerCapture(e.pointerId);
     this.lp.style.cursor = 'grabbing';
     
-    if (this.state.isPlaying) {
+    const wasPlaying = this.state.isPlaying;
+    if (wasPlaying) {
       this.state.stopPlayback(this.audioEngine.getCurrentTime());
       this.audioEngine.stop();
     }
     
     this.state.startScratch(this.getAngle(e), performance.now());
+    this.state.wasPlayingBeforeScratch = wasPlaying;
   }
 
   onLpPointerMove(e) {
@@ -171,17 +234,18 @@ export class TurntableController {
     if (newY < 35) newY = 35;
     if (newY > 215) newY = 215;
 
-    this.pitchKnob.setAttribute('transform', `translate(0, ${newY})`);
+    this.pitchKnob.setAttribute('transform', `translate(14, ${newY})`);
 
     // click notch
     if (Math.abs(newY - 125) < 5) {
       newY = 125;
-      this.pitchKnob.setAttribute('transform', `translate(0, 125)`);
+      this.pitchKnob.setAttribute('transform', `translate(14, 125)`);
     }
 
-    const newPitchMultiplier = 1.0 + ((125 - newY) / 90) * 0.08;
+    const newPitchMultiplier = 1.0 + ((newY - 125) / 90) * 0.08;
     this.state.applyPitch(newPitchMultiplier, this.audioEngine.getCurrentTime());
     this.audioEngine.updatePitch(this.state.effectivePlaybackRate);
+    this.updateLights(newY);
   }
 
   onPitchPointerUp(e) {
@@ -196,6 +260,7 @@ export class TurntableController {
 
     this.pitchKnob.releasePointerCapture(e.pointerId);
     this.pitchKnob.style.cursor = 'grab';
+    this.updateLights();
   }
 
   renderLoop(timestamp) {
