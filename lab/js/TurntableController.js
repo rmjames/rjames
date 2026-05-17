@@ -120,12 +120,14 @@ export class TurntableController {
     this.lp.setPointerCapture(e.pointerId);
     this.lp.style.cursor = 'grabbing';
     
-    if (this.state.isPlaying) {
+    const wasPlaying = this.state.isPlaying;
+    if (wasPlaying) {
       this.state.stopPlayback(this.audioEngine.getCurrentTime());
       this.audioEngine.stop();
     }
     
     this.state.startScratch(this.getAngle(e), performance.now());
+    this.state.wasPlayingBeforeScratch = wasPlaying;
   }
 
   onLpPointerMove(e) {
