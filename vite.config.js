@@ -44,7 +44,7 @@ const copyStaticFiles = () => {
 
             filesToCopy.forEach(({ src, dest }) => {
                 const srcPath = resolve(__dirname, src);
-                const destPath = resolve(__dirname, 'build', dest);
+                const destPath = resolve(__dirname, 'dist', dest);
 
                 if (fs.existsSync(srcPath)) {
                     try {
@@ -59,7 +59,7 @@ const copyStaticFiles = () => {
 
             dirsToCopy.forEach(dir => {
                 const srcDir = resolve(__dirname, dir);
-                const destDir = resolve(__dirname, 'build', dir);
+                const destDir = resolve(__dirname, 'dist', dir);
                 if (fs.existsSync(srcDir)) {
                     try {
                         fs.cpSync(srcDir, destDir, { 
@@ -83,7 +83,6 @@ const copyStaticFiles = () => {
 export default defineConfig({
     plugins: [copyStaticFiles()],
     build: {
-        outDir: 'build',
         emptyOutDir: false,
         rollupOptions: {
             input: {
