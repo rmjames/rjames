@@ -55,13 +55,16 @@
 
         .carousel-view {
             display: flex;
+            flex-direction: row;
             align-items: center;
-            inline-size: 100%;
+            inline-size: 100vw;
             block-size: 100dvh;
             overflow-x: auto;
+            overflow-y: hidden;
             scroll-snap-type: x mandatory;
             scroll-behavior: smooth;
-            gap: 2rem;
+            gap: 1rem;
+            padding-inline: calc(50vw - 42.5vw); /* Centers an 85vw card perfectly */
             box-sizing: border-box;
             cursor: grab;
 
@@ -77,10 +80,10 @@
         .player-card {
             display: flex;
             flex-direction: column;
-            flex: 0 0 95vw;
+            flex: 0 0 85vw;
             position: relative;
-            block-size: 75dvh;
-            border-radius: 6rem;
+            block-size: 65dvh;
+            border-radius: 3rem;
             corner-shape: squircle;
             overflow: hidden;
             scroll-snap-align: center;
