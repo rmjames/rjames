@@ -12,7 +12,6 @@ describe('TurntableController', () => {
   let mockElements;
 
   beforeEach(() => {
-    // Setup fake DOM elements
     mockElements = {
       'start-stop-btn': { addEventListener: vi.fn() },
       'tonearm': { style: {} },
@@ -27,14 +26,14 @@ describe('TurntableController', () => {
       'power-dial': { style: {} },
       'strobe-red-light': { setAttribute: vi.fn(), removeAttribute: vi.fn() },
       'strobe-white-light': { setAttribute: vi.fn() },
-      'lp': { 
+      'lp': {
         addEventListener: vi.fn(),
         setPointerCapture: vi.fn(),
         releasePointerCapture: vi.fn(),
         setAttribute: vi.fn(),
         style: {}
       },
-      'pitch-slider-knob': { 
+      'pitch-slider-knob': {
         addEventListener: vi.fn(),
         setPointerCapture: vi.fn(),
         releasePointerCapture: vi.fn(),
@@ -45,8 +44,7 @@ describe('TurntableController', () => {
     };
 
     document.getElementById = vi.fn((id) => mockElements[id]);
-    
-    // Mock SVG methods
+
     const mockSVG = {
       pauseAnimations: vi.fn(),
       unpauseAnimations: vi.fn(),
@@ -109,7 +107,7 @@ describe('TurntableController', () => {
 
   it('should handle initAudio correctly on success', async () => {
     await controller.initAudio('test.mp3');
-    
+
     expect(controller.audioEngine.load).toHaveBeenCalledWith('test.mp3');
     expect(controller.loadingDiv.style.display).toBe('none');
     expect(controller.svg.pauseAnimations).toHaveBeenCalled();
@@ -118,7 +116,7 @@ describe('TurntableController', () => {
   it('should handle initAudio correctly on failure', async () => {
     controller.audioEngine.load.mockResolvedValueOnce(false);
     await controller.initAudio('test.mp3');
-    
+
     expect(controller.loadingDiv.innerText).toBe('Error decoding audio.');
   });
 
@@ -133,7 +131,7 @@ describe('TurntableController', () => {
   it('should stop playback if already playing when toggled', () => {
     controller.state.isPlaying = true;
     controller.togglePlayback();
-    
+
     expect(controller.state.stopPlayback).toHaveBeenCalled();
     expect(controller.audioEngine.stop).toHaveBeenCalled();
     expect(controller.svg.pauseAnimations).toHaveBeenCalled();
@@ -169,11 +167,11 @@ describe('TurntableController', () => {
     expect(controller.currentPitchY).toBe(175);
     expect(mockElements['pitch-slider-knob'].releasePointerCapture).toHaveBeenCalledWith(1);
   });
-  
+
   it('should trigger scratch down events', () => {
     const downEvent = { pointerId: 1, clientX: 100, clientY: 100 };
     controller.onLpPointerDown(downEvent);
-    
+
     expect(mockElements['lp'].setPointerCapture).toHaveBeenCalledWith(1);
     expect(controller.state.startScratch).toHaveBeenCalled();
   });

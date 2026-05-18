@@ -139,6 +139,10 @@ export class TurntableController {
     if (!this.state.isPlaying) {
       if (!this.isPowerOn) return; // Don't play if power is off
 
+      if (this.state.currentAudioTime >= this.state.audioDuration - 0.1) {
+        this.state.currentAudioTime = 0;
+      }
+
       this.tonearm.style.transition = 'transform 0.6s cubic-bezier(0.34, 1.489, 0.64, 1)';
       this.tonearm.style.transform = 'rotate(22deg)';
 
