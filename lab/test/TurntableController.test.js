@@ -120,6 +120,20 @@ describe('TurntableController', () => {
     expect(controller.loadingDiv.innerText).toBe('Error decoding audio.');
   });
 
+  it('should stop active playback and reset tonearm and lp rotation on track switch', async () => {
+    controller.state.isPlaying = true;
+    controller.audioEngine.getCurrentTime.mockReturnValue(50);
+
+    await controller.initAudio('new-track.mp3');
+
+    expect(controller.state.stopPlayback).toHaveBeenCalledWith(50);
+    expect(controller.audioEngine.stop).toHaveBeenCalled();
+    expect(controller.svg.pauseAnimations).toHaveBeenCalled();
+    expect(controller.tonearm.style.transform).toBe('rotate(-25deg)');
+    expect(controller.state.currentAudioTime).toBe(0);
+    expect(mockElements['lp'].setAttribute).toHaveBeenCalledWith('transform', 'rotate(0)');
+  });
+
   it('should update speed correctly for 45 RPM', () => {
     controller.setSpeed(45);
     expect(controller.state.setSpeed).toHaveBeenCalledWith(45);

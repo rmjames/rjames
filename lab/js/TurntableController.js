@@ -41,11 +41,24 @@ export class TurntableController {
   }
 
   async initAudio(url) {
+    this.loadingDiv.style.display = 'flex';
+
+    if (this.state.isPlaying) {
+      this.state.stopPlayback(this.audioEngine.getCurrentTime());
+      this.audioEngine.stop();
+      this.svg.pauseAnimations();
+      this.tonearm.style.transition = 'transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1)';
+      this.tonearm.style.transform = 'rotate(-25deg)';
+    }
+
+    this.state.currentAudioTime = 0;
+    this.lp.setAttribute('transform', `rotate(0)`);
+
     const success = await this.audioEngine.load(url);
     if (success) {
       this.state.audioDuration = this.audioEngine.audioDuration;
       this.loadingDiv.style.display = 'none';
-      this.setSpeed(33); // init defaults
+      this.setSpeed(this.currentRpm || 33); // init defaults or keep current
       this.svg.pauseAnimations();
     } else {
       this.loadingDiv.innerText = "Error decoding audio.";
