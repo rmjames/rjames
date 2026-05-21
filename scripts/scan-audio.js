@@ -17,7 +17,7 @@ const isAudioFile = (filename) => /\.(mp3|ogg|wav|m4a|flac)$/i.test(filename);
 const findArtInDir = (dir) => {
     try {
         const files = fs.readdirSync(dir);
-        const images = files.filter(f => /\.(jpg|jpeg|png|webp|gif)$/i.test(f));
+        const images = files.filter(f => /\.(jpg|jpeg|png|webp|gif|svg)$/i.test(f));
         if (images.length === 0) return null;
         const best = images.find(f => /front|cover/i.test(f)) || images[0];
         return path.join(dir, best);
@@ -170,7 +170,7 @@ class AudioLibrary {
                     return {
                         ...track,
                         src: srcUrl || track.src,
-                        albumArt: mappedArt || null
+                        albumArt: mappedArt || track.albumArt || null
                     };
                 });
             } catch (err) {

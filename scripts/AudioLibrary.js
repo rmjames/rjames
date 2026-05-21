@@ -54,7 +54,7 @@ class AudioLibrary {
                     return {
                         ...track,
                         src: srcUrl || track.src,
-                        albumArt: mappedArt || null
+                        albumArt: mappedArt || track.albumArt || null
                     };
                 });
             } catch (err) {
