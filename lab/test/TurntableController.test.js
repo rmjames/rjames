@@ -167,7 +167,7 @@ describe('TurntableController', () => {
     expect(mockElements['pitch-slider-knob'].setPointerCapture).toHaveBeenCalledWith(1);
 
     // Mouse move
-    const moveEvent = { clientY: 150 };
+    const moveEvent = { clientY: 150, pointerId: 1 };
     controller.onPitchPointerMove(moveEvent);
     // 125 + 50 = 175
     expect(mockElements['pitch-slider-knob'].setAttribute).toHaveBeenCalledWith('transform', 'translate(14, 175)');
