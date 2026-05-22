@@ -42,15 +42,27 @@ export class AudioEngine {
 
   play(offset, rate, onEnded) {
     if (this.currentSource) {
-      this.currentSource.stop();
-      this.currentSource.disconnect();
+      try {
+        this.currentSource.stop();
+        this.currentSource.disconnect();
+      } catch (e) {
+        console.warn("Failed to stop previous play source:", e);
+      }
     }
     this.currentSource = this.audioCtx.createBufferSource();
     this.currentSource.buffer = this.forwardBuffer;
     this.currentSource.playbackRate.value = rate;
     this.currentSource.connect(this.audioCtx.destination);
     
-    this.currentSource.start(0, offset);
+    // Clamp offset to prevent RangeError if it exceeds buffer duration
+    const safeOffset = Math.max(0, Math.min(offset, this.audioDuration - 0.02));
+    
+    try {
+      this.currentSource.start(0, safeOffset);
+    } catch (e) {
+      console.error("Failed to start play source:", e);
+    }
+    
     if (onEnded) {
       this.currentSource.onended = onEnded;
     }
@@ -59,8 +71,12 @@ export class AudioEngine {
   stop() {
     if (this.currentSource) {
       this.currentSource.onended = null;
-      this.currentSource.stop();
-      this.currentSource.disconnect();
+      try {
+        this.currentSource.stop();
+        this.currentSource.disconnect();
+      } catch (e) {
+        console.warn("Failed to stop play source:", e);
+      }
       this.currentSource = null;
     }
   }
@@ -74,24 +90,47 @@ export class AudioEngine {
   playScratch(velocity, currentAudioTime) {
     const absVel = Math.abs(velocity);
     
-    if (absVel < 0.05) {
-      this.stopScratch();
-      return;
+    // Hysteresis thresholds to avoid audio engine overload from micro-jitter
+    const STOP_THRESHOLD = 0.03;
+    const START_THRESHOLD = 0.08;
+
+    if (this.scratchDirection === 0) {
+      // Currently stopped. Only start if velocity is above START_THRESHOLD
+      if (absVel < START_THRESHOLD) {
+        return;
+      }
+    } else {
+      // Currently playing. Only stop if velocity falls below STOP_THRESHOLD
+      if (absVel < STOP_THRESHOLD) {
+        this.stopScratch();
+        return;
+      }
     }
 
     const newDir = velocity > 0 ? 1 : -1;
     
     if (this.scratchDirection !== newDir) {
       if (this.scratchSource) {
-        this.scratchSource.stop();
-        this.scratchSource.disconnect();
+        try {
+          this.scratchSource.stop();
+          this.scratchSource.disconnect();
+        } catch (e) {
+          console.warn("Failed to stop previous scratch source:", e);
+        }
       }
       this.scratchSource = this.audioCtx.createBufferSource();
       this.scratchSource.buffer = newDir === 1 ? this.forwardBuffer : this.reverseBuffer;
       this.scratchSource.connect(this.audioCtx.destination);
       
       let startPos = newDir === 1 ? currentAudioTime : this.audioDuration - currentAudioTime;
-      this.scratchSource.start(0, startPos);
+      // Safety clamp to prevent RangeError
+      startPos = Math.max(0, Math.min(startPos, this.audioDuration - 0.02));
+      
+      try {
+        this.scratchSource.start(0, startPos);
+      } catch (e) {
+        console.error("Failed to start scratch source:", e);
+      }
       this.scratchDirection = newDir;
     }
     
@@ -102,8 +141,12 @@ export class AudioEngine {
 
   stopScratch() {
     if (this.scratchSource) {
-      this.scratchSource.stop();
-      this.scratchSource.disconnect();
+      try {
+        this.scratchSource.stop();
+        this.scratchSource.disconnect();
+      } catch (e) {
+        console.warn("Failed to stop scratch source:", e);
+      }
       this.scratchSource = null;
       this.scratchDirection = 0;
     }
