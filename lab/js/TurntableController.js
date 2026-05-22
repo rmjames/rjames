@@ -33,6 +33,10 @@ export class TurntableController {
     this.isDraggingPitch = false;
     this.pitchStartY = 0;
     this.currentPitchY = 125;
+    this.smoothedVelocity = 0;
+
+    this.activeLpPointerId = null;
+    this.activePitchPointerId = null;
 
     this.bindEvents();
     
@@ -76,11 +80,13 @@ export class TurntableController {
     this.lp.addEventListener('pointerdown', (e) => this.onLpPointerDown(e));
     this.lp.addEventListener('pointermove', (e) => this.onLpPointerMove(e));
     this.lp.addEventListener('pointerup', (e) => this.onLpPointerUp(e));
+    this.lp.addEventListener('pointercancel', (e) => this.onLpPointerUp(e));
 
     // Pitch events
     this.pitchKnob.addEventListener('pointerdown', (e) => this.onPitchPointerDown(e));
     this.pitchKnob.addEventListener('pointermove', (e) => this.onPitchPointerMove(e));
     this.pitchKnob.addEventListener('pointerup', (e) => this.onPitchPointerUp(e));
+    this.pitchKnob.addEventListener('pointercancel', (e) => this.onPitchPointerUp(e));
   }
 
   togglePower() {
@@ -192,10 +198,16 @@ export class TurntableController {
   }
 
   onLpPointerDown(e) {
+    if (this.activeLpPointerId !== null) return;
     if (!this.audioEngine.forwardBuffer) return; 
     this.audioEngine.resume();
     
-    this.lp.setPointerCapture(e.pointerId);
+    this.activeLpPointerId = e.pointerId;
+    try {
+      this.lp.setPointerCapture(e.pointerId);
+    } catch (err) {
+      console.warn("Failed to set pointer capture on LP:", err);
+    }
     this.lp.style.cursor = 'grabbing';
     
     const wasPlaying = this.state.isPlaying;
@@ -206,18 +218,26 @@ export class TurntableController {
     
     this.state.startScratch(this.getAngle(e), performance.now());
     this.state.wasPlayingBeforeScratch = wasPlaying;
+    this.smoothedVelocity = 0;
   }
 
   onLpPointerMove(e) {
+    if (e.pointerId !== this.activeLpPointerId) return;
     if (!this.state.isScratching) return;
     const currentAngle = this.getAngle(e);
     this.state.updateScratch(currentAngle, performance.now(), this.SECONDS_PER_DEGREE);
   }
 
   onLpPointerUp(e) {
+    if (e.pointerId !== this.activeLpPointerId) return;
+    this.activeLpPointerId = null;
     if (!this.state.isScratching) return;
     this.state.stopScratch();
-    this.lp.releasePointerCapture(e.pointerId);
+    try {
+      this.lp.releasePointerCapture(e.pointerId);
+    } catch (err) {
+      console.warn("Failed to release pointer capture on LP:", err);
+    }
     this.lp.style.cursor = 'grab';
     
     this.audioEngine.stopScratch();
@@ -236,13 +256,20 @@ export class TurntableController {
   }
 
   onPitchPointerDown(e) {
+    if (this.activePitchPointerId !== null) return;
+    this.activePitchPointerId = e.pointerId;
     this.isDraggingPitch = true;
     this.pitchStartY = e.clientY;
-    this.pitchKnob.setPointerCapture(e.pointerId);
+    try {
+      this.pitchKnob.setPointerCapture(e.pointerId);
+    } catch (err) {
+      console.warn("Failed to set pointer capture on pitch knob:", err);
+    }
     this.pitchKnob.style.cursor = 'grabbing';
   }
 
   onPitchPointerMove(e) {
+    if (e.pointerId !== this.activePitchPointerId) return;
     if (!this.isDraggingPitch) return;
 
     const deltaY = e.clientY - this.pitchStartY;
@@ -266,6 +293,8 @@ export class TurntableController {
   }
 
   onPitchPointerUp(e) {
+    if (e.pointerId !== this.activePitchPointerId) return;
+    this.activePitchPointerId = null;
     if (!this.isDraggingPitch) return;
     this.isDraggingPitch = false;
 
@@ -275,7 +304,11 @@ export class TurntableController {
     if (this.currentPitchY > 215) this.currentPitchY = 215;
     if (Math.abs(this.currentPitchY - 125) < 5) this.currentPitchY = 125;
 
-    this.pitchKnob.releasePointerCapture(e.pointerId);
+    try {
+      this.pitchKnob.releasePointerCapture(e.pointerId);
+    } catch (err) {
+      console.warn("Failed to release pointer capture on pitch knob:", err);
+    }
     this.pitchKnob.style.cursor = 'grab';
     this.updateLights();
   }
@@ -291,11 +324,15 @@ export class TurntableController {
         if (Math.abs(this.state.currentVelocity) < 0.01) this.state.currentVelocity = 0;
       }
 
-      this.state.currentAudioTime += this.state.currentVelocity * dt;
+      // Smooth the velocity using low pass filter (Exponential Moving Average)
+      const alpha = 0.35;
+      this.smoothedVelocity = this.smoothedVelocity * (1 - alpha) + this.state.currentVelocity * alpha;
+
+      this.state.currentAudioTime += this.smoothedVelocity * dt;
       if (this.state.currentAudioTime < 0) this.state.currentAudioTime = 0;
       if (this.state.currentAudioTime > this.state.audioDuration) this.state.currentAudioTime = this.state.audioDuration;
 
-      this.audioEngine.playScratch(this.state.currentVelocity, this.state.currentAudioTime);
+      this.audioEngine.playScratch(this.smoothedVelocity, this.state.currentAudioTime);
 
     } else if (this.state.isPlaying) {
       this.state.syncAudioTime(this.audioEngine.getCurrentTime());

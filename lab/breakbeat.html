@@ -26,6 +26,9 @@
       box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8);
       border-radius: 15px;
       border: 1.5px solid rgba(255, 255, 255, 0.12);
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
     }
 
     :root {
@@ -1178,7 +1181,7 @@
       </g>
 
       <!-- Slider Knob -->
-      <g id="pitch-slider-knob" transform="translate(14, 125)" style="cursor: grab;">
+      <g id="pitch-slider-knob" transform="translate(14, 125)" style="cursor: grab; touch-action: none;">
         <rect x="0" y="-18" width="36" height="36" rx="2" fill="var(--black-0)" />
         <rect x="2" y="-16" width="32" height="32" rx="1" fill="var(--gray-0)" />
         <!-- Bevel highlights -->
