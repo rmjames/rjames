@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { resetAnimation, splitText } from './utils.js';
+import { resetAnimation, splitText } from '../utils.js';
 
 describe('utils.js', () => {
     beforeEach(() => {

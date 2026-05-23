@@ -1,14 +1,13 @@
 import { AudioEngine } from './AudioEngine.js';
-import { TurntableState } from './TurntableState.js';
+import { TurntableState } from '../lab/TurntableState.js';
 
 export class TurntableController {
   constructor() {
     this.audioEngine = new AudioEngine();
     this.state = new TurntableState();
-    
+
     this.SECONDS_PER_DEGREE = 1.8 / 360;
 
-    // DOM Elements
     this.btn = document.getElementById('start-stop-btn');
     this.svg = document.querySelector('svg');
     this.tonearm = document.getElementById('tonearm');
@@ -39,8 +38,7 @@ export class TurntableController {
     this.activePitchPointerId = null;
 
     this.bindEvents();
-    
-    // Start render loop
+
     requestAnimationFrame((t) => this.renderLoop(t));
   }
 
@@ -72,7 +70,7 @@ export class TurntableController {
   bindEvents() {
     this.btn33.addEventListener('click', () => this.setSpeed(33));
     this.btn45.addEventListener('click', () => this.setSpeed(45));
-    
+
     this.btn.addEventListener('click', () => this.togglePlayback());
     this.powerSwitch.addEventListener('click', () => this.togglePower());
 
@@ -97,6 +95,10 @@ export class TurntableController {
       this.powerDial.style.transform = 'rotate(0deg)';
       if (this.state.isPlaying) {
         this.togglePlayback();
+      } else if (this.state.isScratching && this.state.wasPlayingBeforeScratch) {
+        this.state.wasPlayingBeforeScratch = false;
+        this.tonearm.style.transition = 'transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1)';
+        this.tonearm.style.transform = 'rotate(-25deg)';
       }
     }
     this.updateLights();
@@ -112,14 +114,14 @@ export class TurntableController {
         this.btn33Led.setAttribute('fill', 'var(--black-0)');
         this.btn45Led.setAttribute('fill', 'lch(60% 100 45)');
       }
-      
+
       // Pitch LED
       if (Math.abs(pitchY - 125) < 5) {
         this.pitchZeroLed.setAttribute('fill', 'lch(80% 100 135)');
       } else {
         this.pitchZeroLed.setAttribute('fill', 'var(--black-0)');
       }
-      
+
       // Strobe
       this.strobeRedLight.setAttribute('fill', 'lch(60% 100 45)');
       this.strobeRedLight.setAttribute('filter', 'url(#red-glow)');
@@ -128,7 +130,7 @@ export class TurntableController {
       this.btn33Led.setAttribute('fill', 'var(--black-0)');
       this.btn45Led.setAttribute('fill', 'var(--black-0)');
       this.pitchZeroLed.setAttribute('fill', 'var(--black-0)');
-      
+
       this.strobeRedLight.setAttribute('fill', 'lch(20% 50 45)');
       this.strobeRedLight.removeAttribute('filter');
       this.strobeWhiteLight.setAttribute('opacity', '0.1');
@@ -146,7 +148,7 @@ export class TurntableController {
       this.btn45Cap.setAttribute('fill', 'var(--white-0)');
     }
     this.updateLights();
-    
+
     this.audioEngine.updatePitch(this.state.effectivePlaybackRate);
     this.state.applyPitch(this.state.pitchMultiplier, this.audioEngine.getCurrentTime());
   }
@@ -171,10 +173,10 @@ export class TurntableController {
           this.audioEngine.play(this.state.currentAudioTime, this.state.effectivePlaybackRate, () => {
             // End callback
             if (this.state.isPlaying && this.state.currentAudioTime >= this.state.audioDuration - 0.1) {
-               this.state.isPlaying = false;
-               this.state.currentAudioTime = this.state.audioDuration;
-               this.svg.pauseAnimations();
-               this.tonearm.style.transform = 'rotate(-25deg)';
+              this.state.isPlaying = false;
+              this.state.currentAudioTime = this.state.audioDuration;
+              this.svg.pauseAnimations();
+              this.tonearm.style.transform = 'rotate(-25deg)';
             }
           });
           this.svg.unpauseAnimations();
@@ -199,9 +201,9 @@ export class TurntableController {
 
   onLpPointerDown(e) {
     if (this.activeLpPointerId !== null) return;
-    if (!this.audioEngine.forwardBuffer) return; 
+    if (!this.audioEngine.forwardBuffer) return;
     this.audioEngine.resume();
-    
+
     this.activeLpPointerId = e.pointerId;
     try {
       this.lp.setPointerCapture(e.pointerId);
@@ -209,13 +211,13 @@ export class TurntableController {
       console.warn("Failed to set pointer capture on LP:", err);
     }
     this.lp.style.cursor = 'grabbing';
-    
+
     const wasPlaying = this.state.isPlaying;
     if (wasPlaying) {
       this.state.stopPlayback(this.audioEngine.getCurrentTime());
       this.audioEngine.stop();
     }
-    
+
     this.state.startScratch(this.getAngle(e), performance.now());
     this.state.wasPlayingBeforeScratch = wasPlaying;
     this.smoothedVelocity = 0;
@@ -239,19 +241,25 @@ export class TurntableController {
       console.warn("Failed to release pointer capture on LP:", err);
     }
     this.lp.style.cursor = 'grab';
-    
+
     this.audioEngine.stopScratch();
-    
+
     if (this.state.wasPlayingBeforeScratch) {
-      this.state.startPlayback(this.audioEngine.getCurrentTime());
-      this.audioEngine.play(this.state.currentAudioTime, this.state.effectivePlaybackRate, () => {
-         if (this.state.isPlaying && this.state.currentAudioTime >= this.state.audioDuration - 0.1) {
+      if (this.isPowerOn) {
+        this.state.startPlayback(this.audioEngine.getCurrentTime());
+        this.audioEngine.play(this.state.currentAudioTime, this.state.effectivePlaybackRate, () => {
+          if (this.state.isPlaying && this.state.currentAudioTime >= this.state.audioDuration - 0.1) {
             this.state.isPlaying = false;
             this.state.currentAudioTime = this.state.audioDuration;
             this.svg.pauseAnimations();
             this.tonearm.style.transform = 'rotate(-25deg)';
-         }
-      });
+          }
+        });
+      } else {
+        this.state.wasPlayingBeforeScratch = false;
+        this.tonearm.style.transition = 'transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1)';
+        this.tonearm.style.transform = 'rotate(-25deg)';
+      }
     }
   }
 
@@ -332,7 +340,11 @@ export class TurntableController {
       if (this.state.currentAudioTime < 0) this.state.currentAudioTime = 0;
       if (this.state.currentAudioTime > this.state.audioDuration) this.state.currentAudioTime = this.state.audioDuration;
 
-      this.audioEngine.playScratch(this.smoothedVelocity, this.state.currentAudioTime);
+      if (this.isPowerOn) {
+        this.audioEngine.playScratch(this.smoothedVelocity, this.state.currentAudioTime);
+      } else {
+        this.audioEngine.stopScratch();
+      }
 
     } else if (this.state.isPlaying) {
       this.state.syncAudioTime(this.audioEngine.getCurrentTime());

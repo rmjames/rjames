@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { initLabAnalytics } from './lab-analytics.js';
+import { initLabAnalytics } from '../lab-analytics.js';
 
 // Mock the global gtag function
 global.gtag = vi.fn();

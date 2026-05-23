@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import fs from 'fs';
 import path from 'path';
-const { loadTasks, saveTasks, getAgentPrompt, callGemini, getAllFiles, scrubSecrets, mergeFindings } = require('./judge.js');
+const { loadTasks, saveTasks, getAgentPrompt, callGemini, getAllFiles, scrubSecrets, mergeFindings } = require('../judge.js');
 
 describe('judge.js', () => {
     beforeEach(() => {
