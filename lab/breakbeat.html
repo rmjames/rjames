@@ -9,6 +9,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>BreakBeat - Technics SL-1210MK2</title>
   <style>
+    :root {
+      --white-0: lch(100% 0 0);
+      --gray-0: lch(85.12% 0 0);
+      --gray-1: lch(83.13% 0 0);
+      --gray-2: lch(17.88% 0 0);
+      --black-0: lch(14.85% 0 0);
+      --crate-scale: 1;
+    }
+
     body {
       margin: 0;
       padding: 0;
@@ -23,28 +32,19 @@
     svg {
       max-width: 100vw;
       max-height: 100vh;
-      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8);
+      box-shadow: 0 30px 60px lch(0% 0 0 / 0.8);
       border-radius: 15px;
-      border: 1.5px solid rgba(255, 255, 255, 0.12);
+      border: 1.5px solid lch(100% 0.01 296.81 / 0.12);
       touch-action: none;
       user-select: none;
       -webkit-user-select: none;
-    }
-
-    :root {
-      --white-0: lch(100% 0 0);
-      --gray-0: lch(85.12% 0 0);
-      --gray-1: lch(83.13% 0 0);
-      --gray-2: lch(17.88% 0 0);
-      --black-0: lch(14.85% 0 0);
-      --crate-scale: 1;
     }
 
     /* Milk Crate Library Styles */
     #library-modal {
       position: absolute;
       inset: 0;
-      background: rgba(0, 0, 0, 0.92);
+      background: lch(0% 0 0 / 0.92);
       z-index: 20;
       display: none;
       padding: 40px;
@@ -92,9 +92,9 @@
       justify-content: center;
       align-items: center;
       position: relative;
-      background: rgba(255, 255, 255, 0.02);
+      background: lch(100% 0.01 296.81 / 0.02);
       border-radius: 16px;
-      border: 1px solid rgba(255, 255, 255, 0.05);
+      border: 1px solid lch(100% 0.01 296.81 / 0.05);
       padding: 20px;
     }
 
@@ -133,7 +133,7 @@
       border: 3px solid lch(12% 0 0);
       background: lch(15% 0 0);
       border-radius: 6px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+      box-shadow: 0 8px 20px lch(0% 0 0 / 0.6);
       overflow: hidden;
       transform-origin: bottom center;
     }
@@ -149,7 +149,6 @@
     .crate-record:hover {
       filter: brightness(1.15);
     }
-
 
     .crate-controls {
       display: flex;
@@ -168,7 +167,7 @@
       font-family: monospace;
       cursor: pointer;
       transition: background 0.2s, transform 0.1s;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 4px 10px lch(0% 0 0 / 0.3);
     }
 
     .crate-nav-btn:hover {
@@ -188,9 +187,9 @@
     /* Album Details Sidebar */
     .details-section {
       flex: 0.9;
-      background: rgba(0, 0, 0, 0.4);
+      background: lch(0% 0 0 / 0.4);
       border-radius: 16px;
-      border: 1px solid rgba(255, 255, 255, 0.05);
+      border: 1px solid lch(100% 0.01 296.81 / 0.05);
       padding: 30px;
       display: flex;
       flex-direction: column;
@@ -220,7 +219,7 @@
       top: 0;
       left: 0;
       border-radius: 8px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+      box-shadow: 0 10px 25px lch(0% 0 0 / 0.6);
       object-fit: cover;
       z-index: 2;
       transition: transform 0.4s ease;
@@ -237,10 +236,10 @@
       top: 3%;
       left: 3%;
       border-radius: 50%;
-      background: radial-gradient(circle, #333 4%, #0f0f0f 5%, #000000 15%, #1c1c1c 25%, #050505 45%, #000 100%);
+      background: radial-gradient(circle, lch(21.25% 0 296.81) 4%, lch(4.31% 0 296.81) 5%, lch(0% 0 0) 15%, lch(7.68% 0 296.81) 25%, lch(2.67% 0 296.81) 45%, lch(0% 0 0) 100%);
       z-index: 1;
       transition: transform 0.7s cubic-bezier(0.25, 1, 0.5, 1);
-      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 6px 15px lch(0% 0 0 / 0.5);
     }
 
     .sleeve-preview-container.active .vinyl-disc-anim {
@@ -252,7 +251,7 @@
       position: absolute;
       inset: 8px;
       border-radius: 50%;
-      border: 1px dashed rgba(255, 255, 255, 0.06);
+      border: 1px dashed lch(96.39% 0 296.81 / 0.06);
       pointer-events: none;
     }
 
@@ -264,8 +263,8 @@
       left: 50%;
       transform: translate(-50%, -50%);
       border-radius: 50%;
-      background: #111;
-      border: 2px solid #000;
+      background: lch(5.06% 0 296.81);
+      border: 2px solid lch(0% 0 0);
       overflow: hidden;
       display: flex;
       align-items: center;
@@ -341,8 +340,8 @@
     }
 
     .details-track-item:hover {
-      background: rgba(255, 255, 255, 0.05);
-      border-color: rgba(255, 255, 255, 0.08);
+      background: lch(100% 0.01 296.81 / 0.05);
+      border-color: lch(100% 0.01 296.81 / 0.08);
       color: var(--white-0);
       transform: translateX(3px);
     }
@@ -413,8 +412,8 @@
       width: 100%;
       height: 100%;
       border-radius: 4px;
-      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.5);
-      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 3px 8px lch(0% 0 0 / 0.5);
+      border: 1px solid lch(100% 0.01 296.81 / 0.08);
       z-index: 2;
       transform: translateZ(2px);
     }
@@ -439,21 +438,21 @@
       height: 30px;
       border-radius: 50%;
       background:
-        radial-gradient(circle, #000 12%, transparent 12.5%),
-        radial-gradient(circle, var(--label-color, #fdd835) 35%, transparent 35.5%),
-        conic-gradient(from 0deg, #111, #2a2a2d 25%, #111 50%, #2a2a2d 75%, #111);
-      box-shadow: -2px 2px 5px rgba(0, 0, 0, 0.5);
+        radial-gradient(circle, lch(0% 0 0) 12%, transparent 12.5%),
+        radial-gradient(circle, var(--label-color, lch(87.12% 78.19 91.74)) 35%, transparent 35.5%),
+        conic-gradient(from 0deg, lch(5.06% 0 296.81), lch(12.06% 0 296.81) 25%, lch(5.06% 0 296.81) 50%, lch(12.06% 0 296.81) 75%, lch(5.06% 0 296.81));
+      box-shadow: -2px 2px 5px lch(0% 0 0 / 0.5);
       z-index: 1;
       transform: translate3d(0, 0, 0);
       transition: transform 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
     }
 
     .card-one .mini-vinyl {
-      --label-color: #fdd835;
+      --label-color: lab(87.12% -2.38 78.15);
     }
 
     .card-two .mini-vinyl {
-      --label-color: #ff4081;
+      --label-color: lab(71.32% 70.64 -15.94);
     }
 
     .mini-crate-label {
@@ -463,12 +462,12 @@
       font-family: monospace;
       letter-spacing: 1.5px;
       transition: all 0.2s ease;
-      background: rgba(0, 0, 0, 0.7);
+      background: lch(0% 0 0 / 0.7);
       padding: 3px 8px;
       border-radius: 12px;
-      border: 1px solid rgba(255, 255, 255, 0.15);
+      border: 1px solid lch(100% 0.01 296.81 / 0.15);
       margin-top: 6px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
+      box-shadow: 0 2px 5px lch(0% 0 0 / 0.4);
       display: inline-block;
     }
 
@@ -491,7 +490,7 @@
     }
 
     .mini-crate-button:hover .mini-crate-label {
-      color: #38ef7d;
+      color: lch(83.99% 80.66 148.23);
     }
 
     .mini-crate-button:active .mini-records-spread {
@@ -898,7 +897,7 @@
         box-sizing: border-box;
         padding: 20px 15px;
         backdrop-filter: none;
-        background: rgba(0, 0, 0, 0.65);
+        background: lch(0% 0 0 / 0.65);
         height: auto;
       }
 
@@ -954,7 +953,7 @@
       <filter id='spotlight'>
         <feGaussianBlur stdDeviation='24' result='blur-1' />
         <feSpecularLighting result='spec-1' in='blur-1' specularExponent='16' lighting-color='lch(96% 0 0 / .2)'>
-          <feSpotLight x='-900' y='-900' z='50' pointsAtX='0' pointsAtY='0' pointsAtZ='10' limitingConeAngle='5' />
+          <feSpotLight x='-900' y='-890' z='50' pointsAtX='0' pointsAtY='0' pointsAtZ='10' limitingConeAngle='5' />
         </feSpecularLighting>
 
         <!-- Mask highlight to the circle's shape to prevent overflow -->
@@ -962,7 +961,6 @@
         <feComposite in='SourceGraphic' in2='spec-masked' operator='arithmetic' k1='0' k2='1' k3='1' k4='0' />
       </filter>
 
-      <!-- Red glow for strobe -->
       <filter id='red-glow' x="-100%" y="-100%" width="300%" height="300%">
         <feGaussianBlur stdDeviation='3' result='blur' />
         <feComposite in='SourceGraphic' in2='blur' operator='over' />
@@ -1031,45 +1029,89 @@
         <stop offset="98%" stop-color="var(--black-0)" />
         <stop offset="100%" stop-color="var(--black-0)" />
       </radialGradient>
+
+      <!-- Chrome Gradient for Rim -->
+      <linearGradient color-interpolation="linearRGB" id="chrome-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#ffffff" />
+        <stop offset="20%" stop-color="#8c8c8c" />
+        <stop offset="40%" stop-color="#ffffff" />
+        <stop offset="60%" stop-color="#444444" />
+        <stop offset="80%" stop-color="#fafafa" />
+        <stop offset="100%" stop-color="#555555" />
+      </linearGradient>
+
+      <!-- Cylinder side chrome gradient -->
+      <linearGradient color-interpolation="linearRGB" id="cylinder-chrome" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#333333" />
+        <stop offset="15%" stop-color="#aaaaaa" />
+        <stop offset="30%" stop-color="#ffffff" />
+        <stop offset="45%" stop-color="#555555" />
+        <stop offset="60%" stop-color="#222222" />
+        <stop offset="75%" stop-color="#eeeeee" />
+        <stop offset="90%" stop-color="#777777" />
+        <stop offset="100%" stop-color="#333333" />
+      </linearGradient>
+
+      <filter id="strobe-spotlight" x="-100%" y="-100%" width="300%" height="300%">
+        <feGaussianBlur in="SourceAlpha" stdDeviation="0.8" result="blur" />
+        <feDiffuseLighting in="blur" surfaceScale="2" diffuseConstant="2.5" lighting-color="lch(60% 100 45)"
+          result="light">
+          <feSpotLight x="22" y="-13" z="5" pointsAtX="36" pointsAtY="-20" pointsAtZ="0" limitingConeAngle="18" />
+        </feDiffuseLighting>
+        <feComposite in="light" in2="SourceGraphic" operator="in" result="lit" />
+        <feBlend in="lit" in2="SourceGraphic" mode="screen" />
+      </filter>
+
     </defs>
 
-    <!-- Turntable Base -->
-    <rect x="0" y="0" width="800" height="650" rx="15" fill="var(--black-0)" stroke="lch(25% 0 0)" stroke-width="2" />
-    <rect x="20" y="20" width="760" height="610" rx="10" fill="lch(12% 0 0)" />
+    <g id="turntable-base">
+      <rect x="0" y="0" width="800" height="650" rx="15" fill="var(--black-0)" stroke="lch(25% 0 0)" stroke-width="2" />
+      <rect x="20" y="20" width="760" height="610" rx="10" fill="lch(12% 0 0)" />
+    </g>
 
-    <!-- 45 Adapter -->
-    <g transform="translate(80, 80)">
+    <g id="adapter-45" transform="translate(80, 80)" filter="url(#chrome-gradient)">
       <circle cx="0" cy="0" r="32" fill="var(--black-0)" />
       <circle cx="0" cy="0" r="28" fill="var(--gray-2)" />
       <circle cx="0" cy="0" r="22" fill="var(--gray-0)" />
       <circle cx="0" cy="0" r="8" fill="var(--black-0)" />
     </g>
 
-    <!-- Power Switch & Strobe -->
     <g id="power-switch" style="cursor: pointer;" transform="translate(80, 480)">
-      <!-- Base -->
-      <circle cx="0" cy="0" r="32" fill="var(--black-0)" />
+      <!-- Base Cylinder -->
+      <circle cx="0" cy="0" r="27" fill="#151515" stroke="#252525" stroke-width="1.5" />
+      <circle cx="0" cy="0" r="27" fill="none" stroke="url(#chrome-gradient)" stroke-width="0.8" opacity="0.4" />
 
-      <!-- Strobe tower -->
-      <g transform="translate(22, -18) rotate(-30)">
-        <rect x="-12" y="-15" width="24" height="30" rx="2" fill="var(--black-0)" />
-        <!-- Red Light -->
-        <rect id="strobe-red-light" x="10" y="-8" width="3" height="16" rx="1.5" fill="lch(20% 50 45)" />
-        <rect id="strobe-white-light" x="10" y="-8" width="3" height="16" rx="1.5" fill="var(--white-0)"
+      <!-- Slot Light (facing platter at -34 degrees) -->
+      <g transform="rotate(-34)">
+        <!-- Slot Window cutout -->
+        <rect x="25.5" y="-6" width="1.5" height="12" rx="0.75" fill="#0d0d0d" />
+        <!-- Red Light inside slot -->
+        <rect id="strobe-red-light" x="25.5" y="-6" width="1.5" height="12" rx="0.75" fill="lch(20% 50 45)" />
+        <rect id="strobe-white-light" x="25.5" y="-6" width="1.5" height="12" rx="0.75" fill="var(--white-0)"
           opacity="0.1" />
       </g>
 
-      <!-- Power Dial -->
       <g id="power-dial" style="transform-origin: 0px 0px; transition: transform 0.2s;">
-        <circle cx="0" cy="0" r="24" fill="var(--gray-2)" />
-        <!-- Dial grip dots -->
-        <circle cx="0" cy="0" r="23" fill="none" stroke="var(--gray-0)" stroke-width="1.5" stroke-dasharray="2 4" />
+        <!-- Base 3D Cylinder with vertical chrome sheen -->
+        <circle cx="0" cy="0" r="24" fill="url(#cylinder-chrome)" />
 
-        <!-- Top surface -->
-        <circle cx="0" cy="0" r="21" fill="var(--black-0)" />
+        <!-- Knurling ridges (simulated using dashed circle) -->
+        <circle cx="0" cy="0" r="23.5" fill="none" stroke="#111111" stroke-width="1.2" stroke-dasharray="1 1" />
+
+        <!-- Chrome Outer Rim (shiny silver ring) -->
+        <circle cx="0" cy="0" r="22.5" fill="none" stroke="url(#chrome-gradient)" stroke-width="1.5" />
+
+        <!-- Inner face dark border -->
+        <circle cx="0" cy="0" r="21.7" fill="#181818" />
+
+        <!-- Fine radial ridges inside the rim -->
+        <circle cx="0" cy="0" r="21" fill="none" stroke="#2c2c2c" stroke-width="1" stroke-dasharray="1 1.5" />
+
+        <!-- Top surface center (flat black) -->
+        <circle cx="0" cy="0" r="19.5" fill="#121212" />
 
         <!-- Indicator mark -->
-        <circle cx="-13" cy="9" r="1.5" fill="var(--gray-0)" />
+        <circle cx="-13" cy="9" r="1.5" fill="#fcfcfc" />
       </g>
 
       <!-- Text and arrows -->
@@ -1077,8 +1119,8 @@
       <path d="M -10 -9 L -6 -10 M -10 -9 L -9 -5" fill="none" stroke="var(--gray-0)" stroke-width="1" />
       <path d="M 10 -9 L 6 -10 M 10 -9 L 9 -5" fill="none" stroke="var(--gray-0)" stroke-width="1" />
 
-      <text x="-14" y="-1" font-size="6" fill="var(--white-0)" text-anchor="middle">off</text>
-      <text x="14" y="-1" font-size="6" fill="var(--white-0)" text-anchor="middle">on</text>
+      <text x="-14" y="-1" font-size="6" fill="var(--white-0)" text-anchor="middle">on</text>
+      <text x="14" y="-1" font-size="6" fill="var(--white-0)" text-anchor="middle">off</text>
       <text x="0" y="14" font-size="6" fill="var(--gray-0)" text-anchor="middle">power</text>
     </g>
 
@@ -1117,15 +1159,20 @@
       <circle cx="5" cy="10" r="265" fill="lch(5% 0 0 / .5)" />
 
       <!-- Platter rim -->
-      <circle cx="0" cy="0" r="265" fill="var(--gray-2)" />
-      <circle cx="0" cy="0" r="260" fill="var(--black-0)" />
 
-      <!-- Strobe dots -->
-      <!-- Large dots -->
-      <circle cx="0" cy="0" r="255" fill="none" stroke="var(--gray-0)" stroke-width="5" stroke-dasharray="6 4" />
-      <circle cx="0" cy="0" r="248" fill="none" stroke="var(--gray-0)" stroke-width="4" stroke-dasharray="8 5" />
-      <circle cx="0" cy="0" r="242" fill="none" stroke="var(--gray-0)" stroke-width="4" stroke-dasharray="10 6" />
-      <circle cx="0" cy="0" r="236" fill="none" stroke="var(--gray-0)" stroke-width="4" stroke-dasharray="12 7" />
+      <g id='platter-rim' fill="url(#chrome-gradient)">
+        <circle cx="0" cy="0" r="265" />
+        <circle cx="0" cy="0" r="264.5" fill="none" stroke="var(--white-0)" stroke-width="0.25" opacity="0.6" />
+        <circle cx="0" cy="0" r="264" fill="var(--black-0)" />
+      </g>
+
+      <g id="strobe-dots" fill="url(#chrome-gradient)">
+        <circle cx="0" cy="0" r="255" fill="none" stroke="var(--gray-0)" stroke-width="5" stroke-dasharray="6 4" />
+        <circle cx="0" cy="0" r="248" fill="none" stroke="var(--gray-0)" stroke-width="4" stroke-dasharray="8 5" />
+        <circle cx="0" cy="0" r="242" fill="none" stroke="var(--gray-0)" stroke-width="4" stroke-dasharray="10 6" />
+        <circle cx="0" cy="0" r="236" fill="none" stroke="var(--gray-0)" stroke-width="4" stroke-dasharray="12 7"
+          fill="url(#chrome-gradient)" />
+      </g>
 
       <!-- The Record -->
       <g id="lp" style="cursor: grab; touch-action: none;">
@@ -1138,97 +1185,115 @@
           width="150" height="150" clip-path="url(#label-clip)" />
       </g>
 
-      <!-- Spindle -->
-      <circle cx="0" cy="0" r="8" fill="var(--gray-0)" />
-      <circle cx="0" cy="0" r="3" fill="var(--white-0)" />
+      <g id="spindle">
+        <circle cx="0" cy="0" r="6" fill="var(--gray-1)" filter="url(#matte-black)" />
+        <circle cx="0" cy="0" r="4" fill="var(--white-0)" filter="url(#chrome-gradient)" />
+      </g>
     </g>
 
-    <!-- Pitch Slider -->
-    <g transform="translate(670, 250)">
-      <!-- Label -->
-      <text x="32" y="262" font-size="8" fill="var(--gray-0)" text-anchor="middle" font-weight="bold">pitch adj.</text>
+    <!-- Power Dial Red Reflection & Strobe Glow (static, extended to cover both the dial's reflection and strobe bloom on the platter/deck) -->
+    <g id="power-dial-red-reflection" transform="translate(80, 480)" opacity="0" filter="url(#strobe-spotlight)"
+      style="transition: opacity 0.3s ease; mix-blend-mode: screen; pointer-events: none;">
+      <!-- Base deck light beam and knob reflection -->
+      <path d="M 0 -24 A 24 24 0 0 1 16.1 -17.8 L 24.8 -27.5 L 36.2 -7.7 L 23.5 -5 A 24 24 0 0 1 0 24 Z"
+        fill="var(--red-glow-100)" />
 
-      <!-- Track Base -->
-      <rect x="14" y="0" width="36" height="250" rx="4" fill="var(--black-0)" />
-      <rect x="16" y="2" width="32" height="246" rx="3" fill="var(--gray-2)" />
+      <!-- Strobe dots red glow (concentric dashed lines overlaying the platter dots inside the spotlight cone) -->
+      <g transform="translate(250, -170)" fill="none" stroke="var(--red-glow-100)">
+        <circle cx="0" cy="0" r="255" stroke-width="5" stroke-dasharray="6 4" />
+        <circle cx="0" cy="0" r="248" stroke-width="4" stroke-dasharray="8 5" />
+        <circle cx="0" cy="0" r="242" stroke-width="4" stroke-dasharray="10 6" />
+        <circle cx="0" cy="0" r="236" stroke-width="4" stroke-dasharray="12 7" />
+      </g>
+    </g>
 
-      <!-- Slot with dust flaps -->
-      <rect x="30" y="15" width="4" height="220" fill="var(--black-0)" />
-      <rect x="30" y="15" width="1" height="220" fill="var(--gray-1)" opacity="0.3" />
-      <rect x="33" y="15" width="1" height="220" fill="var(--gray-1)" opacity="0.3" />
+    <g id="pitch-slider" transform="translate(670, 250)">
+      <text id="pitch-scale-label" x="32" y="262" font-size="8" fill="var(--gray-0)" text-anchor="middle"
+        font-weight="bold">pitch adj.</text>
+
+      <g id="pitch-slider-track-base">
+        <rect x="14" y="0" width="36" height="250" rx="4" fill="var(--black-0)" />
+        <rect x="16" y="2" width="32" height="246" rx="3" fill="var(--gray-2)" />
+      </g>
+
+      <g id="pitch-slider-slot">
+        <rect x="30" y="15" width="4" height="220" fill="var(--black-0)" />
+        <rect x="30" y="15" width="1" height="220" fill="var(--gray-1)" opacity="0.3" />
+        <rect x="33" y="15" width="1" height="220" fill="var(--gray-1)" opacity="0.3" />
+      </g>
 
       <!-- Scale Markings & Text -->
       <g id="pitch-scale" transform="translate(-16, 0)">
-        <!-- Scale Text -->
-        <text x="16" y="35" font-size="8" fill="var(--white-0)" text-anchor="end" dominant-baseline="middle">-8</text>
-        <text x="16" y="80" font-size="8" fill="var(--white-0)" text-anchor="end" dominant-baseline="middle">-4</text>
-        <rect id="pitch-zero-led" x="2" y="122" width="4" height="6" rx="1" fill="var(--black-0)" />
-        <text x="16" y="170" font-size="8" fill="var(--white-0)" text-anchor="end" dominant-baseline="middle">+4</text>
-        <text x="16" y="215" font-size="8" fill="var(--white-0)" text-anchor="end" dominant-baseline="middle">+8</text>
+        <g id="pitch-scale-text">
+          <text id="pitch-scale-minus-8" x="16" y="35" font-size="8" fill="var(--white-0)" text-anchor="end"
+            dominant-baseline="middle">-8</text>
+          <text id="pitch-scale-minus-4" x="16" y="80" font-size="8" fill="var(--white-0)" text-anchor="end"
+            dominant-baseline="middle">-4</text>
+          <rect id="pitch-zero-led" x="2" y="122" width="4" height="6" rx="1" fill="var(--black-0)" />
+          <text id="pitch-scale-plus-4" x="16" y="170" font-size="8" fill="var(--white-0)" text-anchor="end"
+            dominant-baseline="middle">+4</text>
+          <text id="pitch-scale-plus-8" x="16" y="215" font-size="8" fill="var(--white-0)" text-anchor="end"
+            dominant-baseline="middle">+8</text>
+        </g>
 
-        <!-- Major Scale Markings -->
-        <path d="M 18 35 L 26 35 M 18 80 L 26 80 M 18 125 L 26 125 M 18 170 L 26 170 M 18 215 L 26 215"
+        <path id="pitch-scale-major-markings"
+          d="M 18 35 L 26 35 M 18 80 L 26 80 M 18 125 L 26 125 M 18 170 L 26 170 M 18 215 L 26 215"
           stroke="var(--white-0)" stroke-width="1.5" />
-
-        <!-- Minor Scale Markings (2, 6) -->
-        <path d="M 21 57.5 L 26 57.5 M 21 102.5 L 26 102.5 M 21 147.5 L 26 147.5 M 21 192.5 L 26 192.5"
+        <path id="pitch-scale-minor-markings"
+          d="M 21 57.5 L 26 57.5 M 21 102.5 L 26 102.5 M 21 147.5 L 26 147.5 M 21 192.5 L 26 192.5"
           stroke="var(--white-0)" stroke-width="1" />
-
-        <!-- Ticks -->
-        <path
+        <path id="pitch-scale-ticks"
           d="M 23.5 46.25 L 26 46.25 M 23.5 68.75 L 26 68.75 M 23.5 91.25 L 26 91.25 M 23.5 113.75 L 26 113.75 M 23.5 136.25 L 26 136.25 M 23.5 158.75 L 26 158.75 M 23.5 181.25 L 26 181.25 M 23.5 203.75 L 26 203.75"
           stroke="var(--white-0)" stroke-width="0.5" />
       </g>
 
-      <!-- Slider Knob -->
       <g id="pitch-slider-knob" transform="translate(14, 125)" style="cursor: grab; touch-action: none;">
         <rect x="0" y="-18" width="36" height="36" rx="2" fill="var(--black-0)" />
         <rect x="2" y="-16" width="32" height="32" rx="1" fill="var(--gray-0)" />
-        <!-- Bevel highlights -->
-        <rect x="2" y="-16" width="32" height="2" fill="var(--white-0)" opacity="0.5" filter="url(#chrome-metallic)" />
-        <rect x="2" y="14" width="32" height="2" fill="var(--black-0)" opacity="0.3" />
-        <rect x="2" y="-16" width="2" height="32" fill="var(--white-0)" opacity="0.3" filter="url(#chrome-metallic)" />
-        <!-- Center groove line -->
-        <rect x="2" y="-1" width="32" height="2" fill="var(--black-0)" />
+        <g id="pitch-slider-knob-bevel-highlights">
+          <rect x="2" y="-16" width="32" height="2" fill="var(--white-0)" opacity="0.5" fill="url(#chrome-gradient)" />
+          <rect x="2" y="14" width="32" height="2" fill="var(--black-0)" opacity="0.3" />
+          <rect x="2" y="-16" width="2" height="32" fill="var(--white-0)" opacity="0.3"
+            filter="url(#chrome-gradient)" />
+        </g>
+        <rect id="pitch-slider-knob-center-groove-line" x="2" y="-1" width="32" height="2" fill="var(--black-0)" />
       </g>
     </g>
 
-    <!-- Tonearm -->
-    <g transform="translate(680, 150)">
-      <!-- Base Pivot -->
-      <circle cx="0" cy="0" r="80" fill="var(--black-0)" />
-      <circle cx="0" cy="0" r="70" fill="var(--gray-2)" />
-      <circle cx="0" cy="0" r="50" fill="var(--black-0)" stroke="var(--gray-1)" stroke-width="2" />
+    <g id="tonearm-group" transform="translate(680, 150)">
+      <g id="base-pivot">
+        <circle cx="0" cy="0" r="80" fill="var(--black-0)" />
+        <circle cx="0" cy="0" r="70" fill="var(--gray-2)" />
+        <circle cx="0" cy="0" r="50" fill="var(--black-0)" stroke="var(--gray-1)" stroke-width="2" />
+      </g>
 
-      <!-- Counterweight -->
-      <rect x="-20" y="-120" width="40" height="45" rx="4" fill="var(--gray-0)" />
-      <rect x="-15" y="-130" width="30" height="10" rx="2" fill="var(--gray-1)" />
+      <g id="counterweight">
+        <rect x="-20" y="-120" width="40" height="45" rx="4" fill="var(--gray-0)" />
+        <rect x="-15" y="-130" width="30" height="10" rx="2" fill="var(--gray-1)" />
+      </g>
 
-      <!-- Anti-skate dial -->
-      <circle cx="60" cy="30" r="18" fill="var(--black-0)" />
-      <circle cx="60" cy="30" r="14" fill="var(--gray-2)" />
-      <circle cx="60" cy="30" r="10" fill="var(--black-0)" />
+      <g id="anti-skate-dial">
+        <circle cx="60" cy="30" r="18" fill="var(--black-0)" />
+        <circle cx="60" cy="30" r="14" fill="var(--gray-2)" />
+        <circle cx="60" cy="30" r="10" fill="var(--black-0)" />
+      </g>
 
-      <!-- The Arm Group (rotated to sit on the record) -->
       <g id="tonearm"
         style="transform-origin: 0px 0px; transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1); transform: rotate(-25deg);">
-        <!-- Pivot cap -->
-        <circle cx="0" cy="0" r="15" fill="var(--gray-0)" />
-        <circle cx="0" cy="0" r="8" fill="var(--black-0)" />
 
-        <!-- Main S-tube -->
-        <path d="M 0 0 C 0 120, -150 100, -200 220" fill="none" stroke="var(--gray-0)" stroke-width="10"
-          filter="url(#chrome-metallic)" />
+        <g id="tonearm-pivot-cap">
+          <circle cx="0" cy="0" r="15" fill="var(--gray-0)" filter="url(#chrome-gradient)" />
+          <circle cx="0" cy="0" r="8" fill="var(--black-0)" filter="url(#matte-black)" />
+        </g>
 
-        <!-- Headshell -->
-        <g transform="translate(-200, 220) rotate(-25)">
-          <!-- Connector -->
-          <rect x="-8" y="-10" width="16" height="15" fill="var(--gray-1)" />
-          <!-- Body -->
-          <rect x="-12" y="5" width="24" height="50" rx="3" fill="var(--gray-2)" />
-          <!-- Finger lift -->
-          <path d="M 12 25 Q 30 25 30 40" fill="none" stroke="var(--gray-0)" stroke-width="3"
-            filter="url(#matte-black)" />
+        <path id="s-tube" d="M 0 0 C 0 120, -150 100, -200 220" fill="none" stroke="var(--gray-0)" stroke-width="10"
+          filter="url(#chrome-gradient)" />
+
+        <g id="head-shell" transform="translate(-200, 220) rotate(-25)">
+          <rect id="head-shell-connector" x="-8" y="-10" width="16" height="15" fill="var(--gray-1)" />
+          <rect id="head-shell-body" x="-12" y="5" width="24" height="50" rx="3" fill="var(--gray-2)" />
+          <path id="head-shell-finger-lift" d="M 12 25 Q 30 25 30 40" fill="none" stroke="var(--gray-0)"
+            stroke-width="3" filter="url(#chrome-gradient)" />
         </g>
       </g>
     </g>

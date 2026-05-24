@@ -26,6 +26,7 @@ export class TurntableController {
     this.strobeRedLight = document.getElementById('strobe-red-light');
     this.strobeWhiteLight = document.getElementById('strobe-white-light');
     this.pitchZeroLed = document.getElementById('pitch-zero-led');
+    this.powerDialRedReflection = document.getElementById('power-dial-red-reflection');
 
     this.isPowerOn = false;
     this.currentRpm = 33;
@@ -126,6 +127,8 @@ export class TurntableController {
       this.strobeRedLight.setAttribute('fill', 'lch(60% 100 45)');
       this.strobeRedLight.setAttribute('filter', 'url(#red-glow)');
       this.strobeWhiteLight.setAttribute('opacity', '0.6');
+
+      if (this.powerDialRedReflection) this.powerDialRedReflection.setAttribute('opacity', '1');
     } else {
       this.btn33Led.setAttribute('fill', 'var(--black-0)');
       this.btn45Led.setAttribute('fill', 'var(--black-0)');
@@ -134,6 +137,8 @@ export class TurntableController {
       this.strobeRedLight.setAttribute('fill', 'lch(20% 50 45)');
       this.strobeRedLight.removeAttribute('filter');
       this.strobeWhiteLight.setAttribute('opacity', '0.1');
+
+      if (this.powerDialRedReflection) this.powerDialRedReflection.setAttribute('opacity', '0');
     }
   }
 

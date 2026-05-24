@@ -26,6 +26,7 @@ describe('TurntableController', () => {
       'power-dial': { style: {} },
       'strobe-red-light': { setAttribute: vi.fn(), removeAttribute: vi.fn() },
       'strobe-white-light': { setAttribute: vi.fn() },
+      'power-dial-red-reflection': { setAttribute: vi.fn() },
       'lp': {
         addEventListener: vi.fn(),
         setPointerCapture: vi.fn(),
