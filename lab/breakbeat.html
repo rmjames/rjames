@@ -1176,15 +1176,20 @@
 
     <g id="power-dial-red-reflection" transform="translate(80, 480)" opacity="0" filter="url(#strobe-spotlight)"
       style="transition: opacity 0.3s ease; mix-blend-mode: screen; pointer-events: none;">
-      <path id='power-dial-red-reflection-light'
-        d="M 0 -24 A 24 24 0 0 1 16.1 -17.8 L 45.5 -50.5 L 66.5 -14.1 L 23.5 -5 A 24 24 0 0 1 0 24 Z"
-        fill="var(--red-glow-100)" />
+      <clipPath id="strobe-clip">
+        <circle cx="0" cy="0" r="68" />
+      </clipPath>
+      <g clip-path="url(#strobe-clip)">
+        <path id='power-dial-red-reflection-light'
+          d="M 0 -24 A 24 24 0 0 1 16.1 -17.8 L 70.4 -77.9 A 105 105 0 0 1 102.7 -21.9 L 23.5 -5 A 24 24 0 0 1 0 24 Z"
+          fill="var(--red-glow-100)" />
 
-      <g id='strobe-dots-red-glow' transform="translate(250, -170)" fill="none" stroke="var(--red-glow-100)">
-        <circle cx="0" cy="0" r="255" stroke-width="5" stroke-dasharray="6 4" />
-        <circle cx="0" cy="0" r="248" stroke-width="4" stroke-dasharray="8 5" />
-        <circle cx="0" cy="0" r="242" stroke-width="4" stroke-dasharray="10 6" />
-        <circle cx="0" cy="0" r="236" stroke-width="4" stroke-dasharray="12 7" />
+        <g id='strobe-dots-red-glow' transform="translate(250, -170)" fill="none" stroke="var(--red-glow-100)">
+          <circle cx="0" cy="0" r="255" stroke-width="5" stroke-dasharray="6 4" />
+          <circle cx="0" cy="0" r="248" stroke-width="4" stroke-dasharray="8 5" />
+          <circle cx="0" cy="0" r="242" stroke-width="4" stroke-dasharray="10 6" />
+          <circle cx="0" cy="0" r="236" stroke-width="4" stroke-dasharray="12 7" />
+        </g>
       </g>
     </g>
 
@@ -1253,9 +1258,67 @@
       </g>
 
       <g id="anti-skate-dial">
-        <circle cx="60" cy="30" r="18" fill="var(--black-0)" />
-        <circle cx="60" cy="30" r="14" fill="var(--gray-2)" />
-        <circle cx="60" cy="30" r="10" fill="var(--black-0)" />
+        <!-- Index marker line on the base plate -->
+        <line x1="38" y1="30" x2="41.5" y2="30" stroke="var(--white-0)" stroke-width="1" opacity="0.9" />
+
+        <!-- Outer knob base and knurled side -->
+        <circle cx="60" cy="30" r="18" fill="#151515" />
+        <circle cx="60" cy="30" r="17.5" fill="none" stroke="#252525" stroke-width="1" stroke-dasharray="0.8 0.8" />
+        <circle cx="60" cy="30" r="16.5" fill="none" stroke="url(#chrome-gradient)" stroke-width="0.8" opacity="0.7" />
+
+        <!-- Matte black knob face -->
+        <circle cx="60" cy="30" r="15" fill="#181818" />
+        <path d="M 60.00 17.00 L 60.00 15.00
+             M 58.85 16.25 L 58.74 15.05
+             M 57.70 16.39 L 57.50 15.21
+             M 56.57 16.63 L 56.27 15.47
+             M 55.46 16.97 L 55.07 15.83
+             M 54.71 18.12 L 53.90 16.30
+             M 53.35 17.91 L 52.77 16.86
+             M 52.36 18.51 L 51.70 17.51
+             M 51.43 19.19 L 50.68 18.24
+             M 50.55 19.94 L 49.73 19.07
+             M 50.34 21.30 L 48.85 19.96
+             M 49.01 21.66 L 48.05 20.93
+             M 48.35 22.61 L 47.34 21.96
+             M 47.77 23.61 L 46.71 23.05
+             M 47.28 24.65 L 46.17 24.19
+             M 47.64 25.98 L 45.73 25.36
+             M 46.56 26.85 L 45.40 26.57
+             M 46.35 27.98 L 45.16 27.81
+             M 46.23 29.13 L 45.03 29.06
+             M 46.20 30.29 L 45.00 30.31
+             M 47.07 31.36 L 45.08 31.57
+             M 46.44 32.59 L 45.27 32.81
+             M 46.71 33.71 L 45.55 34.03
+             M 47.07 34.81 L 45.94 35.23
+             M 47.51 35.88 L 46.43 36.39
+             M 48.74 36.50 L 47.01 37.50
+             M 48.67 37.88 L 47.68 38.56
+             M 49.37 38.80 L 48.44 39.56
+             M 50.14 39.66 L 49.28 40.49
+             M 50.98 40.45 L 50.20 41.35
+             M 52.36 40.52 L 51.18 42.14" stroke="var(--white-0)" stroke-width="0.5" opacity="0.7" />
+
+        <g id="anti-skate-dial-labels" font-size="3" fill="var(--white-0)" font-family="sans-serif" text-anchor="middle"
+          font-weight="bold" opacity="0.9">
+          <text x="60" y="20.5">0</text>
+          <text x="52.6" y="24">2</text>
+          <text x="50" y="32.2">4</text>
+          <text x="54" y="39">6</text>
+        </g>
+
+        <g id="anti-skate-label">
+          <path id="anti-skate-path" d="M 70 20 A 13.5 13.5 0 0 1 64.5 42" fill="none" stroke="none" />
+          <text font-size="3" fill="var(--white-0)" opacity="0.8" font-family="sans-serif" letter-spacing="0.4"
+            font-weight="bold">
+            <textPath href="#anti-skate-path" startOffset="50%" text-anchor="middle">anti-skating</textPath>
+          </text>
+        </g>
+
+        <!-- Center indentation -->
+        <circle cx="60" cy="30" r="7" fill="#0d0d0d" stroke="#252525" stroke-width="0.8" />
+        <circle cx="60" cy="30" r="4.5" fill="#050505" />
       </g>
 
       <g id="tonearm"
