@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { TurntableState } from '../js/TurntableState.js';
+import { TurntableState } from '../lab/TurntableState.js';
 
 describe('TurntableState', () => {
   let state;
@@ -44,7 +44,7 @@ describe('TurntableState', () => {
 
   it('should not sync audio time beyond audio duration', () => {
     state.startPlayback(5.0);
-    state.syncAudioTime(200.0); 
+    state.syncAudioTime(200.0);
     expect(state.currentAudioTime).toBe(100); // Max duration is 100
   });
 

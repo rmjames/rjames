@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { AudioEngine } from '../js/AudioEngine.js';
+import { AudioEngine } from '../lab/AudioEngine.js';
 
 describe('AudioEngine', () => {
   let engine;
@@ -37,7 +37,7 @@ describe('AudioEngine', () => {
     };
 
     window.AudioContext = vi.fn().mockImplementation(() => mockAudioContext);
-    
+
     global.fetch = vi.fn().mockResolvedValue({
       arrayBuffer: vi.fn().mockResolvedValue(new ArrayBuffer(8))
     });
@@ -83,7 +83,7 @@ describe('AudioEngine', () => {
     await engine.load('dummy.mp3');
     const onEnded = vi.fn();
     engine.play(5.0, 1.2, onEnded);
-    
+
     expect(mockAudioContext.createBufferSource).toHaveBeenCalled();
     expect(mockSource.buffer).toBe(mockBuffer);
     expect(mockSource.playbackRate.value).toBe(1.2);
@@ -95,7 +95,7 @@ describe('AudioEngine', () => {
 
   it('should clamp offset in play() to prevent RangeError', async () => {
     await engine.load('dummy.mp3');
-    
+
     // Negative offset
     engine.play(-10.0, 1.0);
     expect(mockSource.start).toHaveBeenLastCalledWith(0, 0);
@@ -107,11 +107,11 @@ describe('AudioEngine', () => {
 
   it('should handle error if currentSource.start throws in play()', async () => {
     await engine.load('dummy.mp3');
-    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => { });
     mockSource.start.mockImplementationOnce(() => {
       throw new Error('Start error');
     });
-    
+
     expect(() => engine.play(0, 1.0)).not.toThrow();
     expect(consoleSpy).toHaveBeenCalledWith('Failed to start play source:', expect.any(Error));
     consoleSpy.mockRestore();
@@ -121,7 +121,7 @@ describe('AudioEngine', () => {
     await engine.load('dummy.mp3');
     engine.play(0, 1.0);
     engine.stop();
-    
+
     expect(mockSource.stop).toHaveBeenCalled();
     expect(mockSource.disconnect).toHaveBeenCalled();
     expect(mockSource.onended).toBeNull();
@@ -131,12 +131,12 @@ describe('AudioEngine', () => {
   it('should handle error if currentSource.stop throws in stop()', async () => {
     await engine.load('dummy.mp3');
     engine.play(0, 1.0);
-    
-    const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => { });
     mockSource.stop.mockImplementationOnce(() => {
       throw new Error('Stop error');
     });
-    
+
     expect(() => engine.stop()).not.toThrow();
     expect(consoleSpy).toHaveBeenCalledWith('Failed to stop play source:', expect.any(Error));
     expect(engine.currentSource).toBeNull();
@@ -153,7 +153,7 @@ describe('AudioEngine', () => {
   it('should play scratch audio in forward direction', async () => {
     await engine.load('dummy.mp3');
     engine.playScratch(2.0, 15.0); // positive velocity
-    
+
     expect(engine.scratchDirection).toBe(1);
     expect(engine.scratchSource).toBeDefined();
     expect(engine.scratchSource.buffer).toBe(engine.forwardBuffer);
@@ -164,18 +164,18 @@ describe('AudioEngine', () => {
   it('should play scratch audio in reverse direction', async () => {
     await engine.load('dummy.mp3');
     engine.playScratch(-2.0, 15.0); // negative velocity
-    
+
     expect(engine.scratchDirection).toBe(-1);
     expect(engine.scratchSource).toBeDefined();
     expect(engine.scratchSource.buffer).toBe(engine.reverseBuffer);
     // startPos = duration (100) - current (15) = 85
-    expect(mockSource.start).toHaveBeenCalledWith(0, 85.0); 
+    expect(mockSource.start).toHaveBeenCalledWith(0, 85.0);
     expect(mockSource.playbackRate.value).toBe(2.0);
   });
 
   it('should clamp start position in playScratch() to prevent RangeError', async () => {
     await engine.load('dummy.mp3');
-    
+
     // Forward direction, too large offset
     engine.playScratch(1.0, 150.0);
     expect(mockSource.start).toHaveBeenLastCalledWith(0, 99.98);
@@ -187,7 +187,7 @@ describe('AudioEngine', () => {
 
   it('should implement hysteresis for playScratch', async () => {
     await engine.load('dummy.mp3');
-    
+
     // 1. Starting stopped: velocity 0.05 (below START_THRESHOLD 0.08) -> should not start
     engine.playScratch(0.05, 10.0);
     expect(engine.scratchDirection).toBe(0);
@@ -215,7 +215,7 @@ describe('AudioEngine', () => {
 
   it('should stop and disconnect previous scratch source when scratch direction changes', async () => {
     await engine.load('dummy.mp3');
-    
+
     // Override createBufferSource to return a new mock source each time
     const createMockSource = () => ({
       connect: vi.fn(),
@@ -234,7 +234,7 @@ describe('AudioEngine', () => {
     engine.playScratch(1.0, 10.0);
     const firstScratchSource = engine.scratchSource;
     expect(firstScratchSource).toBeDefined();
-    
+
     // Change to reverse scratch
     engine.playScratch(-1.0, 10.0);
     expect(firstScratchSource.stop).toHaveBeenCalled();
@@ -245,12 +245,12 @@ describe('AudioEngine', () => {
 
   it('should handle error if scratchSource.start throws', async () => {
     await engine.load('dummy.mp3');
-    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => { });
+
     mockSource.start.mockImplementationOnce(() => {
       throw new Error('Start error');
     });
-    
+
     expect(() => engine.playScratch(1.0, 10.0)).not.toThrow();
     expect(consoleSpy).toHaveBeenCalledWith('Failed to start scratch source:', expect.any(Error));
     consoleSpy.mockRestore();
@@ -260,7 +260,7 @@ describe('AudioEngine', () => {
     await engine.load('dummy.mp3');
     engine.playScratch(2.0, 15.0);
     engine.playScratch(0.01, 16.0); // velocity < 0.03
-    
+
     expect(mockSource.stop).toHaveBeenCalled();
     expect(mockSource.disconnect).toHaveBeenCalled();
     expect(engine.scratchSource).toBeNull();
@@ -269,7 +269,7 @@ describe('AudioEngine', () => {
 
   it('should cap scratch playback rate to 5.0', async () => {
     await engine.load('dummy.mp3');
-    engine.playScratch(10.0, 15.0); 
+    engine.playScratch(10.0, 15.0);
     expect(mockSource.playbackRate.value).toBe(5.0);
   });
 

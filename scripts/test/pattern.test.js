@@ -9,7 +9,7 @@ describe('pattern.js', () => {
     `;
     // Dynamically import the script to execute it in the test environment
     // A unique timestamp is added to avoid caching issues between tests
-    return import('./pattern.js?t=' + new Date().getTime());
+    return import('../pattern.js?t=' + new Date().getTime());
   });
 
   afterEach(() => {

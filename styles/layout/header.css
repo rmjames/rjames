@@ -1,11 +1,20 @@
-header {
+.header {
     display: flex;
     align-items: baseline;
     justify-content: space-between;
     width: 100%;
     min-block-size: 5rem;
 
-    nav ul {
+    h1 {
+        contain: layout paint style;
+    }
+
+    a {
+        filter: var(--text-shadow-subtle);
+        padding-bottom: var(--s);
+    }
+
+    nav>ul {
         display: flex;
         align-items: center;
         transition:
@@ -18,11 +27,6 @@ header {
             opacity: 0.5;
         }
     }
-}
-
-.header a {
-    filter: var(--text-shadow-subtle);
-    padding-bottom: var(--s);
 }
 
 /* Active state for Lab link in header */

@@ -1,11 +1,11 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { TurntableController } from '../js/TurntableController.js';
-import { AudioEngine } from '../js/AudioEngine.js';
-import { TurntableState } from '../js/TurntableState.js';
+import { TurntableController } from '../lab/TurntableController.js';
+import { AudioEngine } from '../lab/AudioEngine.js';
+import { TurntableState } from '../lab/TurntableState.js';
 
 // Mock dependencies
-vi.mock('../js/AudioEngine.js');
-vi.mock('../js/TurntableState.js');
+vi.mock('../lab/AudioEngine.js');
+vi.mock('../lab/TurntableState.js');
 
 describe('TurntableController', () => {
   let controller;
@@ -26,6 +26,7 @@ describe('TurntableController', () => {
       'power-dial': { style: {} },
       'strobe-red-light': { setAttribute: vi.fn(), removeAttribute: vi.fn() },
       'strobe-white-light': { setAttribute: vi.fn() },
+      'power-dial-red-reflection': { setAttribute: vi.fn() },
       'lp': {
         addEventListener: vi.fn(),
         setPointerCapture: vi.fn(),
@@ -188,5 +189,47 @@ describe('TurntableController', () => {
 
     expect(mockElements['lp'].setPointerCapture).toHaveBeenCalledWith(1);
     expect(controller.state.startScratch).toHaveBeenCalled();
+  });
+
+  it('should not play scratch sound when power is off during scratch render loop', () => {
+    controller.isPowerOn = false;
+    controller.state.isScratching = true;
+    controller.state.currentVelocity = 1.5;
+    controller.state.lastScratchTime = performance.now();
+    controller.state.currentAudioTime = 10;
+    controller.state.audioDuration = 100;
+    
+    controller.renderLoop(performance.now());
+    
+    expect(controller.audioEngine.playScratch).not.toHaveBeenCalled();
+    expect(controller.audioEngine.stopScratch).toHaveBeenCalled();
+  });
+
+  it('should return tonearm to rest when power is turned off while scratching', () => {
+    controller.isPowerOn = true;
+    controller.state.isScratching = true;
+    controller.state.wasPlayingBeforeScratch = true;
+    controller.tonearm.style.transform = 'rotate(22deg)';
+    
+    controller.togglePower(); // Turns power OFF
+    
+    expect(controller.isPowerOn).toBe(false);
+    expect(controller.state.wasPlayingBeforeScratch).toBe(false);
+    expect(controller.tonearm.style.transform).toBe('rotate(-25deg)');
+  });
+
+  it('should not resume playback on pointer release if power is off', () => {
+    controller.isPowerOn = false;
+    controller.activeLpPointerId = 1;
+    controller.state.isScratching = true;
+    controller.state.wasPlayingBeforeScratch = true;
+    controller.tonearm.style.transform = 'rotate(22deg)';
+    
+    const upEvent = { pointerId: 1 };
+    controller.onLpPointerUp(upEvent);
+    
+    expect(controller.audioEngine.play).not.toHaveBeenCalled();
+    expect(controller.state.wasPlayingBeforeScratch).toBe(false);
+    expect(controller.tonearm.style.transform).toBe('rotate(-25deg)');
   });
 });
