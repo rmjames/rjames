@@ -14,7 +14,7 @@ describe('h1-animation.js', () => {
     });
 
     it('should split header text on DOMContentLoaded', async () => {
-        await import('./h1-animation.js?t=' + new Date().getTime());
+        await import('../h1-animation.js?t=' + new Date().getTime());
         
         document.dispatchEvent(new Event('DOMContentLoaded'));
 

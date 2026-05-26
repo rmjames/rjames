@@ -29,7 +29,7 @@ describe('index.js', () => {
     `;
 
     // Dynamically import the script to execute it
-    await import('./index.js?t=' + new Date().getTime());
+    await import('../index.js?t=' + new Date().getTime());
   });
 
   afterEach(() => {

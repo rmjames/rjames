@@ -74,7 +74,7 @@ describe('Favicon Animator Performance', () => {
   it('should pre-generate frames on load and use them during animation without calling toDataURL', async () => {
     // Import the script to trigger the IIFE
     // We use a unique query param to ensure the module is re-evaluated for each test run if needed
-    await import('./favicon-animator.js?t=' + Date.now());
+    await import('../favicon-animator.js?t=' + Date.now());
 
     // 1. Verify pre-generation
     // We need to advance timers to allow the recursive requestIdleCallback to complete
@@ -106,7 +106,7 @@ describe('Favicon Animator Performance', () => {
 
   it('should respect path-based shape selection (House for root)', async () => {
     vi.stubGlobal('location', { pathname: '/' });
-    await import('./favicon-animator.js?t=house-' + Date.now());
+    await import('../favicon-animator.js?t=house-' + Date.now());
     
     // Wait for generation
     for (let i = 0; i < 150; i++) await vi.advanceTimersByTimeAsync(1);
@@ -121,7 +121,7 @@ describe('Favicon Animator Performance', () => {
 
   it('should respect path-based shape selection (File for resume)', async () => {
     vi.stubGlobal('location', { pathname: '/resume.html' });
-    await import('./favicon-animator.js?t=resume-' + Date.now());
+    await import('../favicon-animator.js?t=resume-' + Date.now());
     
     // Wait for generation
     for (let i = 0; i < 150; i++) await vi.advanceTimersByTimeAsync(1);
