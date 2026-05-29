@@ -26,14 +26,52 @@ describe('AudioEngine', () => {
       getChannelData: vi.fn().mockReturnValue(new Float32Array(44100))
     };
 
+    const mockOsc = {
+      connect: vi.fn(),
+      start: vi.fn(),
+      stop: vi.fn(),
+      disconnect: vi.fn(),
+      type: 'sine',
+      frequency: {
+        setValueAtTime: vi.fn(),
+        exponentialRampToValueAtTime: vi.fn()
+      },
+      onended: null
+    };
+
+    const mockGain = {
+      connect: vi.fn(),
+      disconnect: vi.fn(),
+      gain: {
+        setValueAtTime: vi.fn(),
+        exponentialRampToValueAtTime: vi.fn()
+      }
+    };
+
+    const mockFilter = {
+      connect: vi.fn(),
+      disconnect: vi.fn(),
+      type: 'bandpass',
+      frequency: {
+        setValueAtTime: vi.fn()
+      },
+      Q: {
+        setValueAtTime: vi.fn()
+      }
+    };
+
     mockAudioContext = {
       decodeAudioData: vi.fn().mockResolvedValue(mockBuffer),
       createBuffer: vi.fn().mockReturnValue(mockBuffer),
       createBufferSource: vi.fn().mockReturnValue(mockSource),
+      createOscillator: vi.fn().mockReturnValue(mockOsc),
+      createGain: vi.fn().mockReturnValue(mockGain),
+      createBiquadFilter: vi.fn().mockReturnValue(mockFilter),
       resume: vi.fn(),
       state: 'suspended',
       destination: {},
-      currentTime: 10.0
+      currentTime: 10.0,
+      sampleRate: 44100
     };
 
     window.AudioContext = vi.fn().mockImplementation(() => mockAudioContext);
@@ -277,5 +315,59 @@ describe('AudioEngine', () => {
     expect(engine.getCurrentTime()).toBe(0);
     await engine.load('dummy.mp3');
     expect(engine.getCurrentTime()).toBe(10.0);
+  });
+
+  it('should play synthesized click sounds with switch preset', () => {
+    engine.audioCtx = mockAudioContext;
+    engine.playClick('switch');
+
+    expect(mockAudioContext.createOscillator).toHaveBeenCalled();
+    expect(mockAudioContext.createGain).toHaveBeenCalled();
+  });
+
+  it('should play synthesized click sounds with custom options', () => {
+    engine.audioCtx = mockAudioContext;
+    engine.playClick({ thumpGain: 0.5, snapGain: 0 });
+
+    expect(mockAudioContext.createOscillator).toHaveBeenCalled();
+    expect(mockAudioContext.createGain).toHaveBeenCalled();
+  });
+
+  it('should play synthesized spray sounds', () => {
+    engine.audioCtx = mockAudioContext;
+    engine.playClick('spray');
+
+    expect(mockAudioContext.createBufferSource).toHaveBeenCalled();
+    expect(mockAudioContext.createBiquadFilter).toHaveBeenCalled();
+    expect(mockAudioContext.createGain).toHaveBeenCalled();
+  });
+
+  it('should fetch, decode, and cache custom sound files in loadCustomSound()', async () => {
+    engine.audioCtx = mockAudioContext;
+    const buffer = await engine.loadCustomSound('custom.mp3');
+    expect(buffer).toBe(mockBuffer);
+    expect(engine.customSoundBuffers['custom.mp3']).toBe(mockBuffer);
+    expect(global.fetch).toHaveBeenCalledWith('custom.mp3');
+  });
+
+  it('should play cached custom sound files directly in playClick()', async () => {
+    engine.audioCtx = mockAudioContext;
+    engine.customSoundBuffers['custom-cached.mp3'] = mockBuffer;
+
+    engine.playClick('custom-cached.mp3');
+
+    // Should create a buffer source for the cached audio buffer
+    expect(mockAudioContext.createBufferSource).toHaveBeenCalled();
+    expect(mockSource.buffer).toBe(mockBuffer);
+  });
+
+  it('should play custom sound files provided via options object in playClick()', () => {
+    engine.audioCtx = mockAudioContext;
+    engine.customSoundBuffers['options-click.wav'] = mockBuffer;
+
+    engine.playClick({ src: 'options-click.wav' });
+
+    expect(mockAudioContext.createBufferSource).toHaveBeenCalled();
+    expect(mockSource.buffer).toBe(mockBuffer);
   });
 });

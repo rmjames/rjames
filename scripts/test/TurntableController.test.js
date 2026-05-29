@@ -75,6 +75,9 @@ describe('TurntableController', () => {
     AudioEngine.prototype.playScratch = vi.fn();
     AudioEngine.prototype.stopScratch = vi.fn();
     AudioEngine.prototype.getCurrentTime = vi.fn().mockReturnValue(0);
+    AudioEngine.prototype.playClick = vi.fn();
+    AudioEngine.prototype.playCustomSound = vi.fn();
+    AudioEngine.prototype.loadCustomSound = vi.fn().mockResolvedValue({});
 
     // Provide default AudioEngine properties
     Object.defineProperty(AudioEngine.prototype, 'forwardBuffer', { value: {}, writable: true });
@@ -231,5 +234,56 @@ describe('TurntableController', () => {
     expect(controller.audioEngine.play).not.toHaveBeenCalled();
     expect(controller.state.wasPlayingBeforeScratch).toBe(false);
     expect(controller.tonearm.style.transform).toBe('rotate(-25deg)');
+  });
+
+  it('should accept soundConfig and map aliases to selectors and preload files', () => {
+    AudioEngine.prototype.loadCustomSound.mockClear();
+    
+    const config = {
+      startButton: 'custom-start.mp3',
+      powerButton: 'custom-power.wav',
+      randomSelector: 'click'
+    };
+    
+    const testController = new TurntableController(config);
+    
+    expect(testController.soundConfig.get('#start-stop-btn')).toBe('custom-start.mp3');
+    expect(testController.soundConfig.get('#power-switch, #power-dial')).toBe('custom-power.wav');
+    expect(testController.soundConfig.get('randomSelector')).toBe('click');
+    expect(testController.audioEngine.loadCustomSound).toHaveBeenCalledWith('custom-start.mp3');
+    expect(testController.audioEngine.loadCustomSound).toHaveBeenCalledWith('custom-power.wav');
+  });
+
+  it('should accept soundConfig as an ES6 Map', () => {
+    AudioEngine.prototype.loadCustomSound.mockClear();
+    
+    const config = new Map([
+      ['startButton', 'custom-map-start.mp3'],
+      ['powerButton', 'custom-map-power.wav']
+    ]);
+    
+    const testController = new TurntableController(config);
+    
+    expect(testController.soundConfig.get('#start-stop-btn')).toBe('custom-map-start.mp3');
+    expect(testController.soundConfig.get('#power-switch, #power-dial')).toBe('custom-map-power.wav');
+    expect(testController.audioEngine.loadCustomSound).toHaveBeenCalledWith('custom-map-start.mp3');
+    expect(testController.audioEngine.loadCustomSound).toHaveBeenCalledWith('custom-map-power.wav');
+  });
+
+  it('should trigger custom sounds on click based on configuration priority', () => {
+    const testController = new TurntableController({
+      startButton: 'custom-start.mp3'
+    });
+
+    testController.audioEngine.playClick.mockClear();
+
+    const element = document.createElement('div');
+    element.id = 'start-stop-btn';
+    document.body.appendChild(element);
+
+    element.click();
+
+    expect(testController.audioEngine.playClick).toHaveBeenCalledWith('custom-start.mp3');
+    element.remove();
   });
 });

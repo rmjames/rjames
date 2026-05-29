@@ -2,7 +2,7 @@ import { AudioEngine } from './AudioEngine.js';
 import { TurntableState } from '../lab/TurntableState.js';
 
 export class TurntableController {
-  constructor() {
+  constructor(soundConfig = {}) {
     this.audioEngine = new AudioEngine();
     this.state = new TurntableState();
 
@@ -38,7 +38,74 @@ export class TurntableController {
     this.activeLpPointerId = null;
     this.activePitchPointerId = null;
 
+    // Config-driven click sounds definition using Map
+    const aliasMap = new Map([
+      ['startButton', '#start-stop-btn'],
+      ['powerButton', '#power-switch, #power-dial'],
+      ['rpm33Button', '#btn-33'],
+      ['rpm45Button', '#btn-45'],
+      ['sprayCapPink', '#spray-cap-pink'],
+      ['sprayCapYellow', '#spray-cap-yellow'],
+      ['libraryButton', '#btn-library'],
+      ['closeLibraryButton', '#close-library'],
+      ['prevAlbumButton', '#btn-prev-album'],
+      ['nextAlbumButton', '#btn-next-album'],
+      ['trackItem', '.details-track-item'],
+      ['crateRecord', '.crate-record']
+    ]);
+
+    const defaultSoundConfig = new Map([
+      ['#power-switch, #power-dial', 'switch'],
+      ['#start-stop-btn', 'cassette'],
+      ['#cassette-buttons .clickable, #cassette-buttons', 'cassette'],
+      ['[id*="spray-cap"]', 'spray'],
+      ['#btn-33', 'click'],
+      ['#btn-45', 'click'],
+      ['.crate-record', 'click'],
+      ['.details-track-item', 'click'],
+      ['button', 'click']
+    ]);
+
+    this.soundConfig = new Map();
+
+    const userEntries = soundConfig instanceof Map ? soundConfig.entries() : Object.entries(soundConfig);
+    for (const [key, value] of userEntries) {
+      const selector = aliasMap.get(key) || key;
+      this.soundConfig.set(selector, value);
+    }
+
+    for (const [selector, value] of defaultSoundConfig.entries()) {
+      if (!this.soundConfig.has(selector)) {
+        this.soundConfig.set(selector, value);
+      }
+    }
+
+    // Pre-load custom sound files if specified in config Map
+    for (const [selector, sound] of this.soundConfig.entries()) {
+      const isFileUrl = typeof sound === 'string' &&
+        (sound.includes('/') || /\.(mp3|wav|ogg|m4a|aac|webm)$/i.test(sound));
+      if (isFileUrl) {
+        this.audioEngine.loadCustomSound(sound).catch(err => {
+          console.warn("Failed to pre-load sound:", sound, err);
+        });
+      }
+    }
+
     this.bindEvents();
+
+    // Global click sound listener using event delegation
+    document.addEventListener('click', (e) => {
+      const target = e.target;
+      for (const [selector, soundType] of this.soundConfig.entries()) {
+        const matched = target.closest(selector);
+        if (matched) {
+          if (soundType && soundType !== 'none') {
+            this.audioEngine.playClick(soundType);
+          }
+          break;
+        }
+      }
+    }, { capture: true, passive: true });
 
     requestAnimationFrame((t) => this.renderLoop(t));
   }
