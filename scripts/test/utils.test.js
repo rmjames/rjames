@@ -50,6 +50,16 @@ describe('utils.js', () => {
             resetAnimation(elements);
             expect(elements[0].style.animation).toBe('');
         });
+
+        it('should accept an array of Elements directly', () => {
+            const el1 = document.createElement('div');
+            const el2 = document.createElement('div');
+            el1.style.animation = 'fade 1s';
+            el2.style.animation = 'fade 1s';
+            resetAnimation([el1, el2]);
+            expect(el1.style.animation).toBe('');
+            expect(el2.style.animation).toBe('');
+        });
     });
 
     describe('splitText', () => {
@@ -69,6 +79,22 @@ describe('utils.js', () => {
             
             expect(spans[4].textContent).toBe('o');
             expect(spans[4].style.getPropertyValue('--letter-index')).toBe('0');
+        });
+
+        it('should use a DocumentFragment to perform batch DOM insertion', () => {
+            const spyCreateFragment = vi.spyOn(document, 'createDocumentFragment');
+            document.body.innerHTML = '<h1 id="test">Hello</h1>';
+            const el = document.getElementById('test');
+            const spyAppendChild = vi.spyOn(el, 'appendChild');
+
+            splitText('#test');
+
+            expect(spyCreateFragment).toHaveBeenCalled();
+            expect(spyAppendChild).toHaveBeenCalledTimes(1);
+            expect(spyAppendChild.mock.calls[0][0]).toBeInstanceOf(DocumentFragment);
+
+            spyCreateFragment.mockRestore();
+            spyAppendChild.mockRestore();
         });
 
         it('should apply the animationClass if provided', () => {

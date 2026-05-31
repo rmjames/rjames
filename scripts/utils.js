@@ -5,8 +5,8 @@
  * @param {string|NodeList|Element[]} selector - A CSS selector, NodeList, or array of elements to reset.
  */
 export function resetAnimation(selector) {
-    const elements = typeof selector === 'string' 
-        ? document.querySelectorAll(selector) 
+    const elements = typeof selector === 'string'
+        ? document.querySelectorAll(selector)
         : selector;
 
     if (!elements || (elements.length === 0 && !(elements instanceof Element))) return;
@@ -37,11 +37,12 @@ export function resetAnimation(selector) {
 export function splitText(selector, animationClass) {
     const element = document.querySelector(selector);
     if (!element) return;
-    
+
     const originalText = element.textContent;
     element.textContent = '';
     element.setAttribute('aria-label', originalText);
-    
+
+    const fragment = document.createDocumentFragment();
     const chars = [...originalText];
     chars.forEach((char, index) => {
         const span = document.createElement('span');
@@ -51,6 +52,7 @@ export function splitText(selector, animationClass) {
         if (animationClass) {
             span.classList.add(animationClass);
         }
-        element.appendChild(span);
+        fragment.appendChild(span);
     });
+    element.appendChild(fragment);
 }
