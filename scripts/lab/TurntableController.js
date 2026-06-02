@@ -29,6 +29,8 @@ export class TurntableController {
     this.powerDialRedReflection = document.getElementById('power-dial-red-reflection');
 
     this.isPowerOn = false;
+    this.isNeedleOnRecord = false;
+    this.visualRotation = 0;
     this.currentRpm = 33;
     this.isDraggingPitch = false;
     this.pitchStartY = 0;
@@ -63,6 +65,7 @@ export class TurntableController {
       ['#btn-45', 'click'],
       ['.crate-record', 'click'],
       ['.details-track-item', 'click'],
+      ['#tonearm', 'click'],
       ['button', 'click']
     ]);
 
@@ -117,11 +120,12 @@ export class TurntableController {
       this.state.stopPlayback(this.audioEngine.getCurrentTime());
       this.audioEngine.stop();
       this.svg.pauseAnimations();
-      this.tonearm.style.transition = 'transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1)';
-      this.tonearm.style.transform = 'rotate(-25deg)';
     }
 
+    this.liftNeedle();
+
     this.state.currentAudioTime = 0;
+    this.visualRotation = 0;
     this.lp.setAttribute('transform', `rotate(0)`);
 
     const success = await this.audioEngine.load(url);
@@ -141,6 +145,9 @@ export class TurntableController {
 
     this.btn.addEventListener('click', () => this.togglePlayback());
     this.powerSwitch.addEventListener('click', () => this.togglePower());
+
+    // Needle events
+    this.tonearm.addEventListener('click', () => this.toggleNeedle());
 
     // Scratching events
     this.lp.addEventListener('pointerdown', (e) => this.onLpPointerDown(e));
@@ -165,9 +172,9 @@ export class TurntableController {
         this.togglePlayback();
       } else if (this.state.isScratching && this.state.wasPlayingBeforeScratch) {
         this.state.wasPlayingBeforeScratch = false;
-        this.tonearm.style.transition = 'transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1)';
-        this.tonearm.style.transform = 'rotate(-25deg)';
+        this.liftNeedle();
       }
+      this.audioEngine.stopScratch();
     }
     this.updateLights();
   }
@@ -225,6 +232,56 @@ export class TurntableController {
     this.state.applyPitch(this.state.pitchMultiplier, this.audioEngine.getCurrentTime());
   }
 
+  dropNeedle() {
+    this.isNeedleOnRecord = true;
+    this.tonearm.style.transition = 'transform 0.6s cubic-bezier(0.34, 1.489, 0.64, 1)';
+    this.tonearm.style.transform = 'rotate(22deg)';
+
+    if (this.isPowerOn && this.state.isPlaying) {
+      this.audioEngine.stop();
+      setTimeout(() => {
+        if (this.isNeedleOnRecord && this.isPowerOn && this.state.isPlaying) {
+          this.state.startPlayback(this.audioEngine.getCurrentTime());
+          this.audioEngine.play(this.state.currentAudioTime, this.state.effectivePlaybackRate, () => {
+            if (this.state.isPlaying && this.state.currentAudioTime >= this.state.audioDuration - 0.1) {
+              this.state.isPlaying = false;
+              this.state.currentAudioTime = this.state.audioDuration;
+              this.svg.pauseAnimations();
+              this.liftNeedle();
+            }
+          });
+          this.svg.unpauseAnimations();
+        }
+      }, 600);
+    }
+  }
+
+  liftNeedle() {
+    if (this.isNeedleOnRecord) {
+      if (this.state.isPlaying && !this.state.isScratching) {
+        this.state.syncAudioTime(this.audioEngine.getCurrentTime());
+        this.state.startOffset = this.state.currentAudioTime;
+      }
+      this.isNeedleOnRecord = false;
+    }
+    this.tonearm.style.transition = 'transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1)';
+    this.tonearm.style.transform = 'rotate(-25deg)';
+
+    this.audioEngine.stop();
+    this.audioEngine.stopScratch();
+  }
+
+  toggleNeedle() {
+    if (!this.audioEngine.forwardBuffer) return;
+    this.audioEngine.resume();
+
+    if (this.isNeedleOnRecord) {
+      this.liftNeedle();
+    } else {
+      this.dropNeedle();
+    }
+  }
+
   togglePlayback() {
     if (!this.audioEngine.forwardBuffer) return; // not loaded
     this.audioEngine.resume();
@@ -236,30 +293,23 @@ export class TurntableController {
         this.state.currentAudioTime = 0;
       }
 
-      this.tonearm.style.transition = 'transform 0.6s cubic-bezier(0.34, 1.489, 0.64, 1)';
-      this.tonearm.style.transform = 'rotate(22deg)';
+      this.state.startPlayback(this.audioEngine.getCurrentTime());
+      this.svg.unpauseAnimations();
 
-      setTimeout(() => {
-        if (this.tonearm.style.transform === 'rotate(22deg)') {
-          this.state.startPlayback(this.audioEngine.getCurrentTime());
-          this.audioEngine.play(this.state.currentAudioTime, this.state.effectivePlaybackRate, () => {
-            // End callback
-            if (this.state.isPlaying && this.state.currentAudioTime >= this.state.audioDuration - 0.1) {
-              this.state.isPlaying = false;
-              this.state.currentAudioTime = this.state.audioDuration;
-              this.svg.pauseAnimations();
-              this.tonearm.style.transform = 'rotate(-25deg)';
-            }
-          });
-          this.svg.unpauseAnimations();
-        }
-      }, 600);
+      if (this.isNeedleOnRecord) {
+        this.audioEngine.play(this.state.currentAudioTime, this.state.effectivePlaybackRate, () => {
+          if (this.state.isPlaying && this.state.currentAudioTime >= this.state.audioDuration - 0.1) {
+            this.state.isPlaying = false;
+            this.state.currentAudioTime = this.state.audioDuration;
+            this.svg.pauseAnimations();
+            this.liftNeedle();
+          }
+        });
+      }
     } else {
       this.state.stopPlayback(this.audioEngine.getCurrentTime());
       this.audioEngine.stop();
       this.svg.pauseAnimations();
-      this.tonearm.style.transition = 'transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1)';
-      this.tonearm.style.transform = 'rotate(-25deg)';
     }
   }
 
@@ -319,18 +369,19 @@ export class TurntableController {
     if (this.state.wasPlayingBeforeScratch) {
       if (this.isPowerOn) {
         this.state.startPlayback(this.audioEngine.getCurrentTime());
-        this.audioEngine.play(this.state.currentAudioTime, this.state.effectivePlaybackRate, () => {
-          if (this.state.isPlaying && this.state.currentAudioTime >= this.state.audioDuration - 0.1) {
-            this.state.isPlaying = false;
-            this.state.currentAudioTime = this.state.audioDuration;
-            this.svg.pauseAnimations();
-            this.tonearm.style.transform = 'rotate(-25deg)';
-          }
-        });
+        if (this.isNeedleOnRecord) {
+          this.audioEngine.play(this.state.currentAudioTime, this.state.effectivePlaybackRate, () => {
+            if (this.state.isPlaying && this.state.currentAudioTime >= this.state.audioDuration - 0.1) {
+              this.state.isPlaying = false;
+              this.state.currentAudioTime = this.state.audioDuration;
+              this.svg.pauseAnimations();
+              this.liftNeedle();
+            }
+          });
+        }
       } else {
         this.state.wasPlayingBeforeScratch = false;
-        this.tonearm.style.transition = 'transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1)';
-        this.tonearm.style.transform = 'rotate(-25deg)';
+        this.liftNeedle();
       }
     }
   }
@@ -412,18 +463,26 @@ export class TurntableController {
       if (this.state.currentAudioTime < 0) this.state.currentAudioTime = 0;
       if (this.state.currentAudioTime > this.state.audioDuration) this.state.currentAudioTime = this.state.audioDuration;
 
-      if (this.isPowerOn) {
+      if (this.isPowerOn && this.isNeedleOnRecord) {
         this.audioEngine.playScratch(this.smoothedVelocity, this.state.currentAudioTime);
       } else {
         this.audioEngine.stopScratch();
       }
 
+      this.visualRotation = (this.state.currentAudioTime / this.SECONDS_PER_DEGREE) % 360;
+
     } else if (this.state.isPlaying) {
-      this.state.syncAudioTime(this.audioEngine.getCurrentTime());
+      if (this.isNeedleOnRecord) {
+        this.state.syncAudioTime(this.audioEngine.getCurrentTime());
+        this.visualRotation = (this.state.currentAudioTime / this.SECONDS_PER_DEGREE) % 360;
+      } else {
+        this.state.lastStartTime = this.audioEngine.getCurrentTime();
+        const degreesPerSecond = this.state.effectivePlaybackRate / this.SECONDS_PER_DEGREE;
+        this.visualRotation = (this.visualRotation + degreesPerSecond * dt) % 360;
+      }
     }
 
-    const rotation = (this.state.currentAudioTime / this.SECONDS_PER_DEGREE) % 360;
-    this.lp.setAttribute('transform', `rotate(${rotation})`);
+    this.lp.setAttribute('transform', `rotate(${this.visualRotation})`);
 
     requestAnimationFrame((t) => this.renderLoop(t));
   }

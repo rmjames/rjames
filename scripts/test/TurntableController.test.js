@@ -14,7 +14,7 @@ describe('TurntableController', () => {
   beforeEach(() => {
     mockElements = {
       'start-stop-btn': { addEventListener: vi.fn() },
-      'tonearm': { style: {} },
+      'tonearm': { style: {}, addEventListener: vi.fn() },
       'btn-33': { addEventListener: vi.fn() },
       'btn-45': { addEventListener: vi.fn() },
       'btn-33-cap': { setAttribute: vi.fn() },
@@ -285,5 +285,115 @@ describe('TurntableController', () => {
 
     expect(testController.audioEngine.playClick).toHaveBeenCalledWith('custom-start.mp3');
     element.remove();
+  });
+
+  it('should toggle needle on and off the record when tonearm is clicked', () => {
+    controller.audioEngine.forwardBuffer = {}; // Mock loaded buffer
+    controller.isNeedleOnRecord = false;
+
+    // Toggle ON
+    controller.toggleNeedle();
+    expect(controller.isNeedleOnRecord).toBe(true);
+    expect(controller.tonearm.style.transform).toBe('rotate(22deg)');
+
+    // Toggle OFF
+    controller.toggleNeedle();
+    expect(controller.isNeedleOnRecord).toBe(false);
+    expect(controller.tonearm.style.transform).toBe('rotate(-25deg)');
+  });
+
+  it('should play scratch noise only if power is on AND needle is on record', () => {
+    controller.state.isScratching = true;
+    controller.state.currentVelocity = 1.5;
+    controller.state.lastScratchTime = performance.now();
+    controller.state.currentAudioTime = 10;
+    controller.state.audioDuration = 100;
+
+    // Case 1: Power ON, Needle ON -> should play scratch
+    controller.isPowerOn = true;
+    controller.isNeedleOnRecord = true;
+    controller.renderLoop(performance.now());
+    expect(controller.audioEngine.playScratch).toHaveBeenCalled();
+
+    controller.audioEngine.playScratch.mockClear();
+
+    // Case 2: Power ON, Needle OFF -> should NOT play scratch
+    controller.isPowerOn = true;
+    controller.isNeedleOnRecord = false;
+    controller.renderLoop(performance.now());
+    expect(controller.audioEngine.playScratch).not.toHaveBeenCalled();
+    expect(controller.audioEngine.stopScratch).toHaveBeenCalled();
+
+    controller.audioEngine.playScratch.mockClear();
+    controller.audioEngine.stopScratch.mockClear();
+
+    // Case 3: Power OFF, Needle ON -> should NOT play scratch
+    controller.isPowerOn = false;
+    controller.isNeedleOnRecord = true;
+    controller.renderLoop(performance.now());
+    expect(controller.audioEngine.playScratch).not.toHaveBeenCalled();
+    expect(controller.audioEngine.stopScratch).toHaveBeenCalled();
+  });
+
+  it('should only sync audio time if needle is on the record during playback', () => {
+    controller.state.isPlaying = true;
+    controller.state.syncAudioTime.mockClear();
+
+    // Case 1: Needle ON -> should sync audio time
+    controller.isNeedleOnRecord = true;
+    controller.renderLoop(performance.now());
+    expect(controller.state.syncAudioTime).toHaveBeenCalled();
+
+    controller.state.syncAudioTime.mockClear();
+
+    // Case 2: Needle OFF -> should NOT sync audio time (updates lastStartTime instead)
+    controller.isNeedleOnRecord = false;
+    controller.renderLoop(performance.now());
+    expect(controller.state.syncAudioTime).not.toHaveBeenCalled();
+  });
+
+  it('should start playback and unpause animations but NOT play audio if playback is toggled ON but needle is OFF the record', () => {
+    controller.audioEngine.forwardBuffer = {}; // Mock loaded buffer
+    controller.isPowerOn = true;
+    controller.isNeedleOnRecord = false;
+    controller.state.isPlaying = false;
+    controller.audioEngine.play.mockClear();
+
+    controller.togglePlayback();
+
+    expect(controller.state.startPlayback).toHaveBeenCalled();
+    expect(controller.svg.unpauseAnimations).toHaveBeenCalled();
+    expect(controller.audioEngine.play).not.toHaveBeenCalled();
+  });
+
+  it('should play audio if playback is toggled ON and needle is ON the record', () => {
+    controller.audioEngine.forwardBuffer = {}; // Mock loaded buffer
+    controller.isPowerOn = true;
+    controller.isNeedleOnRecord = true;
+    controller.state.isPlaying = false;
+    controller.audioEngine.play.mockClear();
+
+    controller.togglePlayback();
+
+    expect(controller.state.startPlayback).toHaveBeenCalled();
+    expect(controller.svg.unpauseAnimations).toHaveBeenCalled();
+    expect(controller.audioEngine.play).toHaveBeenCalled();
+  });
+
+  it('should visually spin the record even if the needle is OFF the record during playback', () => {
+    controller.isNeedleOnRecord = false;
+    controller.state.isPlaying = true;
+    controller.visualRotation = 10;
+    Object.defineProperty(controller.state, 'effectivePlaybackRate', { value: 1.0, writable: true });
+    controller.SECONDS_PER_DEGREE = 1.8 / 360;
+
+    // Simulate 1 second elapsed
+    controller.state.lastRealTime = 1000;
+    controller.renderLoop(2000); // 1000ms delta (1s)
+
+    // degreesPerSecond = 1.0 / (1.8 / 360) = 200 degrees/sec
+    // expected new visual rotation = (10 + 200) = 210
+    expect(controller.visualRotation).toBeCloseTo(210);
+    expect(mockElements['lp'].setAttribute).toHaveBeenCalledWith('transform', 'rotate(210)');
   });
 });
