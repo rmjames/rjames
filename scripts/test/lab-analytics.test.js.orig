@@ -16,7 +16,7 @@ vi.stubGlobal('IntersectionObserver', class {
     this.callback = callback;
   }
   observe(element) {
-    this.callback([{ isIntersecting: true, target: element }], this);
+    this.callback([{ isIntersecting: true, target: element }]);
   }
   unobserve() {}
   disconnect() {}
@@ -45,7 +45,7 @@ describe('lab-analytics.js', () => {
             <button id="generic-btn">Click Me</button>
             <button id="tracked-btn" data-analytics-element="Tracked Button">Tracked</button>
         `;
-        
+
         // Mock contentWindow and contentDocument
         Object.defineProperty(iframe, 'contentDocument', {
             get: () => mockDoc,
@@ -70,9 +70,9 @@ describe('lab-analytics.js', () => {
 
   it('should track hover on iframe wrapper', () => {
     initLabAnalytics();
-    
+
     const wrapper = document.querySelector('article');
-    
+
     const event = new Event('mouseenter');
     wrapper.dispatchEvent(event);
 
@@ -85,9 +85,9 @@ describe('lab-analytics.js', () => {
 
   it('should track focus on iframe wrapper', () => {
     initLabAnalytics();
-    
+
     const wrapper = document.querySelector('article');
-    
+
     const event = new Event('focus');
     wrapper.dispatchEvent(event);
 
@@ -103,7 +103,7 @@ describe('lab-analytics.js', () => {
 
     const iframe = document.querySelector('#iframe1');
     const genericBtn = iframe.contentDocument.getElementById('generic-btn');
-    
+
     // Simulate click inside iframe on generic element
     const event = new Event('click', { bubbles: true });
     genericBtn.dispatchEvent(event);
@@ -113,7 +113,7 @@ describe('lab-analytics.js', () => {
         event_label: 'Body Click',
         transport_type: 'beacon',
     });
-    
+
     expect(iframe.dataset.analyticsAttached).toBe("true");
   });
 
@@ -122,7 +122,7 @@ describe('lab-analytics.js', () => {
 
     const iframe = document.querySelector('#iframe1');
     const trackedBtn = iframe.contentDocument.getElementById('tracked-btn');
-    
+
     // Simulate click inside iframe on tracked element
     const event = new Event('click', { bubbles: true });
     trackedBtn.dispatchEvent(event);
@@ -149,13 +149,13 @@ describe('lab-analytics.js', () => {
       non_interaction: true,
     });
   });
-  
+
   it('should attach click listener to iframe body on load', () => {
     // Setup an iframe without body initially (simulating loading)
     const iframe3 = document.createElement('iframe');
     iframe3.title = 'Demo 3';
     iframe3.id = 'iframe3';
-    
+
     // Mock empty initially
     Object.defineProperty(iframe3, 'contentDocument', {
         get: () => null,
@@ -165,19 +165,19 @@ describe('lab-analytics.js', () => {
         get: () => ({ document: null }),
         configurable: true
     });
-    
+
     const article = document.createElement('article');
     article.appendChild(iframe3);
     document.querySelector('.demo-examples').appendChild(article);
-    
+
     initLabAnalytics();
-    
+
     expect(iframe3.dataset.analyticsAttached).toBeUndefined();
-    
+
     // Now simulate load and body availability
     const mockDoc = document.implementation.createHTMLDocument();
     mockDoc.body.innerHTML = '<button id="btn">Click</button>';
-    
+
     Object.defineProperty(iframe3, 'contentDocument', {
         get: () => mockDoc,
         configurable: true
@@ -186,12 +186,12 @@ describe('lab-analytics.js', () => {
         get: () => ({ document: mockDoc }),
         configurable: true
     });
-    
+
     iframe3.dispatchEvent(new Event('load'));
-    
+
     // Simulate generic click
     mockDoc.body.dispatchEvent(new Event('click'));
-    
+
     expect(global.gtag).toHaveBeenCalledWith('event', 'click', {
         event_category: 'Demo 3', // Project Name
         event_label: 'Body Click',

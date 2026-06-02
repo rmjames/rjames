@@ -13,7 +13,7 @@ export function initLabAnalytics() {
                 iframeDoc.body.addEventListener("click", (event) => {
                     // Check for specific element tracking
                     const target = event.target.closest('[data-analytics-element]');
-                    
+
                     if (target) {
                          const elementLabel = target.getAttribute('data-analytics-element');
                          const eventData = {
@@ -36,7 +36,7 @@ export function initLabAnalytics() {
                         }
                     }
                 });
-                
+
                 // Track hover on specific elements inside iframe
                 const trackedElements = iframeDoc.querySelectorAll('[data-analytics-element]');
                 trackedElements.forEach(el => {
@@ -61,7 +61,7 @@ export function initLabAnalytics() {
     };
 
     // IntersectionObserver for lazy-loading and analytics attachment (PERF-29, PERF-31)
-    const observer = new IntersectionObserver((entries, obs) => {
+    const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 const iframe = entry.target;
@@ -71,9 +71,6 @@ export function initLabAnalytics() {
                 }
                 // Try attaching immediately in case it's already loaded or fast
                 attachIframeListener(iframe);
-
-                // Performance optimization: Stop observing after lazy-loading
-                obs.unobserve(iframe);
             }
         });
     }, {
