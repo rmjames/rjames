@@ -1,0 +1,11 @@
+--- scripts/test/lab-analytics.test.js
++++ scripts/test/lab-analytics.test.js
+@@ -14,7 +14,7 @@
+     this.callback = callback;
+   }
+   observe(element) {
+-    this.callback([{ isIntersecting: true, target: element }]);
++    this.callback([{ isIntersecting: true, target: element }], this);
+   }
+   unobserve() {}
+   disconnect() {}
