@@ -1,4 +1,4 @@
-const cacheName = 'v19'; // Bumped to v19 to fix 404s by ensuring all scripts are available and cached correctly
+const cacheName = 'v20'; // Bumped to v20 to clear cache for decoupled platter/needle updates
 
 const assetsToCache = [
   '/index.html',
