@@ -287,6 +287,48 @@ describe('TurntableController', () => {
     element.remove();
   });
 
+  it('should trigger haptic vibration on click for main switches', () => {
+    const mockVibrate = vi.fn();
+    vi.stubGlobal('navigator', {
+      vibrate: mockVibrate
+    });
+
+    const testController = new TurntableController({
+      startButton: 'custom-start.mp3'
+    });
+
+    const element = document.createElement('div');
+    element.id = 'start-stop-btn';
+    document.body.appendChild(element);
+
+    element.click();
+
+    expect(mockVibrate).toHaveBeenCalledWith(30);
+    element.remove();
+    vi.unstubAllGlobals();
+  });
+
+  it('should trigger standard haptic vibration on click for standard buttons', () => {
+    const mockVibrate = vi.fn();
+    vi.stubGlobal('navigator', {
+      vibrate: mockVibrate
+    });
+
+    const testController = new TurntableController({
+      btn33: 'click'
+    });
+
+    const element = document.createElement('button');
+    element.id = 'btn-33';
+    document.body.appendChild(element);
+
+    element.click();
+
+    expect(mockVibrate).toHaveBeenCalledWith(15);
+    element.remove();
+    vi.unstubAllGlobals();
+  });
+
   it('should toggle needle on and off the record when tonearm is clicked', () => {
     controller.audioEngine.forwardBuffer = {}; // Mock loaded buffer
     controller.isNeedleOnRecord = false;
