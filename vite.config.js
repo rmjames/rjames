@@ -23,6 +23,7 @@ const copyStaticFiles = () => {
                 { src: 'sw.js', dest: 'sw.js' },
                 { src: 'robot.txt', dest: 'robot.txt' },
                 { src: 'sitemap.xml', dest: 'sitemap.xml' },
+                { src: 'llms.txt', dest: 'llms.txt' },
                 { src: 'scripts/register-sw.js', dest: 'scripts/register-sw.js' },
                 { src: 'scripts/analytics-loader.js', dest: 'scripts/analytics-loader.js' },
                 { src: 'scripts/copyright.js', dest: 'scripts/copyright.js' },

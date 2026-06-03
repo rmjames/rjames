@@ -97,6 +97,7 @@
       border-radius: 16px;
       border: 1px solid lch(100% 0.01 296.81 / 0.05);
       padding: 20px;
+      contain: layout style;
     }
 
     /* 3D Records Stack Wrapper */
@@ -355,9 +356,8 @@
     }
 
     .details-track-item.playing::after {
-      content: '⚡';
+      content: '💿';
       font-size: 11px;
-      color: lch(80% 100 90);
     }
 
     /* Mini Milk Crate Button Styles */
@@ -888,7 +888,6 @@
         width: 100%;
         box-sizing: border-box;
         padding: 15px 10px;
-        contain: layout paint style;
       }
 
       .details-section {
@@ -1322,7 +1321,7 @@
       </g>
 
       <g id="tonearm"
-        style="transform-origin: 0px 0px; transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1); transform: rotate(-25deg);">
+        style="transform-origin: 0px 0px; transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1); transform: rotate(-25deg); cursor: pointer;">
 
         <g id="tonearm-pivot-cap">
           <circle cx="0" cy="0" r="15" fill="var(--gray-0)" filter="url(#chrome-gradient)" />
@@ -1516,7 +1515,10 @@
       });
     });
 
-    function updateCrateView() {
+    function updateCrateView(triggerHaptic = false) {
+      if (triggerHaptic && navigator.vibrate) {
+        navigator.vibrate(15);
+      }
       const records = crateRecordsContainer.querySelectorAll('.crate-record');
 
       // Update crate counter
@@ -1617,12 +1619,12 @@
         if (e.key === 'ArrowLeft') {
           if (activeAlbumIndex > 0) {
             activeAlbumIndex--;
-            updateCrateView();
+            updateCrateView(true);
           }
         } else if (e.key === 'ArrowRight') {
           if (activeAlbumIndex < albums.length - 1) {
             activeAlbumIndex++;
-            updateCrateView();
+            updateCrateView(true);
           }
         }
       }
