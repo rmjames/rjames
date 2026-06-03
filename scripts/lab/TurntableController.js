@@ -104,6 +104,17 @@ export class TurntableController {
         if (matched) {
           if (soundType && soundType !== 'none') {
             this.audioEngine.playClick(soundType);
+
+            // Provide haptic feedback when a control element is selected/clicked
+            if (navigator.vibrate) {
+              if (selector.includes('power') || selector.includes('start-stop')) {
+                navigator.vibrate(30); // stronger vibration for main mechanical switches
+              } else if (selector === '.details-track-item') {
+                navigator.vibrate(30); // solid vibration for track selection
+              } else {
+                navigator.vibrate(15); // light tap for standard buttons / RPM selectors / record flipping
+              }
+            }
           }
           break;
         }
