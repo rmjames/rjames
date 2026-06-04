@@ -138,6 +138,45 @@ describe('TurntableController', () => {
     expect(mockElements['lp'].setAttribute).toHaveBeenCalledWith('transform', 'rotate(0)');
   });
 
+  it('should start playback and spin record on track switch if power is on and it was spinning before', async () => {
+    controller.isPowerOn = true;
+    controller.state.isPlaying = true;
+    controller.isNeedleOnRecord = false;
+    controller.state.startPlayback.mockClear();
+    controller.svg.unpauseAnimations.mockClear();
+
+    await controller.initAudio('new-track.mp3');
+
+    expect(controller.state.startPlayback).toHaveBeenCalled();
+    expect(controller.svg.unpauseAnimations).toHaveBeenCalled();
+  });
+
+  it('should NOT start playback or spin record on track switch if power is on but it was NOT spinning before', async () => {
+    controller.isPowerOn = true;
+    controller.state.isPlaying = false;
+    controller.isNeedleOnRecord = false;
+    controller.state.startPlayback.mockClear();
+    controller.svg.unpauseAnimations.mockClear();
+
+    await controller.initAudio('new-track.mp3');
+
+    expect(controller.state.startPlayback).not.toHaveBeenCalled();
+    expect(controller.svg.unpauseAnimations).not.toHaveBeenCalled();
+  });
+
+  it('should NOT start platter when power is turned on', () => {
+    controller.isPowerOn = false;
+    controller.state.isPlaying = false;
+    controller.state.startPlayback.mockClear();
+    controller.svg.unpauseAnimations.mockClear();
+
+    controller.togglePower(); // Turns ON
+
+    expect(controller.isPowerOn).toBe(true);
+    expect(controller.state.startPlayback).not.toHaveBeenCalled();
+    expect(controller.svg.unpauseAnimations).not.toHaveBeenCalled();
+  });
+
   it('should update speed correctly for 45 RPM', () => {
     controller.setSpeed(45);
     expect(controller.state.setSpeed).toHaveBeenCalledWith(45);
@@ -303,7 +342,7 @@ describe('TurntableController', () => {
 
     element.click();
 
-    expect(mockVibrate).toHaveBeenCalledWith(30);
+    expect(mockVibrate).toHaveBeenCalledWith(12);
     element.remove();
     vi.unstubAllGlobals();
   });
@@ -324,7 +363,28 @@ describe('TurntableController', () => {
 
     element.click();
 
-    expect(mockVibrate).toHaveBeenCalledWith(15);
+    expect(mockVibrate).toHaveBeenCalledWith(8);
+    element.remove();
+    vi.unstubAllGlobals();
+  });
+
+  it('should trigger track item haptic vibration on click for track selection', () => {
+    const mockVibrate = vi.fn();
+    vi.stubGlobal('navigator', {
+      vibrate: mockVibrate
+    });
+
+    const testController = new TurntableController({
+      trackItem: 'click'
+    });
+
+    const element = document.createElement('div');
+    element.className = 'details-track-item';
+    document.body.appendChild(element);
+
+    element.click();
+
+    expect(mockVibrate).toHaveBeenCalledWith(4);
     element.remove();
     vi.unstubAllGlobals();
   });

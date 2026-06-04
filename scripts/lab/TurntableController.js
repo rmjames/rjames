@@ -108,11 +108,11 @@ export class TurntableController {
             // Provide haptic feedback when a control element is selected/clicked
             if (navigator.vibrate) {
               if (selector.includes('power') || selector.includes('start-stop')) {
-                navigator.vibrate(30); // stronger vibration for main mechanical switches
+                navigator.vibrate(12); // stronger vibration for main mechanical switches
               } else if (selector === '.details-track-item') {
-                navigator.vibrate(30); // solid vibration for track selection
+                navigator.vibrate(4); // solid vibration for track selection
               } else {
-                navigator.vibrate(15); // light tap for standard buttons / RPM selectors / record flipping
+                navigator.vibrate(8); // light tap for standard buttons / RPM selectors / record flipping
               }
             }
           }
@@ -126,6 +126,7 @@ export class TurntableController {
 
   async initAudio(url) {
     this.loadingDiv.style.display = 'flex';
+    const wasPlaying = this.state.isPlaying;
 
     if (this.state.isPlaying) {
       this.state.stopPlayback(this.audioEngine.getCurrentTime());
@@ -144,7 +145,11 @@ export class TurntableController {
       this.state.audioDuration = this.audioEngine.audioDuration;
       this.loadingDiv.style.display = 'none';
       this.setSpeed(this.currentRpm || 33); // init defaults or keep current
-      this.svg.pauseAnimations();
+      if (this.isPowerOn && wasPlaying) {
+        this.startPlatter();
+      } else {
+        this.svg.pauseAnimations();
+      }
     } else {
       this.loadingDiv.innerText = "Error decoding audio.";
     }
@@ -293,30 +298,36 @@ export class TurntableController {
     }
   }
 
+  startPlatter() {
+    if (!this.audioEngine.forwardBuffer) return;
+    this.audioEngine.resume();
+
+    if (this.state.currentAudioTime >= this.state.audioDuration - .1) {
+      this.state.currentAudioTime = 0;
+    }
+
+    this.state.startPlayback(this.audioEngine.getCurrentTime());
+    this.svg.unpauseAnimations();
+
+    if (this.isNeedleOnRecord) {
+      this.audioEngine.play(this.state.currentAudioTime, this.state.effectivePlaybackRate, () => {
+        if (this.state.isPlaying && this.state.currentAudioTime >= this.state.audioDuration - .1) {
+          this.state.isPlaying = false;
+          this.state.currentAudioTime = this.state.audioDuration;
+          this.svg.pauseAnimations();
+          this.liftNeedle();
+        }
+      });
+    }
+  }
+
   togglePlayback() {
     if (!this.audioEngine.forwardBuffer) return; // not loaded
     this.audioEngine.resume();
 
     if (!this.state.isPlaying) {
       if (!this.isPowerOn) return; // Don't play if power is off
-
-      if (this.state.currentAudioTime >= this.state.audioDuration - 0.1) {
-        this.state.currentAudioTime = 0;
-      }
-
-      this.state.startPlayback(this.audioEngine.getCurrentTime());
-      this.svg.unpauseAnimations();
-
-      if (this.isNeedleOnRecord) {
-        this.audioEngine.play(this.state.currentAudioTime, this.state.effectivePlaybackRate, () => {
-          if (this.state.isPlaying && this.state.currentAudioTime >= this.state.audioDuration - 0.1) {
-            this.state.isPlaying = false;
-            this.state.currentAudioTime = this.state.audioDuration;
-            this.svg.pauseAnimations();
-            this.liftNeedle();
-          }
-        });
-      }
+      this.startPlatter();
     } else {
       this.state.stopPlayback(this.audioEngine.getCurrentTime());
       this.audioEngine.stop();
@@ -379,17 +390,7 @@ export class TurntableController {
 
     if (this.state.wasPlayingBeforeScratch) {
       if (this.isPowerOn) {
-        this.state.startPlayback(this.audioEngine.getCurrentTime());
-        if (this.isNeedleOnRecord) {
-          this.audioEngine.play(this.state.currentAudioTime, this.state.effectivePlaybackRate, () => {
-            if (this.state.isPlaying && this.state.currentAudioTime >= this.state.audioDuration - 0.1) {
-              this.state.isPlaying = false;
-              this.state.currentAudioTime = this.state.audioDuration;
-              this.svg.pauseAnimations();
-              this.liftNeedle();
-            }
-          });
-        }
+        this.startPlatter();
       } else {
         this.state.wasPlayingBeforeScratch = false;
         this.liftNeedle();
