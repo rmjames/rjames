@@ -28,7 +28,7 @@ vi.stubGlobal('requestIdleCallback', (cb) => {
 // However, the problem is that 'afterEach' clears the DOM, removing elements with listeners.
 // So we need to re-attach listeners.
 // Best approach: Export the init function from the module so we can call it manually in tests.
-import { initAnalytics } from './analytics.js';
+import { initAnalytics } from '../analytics.js';
 
 describe('analytics.js', () => {
   beforeEach(async () => {
