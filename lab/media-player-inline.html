@@ -144,13 +144,6 @@
                 const remaining = (audio.duration || 0) - audio.currentTime;
                 durationTimeEl.textContent = `-${formatTime(remaining)}`;
             }
-            if (event === 'timeupdate') {
-                const progress = (audio.currentTime / audio.duration) * 100 || 0;
-                slider.value = progress;
-                currentTimeEl.textContent = formatTime(audio.currentTime);
-                const remaining = (audio.duration || 0) - audio.currentTime;
-                durationTimeEl.textContent = `-${formatTime(remaining)}`;
-            }
             if (event === 'trackChanged') {
                 UI.updateTrackInfo({ title: titleEl, artist: artistEl }, data);
                 // Reset UI for new track
@@ -161,6 +154,15 @@
 
                 updateMarquee(titleEl);
             }
+        });
+
+        // Handle timeupdate directly on the audio element
+        audio.addEventListener('timeupdate', () => {
+            const progress = (audio.currentTime / audio.duration) * 100 || 0;
+            slider.value = progress;
+            currentTimeEl.textContent = formatTime(audio.currentTime);
+            const remaining = (audio.duration || 0) - audio.currentTime;
+            durationTimeEl.textContent = `-${formatTime(remaining)}`;
         });
 
         // Ensure duration updates when audio metadata is loaded
