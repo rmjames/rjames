@@ -6,13 +6,13 @@ global.gtag = vi.fn();
 // Mock IntersectionObserver
 let intersectionCallback;
 const observerInstance = {
-    observe: vi.fn(),
-    unobserve: vi.fn(),
-    disconnect: vi.fn(),
+  observe: vi.fn(),
+  unobserve: vi.fn(),
+  disconnect: vi.fn(),
 };
 const mockIntersectionObserver = vi.fn((cb) => {
-    intersectionCallback = cb;
-    return observerInstance;
+  intersectionCallback = cb;
+  return observerInstance;
 });
 vi.stubGlobal('IntersectionObserver', mockIntersectionObserver);
 
@@ -90,9 +90,9 @@ describe('analytics.js', () => {
     intersectionCallback([{ isIntersecting: true, target: section }], observerInstance);
 
     expect(global.gtag).toHaveBeenCalledWith('event', 'view_item', {
-        event_category: 'Section Visibility',
-        event_label: 'About',
-        non_interaction: true,
+      event_category: 'Section Visibility',
+      event_label: 'About',
+      non_interaction: true,
     });
     // Check that unobserve was called
     expect(observerInstance.unobserve).toHaveBeenCalledWith(section);
@@ -109,7 +109,7 @@ describe('analytics.js', () => {
 
   it('should track custom data-analytics-link hover', () => {
     const link = document.querySelector('[data-analytics-link]');
-    const event = new Event('mouseenter');
+    const event = new MouseEvent('mouseover', { bubbles: true });
     link.dispatchEvent(event);
 
     expect(global.gtag).toHaveBeenCalledWith('event', 'mouseover', {
@@ -137,9 +137,29 @@ describe('analytics.js', () => {
     popover.dispatchEvent(toggleEvent);
 
     expect(global.gtag).toHaveBeenCalledWith('event', 'view_item', {
-        event_category: 'Popover Engagement',
-        event_label: 'View - sbe-popover',
-        non_interaction: true,
+      event_category: 'Popover Engagement',
+      event_label: 'View - sbe-popover',
+      non_interaction: true,
+    });
+  });
+  it('should track details toggle engagement', () => {
+    document.body.innerHTML += `
+      <details>
+        <summary>Job Experience</summary>
+        <p>Details here.</p>
+      </details>
+    `;
+    const details = document.querySelector('details');
+    details.open = true; // Set to open to match condition
+
+    // Dispatch toggle event (doesn't bubble normally, but we listen on capture phase so we need to ensure the event reaches the document somehow. Since dispatchEvent triggers captures phase too, this is fine).
+    const event = new Event('toggle', { bubbles: false });
+    details.dispatchEvent(event);
+
+    expect(global.gtag).toHaveBeenCalledWith('event', 'select_content', {
+      event_category: 'Resume Interaction',
+      event_label: 'Expand - Job Experience',
+      transport_type: 'beacon',
     });
   });
 });

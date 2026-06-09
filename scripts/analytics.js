@@ -1,5 +1,5 @@
 // Ensure gtag is defined even if analytics-loader.js failed or was blocked
-window.gtag = window.gtag || function() {
+window.gtag = window.gtag || function () {
   (window.dataLayer = window.dataLayer || []).push(arguments);
 };
 
@@ -64,9 +64,9 @@ export function initAnalytics() {
   const sections = document.querySelectorAll("[data-analytics-section]");
   sections.forEach((section) => sectionObserver.observe(section));
 
-  // Track other links
+  // Track other links and brand interactions via event delegation
   document.addEventListener("click", (event) => {
-    const link = event.target.closest("[data-analytics-link]");
+    const link = event.target.closest && event.target.closest("[data-analytics-link]");
     if (link) {
       const linkName = link.dataset.analyticsLink;
       const eventData = {
@@ -76,14 +76,26 @@ export function initAnalytics() {
       };
       gtag("event", "click", eventData);
     }
+
+    const brand = event.target.closest && event.target.closest(".brand");
+    if (brand) {
+      const eventData = {
+        event_category: "Brand Interaction",
+        event_label: `Click - ${brand.textContent.trim()}`,
+        transport_type: "beacon",
+      };
+      gtag("event", "click", eventData);
+    }
   });
 
-  // Performance optimization: Use direct event listeners instead of global delegation.
-  // This assumes the site is an MPA (Multi-Page Application) where content is static per page load.
-  // If dynamic content is added, these listeners need to be re-attached.
-  const analyticsLinks = document.querySelectorAll("[data-analytics-link]");
-  analyticsLinks.forEach((link) => {
-    link.addEventListener("mouseenter", () => {
+  // Performance optimization: Use event delegation on document instead of
+  // attaching individual listeners to potentially many elements.
+
+  // Track hovers via event delegation (mouseover to mimic mouseenter)
+  document.addEventListener("mouseover", (event) => {
+    // Links hover
+    const link = event.target.closest && event.target.closest("[data-analytics-link]");
+    if (link && !link.contains(event.relatedTarget)) {
       const linkName = link.dataset.analyticsLink;
       const eventData = {
         event_category: "Link Hover",
@@ -91,35 +103,25 @@ export function initAnalytics() {
         non_interaction: true,
       };
       gtag("event", "mouseover", eventData);
-    });
-  });
+    }
 
-  // Track brand interactions
-  const brands = document.querySelectorAll(".brand");
-  brands.forEach((brand) => {
-    brand.addEventListener("click", () => {
-      const eventData = {
-        event_category: "Brand Interaction",
-        event_label: `Click - ${brand.textContent.trim()}`,
-        transport_type: "beacon",
-      };
-      gtag("event", "click", eventData);
-    });
-
-    brand.addEventListener("mouseenter", () => {
+    // Brand hover
+    const brand = event.target.closest && event.target.closest(".brand");
+    if (brand && !brand.contains(event.relatedTarget)) {
       const eventData = {
         event_category: "Brand Interaction",
         event_label: `Hover - ${brand.textContent.trim()}`,
         non_interaction: true,
       };
       gtag("event", "mouseover", eventData);
-    });
+    }
   });
 
-  // Track popover engagement
-  const popovers = document.querySelectorAll("[popover]");
-  popovers.forEach((popover) => {
-    popover.addEventListener("toggle", () => {
+  // Track toggle events via event delegation (capturing phase because toggle doesn't bubble)
+  document.addEventListener("toggle", (event) => {
+    // Popover engagement
+    const popover = event.target;
+    if (popover && popover.hasAttribute && popover.hasAttribute("popover")) {
       if (popover.matches(":popover-open")) {
         const eventData = {
           event_category: "Popover Engagement",
@@ -128,13 +130,11 @@ export function initAnalytics() {
         };
         gtag("event", "view_item", eventData);
       }
-    });
-  });
+    }
 
-  // Track details engagement (Resume Job History)
-  const detailsElements = document.querySelectorAll("details");
-  detailsElements.forEach((details) => {
-    details.addEventListener("toggle", () => {
+    // Details engagement
+    const details = event.target;
+    if (details && details.tagName === "DETAILS") {
       if (details.open) {
         const summary = details.querySelector("summary");
         const label = summary ? summary.textContent.trim() : "Details Expanded";
@@ -145,8 +145,8 @@ export function initAnalytics() {
         };
         gtag("event", "select_content", eventData);
       }
-    });
-  });
+    }
+  }, true); // Use capture phase
 }
 
 // Defer initialization until the browser is idle
