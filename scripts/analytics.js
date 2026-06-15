@@ -88,14 +88,13 @@ export function initAnalytics() {
     }
   });
 
-  // Performance optimization: Use event delegation on document instead of
-  // attaching individual listeners to potentially many elements.
-
-  // Track hovers via event delegation (mouseover to mimic mouseenter)
-  document.addEventListener("mouseover", (event) => {
-    // Links hover
-    const link = event.target.closest && event.target.closest("[data-analytics-link]");
-    if (link && !link.contains(event.relatedTarget)) {
+  // Performance optimization (PERF-XX): Avoid global mouseover event delegation.
+  // Listening to 'mouseover' on the document causes event.target.closest() to be
+  // evaluated on almost every mouse movement, blocking the main thread.
+  // Instead, attach 'mouseenter' directly to the elements we want to track.
+  const analyticsLinks = document.querySelectorAll("[data-analytics-link]");
+  analyticsLinks.forEach((link) => {
+    link.addEventListener("mouseenter", () => {
       const linkName = link.dataset.analyticsLink;
       const eventData = {
         event_category: "Link Hover",
@@ -103,18 +102,19 @@ export function initAnalytics() {
         non_interaction: true,
       };
       gtag("event", "mouseover", eventData);
-    }
+    });
+  });
 
-    // Brand hover
-    const brand = event.target.closest && event.target.closest(".brand");
-    if (brand && !brand.contains(event.relatedTarget)) {
+  const brands = document.querySelectorAll(".brand");
+  brands.forEach((brand) => {
+    brand.addEventListener("mouseenter", () => {
       const eventData = {
         event_category: "Brand Interaction",
         event_label: `Hover - ${brand.textContent.trim()}`,
         non_interaction: true,
       };
       gtag("event", "mouseover", eventData);
-    }
+    });
   });
 
   // Track toggle events via event delegation (capturing phase because toggle doesn't bubble)
