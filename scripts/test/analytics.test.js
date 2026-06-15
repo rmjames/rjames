@@ -109,7 +109,7 @@ describe('analytics.js', () => {
 
   it('should track custom data-analytics-link hover', () => {
     const link = document.querySelector('[data-analytics-link]');
-    const event = new MouseEvent('mouseover', { bubbles: true });
+    const event = new MouseEvent('mouseenter', { bubbles: true });
     link.dispatchEvent(event);
 
     expect(global.gtag).toHaveBeenCalledWith('event', 'mouseover', {
@@ -125,6 +125,18 @@ describe('analytics.js', () => {
       event_category: 'Brand Interaction',
       event_label: 'Click - SBE',
       transport_type: 'beacon',
+    });
+  });
+
+  it('should track brand interaction hover', () => {
+    const brand = document.querySelector('.brand');
+    const event = new MouseEvent('mouseenter', { bubbles: true });
+    brand.dispatchEvent(event);
+
+    expect(global.gtag).toHaveBeenCalledWith('event', 'mouseover', {
+      event_category: 'Brand Interaction',
+      event_label: 'Hover - SBE',
+      non_interaction: true,
     });
   });
 
