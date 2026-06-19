@@ -287,7 +287,7 @@ body {
 .eq-grid {
     flex: 1;
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(10, 1fr);
     gap: 0.25rem;
     align-items: center;
     justify-items: center;

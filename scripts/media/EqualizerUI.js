@@ -65,7 +65,7 @@ export class EqualizerUI {
                     <div class="eq-slider__track"></div>
                     <div class="eq-slider__fill"></div>
                     <div class="eq-slider__thumb"></div>
-                    <input type="range" min="-12" max="12" value="0" step="0.1" aria-label="${config.label}">
+                    <input type="range" min="-20" max="20" value="0" step="0.1" aria-label="${config.label}">
                 </div>
                 <span class="eq-slider__label">${config.label}</span>
             `;
