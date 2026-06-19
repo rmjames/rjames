@@ -401,39 +401,24 @@
                 </svg>
             </button>
         </article>
-        <div class="media-player__equalizer">
-            <div class="eq-header">
-                <h3>Equalizer</h3>
-                <button class="eq-close" title="Close" data-analytics-element="Close">
-                    <svg viewBox="0 -960 960 960">
-                        <path
-                            d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z" />
-                    </svg>
-                </button>
-            </div>
-            <div class="eq-grid">
-                <!-- Dynamically populated sliders -->
-            </div>
-        </div>
+        <div class="media-player__equalizer"></div>
     </section>
 
     <audio id="audio-player"></audio>
 
     <script type="module">
         import { MediaPlayerCore } from '../scripts/media/MediaPlayerCore.js';
-        import { Equalizer } from '../scripts/media/Equalizer.js';
+        import { EqualizerUI } from '../scripts/media/EqualizerUI.js';
         import { UI } from '../scripts/media/MediaPlayerUI.js';
-        import { SVG_PATHS, EQ_CONFIG } from '../scripts/media/Constants.js';
+        import { SVG_PATHS } from '../scripts/media/Constants.js';
 
         const audio = document.getElementById('audio-player');
         const core = new MediaPlayerCore(audio);
-        const eq = new Equalizer(audio);
-
         const container = document.querySelector('.media-player-grid');
         const eqContainer = document.querySelector('.media-player__equalizer');
-        const eqGrid = document.querySelector('.eq-grid');
         const eqBtn = document.querySelector('.grid-item--eq');
-        const eqCloseBtn = document.querySelector('.eq-close');
+
+        const equalizerUI = new EqualizerUI(eqContainer, audio, { type: 'simple' });
 
         const titleEl = document.querySelector('.media-player__meta__title');
         const artistEl = document.querySelector('.media-player__meta__artist');
@@ -471,36 +456,8 @@
             }
         };
 
-        // Init EQ
-        EQ_CONFIG.forEach((config, index) => {
-            const sliderWrapper = document.createElement('div');
-            sliderWrapper.className = 'media-player__equalizer__slider';
-            sliderWrapper.innerHTML = `
-                <div class="eq-slider__wrapper">
-                    <div class="eq-slider__track"></div>
-                    <div class="eq-slider__fill"></div>
-                    <div class="eq-slider__thumb"></div>
-                    <input type="range" min="-12" max="12" value="0" step="0.1" aria-label="${config.label}">
-                </div>
-                <span class="eq-slider__label">${config.label}</span>
-            `;
-            const input = sliderWrapper.querySelector('input');
-            input.addEventListener('input', (e) => {
-                eq.setGain(index, parseFloat(e.target.value));
-                UI.updateSliderVisuals(e.target);
-            });
-            eqGrid.appendChild(sliderWrapper);
-            UI.updateSliderVisuals(input);
-        });
-
         eqBtn.addEventListener('click', () => {
-            eq.init();
-            eq.resume();
-            eqContainer.classList.add('active');
-        });
-
-        eqCloseBtn.addEventListener('click', () => {
-            eqContainer.classList.remove('active');
+            equalizerUI.show();
         });
 
         core.subscribe((event, data) => {

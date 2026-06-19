@@ -1,4 +1,4 @@
-const cacheName = 'v20'; // Bumped to v20 to clear cache for decoupled platter/needle updates
+const cacheName = 'v21'; // Bumped to v20 to clear cache for decoupled platter/needle updates
 
 const assetsToCache = [
   '/index.html',
@@ -45,6 +45,7 @@ const assetsToCache = [
   '/scripts/media/ColorExtractor.js',
   '/scripts/media/Constants.js',
   '/scripts/media/Equalizer.js',
+  '/scripts/media/EqualizerUI.js',
   '/scripts/media/MediaPlayerCore.js',
   '/scripts/media/MediaPlayerSelector.js',
   '/scripts/media/MediaPlayerUI.js',
