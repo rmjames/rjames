@@ -116,95 +116,10 @@
             <!-- Dynamically populated -->
         </div>
 
-        <div class="media-player__equalizer">
-            <div class="eq-sidebar">
-                <button class="eq-sidebar__btn" id="eq-close-btn" data-analytics-element="Close Equalizer" aria-label="Close Equalizer">
-                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
-                        fill="currentColor">
-                        <path
-                            d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z" />
-                    </svg>
-                </button>
-
-                <button class="eq-sidebar__btn" id="eq-power-btn" data-analytics-element="Toggle Equalizer" aria-label="Toggle Equalizer">
-                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
-                        fill="currentColor">
-                        <path
-                            d="M480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q54 0 104-17.5t92-50.5L228-676q-33 42-50.5 92T160-480q0 134 93 227t227 93Zm252-124q33-42 50.5-92T800-480q0-134-93-227t-227-93q-54 0-104 17.5T284-732l448 448Z" />
-                    </svg>
-                </button>
-
-                <button class="eq-sidebar__btn" id="eq-save-btn" data-analytics-element="Save Settings" aria-label="Save Settings">
-                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
-                        fill="currentColor">
-                        <path
-                            d="M840-680v480q0 33-23.5 56.5T760-120H200q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h480l160 160Zm-80 34L646-760H200v560h560v-446ZM480-240q50 0 85-35t35-85q0-50-35-85t-85-35q-50 0-85 35t-35 85q0 50 35 85t85 35ZM240-560h360v-160H240v160Zm-40-86v446-560 114Z" />
-                    </svg>
-                </button>
-                <button class="eq-sidebar__btn" id="eq-load-btn" data-analytics-element="Load Settings" aria-label="Load Settings">
-                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
-                        fill="currentColor">
-                        <path
-                            d="M480-120q-75 0-140.5-28.5t-114-77q-48.5-48.5-77-114T120-480q0-75 28.5-140.5t77-114q48.5-48.5 114-77T480-840q82 0 155.5 35T760-706v-94h80v240H600v-80h110q-41-56-101-88t-129-32q-117 0-198.5 81.5T200-480q0 117 81.5 198.5T480-200q106 0 183.5-68.5T758-440h84q-17 106-102 173t-180 67Z" />
-                    </svg>
-                </button>
-            </div>
-
-            <div class="eq-grid">
-                <div class="media-player__equalizer__slider">
-                    <div class="eq-slider__wrapper">
-                        <div class="eq-slider__track"></div>
-                        <div class="eq-slider__fill"></div>
-                        <div class="eq-slider__thumb"></div>
-                        <input type="range" min="-12" max="12" value="3" aria-label="50Hz" step="0.1">
-                    </div>
-                    <span class="eq-slider__label">50Hz</span>
-                </div>
-                <div class="media-player__equalizer__slider">
-                    <div class="eq-slider__wrapper">
-                        <div class="eq-slider__track"></div>
-                        <div class="eq-slider__fill"></div>
-                        <div class="eq-slider__thumb"></div>
-                        <input type="range" min="-12" max="12" value="6" aria-label="230Hz" step="0.1">
-                    </div>
-                    <span class="eq-slider__label">230Hz</span>
-                </div>
-                <div class="media-player__equalizer__slider">
-                    <div class="eq-slider__wrapper">
-                        <div class="eq-slider__track"></div>
-                        <div class="eq-slider__fill"></div>
-                        <div class="eq-slider__thumb"></div>
-                        <input type="range" min="-12" max="12" value="-2" aria-label="910Hz" step="0.1">
-                    </div>
-                    <span class="eq-slider__label">910Hz</span>
-                </div>
-                <div class="media-player__equalizer__slider">
-                    <div class="eq-slider__wrapper">
-                        <div class="eq-slider__track"></div>
-                        <div class="eq-slider__fill"></div>
-                        <div class="eq-slider__thumb"></div>
-                        <input type="range" min="-12" max="12" value="4" aria-label="4kHz" step="0.1">
-                    </div>
-                    <span class="eq-slider__label">4kHz</span>
-                </div>
-                <div class="media-player__equalizer__slider">
-                    <div class="eq-slider__wrapper">
-                        <div class="eq-slider__track"></div>
-                        <div class="eq-slider__fill"></div>
-                        <div class="eq-slider__thumb"></div>
-                        <input type="range" min="-12" max="12" value="0" aria-label="12kHz" step="0.1">
-                    </div>
-                    <span class="eq-slider__label">12kHz</span>
-                </div>
-            </div>
-        </div>
-        <!-- Preset Popover -->
+        <div class="media-player__equalizer"></div>
         <div id="preset-popover" popover="hint">
             <div style="font-weight: bold; margin-bottom: 0.125rem;">Artist Name</div>
             <div style="font-size: 0.65rem; color: oklch(from #ccc l c h);">Album Name</div>
-        </div>
-        </div>
-
         </div>
     </section>
 
@@ -215,14 +130,12 @@
     <script type="module">
         import { audioLibrary } from '../scripts/AudioLibrary.js';
         import { MediaPlayerCore } from '../scripts/media/MediaPlayerCore.js';
-        import { Equalizer } from '../scripts/media/Equalizer.js';
+        import { EqualizerUI } from '../scripts/media/EqualizerUI.js';
         import { UI } from '../scripts/media/MediaPlayerUI.js';
         import { SVG_PATHS } from '../scripts/media/Constants.js';
 
         const audio = document.getElementById('audio-player');
         const core = new MediaPlayerCore(audio);
-        const eq = new Equalizer(audio);
-
         // UI Elements
         const playButton = document.querySelector('.media-player__controls__play');
         const titleEl = document.querySelector('.media-player__meta__title');
@@ -233,18 +146,18 @@
         const optionButton = document.querySelector('.media-player__controls__option');
         const optionIconPath = optionButton.querySelector('svg path');
         const equalizerContainer = document.querySelector('.media-player__equalizer');
-        const eqInputs = document.querySelectorAll('.media-player__equalizer input');
+
+        const equalizerUI = new EqualizerUI(equalizerContainer, audio, { type: 'full' });
 
         // Mode State
         let mode = 'like'; // like, equalizer, rewind
         let liked = false;
-        let isEqOn = true;
         let activeAnchorBtn = null;
 
         // --- Core Subscriptions ---
         core.subscribe((event, data) => {
             if (event === 'play' || event === 'pause' || event === 'ended') {
-                if (event === 'play') eq.init();
+                if (event === 'play') equalizerUI.initAudio();
                 UI.updatePlayIcon(playButton, audio.paused);
             }
             if (event === 'trackChanged') {
@@ -284,8 +197,7 @@
 
         // --- Event Handlers ---
         playButton.addEventListener('click', () => {
-            eq.init();
-            eq.resume();
+            equalizerUI.initAudio();
             core.togglePlay();
         });
 
@@ -322,7 +234,7 @@
             } else if (mode === 'rewind') {
                 audio.currentTime = Math.max(0, audio.currentTime - 10);
             } else if (mode === 'equalizer') {
-                const isActive = equalizerContainer.classList.toggle('active');
+                const isActive = equalizerUI.toggle();
                 document.querySelector('.media-player').classList.toggle('is-eq-open', isActive);
             }
         };
@@ -389,61 +301,8 @@
             }
         });
 
-        // --- Equalizer Features ---
-        const powerBtn = document.getElementById('eq-power-btn');
-        const saveBtn = document.getElementById('eq-save-btn');
-        const loadBtn = document.getElementById('eq-load-btn');
-        const closeBtn = document.getElementById('eq-close-btn');
-
-        eqInputs.forEach((input, index) => {
-            UI.updateSliderVisuals(input);
-            input.addEventListener('input', (e) => {
-                UI.updateSliderVisuals(e.target);
-                if (isEqOn) eq.setGain(index, e.target.value);
-            });
-        });
-
-        closeBtn.addEventListener('click', () => {
-            equalizerContainer.classList.remove('active');
+        equalizerContainer.addEventListener('eq-closed', () => {
             document.querySelector('.media-player').classList.remove('is-eq-open');
-        });
-
-        powerBtn.addEventListener('click', () => {
-            isEqOn = !isEqOn;
-            powerBtn.classList.toggle('active', isEqOn);
-            equalizerContainer.classList.toggle('disabled', !isEqOn);
-            eqInputs.forEach((input, index) => {
-                eq.setGain(index, isEqOn ? input.value : 0);
-            });
-        });
-
-        saveBtn.addEventListener('click', () => {
-            const settings = Array.from(eqInputs).map(i => i.value);
-            localStorage.setItem('rj-eq-settings', JSON.stringify(settings));
-            saveBtn.classList.add('active');
-            setTimeout(() => saveBtn.classList.remove('active'), 1000);
-        });
-
-        loadBtn.addEventListener('click', () => {
-            const saved = JSON.parse(localStorage.getItem('rj-eq-settings') || '[]');
-            eqInputs.forEach((input, index) => {
-                if (saved[index] !== undefined) {
-                    input.value = saved[index];
-                    UI.updateSliderVisuals(input);
-                    if (isEqOn) eq.setGain(index, input.value);
-                }
-            });
-            loadBtn.classList.add('active');
-            setTimeout(() => loadBtn.classList.remove('active'), 1000);
-        });
-
-        // Auto Load
-        const savedSettings = JSON.parse(localStorage.getItem('rj-eq-settings') || '[]');
-        eqInputs.forEach((input, index) => {
-            if (savedSettings[index] !== undefined) {
-                input.value = savedSettings[index];
-                UI.updateSliderVisuals(input);
-            }
         });
 
         updateOptionIcon();
