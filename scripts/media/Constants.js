@@ -6,9 +6,14 @@ export const SVG_PATHS = {
 };
 
 export const EQ_CONFIG = [
-    { label: '50Hz', freq: 40, type: 'lowshelf' },
-    { label: '230Hz', freq: 230, type: 'peaking' },
-    { label: '910Hz', freq: 910, type: 'peaking' },
+    { label: '32Hz', freq: 32, type: 'lowshelf' },
+    { label: '64Hz', freq: 64, type: 'peaking' },
+    { label: '128Hz', freq: 128, type: 'peaking' },
+    { label: '256Hz', freq: 256, type: 'peaking' },
+    { label: '512Hz', freq: 512, type: 'peaking' },
+    { label: '1kHz', freq: 1000, type: 'peaking' },
+    { label: '2kHz', freq: 2000, type: 'peaking' },
     { label: '4kHz', freq: 4000, type: 'peaking' },
-    { label: '12kHz', freq: 12000, type: 'highshelf' }
+    { label: '8kHz', freq: 8000, type: 'peaking' },
+    { label: '16kHz', freq: 16000, type: 'highshelf' }
 ];
