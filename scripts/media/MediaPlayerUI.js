@@ -173,5 +173,66 @@ export const UI = {
         if (!element || !track || !cssVarName) return;
         const color = await ColorExtractor.getAccentColor(track.albumArt);
         element.style.setProperty(cssVarName, color);
+    },
+
+    setupLongPress(button, { onShortPress, onLongPress, delay = 500 }) {
+        if (!button) return;
+
+        let longPressTimer;
+        let longPressTriggered = false;
+
+        const startPress = (e) => {
+            if (e.type === 'touchstart') {
+                // We might not want to prevent default globally, but for a long press button it might be needed.
+                // However, doing so can break scrolling if the button is inside a scrollable container.
+                // We will leave preventDefault up to the caller or allow passive listeners.
+            }
+            longPressTriggered = false;
+            longPressTimer = setTimeout(() => {
+                longPressTriggered = true;
+                if (onLongPress) onLongPress(e);
+                longPressTimer = null;
+            }, delay);
+        };
+
+        const cancelPress = () => {
+            if (longPressTimer) {
+                clearTimeout(longPressTimer);
+                longPressTimer = null;
+            }
+        };
+
+        const handleShortPress = (e) => {
+            cancelPress();
+            if (!longPressTriggered && onShortPress) {
+                onShortPress(e);
+            }
+        };
+
+        // Mouse events
+        button.addEventListener('mousedown', startPress);
+        button.addEventListener('mouseleave', cancelPress);
+        button.addEventListener('mouseup', handleShortPress);
+
+        // Touch events
+        button.addEventListener('touchstart', startPress, { passive: true });
+        button.addEventListener('touchmove', cancelPress, { passive: true }); // Cancel on scroll
+        button.addEventListener('touchend', handleShortPress);
+
+        // Disable context menu on long press for mobile
+        button.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+        });
+
+        // Cleanup function
+        return () => {
+            button.removeEventListener('mousedown', startPress);
+            button.removeEventListener('mouseleave', cancelPress);
+            button.removeEventListener('mouseup', handleShortPress);
+            button.removeEventListener('touchstart', startPress);
+            button.removeEventListener('touchmove', cancelPress);
+            button.removeEventListener('touchend', handleShortPress);
+            button.removeEventListener('contextmenu', e => e.preventDefault());
+        };
     }
 };
