@@ -239,24 +239,15 @@
             }
         };
 
-        let longPressTimer;
-        let longPressTriggered = false;
-
-        optionButton.addEventListener('mousedown', () => {
-            longPressTriggered = false;
-            longPressTimer = setTimeout(() => {
-                longPressTriggered = true;
+        UI.setupLongPress(optionButton, {
+            onShortPress: () => {
+                handleOptionClick();
+            },
+            onLongPress: () => {
                 optionButton.classList.add('animate-outline');
                 toggleMode();
-            }, 500);
-        });
-
-        const stopOptionPress = () => clearTimeout(longPressTimer);
-        ['mouseup', 'mouseleave', 'touchend'].forEach(evt => optionButton.addEventListener(evt, stopOptionPress));
-
-        optionButton.addEventListener('click', () => {
-            if (longPressTriggered) return;
-            handleOptionClick();
+            },
+            delay: 500
         });
 
         // --- Presets & Popover ---
