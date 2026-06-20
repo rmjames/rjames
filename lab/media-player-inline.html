@@ -238,35 +238,14 @@
             console.log('Mode switched to:', currentMode);
         };
 
-        optionBtn.addEventListener('mousedown', () => {
-            longPressTimer = setTimeout(() => {
-                onLongPress();
-                longPressTimer = null;
-            }, LONG_PRESS_MS);
-        });
-
-        window.addEventListener('mouseup', () => {
-            if (longPressTimer) {
-                clearTimeout(longPressTimer);
-                longPressTimer = null;
+        UI.setupLongPress(optionBtn, {
+            onShortPress: () => {
                 handleOptionClick();
-            }
-        });
-
-        optionBtn.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            longPressTimer = setTimeout(() => {
+            },
+            onLongPress: () => {
                 onLongPress();
-                longPressTimer = null;
-            }, LONG_PRESS_MS);
-        }, { passive: false });
-
-        optionBtn.addEventListener('touchend', () => {
-            if (longPressTimer) {
-                clearTimeout(longPressTimer);
-                longPressTimer = null;
-                handleOptionClick();
-            }
+            },
+            delay: LONG_PRESS_MS
         });
     </script>
 </body>
