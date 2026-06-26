@@ -211,8 +211,10 @@ body {
 
 /* Equalizer Interface */
 .media-player__equalizer {
+    container-type: size;
     position: absolute;
     inset: 0;
+    background: #333;
     background: oklch(from #333 l c h);
     border-radius: inherit;
     padding: 1rem;
@@ -224,7 +226,7 @@ body {
     pointer-events: none;
     transform: translateY(10px);
     transition: opacity 0.2s ease, transform 0.2s ease;
-    z-index: 10;
+    z-index: 100;
 }
 
 .media-player__equalizer.active {
@@ -261,6 +263,19 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 0.5rem 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.eq-sidebar::-webkit-scrollbar {
+    display: none;
+}
+
+#eq-close-btn {
+    position: sticky;
+    top: 0;
+    background: oklch(from #333 l c h) !important;
+    z-index: 2;
 }
 
 .eq-sidebar__btn {
@@ -291,6 +306,18 @@ body {
     gap: 0.25rem;
     align-items: center;
     justify-items: center;
+    overflow-y: auto;
+    overflow-x: hidden;
+    min-height: 0;
+}
+
+.eq-grid::-webkit-scrollbar {
+    width: 4px;
+}
+
+.eq-grid::-webkit-scrollbar-thumb {
+    background: oklch(from #555 l c h);
+    border-radius: 4px;
 }
 
 .media-player__equalizer__slider {
@@ -345,6 +372,21 @@ body {
     transform: translate(-50%, -50%);
     left: 50%;
     pointer-events: none;
+}
+
+@container (max-height: 250px) {
+    .media-player__equalizer__slider {
+        min-height: 120px;
+    }
+
+    .eq-sidebar {
+        justify-content: flex-start;
+        gap: 1rem;
+    }
+
+    .eq-grid {
+        gap: 0.125rem;
+    }
 }
 
 /* --- Preset Popover/Tooltip --- */

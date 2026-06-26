@@ -44,6 +44,7 @@
         }
 
         .media-player__equalizer {
+            container-type: size;
             position: absolute;
             inset: 0;
             background: oklch(from #1a1a1a l c h / 0.9);
@@ -107,6 +108,17 @@
             gap: 0.5rem;
             align-items: stretch;
             min-height: 0;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .eq-grid::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .eq-grid::-webkit-scrollbar-thumb {
+            background: oklch(from #555 l c h);
+            border-radius: 4px;
         }
 
         .media-player__equalizer__slider {
@@ -115,6 +127,18 @@
             flex-direction: column;
             align-items: center;
             gap: 0.5rem;
+        }
+
+        @container (max-height: 250px) {
+            .media-player__equalizer__slider {
+                min-height: 120px;
+            }
+            .eq-header h3 {
+                font-size: 1rem;
+            }
+            .eq-grid {
+                gap: 0.25rem;
+            }
         }
 
         .media-player-grid__row {
