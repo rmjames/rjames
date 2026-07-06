@@ -7,3 +7,6 @@
 ## 2025-05-27 - [Event Delegation Anti-Pattern]
 **Learning:** Using global event delegation (`document.addEventListener`) for high-frequency events like `mouseover` or `mousemove` causes extreme main-thread bloat, as the listener evaluates logic (like `.closest()`) on every single DOM boundary crossed by the mouse.
 **Action:** Avoid global event delegation for high-frequency events. Instead, explicitly attach `mouseenter` or `mouseleave` listeners directly to the specific elements that require tracking, ensuring the callbacks only fire when interacting with the intended targets.
+## 2025-05-27 - [Layout Thrashing Prevention in Marquee Updates]
+**Learning:** Sequential DOM reads and writes in the same animation frame (e.g. `clientWidth` followed by `classList.add`) cause layout thrashing (forced synchronous layout). This was happening in `MediaPlayerUI.updateMarquee` when it was called multiple times in rapid succession (e.g. for both title and artist elements).
+**Action:** Always batch DOM reads and writes. A simple way to do this when updating multiple elements is the double `requestAnimationFrame` pattern: perform DOM reads in the first frame, and defer the DOM writes to a nested `requestAnimationFrame` callback.

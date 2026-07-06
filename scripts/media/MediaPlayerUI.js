@@ -31,17 +31,21 @@ export const UI = {
 
         // Defer reads and writes to avoid layout thrashing during track changes
         requestAnimationFrame(() => {
+            // DOM READ phase
             // Use cached width if available to avoid clientWidth read
             const parentWidth = this._parentWidths.get(el) || el.clientWidth;
             const textWidth = el.scrollWidth;
 
-            if (textWidth > parentWidth) {
-                el.classList.add('is-marquee');
-                el.style.setProperty('--marquee-width', `${parentWidth}px`);
-            } else {
-                el.classList.remove('is-marquee');
-                el.style.setProperty('--marquee-width', '0px');
-            }
+            // DOM WRITE phase (deferred to next frame to prevent forced synchronous layout)
+            requestAnimationFrame(() => {
+                if (textWidth > parentWidth) {
+                    el.classList.add('is-marquee');
+                    el.style.setProperty('--marquee-width', `${parentWidth}px`);
+                } else {
+                    el.classList.remove('is-marquee');
+                    el.style.setProperty('--marquee-width', '0px');
+                }
+            });
         });
     },
 
