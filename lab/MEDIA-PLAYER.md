@@ -10,6 +10,10 @@ The media players follow a **Provider/Consumer** architecture:
 - **Provider**: `MediaPlayerCore.js` managing the `<audio>` state, library tracks, and event subscriptions.
 - **Consumer**: Individual HTML files implementing specific UI layouts using `MediaPlayerUI.js` and shared CSS components.
 
+## Maintenance & Future Updates
+
+**IMPORTANT:** This document serves as the source of truth for the media player architecture. Whenever changes are made to `MediaPlayerCore.js`, `MediaPlayerUI.js`, `Equalizer.js`, `ColorExtractor.js`, or any of the HTML variants (including the addition of new variants or components), this document **MUST** be updated. Ensure that any new performance optimizations, security considerations, or UI components are fully documented here to maintain architectural clarity.
+
 ## Shared Tech Stack
 
 - **Logic**: Vanilla JavaScript (ES Modules).
@@ -49,9 +53,23 @@ A premium, OS-level inspired player with rich aesthetics.
   - Source selection icons (YT Music / Phone icons).
   - Prominent themed Play/Pause button.
 
+### 4. Inline Media Player (`media-player-inline.html`)
+A compact inline player optimized for embedding within lists or tight spaces.
+- **Layout**: Horizontal flex-based layout.
+- **Key Features**:
+  - **Decoupled Time Updates**: Listens for `timeupdate` directly on the `<audio>` element rather than through `MediaPlayerCore` notifications for improved performance.
+  - Multi-mode option button (Shuffle/Like) with long-press interactions.
+  - Direct progress slider with current and remaining time displays.
+  - Dynamic marquee for track titles when overflowing parent width.
+
 ## Modular Components (Plug-and-Play)
 
 To ensure interchangeability between variants, components should follow these standardized HTML/CSS patterns.
+
+**General Guidelines for Components:**
+- **Container Queries:** Each component must act as a container query (`container-type: inline-size`) to ensure its internal layout adapts correctly regardless of where it is placed.
+- **Design Tokens:** Always use established project tokens (e.g., CSS variables) for gaps, spacing, and border radius.
+- **Icons:** Keep all icons strictly at `24px` for consistency across variants.
 
 ### 1. `MediaMeta`
 Standardized track information block.
@@ -180,6 +198,19 @@ Standardized text overflow handling for track titles.
   }
   ```
 
+## Performance & Security Updates
+
+### Performance (PERF)
+- **Layout Thrashing Prevention (PERF-30)**: `MediaPlayerUI.updateMarquee` utilizes a double `requestAnimationFrame` pattern. It batches DOM reads in the first frame and defers DOM writes (CSS modifications) to the second nested frame to prevent forced synchronous layouts (layout thrashing) during track changes.
+- **ResizeObserver Caching (PERF-30)**: `MediaPlayerUI` implements a centralized `ResizeObserver` backed by a `WeakMap` to cache parent element widths, avoiding repeated `.clientWidth` reads on resize events.
+- **Color Extraction Optimization**: `ColorExtractor.js` caches `Promise` objects to prevent concurrent duplicate processing of the same image URL. It also utilizes `OffscreenCanvas` (where available) with `{ willReadFrequently: true }` for improved rendering performance.
+- **Iframe Carousel Lazy Loading**: The iframe carousel in `MediaPlayerSelector.js` uses an `IntersectionObserver` to defer loading iframe contents (assigning `src` from `dataset.src`) until they intersect the viewport, preventing massive memory overhead.
+- **Event Decoupling**: The Inline Media Player handles `timeupdate` events natively on the `<audio>` element to reduce main-thread messaging overhead from the core provider.
+
+### Security (SEC)
+- **CSS Injection Prevention (SEC-7)**: `MediaPlayerUI.updateBackgroundArt` aggressively sanitizes album art URLs before applying them to CSS variables, stripping potential breakout characters (`"`, `'`, `(`, `)`) and encoding the URI to prevent CSS injection attacks.
+- **Untrusted URL Rejection (PERF-22)**: `ColorExtractor.getAccentColor` enforces a strict policy that rejects absolute paths (`://`) and protocol-relative paths (`//`). It only processes relative image paths to prevent loading and analyzing untrusted external media.
+
 ## Interchangeability Guidelines
 
 1. **Selector Parity**: Keep class names consistent (`.media-player__*`) even if the layout (Grid vs. Flex) changes.
@@ -197,7 +228,7 @@ Standardized text overflow handling for track titles.
 | `oklch(0.6 0.2 260 / 0.8)` | Accent | Brand/Action highlighting |
 
 ### Spacing & Sizing
-- **Gaps**: Standardized at `.5rem` or `.75rem`.
-- **Radius**: Large curves (`1.25rem` or `1.5rem`) for a premium "soft" feel.
+- **Gaps**: Standardized at `.5rem` or `.75rem` using project tokens.
+- **Radius**: Large curves (`1.25rem` or `1.5rem`) for a premium "soft" feel using project tokens.
 - **Icons**: Standardized at `24px` for consistency across variants.
 - **Animations**: Standard rotation for rewind is **-25°**.
