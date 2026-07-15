@@ -56,8 +56,9 @@ export const UI = {
             if (!el) return;
             let span = el.querySelector('span');
             if (!span) {
-                el.innerHTML = `<span></span>`;
-                span = el.querySelector('span');
+                // PERF: Create element directly to avoid innerHTML overhead
+                span = document.createElement('span');
+                el.replaceChildren(span);
             }
             span.textContent = text;
             this.updateMarquee(el);
@@ -69,10 +70,14 @@ export const UI = {
         if (artBtn) {
             if (track.albumArt) {
                 artBtn.classList.add('has-art');
-                const img = document.createElement('img');
+                // PERF: Reuse existing img element instead of creating/destroying on every track change
+                let img = artBtn.querySelector('img');
+                if (!img) {
+                    img = document.createElement('img');
+                    artBtn.replaceChildren(img);
+                }
                 img.src = track.albumArt;
                 img.alt = track.title;
-                artBtn.replaceChildren(img);
             } else {
                 artBtn.classList.remove('has-art');
                 artBtn.innerHTML = `
