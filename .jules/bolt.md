@@ -10,3 +10,6 @@
 ## 2025-05-27 - [Layout Thrashing Prevention in Marquee Updates]
 **Learning:** Sequential DOM reads and writes in the same animation frame (e.g. `clientWidth` followed by `classList.add`) cause layout thrashing (forced synchronous layout). This was happening in `MediaPlayerUI.updateMarquee` when it was called multiple times in rapid succession (e.g. for both title and artist elements).
 **Action:** Always batch DOM reads and writes. A simple way to do this when updating multiple elements is the double `requestAnimationFrame` pattern: perform DOM reads in the first frame, and defer the DOM writes to a nested `requestAnimationFrame` callback.
+## 2025-05-27 - [DOM Node Reuse and Avoiding innerHTML]
+**Learning:** Frequent DOM updates using `innerHTML = '<span></span>'` or by continuously destroying and recreating elements (like `<img>` tags on every track change in `MediaPlayerUI`) causes unnecessary HTML parsing, memory allocation, and garbage collection overhead, leading to layout thrashing and jank.
+**Action:** When updating elements frequently, prioritize reusing existing DOM nodes. Check for the element's existence first (e.g., `let img = el.querySelector('img')`), create it once with `document.createElement` if missing, and then simply update its attributes (like `.src` or `.textContent`) instead of replacing the entire node.
