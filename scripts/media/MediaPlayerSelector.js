@@ -25,8 +25,9 @@ if (carousel && pagination) {
         // Create Iframe
         const iframe = document.createElement('iframe');
         iframe.className = 'player-frame';
-        iframe.src = player.url;
-        iframe.loading = 'lazy';
+        // PERF: Defer loading iframe source until it enters the viewport
+        iframe.dataset.src = player.url;
+        iframe.loading = 'lazy'; // Keep for native browser support just in case
         card.appendChild(iframe);
 
         carousel.appendChild(card);
@@ -41,6 +42,24 @@ if (carousel && pagination) {
         });
         pagination.appendChild(dot);
     });
+
+    // PERF: Observer for lazy loading horizontal carousel iframes
+    const observer = new IntersectionObserver((entries, obs) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const iframe = entry.target.querySelector('iframe');
+                if (iframe && iframe.dataset.src) {
+                    iframe.src = iframe.dataset.src;
+                    iframe.removeAttribute('data-src');
+                }
+                obs.unobserve(entry.target);
+            }
+        });
+    }, { root: carousel, rootMargin: '0px 50% 0px 50%' });
+
+    // Observe each card
+    const cards = carousel.querySelectorAll('.player-card');
+    cards.forEach(card => observer.observe(card));
 
     window.addEventListener('keydown', (e) => {
         if (e.key === 'ArrowLeft') carousel.scrollBy({ left: -window.innerWidth * 0.8, behavior: 'smooth' });
