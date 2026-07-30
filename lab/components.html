@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="color-scheme" content="dark light" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Media Components Lab</title>
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="stylesheet" href="../styles/lab-shared.css">
+    <link rel="stylesheet" href="../styles/components/media-player.css">
+    <link rel="stylesheet" href="../styles/components/media-player-inline.css">
+    <style>
+        body {
+            padding: 2rem;
+            min-height: 100vh;
+        }
+
+        .components-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .component-wrapper {
+            background: var(--bg-surface, oklch(from #2a2a2a l c h));
+            padding: 1.5rem;
+            border-radius: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            container-type: inline-size;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+            overflow: hidden;
+        }
+
+        @media (prefers-color-scheme: light) {
+            .component-wrapper {
+                background: var(--bg-surface, oklch(from #f5f5f5 l c h));
+                border: 1px solid var(--border-color, rgba(0, 0, 0, 0.1));
+            }
+        }
+
+        /* Overrides to make sure grid children display fine */
+        .component-wrapper .media-player__controls {
+            grid-column: 1 / -1;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            padding: .75rem;
+        }
+
+        .component-wrapper .media-player__meta {
+            width: 100%;
+            background: oklch(from #333 l c h);
+            padding: 1rem;
+            border-radius: 1rem;
+        }
+
+        .component-wrapper .media-player__presets {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-auto-flow: column;
+            grid-auto-columns: calc((100% - 2rem) / 5);
+            gap: 0.5rem;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            scrollbar-width: none;
+            background: oklch(from #333 l c h);
+            padding: 1rem;
+            border-radius: 1rem;
+        }
+
+        .component-wrapper .media-player__progress {
+            background: oklch(from #333 l c h);
+            padding: 1rem;
+            border-radius: 1rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .component-wrapper .media-player__equalizer {
+            background: oklch(from #333 l c h);
+            border-radius: 1rem;
+            min-height: 100px;
+        }
+
+        .progress-slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 4px;
+            border-radius: 2px;
+            background: rgba(255, 255, 255, 0.2);
+            outline: none;
+            cursor: pointer;
+        }
+        .progress-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #fff;
+            cursor: pointer;
+        }
+        .progress-slider::-moz-range-thumb {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #fff;
+            cursor: pointer;
+            border: none;
+        }
+
+        .component-wrapper h3 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+    <main class="components-grid">
+        <!-- Meta Info -->
+        <article class="component-wrapper">
+            <h3>Meta Information</h3>
+            <div class="media-player__meta">
+                <div class="media-player__meta__title"><span>Select Track</span></div>
+                <div class="media-player__meta__artist"><span>...</span></div>
+            </div>
+        </article>
+
+        <!-- Main Controls -->
+        <article class="component-wrapper">
+            <h3>Main Controls</h3>
+            <div class="media-player__controls">
+                <button class="media-player__controls__current" data-analytics-element="Current Track">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
+                        fill="oklch(from #e3e3e3 l c h)">
+                        <path
+                            d="M360-400h400L622-580l-92 120-62-80-108 140Zm-40 160q-33 0-56.5-23.5T240-320v-480q0-33 23.5-56.5T320-880h480q33 0 56.5 23.5T880-800v480q0 33-23.5 56.5T800-240H320Zm0-80h480v-480H320v480ZM160-80q-33 0-56.5-23.5T80-160v-560h80v560h560v80H160Zm160-720v480-480Z" />
+                    </svg>
+                </button>
+                <button class="media-player__controls__play" data-analytics-element="Play">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
+                        fill="oklch(from #e3e3e3 l c h)">
+                        <path
+                            d="M320-200v-560l440 280-440 280Zm80-280Zm0 134 210-134-210-134v268Z" />
+                    </svg>
+                </button>
+                <button class="media-player__controls__option" data-analytics-element="Options">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
+                        fill="oklch(from #e3e3e3 l c h)">
+                        <path
+                            d="M720-120H280v-520l280-280 50 50q7 7 11.5 19t4.5 23v14l-44 174h258q32 0 56 24t24 56v80q0 7-2 15t-4 15L794-168q-9 20-30 34t-44 14Zm-360-80h360l120-280v-80H480l54-220-174 174v406Zm0-406v406-406Zm-80-34v80H160v360h120v80H80v-520h200Z" />
+                    </svg>
+                </button>
+            </div>
+        </article>
+
+        <!-- Progress Bar -->
+        <article class="component-wrapper">
+            <h3>Progress Bar</h3>
+            <div class="media-player__progress">
+                <input type="range" class="progress-slider" min="0" max="100" value="0">
+            </div>
+        </article>
+
+        <!-- Presets -->
+        <article class="component-wrapper">
+            <h3>Presets</h3>
+            <div class="media-player__presets">
+                <!-- Populated by JS -->
+            </div>
+        </article>
+
+        <!-- Inline Player -->
+        <article class="component-wrapper">
+            <h3>Inline Player</h3>
+            <section class="media-player-inline">
+                <div class="media-player-inline__meta">
+                    <span class="media-player-inline__title">Loading...</span>
+                    <span class="media-player-inline__artist">Artist</span>
+                </div>
+                <div class="media-player-inline__controls">
+                    <button class="media-player-inline__prev" data-analytics-element="Previous" title="Previous">
+                        <svg viewBox="0 -960 960 960">
+                            <path d="M240-240v-480h80v480h-80Zm440 0L400-480l280-240v480Z" />
+                        </svg>
+                    </button>
+                    <button class="media-player-inline__play" data-analytics-element="Play" title="Play">
+                        <svg viewBox="0 -960 960 960">
+                            <path d="M320-200v-560l440 280-440 280Zm80-280Zm0 134 210-134-210-134v268Z" />
+                        </svg>
+                    </button>
+                    <button class="media-player-inline__next" data-analytics-element="Next" title="Next">
+                        <svg viewBox="0 -960 960 960">
+                            <path d="M640-240v-480h80v480h-80Zm-400 0v-480l280 240-280 240Z" />
+                        </svg>
+                    </button>
+                </div>
+            </section>
+        </article>
+
+        <!-- Equalizer -->
+        <article class="component-wrapper">
+            <h3>Equalizer</h3>
+            <div class="media-player__equalizer"></div>
+        </article>
+
+        <!-- Individual Buttons -->
+        <article class="component-wrapper">
+            <h3>Individual Buttons</h3>
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
+                <button class="individual-btn media-player-inline__prev" style="background: oklch(from #333 l c h); border-radius: 50%; width: 48px; height: 48px; display: grid; place-items: center; border: none; cursor: pointer;">
+                    <svg viewBox="0 -960 960 960" width="24px" fill="white">
+                        <path d="M240-240v-480h80v480h-80Zm440 0L400-480l280-240v480Z" />
+                    </svg>
+                </button>
+                <button class="individual-btn media-player-inline__play" style="background: oklch(from #333 l c h); border-radius: 50%; width: 48px; height: 48px; display: grid; place-items: center; border: none; cursor: pointer;">
+                    <svg viewBox="0 -960 960 960" width="24px" fill="white">
+                        <path d="M320-200v-560l440 280-440 280Zm80-280Zm0 134 210-134-210-134v268Z" />
+                    </svg>
+                </button>
+                <button class="individual-btn media-player-inline__next" style="background: oklch(from #333 l c h); border-radius: 50%; width: 48px; height: 48px; display: grid; place-items: center; border: none; cursor: pointer;">
+                    <svg viewBox="0 -960 960 960" width="24px" fill="white">
+                        <path d="M640-240v-480h80v480h-80Zm-400 0v-480l280 240-280 240Z" />
+                    </svg>
+                </button>
+            </div>
+        </article>
+
+        <!-- Long Click Button -->
+        <article class="component-wrapper">
+            <h3>Long Click Button</h3>
+            <div style="display: flex; flex-direction: column; gap: 1rem; align-items: flex-start;">
+                <button class="long-click-btn" style="background: oklch(from #333 l c h); border-radius: 1rem; padding: 0.5rem 1rem; color: white; border: none; cursor: pointer; display: flex; align-items: center; gap: 0.5rem;">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor">
+                        <path d="M720-120H280v-520l280-280 50 50q7 7 11.5 19t4.5 23v14l-44 174h258q32 0 56 24t24 56v80q0 7-2 15t-4 15L794-168q-9 20-30 34t-44 14Zm-360-80h360l120-280v-80H480l54-220-174 174v406Zm0-406v406-406Zm-80-34v80H160v360h120v80H80v-520h200Z" />
+                    </svg>
+                    <span>Options (Long Press)</span>
+                </button>
+                <div id="long-click-output" style="min-height: 1.5em; color: var(--text-color, oklch(from #aaa l c h));">Waiting for interaction...</div>
+            </div>
+        </article>
+
+    </main>
+
+    <audio id="audio-player" crossorigin="anonymous"></audio>
+
+<script type="module">
+
+        import { MediaPlayerCore } from '../scripts/media/MediaPlayerCore.js';
+        import { EqualizerUI } from '../scripts/media/EqualizerUI.js';
+        import { UI } from '../scripts/media/MediaPlayerUI.js';
+        import { SVG_PATHS } from '../scripts/media/Constants.js';
+
+        const audio = document.getElementById('audio-player');
+        const core = new MediaPlayerCore(audio);
+
+        // --- DOM Elements ---
+
+        // Meta Component
+        const metaTitleEl = document.querySelector('.media-player__meta__title');
+        const metaArtistEl = document.querySelector('.media-player__meta__artist');
+
+        // Main Controls Component
+        const playButton = document.querySelector('.media-player__controls__play');
+        const currentArtBtn = document.querySelector('.media-player__controls__current');
+        const optionButton = document.querySelector('.media-player__controls__option');
+
+        // Progress Bar Component
+        const progressSlider = document.querySelector('.progress-slider');
+
+        // Presets Component
+        const presetsContainer = document.querySelector('.media-player__presets');
+
+        // Inline Player Component
+        const inlineTitleEl = document.querySelector('.media-player-inline__title');
+        const inlineArtistEl = document.querySelector('.media-player-inline__artist');
+        const inlinePlayButton = document.querySelector('.media-player-inline__play');
+        const inlinePrevButton = document.querySelector('.media-player-inline__prev');
+        const inlineNextButton = document.querySelector('.media-player-inline__next');
+
+        // Equalizer Component
+        const equalizerContainer = document.querySelector('.media-player__equalizer');
+        const equalizerUI = new EqualizerUI(equalizerContainer, audio, { type: 'full' });
+
+
+        // --- Core Subscriptions ---
+        core.subscribe((event, data) => {
+            if (event === 'play' || event === 'pause' || event === 'ended') {
+                if (event === 'play') equalizerUI.initAudio();
+
+                // Update Main Controls
+                UI.updatePlayIcon(playButton, audio.paused);
+
+                // Update Inline Controls
+                const inlinePath = inlinePlayButton.querySelector('svg path');
+                if (inlinePath) {
+                    inlinePath.setAttribute('d', audio.paused ? SVG_PATHS.PLAY : SVG_PATHS.PAUSE);
+                }
+            }
+            if (event === 'trackChanged') {
+                // Update Meta Component
+                UI.updateTrackInfo({ title: metaTitleEl, artist: metaArtistEl, artBtn: currentArtBtn }, data);
+
+                // Update Inline Meta
+                inlineTitleEl.textContent = data.title;
+                inlineArtistEl.textContent = data.artist;
+                UI.updateMarquee(inlineTitleEl.parentElement);
+
+                // Update Presets Active State
+                presetsContainer.querySelectorAll('.media-player__presets__preset').forEach(btn => {
+                    if (btn.dataset.id === data.id) {
+                        btn.classList.add('active');
+                    } else {
+                        btn.classList.remove('active');
+                    }
+                });
+            }
+            if (event === 'timeupdate') {
+                if (audio.duration) {
+                    const progressPercent = (audio.currentTime / audio.duration) * 100;
+                    progressSlider.value = progressPercent;
+                    progressSlider.style.background = `linear-gradient(to right, #fff ${progressPercent}%, rgba(255, 255, 255, 0.2) ${progressPercent}%)`;
+                }
+            }
+        });
+
+
+        // --- Event Listeners ---
+        playButton.addEventListener('click', () => core.togglePlay());
+        inlinePlayButton.addEventListener('click', () => core.togglePlay());
+
+        inlinePrevButton.addEventListener('click', () => core.playPrevious());
+        inlineNextButton.addEventListener('click', () => core.playNext());
+
+        progressSlider.addEventListener('input', (e) => {
+            if (audio.duration) {
+                const newTime = (e.target.value / 100) * audio.duration;
+                audio.currentTime = newTime;
+            }
+        });
+
+
+        // Individual Buttons
+        const indPrevBtn = document.querySelector('.individual-btn.media-player-inline__prev');
+        const indPlayBtn = document.querySelector('.individual-btn.media-player-inline__play');
+        const indNextBtn = document.querySelector('.individual-btn.media-player-inline__next');
+
+        indPrevBtn.addEventListener('click', () => core.playPrevious());
+        indPlayBtn.addEventListener('click', () => core.togglePlay());
+        indNextBtn.addEventListener('click', () => core.playNext());
+
+        // Long Click Button Setup
+        const longClickBtn = document.querySelector('.long-click-btn');
+        const longClickOutput = document.getElementById('long-click-output');
+
+        UI.setupLongPress(longClickBtn, {
+            onShortPress: () => {
+                longClickOutput.textContent = 'Action: Short Press Triggered!';
+                longClickOutput.style.color = 'lightblue';
+            },
+            onLongPress: () => {
+                longClickOutput.textContent = 'Action: LONG Press Triggered!';
+                longClickOutput.style.color = 'lightgreen';
+            },
+            delay: 500
+        });
+
+        // Listen to core events to update the individual play button icon
+        core.subscribe((event) => {
+            if (event === 'play' || event === 'pause' || event === 'ended') {
+                const indPath = indPlayBtn.querySelector('svg path');
+                if (indPath) {
+                    indPath.setAttribute('d', audio.paused ? SVG_PATHS.PLAY : SVG_PATHS.PAUSE);
+                }
+            }
+        });
+
+        // --- Init ---
+        core.loadTrack(0);
+
+        // Populate Presets
+        const fragment = document.createDocumentFragment();
+        core.tracks.forEach(track => {
+            const btn = document.createElement('button');
+            btn.className = 'media-player__presets__preset';
+            btn.dataset.id = track.id;
+            btn.setAttribute('aria-label', `Play ${track.title} by ${track.artist}`);
+
+            if (track.albumArt) {
+                btn.classList.add('has-art');
+                const img = document.createElement('img');
+                img.src = track.albumArt;
+                img.alt = `Album art for ${track.title}`;
+                img.loading = 'lazy';
+                btn.replaceChildren(img);
+            } else {
+                btn.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor">
+                        <path d="M400-120q-66 0-113-47t-47-113q0-66 47-113t113-47q23 0 42.5 5.5T480-418v-422h240v160H560v400q0 66-47 113t-113 47Z"/>
+                    </svg>`;
+            }
+
+            btn.addEventListener('click', () => {
+                const trackIndex = core.tracks.findIndex(t => t.id === track.id);
+                if (trackIndex !== -1) {
+                    if (core.currentTrackIndex === trackIndex && !audio.paused) {
+                        core.togglePlay();
+                    } else {
+                        core.loadTrack(trackIndex);
+                        core.togglePlay();
+                    }
+                }
+            });
+
+            fragment.appendChild(btn);
+        });
+        presetsContainer.appendChild(fragment);
+
+    </script>
+</body>
+</html>
