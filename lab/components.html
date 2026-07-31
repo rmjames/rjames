@@ -117,6 +117,166 @@
             font-size: 1.25rem;
             font-weight: 600;
         }
+
+        /* Configuration Controls Styles */
+        .component-wrapper {
+            position: relative; /* For positioning the controls button */
+            transition: outline 0.2s ease, opacity 0.3s ease, filter 0.3s ease;
+        }
+
+        .component-wrapper.is-configuring {
+            outline: 2px solid var(--orange-3);
+        }
+
+        .components-grid.has-active-config .component-wrapper:not(.is-configuring) {
+            opacity: 0.4;
+            filter: blur(4px);
+            pointer-events: none;
+        }
+
+        .config-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: transparent;
+            border: none;
+            color: var(--text-color, oklch(from #e3e3e3 l c h));
+            cursor: pointer;
+            padding: 0.25rem;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            opacity: 0.5;
+            transition: opacity 0.2s ease, background 0.2s ease;
+            z-index: 10;
+        }
+
+        .config-btn:hover {
+            opacity: 1;
+            background: oklch(1 0 0 / 0.1);
+        }
+
+        .config-popover {
+            padding: 1.5rem;
+            border-radius: 1rem;
+            background: var(--bg-surface, oklch(from #1a1a1a l c h));
+            border: 1px solid var(--border-color, oklch(1 0 0 / 0.1));
+            color: var(--text-color, oklch(from #e3e3e3 l c h));
+            box-shadow: 0 8px 24px oklch(0 0 0 / 0.3);
+            margin: auto;
+            max-width: 90vw;
+            width: max-content;
+            min-width: 400px;
+        }
+
+        .config-popover::backdrop {
+            background: oklch(0 0 0 / 0.5);
+            backdrop-filter: blur(2px);
+        }
+
+        @media (prefers-color-scheme: light) {
+            .config-popover {
+                background: var(--bg-surface, oklch(from #ffffff l c h));
+                border: 1px solid var(--border-color, oklch(0 0 0 / 0.1));
+                color: var(--text-color, oklch(from #333 l c h));
+            }
+            .config-popover::backdrop {
+                background: oklch(0 0 0 / 0.2);
+            }
+            .config-btn {
+                color: var(--text-color, oklch(from #333 l c h));
+            }
+            .config-btn:hover {
+                background: oklch(0 0 0 / 0.1);
+            }
+        }
+
+        .config-popover-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-color, oklch(1 0 0 / 0.1));
+        }
+
+        .config-popover-header h4 {
+            margin: 0;
+            font-size: 1.1rem;
+        }
+
+        .config-popover-close {
+            background: transparent;
+            border: none;
+            color: inherit;
+            cursor: pointer;
+            padding: 0.25rem;
+            display: grid;
+            place-items: center;
+            border-radius: 50%;
+        }
+
+        .config-popover-close:hover {
+            background: oklch(1 0 0 / 0.1);
+        }
+
+        .config-control-group {
+            display: grid;
+            grid-template-columns: 1.5fr 2fr 1fr;
+            gap: 1rem;
+            align-items: center;
+            margin-bottom: 0.75rem;
+            font-family: var(--font-stack);
+        }
+
+        .config-control-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .config-control-group label {
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+
+        .config-control-value {
+            font-size: 0.85rem;
+            font-family: "Courier New", monospace;
+            color: var(--gray-1);
+            text-align: right;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .config-control-group input[type="range"] {
+            width: 100%;
+        }
+
+        .config-control-group select,
+        .config-control-group input[type="text"] {
+            width: 100%;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            border: 1px solid var(--border-color, oklch(1 0 0 / 0.2));
+            background: var(--bg-surface, oklch(0 0 0 / 0.2));
+            color: inherit;
+            font-family: inherit;
+            font-size: 0.85rem;
+        }
+
+        @media (prefers-color-scheme: light) {
+            .config-control-group select,
+            .config-control-group input[type="text"] {
+                border: 1px solid var(--border-color, oklch(0 0 0 / 0.2));
+                background: var(--bg-surface, oklch(1 0 0 / 0.5));
+            }
+            .config-popover-header {
+                border-bottom: 1px solid var(--border-color, oklch(0 0 0 / 0.1));
+            }
+            .config-popover-close:hover {
+                background: oklch(0 0 0 / 0.1);
+            }
+        }
     </style>
 </head>
 <body>
@@ -255,6 +415,7 @@
         import { EqualizerUI } from '../scripts/media/EqualizerUI.js';
         import { UI } from '../scripts/media/MediaPlayerUI.js';
         import { SVG_PATHS } from '../scripts/media/Constants.js';
+        import { ConfigPanelManager } from '../scripts/utils/ConfigPanelManager.js';
 
         const audio = document.getElementById('audio-player');
         const core = new MediaPlayerCore(audio);
@@ -420,6 +581,117 @@
             fragment.appendChild(btn);
         });
         presetsContainer.appendChild(fragment);
+
+        // --- Configuration Controls Setup ---
+        const componentWrappers = document.querySelectorAll('.component-wrapper');
+
+        const labControlSchema = [
+            {
+                label: 'Inline Size (Width)',
+                type: 'range',
+                property: 'width',
+                min: 100, max: 800,
+                value: (target) => target.offsetWidth,
+                unit: 'px',
+                onChange: (val, target) => target.style.width = `${val}px`
+            },
+            {
+                label: 'Block Size (Height)',
+                type: 'range',
+                property: 'height',
+                min: 50, max: 600,
+                value: (target) => target.offsetHeight,
+                unit: 'px',
+                onChange: (val, target) => target.style.height = `${val}px`
+            },
+            {
+                label: 'Border Radius',
+                type: 'range',
+                property: 'borderRadius',
+                min: 0, max: 64, value: 24, unit: 'px', // Default 1.5rem ~ 24px
+                onChange: (val, target) => target.style.borderRadius = `${val}px`
+            },
+            {
+                label: 'Padding',
+                type: 'range',
+                property: 'padding',
+                min: 0, max: 64, value: 24, unit: 'px', // Default 1.5rem ~ 24px
+                onChange: (val, target) => target.style.padding = `${val}px`
+            },
+            {
+                label: 'Font Size',
+                type: 'range',
+                property: 'fontSize',
+                min: 10, max: 32, value: 16, unit: 'px',
+                onChange: (val, target) => target.style.fontSize = `${val}px`
+            },
+            {
+                label: 'Background Color',
+                type: 'select',
+                property: 'backgroundColor',
+                options: ['Default', 'var(--black-3)', 'var(--black-1)', 'var(--white-1)', 'var(--white-2)', 'var(--blue-1)', 'var(--orange-1)'],
+                onChange: (val, target) => target.style.background = val === 'Default' ? '' : val
+            },
+            {
+                label: 'Text/Icon Color',
+                type: 'select',
+                property: 'color',
+                options: ['Default', 'var(--white-1)', 'var(--white-2)', 'var(--black-3)', 'var(--black-1)', 'var(--gray-1)', 'var(--blue-3)', 'var(--orange-2)'],
+                onChange: (val, target) => target.style.color = val === 'Default' ? '' : val
+            },
+            {
+                label: 'Font Family',
+                type: 'select',
+                property: 'fontFamily',
+                options: ['System Default', 'Arial, sans-serif', '"Courier New", monospace', 'Georgia, serif', '"Times New Roman", Times, serif'],
+                onChange: (val, target) => target.style.fontFamily = val === 'System Default' ? '' : val
+            },
+            {
+                label: 'Display',
+                type: 'select',
+                property: 'display',
+                options: ['flex', 'block', 'grid', 'inline-block'],
+                onChange: (val, target) => target.style.display = val
+            },
+            {
+                label: 'Transform',
+                type: 'text',
+                property: 'transform',
+                placeholder: 'e.g., scale(0.9) rotate(5deg)',
+                onChange: (val, target) => target.style.transform = val
+            },
+            {
+                label: 'Transition',
+                type: 'text',
+                property: 'transition',
+                placeholder: 'e.g., all 0.3s ease',
+                onChange: (val, target) => target.style.transition = val
+            }
+        ];
+
+        componentWrappers.forEach((wrapper) => {
+            // Instantiate the agnostic config panel manager
+            new ConfigPanelManager({
+                target: wrapper,
+                schema: labControlSchema
+            });
+
+            // Listen to the dispatched CustomEvents to handle UI state explicitly in the consuming file
+            wrapper.addEventListener('config-open', () => {
+                const grid = wrapper.closest('.components-grid');
+                wrapper.classList.add('is-configuring');
+                if (grid) grid.classList.add('has-active-config');
+            });
+
+            wrapper.addEventListener('config-close', () => {
+                const grid = wrapper.closest('.components-grid');
+                wrapper.classList.remove('is-configuring');
+                // Check if any other popovers are still open (unlikely due to popover auto behavior, but safe)
+                if (grid && !document.querySelector('.is-configuring')) {
+                    grid.classList.remove('has-active-config');
+                }
+            });
+        });
 
     </script>
 </body>
