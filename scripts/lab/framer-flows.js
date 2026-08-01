@@ -1,4 +1,4 @@
-import { resetAnimation } from '../utils.js';
+import { resetAnimation } from '../utils/resetAnimation.js';
 
 function handleReset() {
     resetAnimation('.box, .box-m, .box-s');

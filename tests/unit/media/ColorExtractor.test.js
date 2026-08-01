@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { ColorExtractor } from '../../../scripts/media/ColorExtractor.js';
+import { ColorExtractor } from '../../../scripts/utils/ColorExtractor.js';
 
 describe('ColorExtractor', () => {
     describe('rgbToOklch', () => {

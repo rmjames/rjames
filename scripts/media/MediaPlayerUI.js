@@ -1,5 +1,5 @@
 import { SVG_PATHS } from './Constants.js';
-import { ColorExtractor } from './ColorExtractor.js';
+import { ColorExtractor } from '../utils/ColorExtractor.js';
 
 export const UI = {
     updatePlayIcon(button, isPaused) {

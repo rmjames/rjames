@@ -1,10 +1,10 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { UI } from '../../../scripts/media/MediaPlayerUI.js';
 import { SVG_PATHS } from '../../../scripts/media/Constants.js';
-import { ColorExtractor } from '../../../scripts/media/ColorExtractor.js';
+import { ColorExtractor } from '../../../scripts/utils/ColorExtractor.js';
 
 // Mock ColorExtractor
-vi.mock('../../../scripts/media/ColorExtractor.js', () => ({
+vi.mock('../../../scripts/utils/ColorExtractor.js', () => ({
     ColorExtractor: {
         getAccentColor: vi.fn().mockResolvedValue('oklch(0.5 0.5 180)')
     }

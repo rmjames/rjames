@@ -130,16 +130,15 @@
     let t = 0;
     const generateChunk = (deadline) => {
       while ((!deadline || deadline.timeRemaining() > 1) && t <= totalDuration) {
-        let progress = 0;
         if (t < timing.hold1) {
           current.set(circle);
         } else if (t < timing.hold1 + timing.morph1) {
-          progress = (t - timing.hold1) / timing.morph1;
+          const progress = (t - timing.hold1) / timing.morph1;
           for (let i = 0; i < current.length; i++) current[i] = circle[i] + (target[i] - circle[i]) * progress;
         } else if (t < timing.hold1 + timing.morph1 + timing.hold2) {
           current.set(target);
         } else if (t < timing.hold1 + timing.morph1 + timing.hold2 + timing.morph2) {
-          progress = (t - (timing.hold1 + timing.morph1 + timing.hold2)) / timing.morph2;
+          const progress = (t - (timing.hold1 + timing.morph1 + timing.hold2)) / timing.morph2;
           for (let i = 0; i < current.length; i++) current[i] = target[i] + (circle[i] - target[i]) * progress;
         } else {
           current.set(circle);
