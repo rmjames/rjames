@@ -1,4 +1,4 @@
-import { resetAnimation } from '../utils.js';
+import { resetAnimation } from '../utils/resetAnimation.js';
 
 function handleReset() {
     resetAnimation('.bloc, .triangle, .circle, .half-circle, .polygon');

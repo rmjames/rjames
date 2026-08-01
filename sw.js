@@ -42,7 +42,7 @@ const assetsToCache = [
   '/scripts/analytics.js',
   '/scripts/analytics-loader.js',
   '/scripts/copyright.js',
-  '/scripts/media/ColorExtractor.js',
+  '/scripts/utils/ColorExtractor.js',
   '/scripts/media/Constants.js',
   '/scripts/media/Equalizer.js',
   '/scripts/media/EqualizerUI.js',

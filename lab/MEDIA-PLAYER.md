@@ -10,6 +10,15 @@ The media players follow a **Provider/Consumer** architecture:
 - **Provider**: `MediaPlayerCore.js` managing the `<audio>` state, library tracks, and event subscriptions.
 - **Consumer**: Individual HTML files implementing specific UI layouts using `MediaPlayerUI.js` and shared CSS components.
 
+### Component Sharing Strategy
+
+To share common HTML components (like MediaControls, MediaMeta) across the various media player HTML files within this vanilla JS/ES Modules architecture, we utilize **JS Factory Functions (DOM Generation)**.
+
+- **Approach**: Dedicated factory functions (e.g., `createMediaControls()`) are exported from a shared module (such as `MediaPlayerUI.js` or a new component factory module). 
+- **Implementation**: These functions use standard DOM APIs (`document.createElement` or `insertAdjacentHTML`) to build the required HTML structure, attach necessary event listeners, and return the DOM node.
+- **Usage**: The consumer HTML files simply define an empty container and append the generated DOM node.
+- **Benefits**: This approach fits natively into the existing ES Module pattern, eliminates repetitive HTML boilerplates across the different player variants, and makes it straightforward to pass the `MediaPlayerCore` instance into the factories for immediate event binding.
+
 ## Maintenance & Future Updates
 
 **IMPORTANT:** This document serves as the source of truth for the media player architecture. Whenever changes are made to `MediaPlayerCore.js`, `MediaPlayerUI.js`, `Equalizer.js`, `ColorExtractor.js`, or any of the HTML variants (including the addition of new variants or components), this document **MUST** be updated. Ensure that any new performance optimizations, security considerations, or UI components are fully documented here to maintain architectural clarity.
