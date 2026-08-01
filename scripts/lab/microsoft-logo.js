@@ -1,4 +1,4 @@
-import { resetAnimation } from '../utils.js';
+import { resetAnimation } from '../utils/resetAnimation.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const resetBtn = document.querySelector('.reset-btn');
