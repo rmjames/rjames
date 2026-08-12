@@ -3,6 +3,7 @@
     height: 1.25rem;
     margin-block-end: 0.3rem;
     fill: light-dark(var(--black-1), var(--white-1));
+    flex-shrink: 0
 }
 
 .icon-set {
