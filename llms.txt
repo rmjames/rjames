@@ -2,6 +2,12 @@
 
 > Robert James is a UX Engineer who designs and builds digital experiences and products. This repository contains his personal website, resume, design system pattern library, and a collection of interactive experimental lab projects.
 
+## Contact & Inquiries
+
+- [Contact / Email Inquiry](mailto:rma.james@gmail.com?Subject=Inquiry): Direct email contact link to initiate project discussions, inquiries, or collaborations with Robert James.
+- [LinkedIn](https://www.linkedin.com/in/robertmajames): Professional profile and messaging.
+- [GitHub](https://github.com/rmjames): Open-source repositories and code contributions.
+
 ## Core Pages
 
 - [Homepage](https://robertjames.nyc/): Personal details, brand interactions, and highlights.
@@ -11,13 +17,14 @@
 
 ## Interactive Lab Projects
 
-- [Interactive Headphones](https://robertjames.nyc/lab/headphones.html): Interactive headphones animation featuring configurable 3D-like states, ambient audio preview playback, and fade out capabilities.
-- [Framer Flows](https://robertjames.nyc/lab/framer-flows.html): Simulation demonstrating smooth workflow animations and transitions mimicking Framer interfaces.
-- [Emoji Speaker](https://robertjames.nyc/lab/emoji-speaker.html): Interactive layout showcasing custom grid animations with animated emoji audio visualizations.
-- [Google Search Loader](https://robertjames.nyc/lab/google-search-loader.html): Reconstruction of Google Search loading/processing visual indicators.
-- [Google Loader](https://robertjames.nyc/lab/google-loader.html): CSS-only replication of Google's standard animated loading dot loops.
-- [Framer Loaders](https://robertjames.nyc/lab/framer-loaders.html): Re-creation of loaders and spinners matching Framer design aesthetics.
 - [Microsoft Logo](https://robertjames.nyc/lab/microsoft-logo.html): Animated CSS transition recreation of Microsoft's branding grid.
+- [Interactive Headphones](https://robertjames.nyc/lab/headphones.html): Interactive headphones animation featuring configurable 3D-like states, ambient audio preview playback, and fade out capabilities.
+- [Emoji Speaker](https://robertjames.nyc/lab/emoji-speaker.html): Interactive layout showcasing custom grid animations with animated emoji audio visualizations.
+- [Framer Loaders](https://robertjames.nyc/lab/framer-loaders.html): Re-creation of loaders and spinners matching Framer design aesthetics.
+- [Google Loader](https://robertjames.nyc/lab/google-loader.html): CSS-only replication of Google's standard animated loading dot loops.
+- [Framer Flows](https://robertjames.nyc/lab/framer-flows.html): Simulation demonstrating smooth workflow animations and transitions mimicking Framer interfaces.
+- [Google Search Loader](https://robertjames.nyc/lab/google-search-loader.html): Reconstruction of Google Search loading/processing visual indicators.
 - [Framer Logo](https://robertjames.nyc/lab/framer-logo.html): Re-creation of Framer's signature geometric branding animation.
 - [Figma Logo](https://robertjames.nyc/lab/figma-logo.html): Smooth CSS translation of Figma's classic branding shapes.
 - [Buttons Custom Properties](https://robertjames.nyc/lab/buttons-custom-properties.html): Micro-interaction demos of CSS Custom Property-driven button animations.
+- [Checkout Tracking Card](https://robertjames.nyc/lab/checkout-tracking-card.html): Interactive order status progress card featuring animated step transitions and state tracking.
