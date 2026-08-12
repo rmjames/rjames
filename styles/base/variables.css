@@ -50,6 +50,7 @@
     --recursive-CRSV: 0.5;
     --selection-color: var(--gray-1);
     color-scheme: light dark;
+    --asset-theme: ;
 
     @supports (color: rgb(from white r g b)) {
         --white-1: oklch(from hsl(0 0% 100%) l c h);

@@ -11,7 +11,7 @@
     align-items: center;
     gap: 0.5rem;
     padding: 0.5rem 1rem;
-    background: rgba(255, 255, 255, 0.7);
+    background: oklch(from rgba(255, 255, 255, 0.7) l c h);
     color: #1a1a1a;
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
@@ -20,9 +20,9 @@
     font-family: system-ui, -apple-system, sans-serif;
     font-size: 0.875rem;
     font-weight: 600;
-    border: 1px solid rgba(0, 0, 0, 0.08);
+    border: 1px solid oklch(from rgba(0, 0, 0, 0.08) l c h);
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 12px oklch(0% 0 0 / 5%);
 
     span {
         font-size: inherit;
@@ -32,23 +32,23 @@
 
 @media (prefers-color-scheme: dark) {
     .back-link {
-        background: rgba(30, 30, 30, 0.7);
+        background: oklch(from rgba(30, 30, 30, 0.7) l c h);
         color: #f5f5f5;
-        border-color: rgba(255, 255, 255, 0.08);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+        border-color: oklch(from rgba(255, 255, 255, 0.08) l c h);
+        box-shadow: 0 4px 12px oklch(0% 0 0 / 25%);
     }
 }
 
 .back-link:hover {
     transform: translateX(-4px);
-    background: rgba(255, 255, 255, 0.9);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+    background: oklch(from rgba(255, 255, 255, 0.9) l c h);
+    box-shadow: 0 6px 16px oklch(0% 0 0 / 10%);
 }
 
 @media (prefers-color-scheme: dark) {
     .back-link:hover {
-        background: rgba(50, 50, 50, 0.9);
-        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+        background: oklch(from rgba(50, 50, 50, 0.9) l c h);
+        box-shadow: 0 6px 16px oklch(0% 0 0 / 35%);
     }
 }
 
@@ -77,3 +77,5 @@
 html.in-iframe .back-link {
     display: none !important;
 }
+
+/*# sourceMappingURL=lab-shared.css.map */

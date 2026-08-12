@@ -23,7 +23,7 @@
 :where(:any-link, :-webkit-any-link) {
     color: light-dark(var(--text-dark-color), var(--text-light-color));
     text-decoration: none;
-    padding: 0 var(--xs);
+    padding: 0;
     transition: opacity 0.2s;
 }
 
