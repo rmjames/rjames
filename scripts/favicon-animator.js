@@ -10,6 +10,8 @@
 
   const FPS_TARGET = 10; // 10 FPS is plenty for a favicon and saves CPU
   const PAINT_INTERVAL = 1000 / FPS_TARGET;
+  const STROKE_WIDTH = .075; // Thinner stroke width for favicon rendering (reduced from 0.125)
+  const STROKE_COLOR = '%23f59e0b';
 
   const timing = {
     hold1: 2000,
@@ -120,7 +122,7 @@
       d += `C${pts[o].toFixed(3)} ${pts[o+1].toFixed(3)} ${pts[o+2].toFixed(3)} ${pts[o+3].toFixed(3)} ${pts[o+4].toFixed(3)} ${pts[o+5].toFixed(3)}`;
     }
     // Using %23 for # to avoid issues in some browsers
-    return `data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 1 1%22><path d=%22${d}Z%22 fill=%22none%22 stroke=%22%23f59e0b%22 stroke-width=%220.125%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22/></svg>`;
+    return `data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 1 1%22><path d=%22${d}Z%22 fill=%22none%22 stroke=%22${STROKE_COLOR}%22 stroke-width=%22${STROKE_WIDTH}%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22/></svg>`;
   }
 
   function pregenerateFrames() {
