@@ -27,7 +27,7 @@ jobs:
       (github.event_name == 'issue_comment' && contains(fromJSON('["trusted-user", "another-user"]'), github.event.comment.user.login))
     steps:
       - name: Invoke Jules for Cleanup
-        uses: google-labs-code/jules-invoke@v1
+        uses: google-labs-code/jules-action@v1
         with:
           prompt: |
             Please analyze the codebase and perform maintenance tasks:
