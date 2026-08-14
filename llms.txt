@@ -4,7 +4,6 @@
 
 ## Contact & Inquiries
 
-- [Contact / Email Inquiry](mailto:rma.james@gmail.com?Subject=Inquiry): Direct email contact link to initiate project discussions, inquiries, or collaborations with Robert James.
 - [LinkedIn](https://www.linkedin.com/in/robertmajames): Professional profile and messaging.
 - [GitHub](https://github.com/rmjames): Open-source repositories and code contributions.
 
