@@ -17,7 +17,7 @@ section {
     display: flex;
     flex-wrap: wrap;
     inline-size: 76vmin;
-    height: 76vmin;
+    block-size: 76vmin;
     gap: 0 1vmin;
 }
 
@@ -29,18 +29,22 @@ section {
 }
 
 .toTop {
+    --bg: oklch(from hsl(13.1 90.4% 55.3%) l c h);
     animation: toTop var(--delay) 1s var(--timing) forwards;
 }
 
 .toRight {
+    --bg: oklch(from hsl(79.1 93.8% 38%) l c h);
     animation: toRight var(--delay) 1.125s var(--timing) forwards;
 }
 
 .toLeft {
+    --bg: oklch(from hsl(199.1 95.9% 48.2%) l c h);
     animation: toLeft var(--delay) 1.25s var(--timing) forwards;
 }
 
 .toBottom {
+    --bg: oklch(from hsl(43.5 100% 50.8%) l c h);
     animation: toBottom var(--delay) 1.375s var(--timing) forwards;
 }
 
