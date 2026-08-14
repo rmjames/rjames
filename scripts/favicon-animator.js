@@ -203,6 +203,9 @@
   }
 
   function start() {
+    if (typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      return;
+    }
     if (!isCacheComplete) {
       pregenerateFrames();
       return;

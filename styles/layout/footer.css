@@ -40,6 +40,7 @@
         }
     }
 
+    & svg,
     & [role="img"] {
         display: none;
     }
