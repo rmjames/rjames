@@ -43,4 +43,23 @@ test.describe('Lab Animations Control', () => {
     await expect(speaker).toHaveCSS('animation-play-state', /running/);
     await expect(toggleBtn).toHaveAttribute('aria-label', 'Pause animation');
   });
+
+  test('Microsoft Logo animation renders boxes and supports reset', async ({ page }) => {
+    await page.goto('/lab/microsoft-logo.html');
+
+    const boxes = page.locator('.box');
+    await expect(boxes).toHaveCount(4);
+
+    const resetBtn = page.locator('.reset-btn');
+    await expect(resetBtn).toBeVisible();
+
+    await expect(page.locator('.box.toTop')).toBeVisible();
+    await expect(page.locator('.box.toRight')).toBeVisible();
+    await expect(page.locator('.box.toLeft')).toBeVisible();
+    await expect(page.locator('.box.toBottom')).toBeVisible();
+
+    // Trigger reset animation button
+    await resetBtn.click();
+    await expect(boxes.first()).toBeVisible();
+  });
 });
