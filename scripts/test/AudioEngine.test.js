@@ -74,7 +74,9 @@ describe('AudioEngine', () => {
       sampleRate: 44100
     };
 
-    window.AudioContext = vi.fn().mockImplementation(() => mockAudioContext);
+    window.AudioContext = vi.fn().mockImplementation(function() {
+      return mockAudioContext;
+    });
 
     global.fetch = vi.fn().mockResolvedValue({
       arrayBuffer: vi.fn().mockResolvedValue(new ArrayBuffer(8))

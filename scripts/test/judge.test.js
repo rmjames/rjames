@@ -190,6 +190,35 @@ describe('judge.js', () => {
             expect(result).toEqual({ pass: true, reasons: [] });
         });
 
+        it('should use custom GEMINI_BASE_URL and GEMINI_MODEL when configured', async () => {
+            const originalBase = process.env.GEMINI_BASE_URL;
+            const originalModel = process.env.GEMINI_MODEL;
+            process.env.GEMINI_BASE_URL = 'https://custom-proxy.example.com';
+            process.env.GEMINI_MODEL = 'custom-gemini-model';
+
+            global.fetch = vi.fn().mockResolvedValue({
+                ok: true,
+                json: () => Promise.resolve({
+                    candidates: [{
+                        content: {
+                            parts: [{ text: '{"pass": true, "reasons": []}' }]
+                        }
+                    }]
+                })
+            });
+
+            await callGemini('api-key', 'prompt', 'Security');
+            expect(global.fetch).toHaveBeenCalledWith(
+                'https://custom-proxy.example.com/v1beta/models/custom-gemini-model:generateContent',
+                expect.any(Object)
+            );
+
+            if (originalBase !== undefined) process.env.GEMINI_BASE_URL = originalBase;
+            else delete process.env.GEMINI_BASE_URL;
+            if (originalModel !== undefined) process.env.GEMINI_MODEL = originalModel;
+            else delete process.env.GEMINI_MODEL;
+        });
+
         it('should handle API errors gracefully', async () => {
             global.fetch = vi.fn().mockResolvedValue({
                 ok: false,
