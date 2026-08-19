@@ -165,7 +165,7 @@ body.dark-mode {
 }
 
 .btn-primary {
-    background-color: var(--accent-oklch(from blue l c h));
+    background-color: oklch(from blue l c h);
     color: oklch(from white l c h);
     border: none;
     padding: 0.6rem 1.2rem;

@@ -28,15 +28,16 @@
     <link rel="preload" href="fonts/recursive-variable.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="styles/main.css" as="style" />
     <link rel="stylesheet" href="styles/main.css" />
+    <link rel="modulepreload" href="scripts/favicon-animator.js">
     <link rel="apple-touch-icon" href="images/icon-ios.svg" />
     <link rel="icon" type="image/svg+xml" sizes="any" href="images/icon.svg" id="favicon-svg" />
     <link rel="icon" type="image/png" href="favicon_144.png" sizes="144x144" />
     <link rel="icon" type="image/png" href="favicon_512.png" sizes="512x512" />
     <link rel="icon" type="image/png" href="favicon_192.png" sizes="192x192" />
     <link rel="manifest" href="manifest.json" />
-    <script src="scripts/favicon-animator.js" async></script>
+    <script type="module" src="scripts/favicon-animator.js" async></script>
+    <script type="module" src="scripts/h1-animation.js"></script>
     <script type="speculationrules" src="scripts/speculation-rules-index.json"></script>
-    <script type="module" src="scripts/h1-animation.js" defer></script>
 </head>
 
 <body>
@@ -285,10 +286,10 @@
         </ul>
         <p class="copyright">©Robert James</p>
     </footer>
-    <script src="scripts/copyright.js" defer></script>
-    <script src="scripts/analytics-loader.js" defer></script>
-    <script src="scripts/register-sw.js" defer></script>
-    <script src="scripts/analytics.js" type="module" defer></script>
+    <script type="module" src="scripts/copyright.js"></script>
+    <script type="module" src="scripts/analytics-loader.js"></script>
+    <script type="module" src="scripts/register-sw.js"></script>
+    <script type="module" src="scripts/analytics.js"></script>
 </body>
 
 </html>
