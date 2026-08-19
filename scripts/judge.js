@@ -237,7 +237,13 @@ ${codebaseContent}
 
 async function callGemini(apiKey, prompt, agentType) {
     try {
-        const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent', {
+        const baseUrl = (process.env.GEMINI_BASE_URL || 'https://generativelanguage.googleapis.com').replace(/\/+$/, '');
+        const model = process.env.GEMINI_MODEL || 'gemini-flash-latest';
+        const url = baseUrl.includes('/models/')
+            ? baseUrl
+            : `${baseUrl}/v1beta/models/${model}:generateContent`;
+
+        const response = await fetch(url, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -259,6 +265,11 @@ async function callGemini(apiKey, prompt, agentType) {
             const errBody = await response.text();
             console.error(`Gemini API Error for ${agentType} Agent: ${response.status} ${response.statusText}`);
             console.error(scrubSecrets(errBody, apiKey));
+            if (errBody.includes('User location is not supported')) {
+                console.error('\n💡 Location Error Troubleshooting:');
+                console.error('   1. Check VPN / Proxy: Switch to a supported country/region (e.g. US, Canada).');
+                console.error('   2. Set GEMINI_BASE_URL in your .env to route through a reverse proxy or Vertex AI gateway.\n');
+            }
             return null;
         }
 
@@ -273,20 +284,33 @@ async function callGemini(apiKey, prompt, agentType) {
         let result;
         try {
             let cleanText = textResponse.trim();
+            if (cleanText.startsWith('```')) {
+                cleanText = cleanText.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
+            }
             // Try to extract JSON if it's wrapped in markdown or has preamble
             const jsonMatch = cleanText.match(/\{[\s\S]*\}/);
             if (jsonMatch) {
                 cleanText = jsonMatch[0];
             }
 
-            result = JSON.parse(cleanText);
+            try {
+                result = JSON.parse(cleanText);
+            } catch {
+                // Sanitize unescaped newlines/tabs inside JSON string literals
+                const sanitized = cleanText.replace(/(?<=:\s*"[^"]*)\n(?=[^"]*")/g, '\\n')
+                    .split('').filter(c => {
+                        const code = c.charCodeAt(0);
+                        return code >= 32 || code === 10 || code === 13 || code === 9;
+                    }).join('');
+                result = JSON.parse(sanitized);
+            }
 
             if (result.reasons && Array.isArray(result.reasons)) {
                 result.reasons = result.reasons.map(r => ({ ...r, agentType }));
             }
             return result;
         } catch (e) {
-            console.error(`Failed to parse Gemini response as JSON for ${agentType} Agent:`);
+            console.error(`Failed to parse Gemini response as JSON for ${agentType} Agent:`, e.message);
             console.error("--- RAW RESPONSE START ---");
             console.error(textResponse);
             console.error("--- RAW RESPONSE END ---");

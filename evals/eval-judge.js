@@ -57,7 +57,11 @@ async function runEvals() {
             } else {
                 // Detection Eval: Check for expected keywords
                 const foundExpected = test.expectedIssue 
-                    ? response.reasons.some(r => r.suggestions.toLowerCase().includes(test.expectedIssue.toLowerCase()))
+                    ? response.reasons.some(r => {
+                        const sugg = (r.suggestions || '').toLowerCase();
+                        const exp = test.expectedIssue.toLowerCase();
+                        return sugg.includes(exp) || sugg.replace(/[^a-z0-9]/g, '').includes(exp.replace(/[^a-z0-9]/g, ''));
+                    })
                     : response.pass === true;
 
                 const isFalsePositive = !test.expectedIssue && response.pass === false;
@@ -86,19 +90,38 @@ function printSummary(results) {
     const passed = results.filter(r => r.passed).length;
     const recall = (passed / total) * 100;
 
-    console.log("\n" + "=".repeat(40));
-    console.log("📊 EVALUATION SUMMARY");
-    console.log("=".repeat(40));
-    console.log(`Total Tests: ${total}`);
-    console.log(`Passed:      ${passed}`);
-    console.log(`Recall:      ${recall.toFixed(2)}%`);
-    console.log("=".repeat(40));
+    console.log("\n" + "=".repeat(60));
+    console.log("📊 THREAT MODEL & PERFORMANCE EVALUATION SUMMARY");
+    console.log("=".repeat(60));
+    console.log(`Total Fixtures:    ${total}`);
+    console.log(`Passed:            ${passed}`);
+    console.log(`Recall Rate:       ${recall.toFixed(2)}%`);
+    console.log("-".repeat(60));
+
+    // Threat Category Breakdown
+    const categoryStats = {};
+    results.forEach(r => {
+        const cat = r.threatCategory || 'General';
+        if (!categoryStats[cat]) {
+            categoryStats[cat] = { total: 0, passed: 0 };
+        }
+        categoryStats[cat].total++;
+        if (r.passed) categoryStats[cat].passed++;
+    });
+
+    console.log("🛡️  Threat Category Breakdown:");
+    Object.entries(categoryStats).forEach(([cat, stats]) => {
+        const catRecall = ((stats.passed / stats.total) * 100).toFixed(0);
+        const icon = stats.passed === stats.total ? "✅" : "⚠️ ";
+        console.log(`  ${icon} ${cat.padEnd(35)} ${stats.passed}/${stats.total} (${catRecall}%)`);
+    });
+    console.log("=".repeat(60));
 
     if (passed < total) {
-        console.log("\nFailures:");
+        console.log("\nFailures / Gaps in Threat Detection:");
         results.filter(r => !r.passed).forEach(r => {
             const status = r.expectedIssue ? "False Negative (Missing Issue)" : "False Positive (Unexpected Issue)";
-            console.log(`\n[${status}] - ${r.name}`);
+            console.log(`\n[${status}] - ${r.name} [${r.threatCategory || 'General'}]`);
             if (r.error) {
                 console.log(`  Error: ${r.error}`);
             } else if (r.expectedIssue) {
@@ -112,4 +135,8 @@ function printSummary(results) {
     console.log("\n");
 }
 
-runEvals();
+if (require.main === module) {
+    runEvals();
+}
+
+module.exports = { runEvals, printSummary };

@@ -4,6 +4,7 @@
     "file": "evals/fixtures/xss.js",
     "type": "detection",
     "agentType": "Security",
+    "threatCategory": "Client-Side Injection",
     "expectedIssue": "XSS",
     "severity": "High"
   },
@@ -12,7 +13,8 @@
     "file": "evals/fixtures/perf-sync.js",
     "type": "detection",
     "agentType": "Performance",
-    "expectedIssue": "data URL",
+    "threatCategory": "Graphics & Frame Budget",
+    "expectedIssue": "toDataURL",
     "severity": "Medium"
   },
   {
@@ -20,6 +22,7 @@
     "file": "evals/fixtures/clean.js",
     "type": "detection",
     "agentType": "Security",
+    "threatCategory": "Baseline / False Positive Check",
     "expectedIssue": null,
     "severity": "None"
   },
@@ -28,6 +31,7 @@
     "file": "evals/fixtures/cmd-injection.js",
     "type": "detection",
     "agentType": "Security",
+    "threatCategory": "Server & Tooling Security",
     "expectedIssue": "injection",
     "severity": "Critical"
   },
@@ -36,6 +40,7 @@
     "file": "evals/fixtures/layout-thrashing.js",
     "type": "detection",
     "agentType": "Performance",
+    "threatCategory": "DOM & Layout Performance",
     "expectedIssue": "layout",
     "severity": "Medium"
   },
@@ -44,7 +49,53 @@
     "file": "evals/fixtures/refactor-xhr.js",
     "type": "capability",
     "agentType": "Performance",
+    "threatCategory": "Modern Web Standards",
     "task": "Refactor this synchronous XHR request to use modern Fetch API with async/await. Return only the code.",
     "validator": "evals/validators/check-refactor.js"
+  },
+  {
+    "name": "Cross-Window PostMessage Origin Bypass",
+    "file": "evals/fixtures/open-postmessage.js",
+    "type": "detection",
+    "agentType": "Security",
+    "threatCategory": "Cross-Window & Origin Security",
+    "expectedIssue": "origin",
+    "severity": "High"
+  },
+  {
+    "name": "Object Prototype Pollution",
+    "file": "evals/fixtures/prototype-pollution.js",
+    "type": "detection",
+    "agentType": "Security",
+    "threatCategory": "Data & Storage Integrity",
+    "expectedIssue": "prototype",
+    "severity": "High"
+  },
+  {
+    "name": "ReDoS Catastrophic Backtracking",
+    "file": "evals/fixtures/redos.js",
+    "type": "detection",
+    "agentType": "Security",
+    "threatCategory": "ReDoS & Parsing DoS",
+    "expectedIssue": "redos",
+    "severity": "Medium"
+  },
+  {
+    "name": "Service Worker Cache Tampering",
+    "file": "evals/fixtures/cache-poisoning-sw.js",
+    "type": "detection",
+    "agentType": "Security",
+    "threatCategory": "Service Worker & Caching",
+    "expectedIssue": "cache",
+    "severity": "High"
+  },
+  {
+    "name": "Insecure Credential Storage in LocalStorage",
+    "file": "evals/fixtures/insecure-storage.js",
+    "type": "detection",
+    "agentType": "Security",
+    "threatCategory": "Secrets & Storage",
+    "expectedIssue": "localstorage",
+    "severity": "Medium"
   }
 ]

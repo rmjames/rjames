@@ -33,7 +33,9 @@ describe('Equalizer', () => {
             resume: vi.fn()
         };
 
-        window.AudioContext = vi.fn().mockImplementation(() => audioCtxMock);
+        window.AudioContext = vi.fn().mockImplementation(function() {
+            return audioCtxMock;
+        });
 
         audioElement = document.createElement('audio');
     });

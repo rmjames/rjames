@@ -10,7 +10,7 @@ const observerInstance = {
   unobserve: vi.fn(),
   disconnect: vi.fn(),
 };
-const mockIntersectionObserver = vi.fn((cb) => {
+const mockIntersectionObserver = vi.fn(function(cb) {
   intersectionCallback = cb;
   return observerInstance;
 });
