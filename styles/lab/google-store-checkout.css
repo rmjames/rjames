@@ -283,8 +283,8 @@ body.dark-mode {
 }
 
 .check input:checked {
-    background-color: var(--accent-oklch(from blue l c h));
-    border-color: var(--accent-oklch(from blue l c h));
+    background-color: oklch(from blue l c h);
+    border-color: oklch(from blue l c h);
 }
 
 .check input:checked::before {
@@ -318,7 +318,7 @@ body.dark-mode {
     left: 0;
     block-size: 100%;
     inline-size: 0%;
-    background-color: var(--accent-oklch(from blue l c h));
+    background-color: oklch(from blue l c h);
     transition: inline-size 0.2s ease;
 }
 
@@ -529,7 +529,7 @@ body.dark-mode {
         transform var(--truck-speed) cubic-bezier(0.68, -0.55, 0.265, 1.55),
         visibility 1s;
     z-index: 10;
-    color: var(--accent-oklch(from blue l c h));
+    color: oklch(from blue l c h);
     inline-size: 24px;
     block-size: 24px;
 }
