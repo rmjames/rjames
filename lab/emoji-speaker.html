@@ -109,7 +109,8 @@
     <link rel="icon" type="image/png" href="../favicon_192.png" sizes="192x192" />
     <link rel="manifest" href="../manifest.json" />
     <link rel="stylesheet" href="../styles/lab-shared.css">
-    <script src="../scripts/favicon-animator.js" async></script>
+    <link rel="modulepreload" href="../scripts/favicon-animator.js">
+    <script type="module" src="../scripts/favicon-animator.js" async></script>
 </head>
 
 <body>
@@ -131,7 +132,7 @@
                 d="M528-192v-576h240v576H528Zm-336 0v-576h240v576H192Zm408-72h96v-432h-96v432Zm-336 0h96v-432h-96v432Zm0-432v432-432Zm336 0v432-432Z" />
         </svg>
     </button>
-    <script>
+    <script type="module">
         const btn = document.querySelector('.toggle-btn');
         const iconPath = btn.querySelector('path');
         const animatedElements = document.querySelectorAll('.stack li');
