@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+function init() {
     const colors = ['oklch(from blue l c h)', 'oklch(from red l c h)', 'oklch(from orange l c h)', 'oklch(from blue l c h)', 'oklch(from green l c h)', 'oklch(from red l c h)'];
     const container = document.querySelector('.container');
     const resetBtn = document.querySelector('.reset-btn');
@@ -43,4 +43,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     split('Google');
-});
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+} else {
+    init();
+}
