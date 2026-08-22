@@ -35,7 +35,7 @@
         overflow: hidden;
         outline: 1px solid lch(96 1 18 / .12);
         box-shadow: 0 0 8px color-mix(in oklch, var(--blue-2) 24%, transparent 76%);
-        transition: transform 0.24s var(--ease-3), box-shadow 0.28s var(--ease-3);
+        transition: transform .24s var(--ease-3), box-shadow .28s var(--ease-3);
 
         @supports (corner-shape: squircle) {
             corner-shape: squircle;
@@ -61,11 +61,12 @@
         backdrop-filter: blur(4px);
         opacity: 0;
         transition: opacity .2s var(--ease-3), outline-offset .2s var(--ease-3);
-        outline: 1px solid lch(96 1 18 / .12);
+        outline: 1px solid light-dark(oklch(0 none none / .12), oklch(1 none none / .12));
 
         &:focus-visible {
             opacity: 1;
-            outline-offset: .125rem;
+            outline: 2px solid currentColor;
+            outline-offset: .25rem;
         }
     }
 

@@ -43,6 +43,8 @@ const assetsToCache = [
   '/scripts/analytics-loader.js',
   '/scripts/copyright.js',
   '/scripts/utils/ColorExtractor.js',
+  '/scripts/utils/labNavigation.js',
+  '/scripts/utils/splitText.js',
   '/scripts/media/Constants.js',
   '/scripts/media/Equalizer.js',
   '/scripts/media/EqualizerUI.js',
@@ -60,7 +62,7 @@ self.addEventListener('install', event => {
       .then(cache => {
         // Cache assets individually so a single 404 doesn't fail the entire installation
         return Promise.all(
-          assetsToCache.map(url => 
+          assetsToCache.map(url =>
             cache.add(url).catch(error => {
               console.warn(`Failed to cache ${url} during install:`, error);
             })
@@ -102,8 +104,8 @@ self.addEventListener('fetch', event => {
         const destination = request.destination;
 
         // Prevent caching HTML fallbacks for assets (Cache Poisoning protection)
-        if (contentType.includes('text/html') && 
-            ['script', 'style', 'image', 'font', 'audio', 'video'].includes(destination)) {
+        if (contentType.includes('text/html') &&
+          ['script', 'style', 'image', 'font', 'audio', 'video'].includes(destination)) {
           return false;
         }
 

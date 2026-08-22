@@ -61,7 +61,7 @@ describe('Favicon Animator Performance', () => {
     vi.stubGlobal('cancelAnimationFrame', vi.fn((id) => clearTimeout(id)));
 
     // Mock window.location for path detection
-    vi.stubGlobal('location', { pathname: '/' });
+    vi.stubGlobal('location', { pathname: '/', origin: 'http://localhost:3000', href: 'http://localhost:3000/' });
   });
 
   afterEach(() => {
