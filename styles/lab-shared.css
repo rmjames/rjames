@@ -3,6 +3,7 @@
 }
 
 .back-link {
+    color-scheme: light dark;
     position: fixed;
     inset-block-start: 1.25rem;
     inset-inline-start: 1.25rem;
@@ -107,5 +108,4 @@ html.in-iframe .back-link {
         outline-offset: 2px;
     }
 }
-
 /*# sourceMappingURL=lab-shared.css.map */
