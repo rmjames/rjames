@@ -84,6 +84,7 @@ const copyStaticFiles = () => {
 export default defineConfig({
     plugins: [copyStaticFiles()],
     build: {
+        target: 'esnext',
         emptyOutDir: false,
         rollupOptions: {
             input: {
