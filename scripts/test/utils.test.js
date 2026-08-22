@@ -1,16 +1,48 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { resetAnimation } from '../utils/resetAnimation.js';
 import { splitText } from '../utils/splitText.js';
+import { initLabNavigation } from '../utils/labNavigation.js';
 
-describe('utils.js', () => {
+describe('utils', () => {
     beforeEach(() => {
         document.body.innerHTML = '';
+        document.documentElement.className = '';
         vi.stubGlobal('requestAnimationFrame', vi.fn((cb) => cb()));
     });
 
     afterEach(() => {
         vi.clearAllMocks();
         vi.unstubAllGlobals();
+    });
+
+    describe('initLabNavigation', () => {
+        it('should add from-lab class when referrer is from /lab.html', () => {
+            vi.stubGlobal('location', { pathname: '/lab/google-loader.html', origin: 'http://localhost:3000', href: 'http://localhost:3000/lab/google-loader.html' });
+            Object.defineProperty(document, 'referrer', {
+                value: 'http://localhost:3000/lab.html',
+                configurable: true
+            });
+            initLabNavigation();
+            expect(document.documentElement.classList.contains('from-lab')).toBe(true);
+        });
+
+        it('should not add from-lab class when referrer is external', () => {
+            vi.stubGlobal('location', { pathname: '/lab/google-loader.html', origin: 'http://localhost:3000', href: 'http://localhost:3000/lab/google-loader.html' });
+            Object.defineProperty(document, 'referrer', {
+                value: 'https://google.com/',
+                configurable: true
+            });
+            initLabNavigation();
+            expect(document.documentElement.classList.contains('from-lab')).toBe(false);
+        });
+
+        it('should add in-iframe class when in an iframe', () => {
+            const originalTop = window.top;
+            Object.defineProperty(window, 'top', { value: {}, configurable: true });
+            initLabNavigation();
+            expect(document.documentElement.classList.contains('in-iframe')).toBe(true);
+            Object.defineProperty(window, 'top', { value: originalTop, configurable: true });
+        });
     });
 
     describe('resetAnimation', () => {

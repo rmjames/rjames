@@ -4,9 +4,6 @@
  * Refactored to use SVG data URIs for zero-jank performance (PERF-18).
  */
 (function () {
-  if (window.self !== window.top) {
-    document.documentElement.classList.add('in-iframe');
-  }
 
   const FPS_TARGET = 10; // 10 FPS is plenty for a favicon and saves CPU
   const PAINT_INTERVAL = 1000 / FPS_TARGET;
