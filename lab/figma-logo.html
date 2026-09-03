@@ -37,37 +37,49 @@
             }
 
             & .item {
-                animation: enter calc(.28s * sibling-count()) ease-in-out backwards;
-                animation-delay: calc(sibling-index() * .24s);
+                --count: 5;
+                --i: 1;
+                animation: enter calc(.28s * var(--count)) ease-in-out backwards;
+                animation-delay: calc(var(--i) * .24s);
 
                 &:nth-child(1) {
+                    --i: 1;
                     --color: oklch(from #f24e1e l c h);
                     background: var(--color);
                     border-radius: 50px 0 0 50px;
                 }
 
                 &:nth-child(2) {
+                    --i: 2;
                     --color: oklch(from #a259ff l c h);
                     background: var(--color);
                     border-radius: 50px 0 0 50px;
                 }
 
                 &:nth-child(3) {
+                    --i: 3;
                     --color: oklch(from #0acf83 l c h);
                     background: var(--color);
                     border-radius: 50px 0 50px 50px;
                 }
 
                 &:nth-child(4) {
+                    --i: 4;
                     --color: oklch(from #ff7262 l c h);
                     background: var(--color);
                     border-radius: 0 50px 50px 0;
                 }
 
                 &:nth-child(5) {
+                    --i: 5;
                     --color: oklch(from #1abcfe l c h);
                     background: var(--color);
                     border-radius: 50%;
+                }
+
+                @supports (animation-delay: calc(sibling-index() * 1s)) {
+                    animation-duration: calc(.28s * sibling-count());
+                    animation-delay: calc(sibling-index() * .24s);
                 }
             }
         }
