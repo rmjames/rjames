@@ -78,7 +78,6 @@ html.in-iframe .back-link {
     inset-block-end: max(1.25rem, 4cqi);
     inset-inline-end: max(1.25rem, 4cqi);
     background: transparent;
-    color: currentColor;
     border: none;
     cursor: pointer;
     padding: .5rem;
@@ -108,4 +107,5 @@ html.in-iframe .back-link {
         outline-offset: 2px;
     }
 }
+
 /*# sourceMappingURL=lab-shared.css.map */
