@@ -118,4 +118,18 @@ test.describe('Lab Animations Control', () => {
     await resetBtn.click();
     await expect(page.locator('.tracking-card')).toBeVisible();
   });
+
+  test('Figma Logo supports reset/replay', async ({ page }) => {
+    await page.goto('/lab/figma-logo.html');
+
+    const items = page.locator('.item');
+    await expect(items).toHaveCount(5);
+
+    const resetBtn = page.locator('.reset-btn');
+    await expect(resetBtn).toBeVisible();
+    await expect(resetBtn).toHaveAttribute('aria-label', 'Replay animation');
+
+    await resetBtn.click();
+    await expect(items.first()).toBeVisible();
+  });
 });
