@@ -39,14 +39,15 @@
             & .item {
                 --count: 5;
                 --i: 1;
-                animation: enter calc(.28s * var(--count)) ease-in-out backwards;
-                animation-delay: calc(var(--i) * .24s);
+                animation: enter calc(.24s * var(--count)) ease-in-out backwards;
+                animation-delay: calc(var(--i) * .2s);
 
                 &:nth-child(1) {
                     --i: 1;
                     --color: oklch(from #f24e1e l c h);
                     background: var(--color);
                     border-radius: 50px 0 0 50px;
+                    z-index: 2;
                 }
 
                 &:nth-child(2) {
@@ -54,6 +55,7 @@
                     --color: oklch(from #a259ff l c h);
                     background: var(--color);
                     border-radius: 50px 0 0 50px;
+                    z-index: 2;
                 }
 
                 &:nth-child(3) {
@@ -61,6 +63,7 @@
                     --color: oklch(from #0acf83 l c h);
                     background: var(--color);
                     border-radius: 50px 0 50px 50px;
+                    z-index: 2;
                 }
 
                 &:nth-child(4) {
@@ -68,6 +71,8 @@
                     --color: oklch(from #ff7262 l c h);
                     background: var(--color);
                     border-radius: 0 50px 50px 0;
+                    animation-name: enter-left;
+                    z-index: 1;
                 }
 
                 &:nth-child(5) {
@@ -75,11 +80,13 @@
                     --color: oklch(from #1abcfe l c h);
                     background: var(--color);
                     border-radius: 50%;
+                    animation-name: enter-left;
+                    z-index: 1;
                 }
 
                 @supports (animation-delay: calc(sibling-index() * 1s)) {
-                    animation-duration: calc(.28s * sibling-count());
-                    animation-delay: calc(sibling-index() * .24s);
+                    animation-duration: calc(.24s * sibling-count());
+                    animation-delay: calc(sibling-count() - sibling-index() + .2s);
                 }
             }
         }
@@ -92,8 +99,12 @@
                 translate: -1ch 1ch;
             }
 
+            32% {
+                opacity: 1;
+            }
+
             64% {
-                opacity: .76;
+                opacity: 1;
                 rotate: 2deg;
                 scale: 1.025;
                 translate: 0 0;
@@ -102,6 +113,26 @@
             96% {
                 opacity: 1;
                 rotate: 0deg;
+                scale: 1;
+                translate: 0 0;
+            }
+        }
+
+        @keyframes enter-left {
+            from {
+                opacity: 0;
+                scale: .95;
+                translate: -50% 0;
+            }
+
+            64% {
+                opacity: 1;
+                scale: 1.025;
+                translate: 2% 0;
+            }
+
+            96% {
+                opacity: 1;
                 scale: 1;
                 translate: 0 0;
             }
