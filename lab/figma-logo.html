@@ -39,8 +39,8 @@
             & .item {
                 --count: 5;
                 --i: 1;
-                animation: enter calc(.28s * var(--count)) ease-in-out backwards;
-                animation-delay: calc(var(--i) * .24s);
+                animation: enter calc(.24s * var(--count)) ease-in-out backwards;
+                animation-delay: calc(var(--i) * .2s);
 
                 &:nth-child(1) {
                     --i: 1;
@@ -85,8 +85,8 @@
                 }
 
                 @supports (animation-delay: calc(sibling-index() * 1s)) {
-                    animation-duration: calc(.28s * sibling-count());
-                    animation-delay: calc(sibling-count() - sibling-index() + .24s);
+                    animation-duration: calc(.24s * sibling-count());
+                    animation-delay: calc(sibling-count() - sibling-index() + .2s);
                 }
             }
         }
