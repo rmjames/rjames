@@ -8,7 +8,16 @@ This document defines the technical and design specifications for the media play
 
 The media players follow a **Provider/Consumer** architecture:
 - **Provider**: `MediaPlayerCore.js` managing the `<audio>` state, library tracks, and event subscriptions.
+- **Media Session Coordinator**: `MediaSessionService.js` acting as a centralized bridge to the browser's native Media Session API (`navigator.mediaSession`), synchronizing OS lock screen metadata, hardware media keys (play, pause, prev, next, seek backward/forward, seekto, stop), and playback position state across all player instances.
 - **Consumer**: Individual HTML files implementing specific UI layouts using `MediaPlayerUI.js` and shared CSS components.
+
+### Media Session Integration
+To ensure a single source of truth for platform media notifications and OS hardware controls:
+- **Centralized Service**: `MediaSessionService` automatically coordinates active `MediaPlayerCore` instances. When a player begins playback or connects, the service seamlessly unbinds any previous instance and binds the active player.
+- **Metadata & Artwork**: Emits track details (`title`, `artist`, `album`) and a responsive array of artwork resolutions (`96x96` through `512x512`).
+- **Position Tracking**: Safely binds to `<audio>` `timeupdate` and playback events to update `navigator.mediaSession.setPositionState()` with duration/position validation.
+- **Hardware Controls**: Handles native action events: `play`, `pause`, `previoustrack`, `nexttrack`, `seekbackward` (default 10s), `seekforward` (default 10s), `seekto`, and `stop`.
+- **Opt-Out**: `MediaPlayerCore` accepts `{ mediaSession: false }` in constructor options to disable automatic Media Session binding when needed (e.g. isolated test environments).
 
 ### Component Sharing Strategy
 
@@ -21,7 +30,7 @@ To share common HTML components (like MediaControls, MediaMeta) across the vario
 
 ## Maintenance & Future Updates
 
-**IMPORTANT:** This document serves as the source of truth for the media player architecture. Whenever changes are made to `MediaPlayerCore.js`, `MediaPlayerUI.js`, `Equalizer.js`, `ColorExtractor.js`, or any of the HTML variants (including the addition of new variants or components), this document **MUST** be updated. Ensure that any new performance optimizations, security considerations, or UI components are fully documented here to maintain architectural clarity.
+**IMPORTANT:** This document serves as the source of truth for the media player architecture. Whenever changes are made to `MediaPlayerCore.js`, `MediaSessionService.js`, `MediaPlayerUI.js`, `Equalizer.js`, `ColorExtractor.js`, or any of the HTML variants (including the addition of new variants or components), this document **MUST** be updated. Ensure that any new performance optimizations, security considerations, or UI components are fully documented here to maintain architectural clarity.
 
 ## Shared Tech Stack
 

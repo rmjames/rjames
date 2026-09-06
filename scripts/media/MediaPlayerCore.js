@@ -1,13 +1,19 @@
 import { audioLibrary } from '../AudioLibrary.js';
+import { mediaSessionService } from './MediaSessionService.js';
 
 export class MediaPlayerCore {
-    constructor(audioElement) {
+    constructor(audioElement, options = {}) {
         this.audio = audioElement;
+        this.options = options;
         this.tracks = audioLibrary.getAll();
         this.currentIndex = 0;
         this.listeners = new Set();
 
         this._initAudioEvents();
+
+        if (this.options.mediaSession !== false) {
+            mediaSessionService.connect(this);
+        }
     }
 
     _initAudioEvents() {
@@ -15,6 +21,7 @@ export class MediaPlayerCore {
         this.audio.addEventListener('pause', () => this.notify('pause'));
         this.audio.addEventListener('ended', () => this.notify('ended'));
         this.audio.addEventListener('error', (e) => this.notify('error', e));
+        this.audio.addEventListener('timeupdate', () => this.notify('timeupdate'));
     }
 
     subscribe(callback) {
@@ -42,6 +49,9 @@ export class MediaPlayerCore {
     }
 
     play() {
+        if (this.options.mediaSession !== false) {
+            mediaSessionService.connect(this);
+        }
         if (!this.audio.src && this.tracks.length > 0) {
             this.loadTrack(0);
         }
@@ -87,5 +97,12 @@ export class MediaPlayerCore {
         const track = this.loadTrack(nextRandom);
         this.play();
         return track;
+    }
+
+    destroy() {
+        if (mediaSessionService.activeCore === this) {
+            mediaSessionService.disconnect();
+        }
+        this.listeners.clear();
     }
 }

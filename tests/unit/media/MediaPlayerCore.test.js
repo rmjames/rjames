@@ -134,4 +134,18 @@ describe('MediaPlayerCore', () => {
          expect(singlePlayer.currentIndex).toBe(0);
          expect(track).toBe(mockTracks[0]);
     });
+
+    it('should respect mediaSession: false option in constructor', () => {
+        const noSessionPlayer = new MediaPlayerCore(audioElement, { mediaSession: false });
+        expect(noSessionPlayer.options.mediaSession).toBe(false);
+    });
+
+    it('should clean up listeners and disconnect mediaSession on destroy', () => {
+        const listener = vi.fn();
+        mediaPlayer.subscribe(listener);
+
+        mediaPlayer.destroy();
+        audioElement.dispatchEvent(new Event('play'));
+        expect(listener).not.toHaveBeenCalled();
+    });
 });
