@@ -47,17 +47,8 @@ export function parsePolygon(input) {
  * @param {string} input 
  * @returns {{type: 'circle', r: number, cx: number, cy: number, rUnit: string, cxUnit: string, cyUnit: string}}
  */
-export function parseCircle(input) {
-    const defaultCircle = { type: 'circle', r: 40, cx: 50, cy: 50, rUnit: '%', cxUnit: '%', cyUnit: '%' };
-    if (!input || typeof input !== 'string') return defaultCircle;
-
-    const match = input.match(/circle\s*\((.*)\)/is);
-    if (!match) return defaultCircle;
-
-    const inner = match[1].trim();
-    if (!inner) return defaultCircle;
-
-    let rStr = '40%';
+function extractAtPosition(inner, defaultRadius = '40%') {
+    let rStr = defaultRadius;
     let atStr = '50% 50%';
 
     if (inner.includes('at')) {
@@ -68,10 +59,25 @@ export function parseCircle(input) {
         rStr = inner;
     }
 
-    const rParsed = parseValueWithUnit(rStr) || { value: 40, unit: '%' };
     const atParts = atStr.split(/\s+/).filter(Boolean);
     const cxParsed = parseValueWithUnit(atParts[0]) || { value: 50, unit: '%' };
     const cyParsed = parseValueWithUnit(atParts[1]) || { value: 50, unit: '%' };
+
+    return { rStr, cxParsed, cyParsed };
+}
+
+export function parseCircle(input) {
+    const defaultCircle = { type: 'circle', r: 40, cx: 50, cy: 50, rUnit: '%', cxUnit: '%', cyUnit: '%' };
+    if (!input || typeof input !== 'string') return defaultCircle;
+
+    const match = input.match(/circle\s*\((.*)\)/is);
+    if (!match) return defaultCircle;
+
+    const inner = match[1].trim();
+    if (!inner) return defaultCircle;
+
+    const { rStr, cxParsed, cyParsed } = extractAtPosition(inner, '40%');
+    const rParsed = parseValueWithUnit(rStr) || { value: 40, unit: '%' };
 
     return {
         type: 'circle',
@@ -112,24 +118,10 @@ export function parseEllipse(input) {
     const inner = match[1].trim();
     if (!inner) return defaultEllipse;
 
-    let rStr = '45% 30%';
-    let atStr = '50% 50%';
-
-    if (inner.includes('at')) {
-        const [rPart, atPart] = inner.split(/\bat\b/i).map(s => s.trim());
-        if (rPart) rStr = rPart;
-        if (atPart) atStr = atPart;
-    } else {
-        rStr = inner;
-    }
-
+    const { rStr, cxParsed, cyParsed } = extractAtPosition(inner, '45% 30%');
     const rParts = rStr.split(/\s+/).filter(Boolean);
     const rxParsed = parseValueWithUnit(rParts[0]) || { value: 45, unit: '%' };
     const ryParsed = parseValueWithUnit(rParts[1]) || { value: 30, unit: '%' };
-
-    const atParts = atStr.split(/\s+/).filter(Boolean);
-    const cxParsed = parseValueWithUnit(atParts[0]) || { value: 50, unit: '%' };
-    const cyParsed = parseValueWithUnit(atParts[1]) || { value: 50, unit: '%' };
 
     return {
         type: 'ellipse',
@@ -157,6 +149,28 @@ export function formatEllipse(e) {
     return `ellipse(${formatNumber(e.rx)}${rxu} ${formatNumber(e.ry)}${ryu} at ${formatNumber(e.cx)}${cxu} ${formatNumber(e.cy)}${cyu})`;
 }
 
+function extractRoundPart(inner) {
+    let offsetsStr = inner;
+    let roundVal = null;
+    let roundUnit = '%';
+
+    if (inner.includes('round')) {
+        const [oPart, rPart] = inner.split(/\bround\b/i).map(s => s.trim());
+        offsetsStr = oPart;
+        const rParsed = parseValueWithUnit(rPart);
+        if (rParsed) {
+            roundVal = rParsed.value;
+            roundUnit = rParsed.unit || '%';
+        }
+    }
+
+    return { offsetsStr, roundVal, roundUnit };
+}
+
+function formatRoundPart(round, roundUnit = '%') {
+    return round ? ` round ${formatNumber(round)}${roundUnit}` : '';
+}
+
 /**
  * Parses a CSS inset() string: inset(<shape-arg>{1,4} [round <radius>]?)
  * e.g. "inset(10% 15% 10% 15% round 15px)" or "inset(10%)"
@@ -173,20 +187,7 @@ export function parseInset(input) {
     const inner = match[1].trim();
     if (!inner) return defaultInset;
 
-    let offsetsStr = inner;
-    let roundVal = null;
-    let roundUnit = '%';
-
-    if (inner.includes('round')) {
-        const [oPart, rPart] = inner.split(/\bround\b/i).map(s => s.trim());
-        offsetsStr = oPart;
-        const rParsed = parseValueWithUnit(rPart);
-        if (rParsed) {
-            roundVal = rParsed.value;
-            roundUnit = rParsed.unit || '%';
-        }
-    }
-
+    const { offsetsStr, roundVal, roundUnit } = extractRoundPart(inner);
     const parts = offsetsStr.split(/\s+/).filter(Boolean).map(parseValueWithUnit).filter(Boolean);
     let top = 10, right = 10, bottom = 10, left = 10, unit = '%';
 
@@ -233,8 +234,7 @@ export function formatInset(i) {
     const r = `${formatNumber(i.right)}${u}`;
     const b = `${formatNumber(i.bottom)}${u}`;
     const l = `${formatNumber(i.left)}${u}`;
-    const roundStr = i.round ? ` round ${formatNumber(i.round)}${i.roundUnit || '%'}` : '';
-    return `inset(${t} ${r} ${b} ${l}${roundStr})`;
+    return `inset(${t} ${r} ${b} ${l}${formatRoundPart(i.round, i.roundUnit)})`;
 }
 
 /**
@@ -251,20 +251,7 @@ export function parseRect(input) {
     if (!match) return defaultRect;
 
     const inner = match[1].trim();
-    let offsetsStr = inner;
-    let roundVal = null;
-    let roundUnit = '%';
-
-    if (inner.includes('round')) {
-        const [oPart, rPart] = inner.split(/\bround\b/i).map(s => s.trim());
-        offsetsStr = oPart;
-        const rParsed = parseValueWithUnit(rPart);
-        if (rParsed) {
-            roundVal = rParsed.value;
-            roundUnit = rParsed.unit || '%';
-        }
-    }
-
+    const { offsetsStr, roundVal, roundUnit } = extractRoundPart(inner);
     const parts = offsetsStr.split(/\s+/).filter(Boolean).map(parseValueWithUnit).filter(Boolean);
     if (parts.length >= 4) {
         return {
@@ -288,8 +275,7 @@ export function parseRect(input) {
  */
 export function formatRect(r) {
     const u = r.unit || '%';
-    const roundStr = r.round ? ` round ${formatNumber(r.round)}${r.roundUnit || '%'}` : '';
-    return `rect(${formatNumber(r.top)}${u} ${formatNumber(r.right)}${u} ${formatNumber(r.bottom)}${u} ${formatNumber(r.left)}${u}${roundStr})`;
+    return `rect(${formatNumber(r.top)}${u} ${formatNumber(r.right)}${u} ${formatNumber(r.bottom)}${u} ${formatNumber(r.left)}${u}${formatRoundPart(r.round, r.roundUnit)})`;
 }
 
 /**
@@ -306,20 +292,7 @@ export function parseXywh(input) {
     if (!match) return defaultXywh;
 
     const inner = match[1].trim();
-    let coordsStr = inner;
-    let roundVal = null;
-    let roundUnit = '%';
-
-    if (inner.includes('round')) {
-        const [cPart, rPart] = inner.split(/\bround\b/i).map(s => s.trim());
-        coordsStr = cPart;
-        const rParsed = parseValueWithUnit(rPart);
-        if (rParsed) {
-            roundVal = rParsed.value;
-            roundUnit = rParsed.unit || '%';
-        }
-    }
-
+    const { offsetsStr: coordsStr, roundVal, roundUnit } = extractRoundPart(inner);
     const parts = coordsStr.split(/\s+/).filter(Boolean).map(parseValueWithUnit).filter(Boolean);
     if (parts.length >= 4) {
         return {
@@ -343,8 +316,7 @@ export function parseXywh(input) {
  */
 export function formatXywh(x) {
     const u = x.unit || '%';
-    const roundStr = x.round ? ` round ${formatNumber(x.round)}${x.roundUnit || '%'}` : '';
-    return `xywh(${formatNumber(x.x)}${u} ${formatNumber(x.y)}${u} ${formatNumber(x.width)}${u} ${formatNumber(x.height)}${u}${roundStr})`;
+    return `xywh(${formatNumber(x.x)}${u} ${formatNumber(x.y)}${u} ${formatNumber(x.width)}${u} ${formatNumber(x.height)}${u}${formatRoundPart(x.round, x.roundUnit)})`;
 }
 
 /**

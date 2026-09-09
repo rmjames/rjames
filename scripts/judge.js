@@ -144,7 +144,7 @@ function getAllFiles(dirPath, arrayOfFiles) {
                     arrayOfFiles.push(fullPath);
                 }
             }
-        } catch (err) {
+        } catch {
             // Skip unreadable files or broken symlinks
         }
     });

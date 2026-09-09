@@ -4,10 +4,9 @@ log/*.log
 tmp/**
 node_modules/
 .sass-cache
-node_modules
-dist
+dist/
+build/
 .tmp
-.sass-cache
 .babelrc
 test-results/
 playwright-report/

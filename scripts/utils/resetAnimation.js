@@ -26,3 +26,25 @@ export function resetAnimation(selector) {
         });
     });
 }
+
+/**
+ * Attaches click listener to a reset button to trigger resetAnimation.
+ * Handles DOM ready state automatically.
+ *
+ * @param {string|NodeList|Element[]} targetSelector - Target elements whose animations should be reset.
+ * @param {string} [buttonSelector='.reset-btn'] - Selector for the reset button element.
+ */
+export function bindResetButton(targetSelector, buttonSelector = '.reset-btn') {
+    const bind = () => {
+        const btn = document.querySelector(buttonSelector);
+        if (btn) {
+            btn.addEventListener('click', () => resetAnimation(targetSelector));
+        }
+    };
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', bind);
+    } else {
+        bind();
+    }
+}

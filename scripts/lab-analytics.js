@@ -1,4 +1,14 @@
 
+function trackEvent(category, action, label, extra = {}) {
+    if (typeof gtag === 'function') {
+        gtag("event", action, {
+            event_category: category,
+            event_label: label,
+            ...extra,
+        });
+    }
+}
+
 export function initLabAnalytics() {
     const iframes = document.querySelectorAll(".demo-examples iframe");
 
@@ -11,51 +21,23 @@ export function initLabAnalytics() {
                 if (iframe.dataset.analyticsAttached) return;
 
                 iframeDoc.body.addEventListener("click", (event) => {
-                    // Check for specific element tracking
                     const target = event.target.closest('[data-analytics-element]');
-                    
-                    if (target) {
-                         const elementLabel = target.getAttribute('data-analytics-element');
-                         const eventData = {
-                            event_category: iframe.title, // Namespaced to Project
-                            event_label: elementLabel,
-                            transport_type: "beacon",
-                        };
-                        if (typeof gtag === 'function') {
-                            gtag("event", "click", eventData);
-                        }
-                    } else {
-                        // Generic tracking for clicks elsewhere in the iframe
-                        const eventData = {
-                            event_category: iframe.title, // Namespaced to Project
-                            event_label: "Body Click",
-                            transport_type: "beacon",
-                        };
-                        if (typeof gtag === 'function') {
-                            gtag("event", "click", eventData);
-                        }
-                    }
+                    const elementLabel = target ? target.getAttribute('data-analytics-element') : "Body Click";
+                    trackEvent(iframe.title, "click", elementLabel, { transport_type: "beacon" });
                 });
                 
                 // Track hover on specific elements inside iframe
                 const trackedElements = iframeDoc.querySelectorAll('[data-analytics-element]');
                 trackedElements.forEach(el => {
                      el.addEventListener('mouseenter', () => {
-                        const elementLabel = el.getAttribute('data-analytics-element');
-                         const eventData = {
-                            event_category: iframe.title, // Namespaced to Project
-                            event_label: `${elementLabel} Hover`,
-                            non_interaction: true,
-                        };
-                        if (typeof gtag === 'function') {
-                            gtag("event", "mouseover", eventData);
-                        }
+                         const elementLabel = el.getAttribute('data-analytics-element');
+                         trackEvent(iframe.title, "mouseover", `${elementLabel} Hover`, { non_interaction: true });
                      });
                 });
 
                 iframe.dataset.analyticsAttached = "true";
             }
-        } catch (e) {
+        } catch {
             // Cross-origin or restricted access
         }
     };
@@ -85,26 +67,12 @@ export function initLabAnalytics() {
         const wrapper = iframe.closest("article");
         if (wrapper) {
             wrapper.addEventListener("mouseenter", () => {
-                const eventData = {
-                    event_category: iframe.title, // Namespaced to Project
-                    event_label: "Card Hover",
-                    non_interaction: true,
-                };
-                if (typeof gtag === 'function') {
-                    gtag("event", "mouseover", eventData);
-                }
+                trackEvent(iframe.title, "mouseover", "Card Hover", { non_interaction: true });
             });
 
             // Track focus on the article
             wrapper.addEventListener("focus", () => {
-                const eventData = {
-                    event_category: iframe.title, // Namespaced to Project
-                    event_label: "Card Focus",
-                    non_interaction: true,
-                };
-                if (typeof gtag === 'function') {
-                    gtag("event", "focus", eventData);
-                }
+                trackEvent(iframe.title, "focus", "Card Focus", { non_interaction: true });
             });
         }
 
