@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { resetAnimation } from '../utils/resetAnimation.js';
+import { resetAnimation, bindResetButton } from '../utils/resetAnimation.js';
 import { splitText } from '../utils/splitText.js';
 import { initLabNavigation } from '../utils/labNavigation.js';
 
@@ -92,6 +92,41 @@ describe('utils', () => {
             resetAnimation([el1, el2]);
             expect(el1.style.animation).toBe('');
             expect(el2.style.animation).toBe('');
+        });
+    });
+
+    describe('bindResetButton', () => {
+        it('should bind click on .reset-btn and reset target animation', () => {
+            document.body.innerHTML = `
+                <div class="target" style="animation: bounce 1s"></div>
+                <button class="reset-btn"></button>
+            `;
+            bindResetButton('.target');
+
+            const btn = document.querySelector('.reset-btn');
+            const target = document.querySelector('.target');
+            btn.click();
+
+            expect(target.style.animation).toBe('');
+        });
+
+        it('should handle custom button selector', () => {
+            document.body.innerHTML = `
+                <div class="target" style="animation: spin 1s"></div>
+                <button class="custom-reset"></button>
+            `;
+            bindResetButton('.target', '.custom-reset');
+
+            const btn = document.querySelector('.custom-reset');
+            const target = document.querySelector('.target');
+            btn.click();
+
+            expect(target.style.animation).toBe('');
+        });
+
+        it('should handle missing reset button gracefully', () => {
+            document.body.innerHTML = `<div class="target"></div>`;
+            expect(() => bindResetButton('.target')).not.toThrow();
         });
     });
 

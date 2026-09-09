@@ -132,7 +132,7 @@ const AudioEngine = {
         try {
             await state.audio.play();
             setState({ isPlaying: true });
-        } catch (err) {
+        } catch {
             AudioEngine.stop();
         }
     }

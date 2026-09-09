@@ -32,7 +32,7 @@ linkContacts.forEach(link => {
   setupComponentInteraction(link, null, (trigger) => {
     console.log(`Interacted with link: ${trigger.textContent}`);
     // Temporarily dim to show interaction
-    trigger.style.opacity = '0.5';
+    trigger.style.opacity = '.5';
     setTimeout(() => {
         trigger.style.opacity = '';
     }, 200);

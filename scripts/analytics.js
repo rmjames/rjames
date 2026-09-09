@@ -14,11 +14,6 @@ export function initAnalytics() {
           event_category: "Header Navigation",
           event_label: link.textContent,
           transport_type: "beacon",
-          event_callback: () => {
-            // This callback is not strictly necessary for tracking,
-            // but can be useful for debugging or ensuring navigation
-            // happens after the event is sent.
-          },
         };
         gtag("event", "click", eventData);
       }
@@ -58,7 +53,7 @@ export function initAnalytics() {
         }
       });
     },
-    { threshold: 0.5 },
+    { threshold: .5 },
   );
 
   const sections = document.querySelectorAll("[data-analytics-section]");

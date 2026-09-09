@@ -70,7 +70,6 @@ describe('analytics.js', () => {
       event_category: 'Header Navigation',
       event_label: 'Resume',
       transport_type: 'beacon',
-      event_callback: expect.any(Function),
     });
   });
 
