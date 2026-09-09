@@ -13,7 +13,8 @@ export class AudioEngine {
   async load(url) {
     this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     try {
-      const response = await fetch(url);
+      const cleanUrl = typeof url === 'string' ? url.replace(/[?&]import(?:&.*)?$/, '') : url;
+      const response = await fetch(cleanUrl);
       const arrayBuffer = await response.arrayBuffer();
       this.forwardBuffer = await this.audioCtx.decodeAudioData(arrayBuffer);
       this.audioDuration = this.forwardBuffer.duration;
@@ -56,7 +57,7 @@ export class AudioEngine {
     this.currentSource.connect(this.audioCtx.destination);
     
     // Clamp offset to prevent RangeError if it exceeds buffer duration
-    const safeOffset = Math.max(0, Math.min(offset, this.audioDuration - 0.02));
+    const safeOffset = Math.max(0, Math.min(offset, this.audioDuration - .02));
     
     try {
       this.currentSource.start(0, safeOffset);
@@ -92,8 +93,8 @@ export class AudioEngine {
     const absVel = Math.abs(velocity);
     
     // Hysteresis thresholds to avoid audio engine overload from micro-jitter
-    const STOP_THRESHOLD = 0.03;
-    const START_THRESHOLD = 0.08;
+    const STOP_THRESHOLD = .03;
+    const START_THRESHOLD = .08;
 
     if (this.scratchDirection === 0) {
       // Currently stopped. Only start if velocity is above START_THRESHOLD
@@ -125,7 +126,7 @@ export class AudioEngine {
       
       let startPos = newDir === 1 ? currentAudioTime : this.audioDuration - currentAudioTime;
       // Safety clamp to prevent RangeError
-      startPos = Math.max(0, Math.min(startPos, this.audioDuration - 0.02));
+      startPos = Math.max(0, Math.min(startPos, this.audioDuration - .02));
       
       try {
         this.scratchSource.start(0, startPos);
@@ -136,7 +137,7 @@ export class AudioEngine {
     }
     
     if (this.scratchSource) {
-      this.scratchSource.playbackRate.value = Math.min(absVel, 5.0);
+      this.scratchSource.playbackRate.value = Math.min(absVel, 5);
     }
   }
 
@@ -159,7 +160,7 @@ export class AudioEngine {
 
   getNoiseBuffer() {
     if (this._noiseBuffer) return this._noiseBuffer;
-    const bufferSize = this.audioCtx.sampleRate * 0.2; // 0.2 seconds
+    const bufferSize = this.audioCtx.sampleRate * .2; // .2 seconds
     const buffer = this.audioCtx.createBuffer(1, bufferSize, this.audioCtx.sampleRate);
     const data = buffer.getChannelData(0);
     for (let i = 0; i < bufferSize; i++) {
@@ -179,15 +180,15 @@ export class AudioEngine {
     filter.Q.setValueAtTime(1.5, t);
     
     const gainNode = this.audioCtx.createGain();
-    gainNode.gain.setValueAtTime(0.12, t);
-    gainNode.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
+    gainNode.gain.setValueAtTime(.12, t);
+    gainNode.gain.exponentialRampToValueAtTime(.001, t + .15);
     
     noiseSource.connect(filter);
     filter.connect(gainNode);
     gainNode.connect(this.audioCtx.destination);
     
     noiseSource.start(t);
-    noiseSource.stop(t + 0.15);
+    noiseSource.stop(t + .15);
     
     noiseSource.onended = () => {
       noiseSource.disconnect();
@@ -269,80 +270,62 @@ export class AudioEngine {
     let params = {
       thumpFreqStart: 150,
       thumpFreqEnd: 60,
-      thumpDecay: 0.025,
-      thumpGain: 0.15,
+      thumpDecay: .025,
+      thumpGain: .15,
       snapFreqStart: 8000,
       snapFreqEnd: 2000,
-      snapDecay: 0.008,
-      snapGain: 0.08
+      snapDecay: .008,
+      snapGain: .08
     };
 
     if (typeOrParams === 'switch') {
       params = {
         thumpFreqStart: 120,
         thumpFreqEnd: 50,
-        thumpDecay: 0.035,
-        thumpGain: 0.25,
+        thumpDecay: .035,
+        thumpGain: .25,
         snapFreqStart: 6000,
         snapFreqEnd: 1500,
-        snapDecay: 0.012,
-        snapGain: 0.12
+        snapDecay: .012,
+        snapGain: .12
       };
     } else if (typeOrParams === 'cassette' || typeOrParams === 'heavy') {
       params = {
         thumpFreqStart: 90,
         thumpFreqEnd: 40,
-        thumpDecay: 0.05,
-        thumpGain: 0.35,
+        thumpDecay: .05,
+        thumpGain: .35,
         snapFreqStart: 4000,
         snapFreqEnd: 1000,
-        snapDecay: 0.02,
-        snapGain: 0.15
+        snapDecay: .02,
+        snapGain: .15
       };
     } else if (typeof typeOrParams === 'object' && typeOrParams !== null) {
       params = { ...params, ...typeOrParams };
     }
 
-    // Synthesize the thump
-    if (params.thumpGain > 0) {
-      const osc1 = this.audioCtx.createOscillator();
-      const gain1 = this.audioCtx.createGain();
-      osc1.type = 'sine';
-      osc1.frequency.setValueAtTime(params.thumpFreqStart, t);
-      osc1.frequency.exponentialRampToValueAtTime(params.thumpFreqEnd, t + params.thumpDecay);
-      
-      gain1.gain.setValueAtTime(params.thumpGain, t);
-      gain1.gain.exponentialRampToValueAtTime(0.001, t + params.thumpDecay);
-      
-      osc1.connect(gain1);
-      gain1.connect(this.audioCtx.destination);
-      osc1.start(t);
-      osc1.stop(t + params.thumpDecay);
-      osc1.onended = () => {
-        osc1.disconnect();
-        gain1.disconnect();
-      };
-    }
+    this._synthesizePulse('sine', params.thumpFreqStart, params.thumpFreqEnd, params.thumpGain, params.thumpDecay, t);
+    this._synthesizePulse('triangle', params.snapFreqStart, params.snapFreqEnd, params.snapGain, params.snapDecay, t);
+  }
 
-    // Synthesize the snap
-    if (params.snapGain > 0) {
-      const osc2 = this.audioCtx.createOscillator();
-      const gain2 = this.audioCtx.createGain();
-      osc2.type = 'triangle';
-      osc2.frequency.setValueAtTime(params.snapFreqStart, t);
-      osc2.frequency.exponentialRampToValueAtTime(params.snapFreqEnd, t + params.snapDecay);
-      
-      gain2.gain.setValueAtTime(params.snapGain, t);
-      gain2.gain.exponentialRampToValueAtTime(0.001, t + params.snapDecay);
-      
-      osc2.connect(gain2);
-      gain2.connect(this.audioCtx.destination);
-      osc2.start(t);
-      osc2.stop(t + params.snapDecay);
-      osc2.onended = () => {
-        osc2.disconnect();
-        gain2.disconnect();
-      };
-    }
+  _synthesizePulse(type, startFreq, endFreq, peakGain, decay, t) {
+    if (peakGain <= 0) return;
+    const osc = this.audioCtx.createOscillator();
+    const gain = this.audioCtx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(startFreq, t);
+    osc.frequency.exponentialRampToValueAtTime(endFreq, t + decay);
+
+    gain.gain.setValueAtTime(peakGain, t);
+    gain.gain.exponentialRampToValueAtTime(.001, t + decay);
+
+    osc.connect(gain);
+    gain.connect(this.audioCtx.destination);
+    osc.start(t);
+    osc.stop(t + decay);
+    osc.onended = () => {
+      osc.disconnect();
+      gain.disconnect();
+    };
   }
 }

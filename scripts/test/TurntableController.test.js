@@ -94,7 +94,7 @@ describe('TurntableController', () => {
     TurntableState.prototype.syncAudioTime = vi.fn();
 
     // Stub rAF to prevent infinite loops in tests
-    vi.spyOn(window, 'requestAnimationFrame').mockImplementation((cb) => 0);
+    vi.spyOn(window, 'requestAnimationFrame').mockImplementation(() => 0);
 
     controller = new TurntableController();
   });
@@ -332,7 +332,7 @@ describe('TurntableController', () => {
       vibrate: mockVibrate
     });
 
-    const testController = new TurntableController({
+    new TurntableController({
       startButton: 'custom-start.mp3'
     });
 
@@ -353,7 +353,7 @@ describe('TurntableController', () => {
       vibrate: mockVibrate
     });
 
-    const testController = new TurntableController({
+    new TurntableController({
       btn33: 'click'
     });
 
@@ -374,7 +374,7 @@ describe('TurntableController', () => {
       vibrate: mockVibrate
     });
 
-    const testController = new TurntableController({
+    new TurntableController({
       trackItem: 'click'
     });
 
