@@ -74,6 +74,7 @@ describe('ColorExtractor', () => {
             expect(await ColorExtractor.getAccentColor('//example.com/img.jpg')).toBe('oklch(0.623 0.214 259.415)');
             expect(await ColorExtractor.getAccentColor('ftp://example.com/img.jpg')).toBe('oklch(0.623 0.214 259.415)');
             expect(await ColorExtractor.getAccentColor('blob:http://localhost/something')).toBe('oklch(0.623 0.214 259.415)');
+            expect(await ColorExtractor.getAccentColor('javascript:alert(1)')).toBe('oklch(0.623 0.214 259.415)');
         });
 
         it('should return default color on image error', async () => {
