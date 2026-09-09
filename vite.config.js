@@ -13,6 +13,18 @@ const labFiles = fs.readdirSync(labDir)
         return acc;
     }, {});
 
+// Get all HTML files from the tools directory
+const toolsDir = resolve(__dirname, 'tools');
+const toolsFiles = fs.existsSync(toolsDir)
+    ? fs.readdirSync(toolsDir)
+        .filter(file => file.endsWith('.html'))
+        .reduce((acc, file) => {
+            const name = file.replace('.html', '');
+            acc[`tools/${name}`] = resolve(toolsDir, file);
+            return acc;
+        }, {})
+    : {};
+
 // Custom plugin to copy static files
 const copyStaticFiles = () => {
     return {
@@ -30,6 +42,7 @@ const copyStaticFiles = () => {
                 { src: 'scripts/favicon-animator.js', dest: 'scripts/favicon-animator.js' },
                 { src: 'resume_icon.svg', dest: 'resume_icon.svg' },
                 { src: 'lab_icon.svg', dest: 'lab_icon.svg' },
+                { src: 'tools_icon.svg', dest: 'tools_icon.svg' },
             ];
 
             // Add favicons
@@ -67,8 +80,9 @@ const copyStaticFiles = () => {
                             recursive: true,
                             force: true,
                             filter: (src) => {
-                                // Exclude test files and node scripts from production build
-                                return !src.includes('.test.js') && !src.includes('scan-audio.js');
+                                // Exclude test files and internal tooling scripts from production build
+                                const excluded = ['.test.', '/test/', 'scan-audio.js', 'upload-audio-r2.js', 'judge.js'];
+                                return !excluded.some(pattern => src.includes(pattern));
                             }
                         });
                         console.log(`Copied directory ${dir} to dist/${dir}`);
@@ -92,6 +106,7 @@ export default defineConfig({
                 resume: resolve(__dirname, 'resume.html'),
                 lab: resolve(__dirname, 'lab.html'),
                 patternLibrary: resolve(__dirname, 'pattern-library.html'),
+                ...toolsFiles,
                 ...labFiles
             },
         },
