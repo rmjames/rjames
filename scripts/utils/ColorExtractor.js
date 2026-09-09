@@ -50,8 +50,8 @@ export const ColorExtractor = {
 
         if (!imageUrl) return DEFAULT_COLOR;
 
-        // Security check: only allow relative paths (PERF-22: lightweight check)
-        if (imageUrl.includes('://') || imageUrl.startsWith('//')) {
+        // Security check: only allow relative paths (reject schemes like http:, javascript:, data:, etc. and protocol-relative //)
+        if (/^(?:[a-z]+:|\/\/)/i.test(imageUrl)) {
             return DEFAULT_COLOR;
         }
 
