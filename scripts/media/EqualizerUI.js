@@ -65,7 +65,7 @@ export class EqualizerUI {
                     <div class="eq-slider__track"></div>
                     <div class="eq-slider__fill"></div>
                     <div class="eq-slider__thumb"></div>
-                    <input type="range" min="-20" max="20" value="0" step="0.1" aria-label="${config.label}">
+                    <input type="range" min="-20" max="20" value="0" step=".1" aria-label="${config.label}">
                 </div>
                 <span class="eq-slider__label">${config.label}</span>
             `;
@@ -125,7 +125,12 @@ export class EqualizerUI {
     }
 
     _loadSettings() {
-        const savedSettings = JSON.parse(localStorage.getItem('rj-eq-settings') || '[]');
+        let savedSettings = [];
+        try {
+            savedSettings = JSON.parse(localStorage.getItem('rj-eq-settings') || '[]');
+        } catch {
+            savedSettings = [];
+        }
         this.inputs.forEach((input, index) => {
             if (savedSettings[index] !== undefined) {
                 input.value = savedSettings[index];

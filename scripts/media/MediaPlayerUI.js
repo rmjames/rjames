@@ -141,16 +141,16 @@ export const UI = {
 
         const artistDiv = document.createElement('div');
         artistDiv.style.fontWeight = 'bold';
-        artistDiv.style.marginBottom = '0.125rem';
+        artistDiv.style.marginBottom = '.125rem';
         artistDiv.textContent = artist;
 
         const albumDiv = document.createElement('div');
-        albumDiv.style.fontSize = '0.65rem';
+        albumDiv.style.fontSize = '.65rem';
         albumDiv.style.color = 'oklch(from #ccc l c h)';
         albumDiv.textContent = album;
 
         const titleDiv = document.createElement('div');
-        titleDiv.style.fontSize = '0.65rem';
+        titleDiv.style.fontSize = '.65rem';
         titleDiv.style.color = 'oklch(from #ccc l c h)';
         titleDiv.textContent = track.title;
 
@@ -243,9 +243,10 @@ export const UI = {
         button.addEventListener('touchend', handleShortPress);
 
         // Disable context menu on long press for mobile
-        button.addEventListener('contextmenu', (e) => {
+        const preventContextMenu = (e) => {
             e.preventDefault();
-        });
+        };
+        button.addEventListener('contextmenu', preventContextMenu);
 
         // Cleanup function
         return () => {
@@ -255,7 +256,7 @@ export const UI = {
             button.removeEventListener('touchstart', startPress);
             button.removeEventListener('touchmove', cancelPress);
             button.removeEventListener('touchend', handleShortPress);
-            button.removeEventListener('contextmenu', e => e.preventDefault());
+            button.removeEventListener('contextmenu', preventContextMenu);
         };
     }
 };

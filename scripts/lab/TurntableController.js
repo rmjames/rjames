@@ -84,7 +84,7 @@ export class TurntableController {
     }
 
     // Pre-load custom sound files if specified in config Map
-    for (const [selector, sound] of this.soundConfig.entries()) {
+    for (const sound of this.soundConfig.values()) {
       const isFileUrl = typeof sound === 'string' &&
         (sound.includes('/') || /\.(mp3|wav|ogg|m4a|aac|webm)$/i.test(sound));
       if (isFileUrl) {
@@ -248,9 +248,18 @@ export class TurntableController {
     this.state.applyPitch(this.state.pitchMultiplier, this.audioEngine.getCurrentTime());
   }
 
+  onPlaybackEnded() {
+    if (this.state.isPlaying && this.state.currentAudioTime >= this.state.audioDuration - .1) {
+      this.state.isPlaying = false;
+      this.state.currentAudioTime = this.state.audioDuration;
+      this.svg.pauseAnimations();
+      this.liftNeedle();
+    }
+  }
+
   dropNeedle() {
     this.isNeedleOnRecord = true;
-    this.tonearm.style.transition = 'transform 0.6s cubic-bezier(0.34, 1.489, 0.64, 1)';
+    this.tonearm.style.transition = 'transform .6s cubic-bezier(.34, 1.489, .64, 1)';
     this.tonearm.style.transform = 'rotate(22deg)';
 
     if (this.isPowerOn && this.state.isPlaying) {
@@ -258,14 +267,7 @@ export class TurntableController {
       setTimeout(() => {
         if (this.isNeedleOnRecord && this.isPowerOn && this.state.isPlaying) {
           this.state.startPlayback(this.audioEngine.getCurrentTime());
-          this.audioEngine.play(this.state.currentAudioTime, this.state.effectivePlaybackRate, () => {
-            if (this.state.isPlaying && this.state.currentAudioTime >= this.state.audioDuration - 0.1) {
-              this.state.isPlaying = false;
-              this.state.currentAudioTime = this.state.audioDuration;
-              this.svg.pauseAnimations();
-              this.liftNeedle();
-            }
-          });
+          this.audioEngine.play(this.state.currentAudioTime, this.state.effectivePlaybackRate, () => this.onPlaybackEnded());
           this.svg.unpauseAnimations();
         }
       }, 600);
@@ -280,7 +282,7 @@ export class TurntableController {
       }
       this.isNeedleOnRecord = false;
     }
-    this.tonearm.style.transition = 'transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1)';
+    this.tonearm.style.transition = 'transform .6s cubic-bezier(.4, 0, .2, 1)';
     this.tonearm.style.transform = 'rotate(-25deg)';
 
     this.audioEngine.stop();
@@ -310,14 +312,7 @@ export class TurntableController {
     this.svg.unpauseAnimations();
 
     if (this.isNeedleOnRecord) {
-      this.audioEngine.play(this.state.currentAudioTime, this.state.effectivePlaybackRate, () => {
-        if (this.state.isPlaying && this.state.currentAudioTime >= this.state.audioDuration - .1) {
-          this.state.isPlaying = false;
-          this.state.currentAudioTime = this.state.audioDuration;
-          this.svg.pauseAnimations();
-          this.liftNeedle();
-        }
-      });
+      this.audioEngine.play(this.state.currentAudioTime, this.state.effectivePlaybackRate, () => this.onPlaybackEnded());
     }
   }
 
@@ -411,25 +406,21 @@ export class TurntableController {
     this.pitchKnob.style.cursor = 'grabbing';
   }
 
+  clampPitch(y) {
+    const clamped = Math.max(35, Math.min(215, y));
+    return Math.abs(clamped - 125) < 5 ? 125 : clamped;
+  }
+
   onPitchPointerMove(e) {
     if (e.pointerId !== this.activePitchPointerId) return;
     if (!this.isDraggingPitch) return;
 
     const deltaY = e.clientY - this.pitchStartY;
-    let newY = this.currentPitchY + deltaY;
-
-    if (newY < 35) newY = 35;
-    if (newY > 215) newY = 215;
+    const newY = this.clampPitch(this.currentPitchY + deltaY);
 
     this.pitchKnob.setAttribute('transform', `translate(14, ${newY})`);
 
-    // click notch
-    if (Math.abs(newY - 125) < 5) {
-      newY = 125;
-      this.pitchKnob.setAttribute('transform', `translate(14, 125)`);
-    }
-
-    const newPitchMultiplier = 1.0 + ((newY - 125) / 90) * 0.08;
+    const newPitchMultiplier = 1 + ((newY - 125) / 90) * .08;
     this.state.applyPitch(newPitchMultiplier, this.audioEngine.getCurrentTime());
     this.audioEngine.updatePitch(this.state.effectivePlaybackRate);
     this.updateLights(newY);
@@ -442,10 +433,7 @@ export class TurntableController {
     this.isDraggingPitch = false;
 
     const deltaY = e.clientY - this.pitchStartY;
-    this.currentPitchY += deltaY;
-    if (this.currentPitchY < 35) this.currentPitchY = 35;
-    if (this.currentPitchY > 215) this.currentPitchY = 215;
-    if (Math.abs(this.currentPitchY - 125) < 5) this.currentPitchY = 125;
+    this.currentPitchY = this.clampPitch(this.currentPitchY + deltaY);
 
     try {
       this.pitchKnob.releasePointerCapture(e.pointerId);
@@ -463,12 +451,12 @@ export class TurntableController {
 
     if (this.state.isScratching) {
       if (performance.now() - this.state.lastScratchTime > 50) {
-        this.state.currentVelocity *= 0.8;
-        if (Math.abs(this.state.currentVelocity) < 0.01) this.state.currentVelocity = 0;
+        this.state.currentVelocity *= .8;
+        if (Math.abs(this.state.currentVelocity) < .01) this.state.currentVelocity = 0;
       }
 
       // Smooth the velocity using low pass filter (Exponential Moving Average)
-      const alpha = 0.35;
+      const alpha = .35;
       this.smoothedVelocity = this.smoothedVelocity * (1 - alpha) + this.state.currentVelocity * alpha;
 
       this.state.currentAudioTime += this.smoothedVelocity * dt;

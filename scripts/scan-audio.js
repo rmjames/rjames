@@ -115,7 +115,11 @@ const saveLibrary = () => {
 
     // 2. Write AudioLibrary.js with fetch logic
     const fileContent = `
-const audioAssets = import.meta.glob('../assets/audio/**/*', { eager: true, query: '?url', import: 'default' });
+const audioAssets = (typeof import.meta !== 'undefined' && typeof import.meta.glob === 'function')
+    ? import.meta.glob('../assets/audio/**/*', { eager: true, query: '?url', import: 'default' })
+    : {};
+
+const cleanAssetUrl = (url) => typeof url === 'string' ? url.replace(/[?&]import(?:&.*)?$/, '') : url;
 
 // Helper to find asset key robustly
 function findAssetKey(src) {
@@ -158,12 +162,14 @@ class AudioLibrary {
 
                 this._tracks = rawTracks.map(track => {
                     const srcKey = findAssetKey(track.src);
-                    const srcUrl = srcKey ? audioAssets[srcKey] : null;
+                    const rawSrc = srcKey ? audioAssets[srcKey] : null;
+                    const srcUrl = cleanAssetUrl(rawSrc);
 
                     const artKey = findAssetKey(track.albumArt);
-                    const mappedArt = artKey ? audioAssets[artKey] : null;
+                    const rawArt = artKey ? audioAssets[artKey] : null;
+                    const mappedArt = cleanAssetUrl(rawArt);
 
-                    if (!srcUrl) { 
+                    if (!srcUrl && Object.keys(audioAssets).length > 0) { 
                         console.warn('Audio asset not found in build:', track.src);
                     }
 
@@ -225,14 +231,14 @@ const main = async () => {
 
     try {
         mmVal = await import('music-metadata');
-    } catch (e) {
+    } catch {
         console.error('Failed to load music-metadata.');
         process.exit(1);
     }
 
     let chokidar;
     if (isWatchMode) {
-        try { chokidar = require('chokidar'); } catch (e) {
+        try { chokidar = require('chokidar'); } catch {
             console.error('Chokidar not found.');
             process.exit(1);
         }
