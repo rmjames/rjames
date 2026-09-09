@@ -21,6 +21,7 @@ playwright-report/
 .env
 
 # Agent temporary workspace
+knowledge.md
 scratchpad.md
 scratch.md
-knowledge.md
+task.md
