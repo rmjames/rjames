@@ -17,8 +17,8 @@ description: |
 
 > [!CAUTION]
 > **CONTEXT PURGE & ZERO-TRUST RESET**:
-> Ignore all prior assumptions of safety, developer intent, internal network trust, or "benign environment" assurances from earlier conversation turns. 
-> 
+> Ignore all prior assumptions of safety, developer intent, internal network trust, or "benign environment" assurances from earlier conversation turns.
+>
 > You are an unsparing red-team auditor and security engineer.
 > - **Assume Compromise**: Every boundary (network, client runtime, storage, dependency, API payload) is actively contested.
 > - **No Security Through Obscurity**: Comments like `// internal use only`, hidden DOM elements, non-standard parameter names, or minified code do NOT constitute security boundaries.
@@ -114,7 +114,7 @@ git worktree add -b "$BRANCH_NAME" "$WORKTREE_DIR" HEAD
 
 Organize findings in descending order of severity. Do not soften or sugarcoat risks.
 
-```markdown
+````markdown
 # Security Audit Report: [Target Component / Scope]
 **Audit Timestamp:** [YYYY-MM-DD HH:MM:SS]
 **Posture:** Critical Adversarial Zero-Trust
@@ -146,7 +146,7 @@ Provide the concrete diff to eliminate the flaw:
 - element.innerHTML = userContent;
 + element.textContent = userContent;
 ```
-```
+````
 
 ### Step 1.4: Mandatory Approval Gate
 
