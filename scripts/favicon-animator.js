@@ -3,7 +3,7 @@
  * Animation sequence: Circle (2s) -> Target (0.5s) -> Target (1.5s) -> Circle (0.5s) -> STOP.
  * Refactored to use SVG data URIs for zero-jank performance (PERF-18).
  */
-(function () {
+const faviconGenerator = (function () {
 
   const FPS_TARGET = 10; // 10 FPS is plenty for a favicon and saves CPU
   const PAINT_INTERVAL = 1000 / FPS_TARGET;
@@ -94,12 +94,29 @@
     [0.27, 0.18, 0.27, 0.12, 0.30, 0.12]
   ]);
 
+  const tool = flatten([
+    [.22, .78],
+    [.16, .84, .16, .90, .22, .94],
+    [.26, .98, .32, .98, .36, .94],
+    [.44, .86, .54, .76, .60, .68],
+    [.66, .72, .76, .72, .84, .64],
+    [.90, .58, .90, .48, .82, .44],
+    [.74, .40, .68, .42, .62, .46],
+    [.58, .50, .54, .44, .58, .36],
+    [.64, .28, .70, .24, .78, .16],
+    [.86, .08, .82, .02, .72, .06],
+    [.62, .12, .54, .20, .48, .30],
+    [.40, .42, .32, .54, .26, .64],
+    [.24, .68, .20, .74, .22, .78]
+  ]);
+
   const path = window.location.pathname;
   const isHeadphones = path.includes('headphones.html');
   const isResume = path.includes('resume.html') || document.title.toLowerCase().includes('resume');
   const isLab = path.includes('/lab.html') || path.includes('/lab/') || document.title.toLowerCase().includes('lab');
+  const isTool = path.includes('/tools/') || path.includes('/tools.html') || path.includes('point-visualizer') || document.title.toLowerCase().includes('tool') || document.title.toLowerCase().includes('workbench');
 
-  const target = isHeadphones ? headphone : (isResume ? file : (isLab ? flask : house));
+  const target = isTool ? tool : (isHeadphones ? headphone : (isResume ? file : (isLab ? flask : house)));
   const current = new Float32Array(circle.length);
 
   const favicon = document.getElementById('favicon-svg') || document.querySelector("link[rel*='icon']");
@@ -231,4 +248,23 @@
 
   if (document.readyState === 'complete') pregenerateFrames();
   else window.addEventListener('load', pregenerateFrames);
+
+  const instance = {
+    start,
+    stop,
+    pregenerateFrames,
+    generateSVGDataURI,
+    shapes: { circle, house, flask, headphone, file, tool },
+    getTargetShape: () => target,
+    getFrames: () => framesCache
+  };
+
+  if (typeof window !== 'undefined') {
+    window.faviconGenerator = instance;
+  }
+
+  return instance;
 })();
+
+export { faviconGenerator };
+export default faviconGenerator;
