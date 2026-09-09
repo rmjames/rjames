@@ -1,9 +1,10 @@
-const cacheName = 'v21'; // Bumped to v20 to clear cache for decoupled platter/needle updates
+const cacheName = 'v22'; // Bumped to v22 to include point-visualizer.html
 
 const assetsToCache = [
   '/index.html',
   '/resume.html',
   '/lab.html',
+  '/tools/point-visualizer.html',
   '/lab/buttons-custom-properties.html',
   '/lab/emoji-speaker.html',
   '/lab/figma-logo.html',
@@ -35,6 +36,7 @@ const assetsToCache = [
   '/manifest.json',
   '/resume_icon.svg',
   '/lab_icon.svg',
+  '/tools_icon.svg',
   '/scripts/resume-print.js',
   '/scripts/favicon-animator.js',
   '/scripts/AudioLibrary.js',

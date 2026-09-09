@@ -48,6 +48,18 @@
           "type": "image/svg+xml"
         }
       ]
+    },
+    {
+      "name": "Tools",
+      "description": "Interactive web design and developer tools",
+      "url": "/tools/point-visualizer.html",
+      "icons": [
+        {
+          "src": "/tools_icon.svg",
+          "sizes": "192x192 any",
+          "type": "image/svg+xml"
+        }
+      ]
     }
   ],
   "share_target": {

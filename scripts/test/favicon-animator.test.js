@@ -130,4 +130,20 @@ describe('Favicon Animator Performance', () => {
     await vi.advanceTimersByTimeAsync(67);
     expect(faviconMock.href).toContain('data:image/svg+xml');
   });
+
+  it('should respect path-based shape selection (Tool for tools path) via faviconGenerator', async () => {
+    vi.stubGlobal('location', { pathname: '/tools/point-visualizer.html' });
+    const module = await import('../favicon-animator.js?t=tools-' + Date.now());
+    
+    // Wait for generation
+    for (let i = 0; i < 150; i++) await vi.advanceTimersByTimeAsync(1);
+    window.dispatchEvent(new Event('focus'));
+    await vi.advanceTimersByTimeAsync(110);
+    await vi.advanceTimersByTimeAsync(67);
+    expect(faviconMock.href).toContain('data:image/svg+xml');
+
+    expect(window.faviconGenerator).toBeDefined();
+    expect(module.faviconGenerator).toBeDefined();
+    expect(window.faviconGenerator.getTargetShape()).toEqual(window.faviconGenerator.shapes.tool);
+  });
 });

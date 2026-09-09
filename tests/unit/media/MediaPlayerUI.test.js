@@ -15,7 +15,7 @@ vi.stubGlobal('ResizeObserver', class {
   constructor(callback) {
     this.callback = callback;
   }
-  observe(element) {}
+  observe() {}
   unobserve() {}
   disconnect() {}
 });
@@ -220,6 +220,43 @@ describe('MediaPlayerUI', () => {
 
             expect(el.classList.contains('is-marquee')).toBe(false);
             expect(el.style.getPropertyValue('--marquee-width')).toBe('0px');
+        });
+
+        it('should avoid re-observing already observed elements on subsequent updates', () => {
+            const el = document.createElement('div');
+            el.innerHTML = '<span>Text</span>';
+            Object.defineProperty(el, 'clientWidth', { value: 100, configurable: true });
+            Object.defineProperty(el, 'scrollWidth', { value: 150, configurable: true });
+
+            UI._initResizeObserver();
+            const observeSpy = vi.spyOn(UI._resizeObserver, 'observe');
+
+            UI.updateMarquee(el);
+            UI.updateMarquee(el);
+
+            expect(observeSpy).toHaveBeenCalledTimes(1);
+        });
+
+        it('should process ResizeObserver entries directly in the batch without re-observing', () => {
+            const el = document.createElement('div');
+            el.innerHTML = '<span>Resized Long Content</span>';
+            Object.defineProperty(el, 'scrollWidth', { value: 300, configurable: true });
+
+            UI._initResizeObserver();
+            const observeSpy = vi.spyOn(UI._resizeObserver, 'observe');
+            observeSpy.mockClear();
+
+            // Simulate ResizeObserver callback triggering
+            UI._resizeObserver.callback([
+                {
+                    target: el,
+                    contentRect: { width: 150 }
+                }
+            ]);
+
+            expect(observeSpy).not.toHaveBeenCalled();
+            expect(el.classList.contains('is-marquee')).toBe(true);
+            expect(el.style.getPropertyValue('--marquee-width')).toBe('150px');
         });
     });
 

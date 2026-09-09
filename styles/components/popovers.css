@@ -91,13 +91,22 @@
     }
 }
 
-.work {
-    transition: filter var(--link-timing) var(--link-ease);
+/* Smooth backdrop transition for main content when popover activates */
+main {
+    transition:
+        filter var(--link-timing) var(--link-ease),
+        opacity var(--link-timing) var(--link-ease);
 }
 
-/* Blur everything in main that is not .popover on :popover-open */
-main:has(~ .popover:popover-open) :not(.popover) {
-    filter: blur(4px) opacity(0.64) hue-rotate(206deg);
+/* 
+ * PERF-39: Target main directly instead of ':not(.popover)' descendant selector.
+ * Applying the graphic filter to the container executes a single GPU composite/shader pass
+ * instead of allocating separate rasterization layers and running blur/hue-rotate passes
+ * on every descendant element (headings, paragraphs, buttons, links).
+ */
+main:has(~ .popover:popover-open) {
+    filter: blur(4px) opacity(.64) hue-rotate(206deg);
+    will-change: filter, opacity;
 }
 
 [interestfor] {

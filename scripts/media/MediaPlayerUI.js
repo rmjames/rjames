@@ -9,44 +9,58 @@ export const UI = {
         }
     },
 
-    // Caching for ResizeObserver (PERF-30)
+    // Caching and batching for Marquee and ResizeObserver (PERF-30, PERF-42)
     _parentWidths: new WeakMap(),
     _resizeObserver: null,
+    _observedElements: new WeakSet(),
+    _marqueeElements: new Set(),
 
     _initResizeObserver() {
         if (this._resizeObserver) return;
         this._resizeObserver = new ResizeObserver(entries => {
+            // PERF-42: Buffer entries directly into the batched queue using the precomputed
+            // contentRect dimensions without re-observing targets or triggering nested rAF loops.
             for (const entry of entries) {
                 this._parentWidths.set(entry.target, entry.contentRect.width);
-                // If dimensions change, re-check marquee status
-                this.updateMarquee(entry.target);
+                this._marqueeElements.add(entry.target);
             }
+            requestAnimationFrame(() => this._processMarqueeBatch());
         });
+    },
+
+    _processMarqueeBatch() {
+        if (this._marqueeElements.size === 0) return;
+        const elements = Array.from(this._marqueeElements);
+        this._marqueeElements.clear();
+
+        // Phase 1 (DOM Reads): Batch all layout reads together to eliminate forced synchronous reflows
+        const updates = elements.map(el => {
+            const parentWidth = this._parentWidths.get(el) || el.clientWidth;
+            const textWidth = el.scrollWidth;
+            return {
+                el,
+                isMarquee: textWidth > parentWidth,
+                parentWidth
+            };
+        });
+
+        // Phase 2 (DOM Writes): Apply class and CSS variable mutations in the same frame without double-rAF delay
+        for (const { el, isMarquee, parentWidth } of updates) {
+            el.classList.toggle('is-marquee', isMarquee);
+            el.style.setProperty('--marquee-width', isMarquee ? `${parentWidth}px` : '0px');
+        }
     },
 
     updateMarquee(el) {
         if (!el) return;
         this._initResizeObserver();
-        this._resizeObserver.observe(el);
+        if (!this._observedElements.has(el)) {
+            this._observedElements.add(el);
+            this._resizeObserver.observe(el);
+        }
 
-        // Defer reads and writes to avoid layout thrashing during track changes
-        requestAnimationFrame(() => {
-            // DOM READ phase
-            // Use cached width if available to avoid clientWidth read
-            const parentWidth = this._parentWidths.get(el) || el.clientWidth;
-            const textWidth = el.scrollWidth;
-
-            // DOM WRITE phase (deferred to next frame to prevent forced synchronous layout)
-            requestAnimationFrame(() => {
-                if (textWidth > parentWidth) {
-                    el.classList.add('is-marquee');
-                    el.style.setProperty('--marquee-width', `${parentWidth}px`);
-                } else {
-                    el.classList.remove('is-marquee');
-                    el.style.setProperty('--marquee-width', '0px');
-                }
-            });
-        });
+        this._marqueeElements.add(el);
+        requestAnimationFrame(() => this._processMarqueeBatch());
     },
 
     updateTrackInfo(elements, track) {

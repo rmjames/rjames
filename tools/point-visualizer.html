@@ -1,0 +1,3353 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; object-src 'none'; frame-ancestors 'none';">
+    <title>DevTools Shape &amp; Path Workbench</title>
+    <link rel="icon" type="image/svg+xml" sizes="any" href="/tools_icon.svg" id="favicon-svg">
+    <link rel="icon" type="image/png" href="/favicon_144.png" sizes="144x144">
+    <link rel="icon" type="image/png" href="/favicon_512.png" sizes="512x512">
+    <link rel="icon" type="image/png" href="/favicon_192.png" sizes="192x192">
+    <link rel="manifest" href="/manifest.json">
+    <script type="module" src="/scripts/favicon-animator.js" async></script>
+    <style>
+        :root {
+            color-scheme: dark;
+            --surface-1: oklch(.18 0 0);
+            --surface-2: oklch(.24 0 0);
+            --surface-3: oklch(.28 0 0);
+            --surface-code: oklch(.14 0 0);
+            --text-1: oklch(.96 0 0);
+            --text-2: oklch(.75 0 0);
+            --text-muted: oklch(.55 0 0);
+            --accent: oklch(.75 .15 45);
+            /* amber/orange */
+            --accent-alpha: oklch(.75 .15 45 / .12);
+            --grid-major: oklch(1 0 0 / .15);
+            --grid-minor: oklch(1 0 0 / .05);
+            --anchor: oklch(.68 .18 220);
+            /* cyan/blue */
+            --anchor-alpha: oklch(.68 .18 220 / .3);
+            --control: oklch(.65 .2 0);
+            /* pink/red */
+            --devtools-prop: oklch(.72 .18 215);
+            --devtools-val: oklch(.88 .05 85);
+            --devtools-tag: oklch(.7 .18 350);
+            --devtools-btn-active: oklch(.68 .18 220 / .2);
+            --border-subtle: oklch(1 0 0 / .12);
+            --focus-ring: oklch(.75 .15 45 / .6);
+            --radius-s: .25rem;
+            --radius-m: .5rem;
+            --radius-l: .75rem;
+
+            --control-width: 38cqi;
+            interpolate-size: allow-keywords;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            container-type: inline-size;
+            padding: .25cqi .5cqi;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--surface-1);
+            color: var(--text-1);
+            min-block-size: 100vh;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        /* App Header */
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-block-end: .75rem;
+            border-block-end: .0625rem solid var(--border-subtle);
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .brand-wrap {
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+        }
+
+        .brand-icon {
+            inline-size: 1.75rem;
+            block-size: 1.75rem;
+            color: var(--accent);
+        }
+
+        .brand-title {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: -.02em;
+        }
+
+        .brand-subtitle {
+            margin: 0;
+            font-size: .75rem;
+            color: var(--text-2);
+        }
+
+        /* Accessible & Animated Tab Navigation */
+        .tabs {
+            position: relative;
+            display: flex;
+            gap: .25rem;
+            background: var(--surface-2);
+            padding: .25rem;
+            border-radius: var(--radius-m);
+            corner-shape: squircle;
+            border: .0625rem solid var(--border-subtle);
+            overflow: hidden;
+        }
+
+        .tab-indicator {
+            position: absolute;
+            inset-block-start: .25rem;
+            inset-block-end: .25rem;
+            inset-inline-start: 0;
+            inline-size: 0;
+            background: var(--surface-code);
+            border-radius: var(--radius-s);
+            corner-shape: squircle;
+            border: .0625rem solid var(--border-subtle);
+            box-shadow: 0 .0625rem .2rem oklch(0 0 0 / .25);
+            transition: transform .25s cubic-bezier(.2, .8, .2, 1), inline-size .25s cubic-bezier(.2, .8, .2, 1);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .tab-btn {
+            position: relative;
+            z-index: 2;
+            background: transparent;
+            color: var(--text-2);
+            border: none;
+            padding: .5rem .875rem;
+            border-radius: var(--radius-s);
+            corner-shape: squircle;
+            font-size: .875rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: .4rem;
+            transition: color .2s ease;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-1);
+        }
+
+        .tab-btn:focus-visible {
+            outline: .125rem solid var(--accent);
+            outline-offset: .0625rem;
+        }
+
+        .tab-btn.active {
+            color: var(--accent);
+        }
+
+        .tab-glyph {
+            font-size: 1rem;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: .5rem;
+            align-items: center;
+        }
+
+        /* 2-Column Resizable Workspace (Left: Canvas, Right: Control Panel) */
+        .workspace {
+            container-name: workspace;
+            container-type: inline-size;
+            display: grid;
+            grid-template-columns: minmax(30cqi, 1fr) .4rem var(--control-width, 38cqi);
+            gap: .25cqi;
+            flex-grow: 1;
+            min-block-size: 0;
+            inline-size: 100%;
+            position: relative;
+        }
+
+        @container (max-width: 55rem) {
+            .workspace {
+                display: flex;
+                flex-direction: column;
+                gap: .75rem;
+                overflow-y: auto;
+            }
+
+            .resizer {
+                display: none !important;
+            }
+
+            .viewport-panel {
+                max-block-size: none;
+                flex-shrink: 0;
+            }
+
+            .canvas-container {
+                min-block-size: min(85vw, 24rem);
+                aspect-ratio: 1;
+            }
+
+            .panel {
+                max-block-size: none;
+                overflow: visible;
+            }
+        }
+
+        /* Interactive Resizer Divider */
+        .resizer {
+            inline-size: .4rem;
+            margin-inline: -.0625rem;
+            cursor: col-resize;
+            background: transparent;
+            border-radius: .2rem;
+            corner-shape: squircle;
+            transition: background .15s ease;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+            touch-action: none;
+        }
+
+        .resizer:hover,
+        .resizer.resizing {
+            background: var(--anchor);
+        }
+
+        .panel {
+            container-type: inline-size;
+            background: var(--surface-2);
+            border-radius: var(--radius-m);
+            corner-shape: squircle;
+            border: .0625rem solid var(--border-subtle);
+            padding: clamp(.6rem, 2cqi, 1rem);
+            display: flex;
+            flex-direction: column;
+            gap: .75rem;
+            max-block-size: calc(100vh - 6.5rem);
+            overflow-y: auto;
+            min-inline-size: 0;
+            flex-grow: 1;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: .5rem;
+        }
+
+        .panel-title {
+            margin: 0;
+            font-size: 1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: .4rem;
+        }
+
+        /* Collapsible Control Groups with Smooth Animation */
+        details.control-group {
+            background: var(--surface-1);
+            border: .0625rem solid var(--border-subtle);
+            border-radius: var(--radius-s);
+            corner-shape: squircle;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: background .2s ease, border-color .2s ease;
+        }
+
+        details.control-group[open] {
+            background: var(--surface-code);
+            border-color: color-mix(in oklch, var(--border-subtle) 70%, var(--anchor) 30%);
+        }
+
+        details.control-group::details-content {
+            transition: block-size .26s cubic-bezier(.16, 1, .3, 1), content-visibility .26s allow-discrete, opacity .22s ease;
+            block-size: 0;
+            opacity: 0;
+            overflow: hidden;
+        }
+
+        details.control-group[open]::details-content {
+            block-size: auto;
+            opacity: 1;
+        }
+
+        details.control-group > summary.control-group-summary {
+            list-style: none;
+            cursor: pointer;
+            user-select: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: .5rem;
+            padding: .5rem .75rem;
+            font-size: .875rem;
+            font-weight: 600;
+            color: var(--text-1);
+            background: var(--surface-1);
+            transition: background .15s ease, color .15s ease;
+        }
+
+        details.control-group > summary.control-group-summary:hover {
+            background: var(--surface-3);
+            color: var(--accent);
+        }
+
+        details.control-group > summary.control-group-summary:focus-visible {
+            outline: .125rem solid var(--accent);
+            outline-offset: -.125rem;
+        }
+
+        details.control-group > summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .summary-left {
+            display: flex;
+            align-items: center;
+            gap: .4rem;
+        }
+
+        .summary-actions {
+            display: flex;
+            align-items: center;
+            gap: .35rem;
+        }
+
+        .details-chevron {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            inline-size: .875rem;
+            block-size: .875rem;
+            color: var(--text-2);
+            transition: transform .24s cubic-bezier(.16, 1, .3, 1);
+            font-size: .75rem;
+        }
+
+        details.control-group[open] > summary .details-chevron {
+            transform: rotate(90deg);
+        }
+
+        .control-group-title {
+            font-size: .875rem;
+            font-weight: 600;
+        }
+
+        .control-group-content {
+            padding: .65rem .75rem;
+            display: flex;
+            flex-direction: column;
+            gap: .5rem;
+            animation: accordionContentFade .25s ease backwards;
+        }
+
+        @keyframes accordionContentFade {
+            from {
+                opacity: 0;
+                transform: translateY(-.25rem);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .checkpoint-count-badge {
+            font-size: .75rem;
+            background: var(--surface-3);
+            color: var(--accent);
+            padding: .1rem .4rem;
+            border-radius: .2rem;
+            corner-shape: squircle;
+            font-weight: 600;
+        }
+
+        /* Checkpoint Quick Select dropdown in collapsed view */
+        .checkpoints-collapsed-view {
+            display: flex;
+            flex-direction: column;
+            gap: .35rem;
+            padding-block-start: .2rem;
+        }
+
+        .checkpoints-select {
+            appearance: none;
+            background: var(--surface-1);
+            border: .0625rem solid var(--border-subtle);
+            border-radius: var(--radius-s);
+            corner-shape: squircle;
+            color: var(--text-1);
+            font-size: .75rem;
+            font-family: inherit;
+            padding: .4rem .75rem;
+            inline-size: 100%;
+            cursor: pointer;
+            outline: none;
+            transition: border-color .15s ease;
+        }
+
+        .checkpoints-select:hover {
+            border-color: var(--anchor);
+        }
+
+        .checkpoints-select:focus-visible {
+            border-color: var(--accent);
+            outline: .125rem solid var(--accent);
+            outline-offset: .0625rem;
+        }
+
+        /* History Panel */
+        .checkpoints-group .control-group-content {
+            max-block-size: clamp(12rem, 45cqi, 20rem);
+        }
+
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: .25cqi;
+            max-block-size: clamp(10rem, 40cqi, 18rem);
+            overflow-y: auto;
+            overscroll-behavior: contain;
+            scrollbar-width: thin;
+            scrollbar-color: var(--border-subtle) transparent;
+            flex-grow: 1;
+            min-block-size: 0;
+            padding-inline-end: .25rem;
+        }
+
+        .history-list::-webkit-scrollbar {
+            inline-size: .375rem;
+        }
+
+        .history-list::-webkit-scrollbar-thumb {
+            background: var(--border-subtle);
+            border-radius: var(--radius-s);
+            corner-shape: squircle;
+        }
+
+        .history-item {
+            padding: .5rem .75rem;
+            background: var(--surface-1);
+            border: .0625rem solid var(--grid-minor);
+            border-radius: var(--radius-s);
+            corner-shape: squircle;
+            cursor: pointer;
+            font-size: .75rem;
+            display: flex;
+            flex-direction: column;
+            gap: .25rem;
+            transition: all .15s ease;
+        }
+
+        .history-item:hover {
+            border-color: var(--anchor);
+            transform: translateY(-.0625rem);
+        }
+
+        .history-item.active {
+            border-color: var(--anchor);
+            background: color-mix(in oklch, var(--anchor) 15%, var(--surface-1));
+        }
+
+        .history-item-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .history-item-badge {
+            font-size: .75rem;
+            padding: .1rem .35rem;
+            border-radius: .2rem;
+            corner-shape: squircle;
+            background: var(--surface-3);
+            color: var(--text-2);
+            text-transform: uppercase;
+        }
+
+        .history-item-time {
+            color: var(--text-muted);
+            font-size: .75rem;
+        }
+
+        .btn {
+            background: var(--surface-3);
+            color: var(--text-1);
+            border: .0625rem solid var(--border-subtle);
+            padding: .5rem .875rem;
+            border-radius: var(--radius-s);
+            corner-shape: squircle;
+            cursor: pointer;
+            font-size: .875rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: .4rem;
+            transition: all .15s ease;
+            white-space: nowrap;
+        }
+
+        .btn:hover {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
+        }
+
+        .btn:focus-visible {
+            outline: .125rem solid var(--accent);
+            outline-offset: .0625rem;
+        }
+
+        .btn-sm {
+            padding: .25rem .5rem;
+            font-size: .75rem;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
+        }
+
+        .btn-primary:hover {
+            filter: brightness(1.1);
+        }
+
+        /* Presets & Controls Bar */
+        .controls-subbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .5rem;
+            align-items: center;
+        }
+
+        .pill-group {
+            display: inline-flex;
+            background: var(--surface-1);
+            border: .0625rem solid var(--border-subtle);
+            border-radius: var(--radius-s);
+            corner-shape: squircle;
+            padding: .125rem;
+            gap: .125rem;
+            flex-wrap: wrap;
+        }
+
+        .pill-btn {
+            background: transparent;
+            color: var(--text-2);
+            border: none;
+            padding: .25rem .5rem;
+            border-radius: .2rem;
+            corner-shape: squircle;
+            font-size: .75rem;
+            cursor: pointer;
+            font-family: ui-monospace, monospace;
+            transition: all .15s ease;
+        }
+
+        .pill-btn:hover {
+            color: var(--text-1);
+        }
+
+        .pill-btn.active {
+            background: var(--surface-3);
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        select.preset-select {
+            background: var(--surface-1);
+            color: var(--text-1);
+            border: .0625rem solid var(--border-subtle);
+            padding: .35rem .6rem;
+            border-radius: var(--radius-s);
+            corner-shape: squircle;
+            font-size: .75rem;
+            cursor: pointer;
+            outline: none;
+            flex-grow: 1;
+            min-inline-size: 8.75rem;
+        }
+
+        select.preset-select:focus {
+            border-color: var(--accent);
+        }
+
+        /* Customizable Shape Dropdown (Baseline 2025 & Progressive Enhancement) */
+        select.custom-shape-select,
+        select.custom-shape-select::picker(select) {
+            appearance: base-select;
+        }
+
+        .shape-dropdown {
+            position: relative;
+            display: inline-block;
+            flex-grow: 1;
+            min-inline-size: 10rem;
+        }
+
+        .shape-dropdown-btn {
+            inline-size: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: .5rem;
+            background: var(--surface-1);
+            color: var(--text-1);
+            border: .0625rem solid var(--border-subtle);
+            padding: .35rem .6rem;
+            border-radius: var(--radius-s);
+            corner-shape: squircle;
+            font-size: .75rem;
+            font-family: inherit;
+            cursor: pointer;
+            outline: none;
+            transition: border-color .15s ease, background .15s ease;
+            text-align: start;
+        }
+
+        .shape-dropdown-btn:hover {
+            border-color: var(--accent);
+            background: var(--surface-2);
+        }
+
+        .shape-dropdown-btn:focus-visible {
+            border-color: var(--accent);
+            outline: .125rem solid var(--accent);
+            outline-offset: .0625rem;
+        }
+
+        .shape-selected-content {
+            display: inline-flex;
+            align-items: center;
+            gap: .5rem;
+            min-inline-size: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .shape-selected-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            color: var(--accent);
+        }
+
+        .shape-chevron {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-2);
+            transition: transform .2s ease;
+            flex-shrink: 0;
+        }
+
+        .shape-dropdown.open .shape-chevron {
+            transform: rotate(180deg);
+        }
+
+        .shape-dropdown-menu {
+            position: absolute;
+            inset-block-start: calc(100% + .25rem);
+            inset-inline-start: 0;
+            inline-size: 100%;
+            min-inline-size: 13rem;
+            background: var(--surface-1);
+            border: .0625rem solid var(--border-subtle);
+            border-radius: var(--radius-m);
+            corner-shape: squircle;
+            box-shadow: 0 .5rem 1.5rem -.25rem oklch(0 0 0 / .45), 0 .125rem .375rem -.0625rem oklch(0 0 0 / .2);
+            padding: .3rem;
+            display: flex;
+            flex-direction: column;
+            gap: .125rem;
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-.375rem) scale(.98);
+            transform-origin: top;
+            transition: opacity .18s cubic-bezier(.16, 1, .3, 1),
+                transform .18s cubic-bezier(.16, 1, .3, 1),
+                visibility .18s;
+            pointer-events: none;
+            backdrop-filter: blur(.75rem);
+        }
+
+        .shape-dropdown.open .shape-dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+            pointer-events: auto;
+        }
+
+        .shape-dropdown.open .shape-option {
+            animation: shapeOptionStagger .24s cubic-bezier(.16, 1, .3, 1) backwards;
+            animation-delay: calc(var(--option-idx, 0) * 35ms);
+        }
+
+        @keyframes shapeOptionStagger {
+            0% {
+                opacity: 0;
+                transform: translateY(-.5rem);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .shape-option {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: .5rem;
+            padding: .4rem .55rem;
+            border-radius: var(--radius-s);
+            corner-shape: squircle;
+            font-size: .75rem;
+            color: var(--text-2);
+            cursor: pointer;
+            user-select: none;
+            transition: background .12s ease, color .12s ease;
+            outline: none;
+            border: none;
+            background: transparent;
+            inline-size: 100%;
+            text-align: start;
+            box-sizing: border-box;
+        }
+
+        .shape-option:hover,
+        .shape-option:focus-visible {
+            background: var(--surface-2);
+            color: var(--text-1);
+        }
+
+        .shape-option.active {
+            background: var(--surface-3);
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .shape-option-left {
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+        }
+
+        .shape-option-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+            flex-shrink: 0;
+        }
+
+        .shape-check-icon {
+            display: none;
+            color: var(--accent);
+            flex-shrink: 0;
+        }
+
+        .shape-option.active .shape-check-icon {
+            display: inline-flex;
+        }
+
+        .devtools-inspector {
+            background: var(--surface-code);
+            border: .0625rem solid var(--border-subtle);
+            border-radius: var(--radius-m);
+            corner-shape: squircle;
+            padding: .875rem;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: .875rem;
+            line-height: 1.5;
+            display: flex;
+            flex-direction: column;
+            gap: .4rem;
+            box-shadow: inset 0 .0625rem .2rem oklch(0 0 0 / .3);
+        }
+
+        .devtools-header,
+        .devtools-footer {
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .devtools-selector {
+            color: var(--devtools-tag);
+        }
+
+        .devtools-declaration {
+            display: flex;
+            align-items: flex-start;
+            gap: .4rem;
+            padding-inline-start: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .devtools-checkbox {
+            appearance: none;
+            margin: .25rem 0 0 0;
+            inline-size: .875rem;
+            block-size: .875rem;
+            border: .0625rem solid var(--border-subtle);
+            border-radius: .2rem;
+            corner-shape: squircle;
+            background: var(--surface-2);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .devtools-checkbox:checked {
+            background: var(--anchor);
+            border-color: var(--anchor);
+        }
+
+        .devtools-checkbox:checked::after {
+            content: "✓";
+            position: absolute;
+            font-size: .625rem;
+            color: #000;
+            font-weight: bold;
+            inset-inline-start: .125rem;
+            inset-block-start: -.0625rem;
+        }
+
+        .devtools-prop {
+            color: var(--devtools-prop);
+            font-weight: 600;
+        }
+
+        /* Interactive DevTools Shape Icon Button */
+        .shape-icon-btn {
+            background: transparent;
+            color: var(--text-2);
+            border: .0625rem solid var(--border-subtle);
+            border-radius: .2rem;
+            corner-shape: squircle;
+            padding: .125rem .25rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all .15s ease;
+            vertical-align: middle;
+        }
+
+        .shape-icon-btn:hover {
+            color: var(--anchor);
+            border-color: var(--anchor);
+        }
+
+        .shape-icon-btn.active {
+            background: var(--devtools-btn-active);
+            color: var(--anchor);
+            border-color: var(--anchor);
+        }
+
+        .devtools-value-wrap {
+            flex: 1;
+            min-inline-size: 10rem;
+        }
+
+        .devtools-textarea {
+            inline-size: 100%;
+            background: transparent;
+            color: var(--devtools-val);
+            border: .0625rem dashed transparent;
+            border-radius: .2rem;
+            corner-shape: squircle;
+            padding: .125rem .25rem;
+            font-family: inherit;
+            font-size: inherit;
+            line-height: inherit;
+            resize: vertical;
+            min-block-size: 4.5rem;
+            outline: none;
+            white-space: pre-wrap;
+            word-break: break-all;
+            transition: border-color .2s;
+        }
+
+        .devtools-textarea:focus {
+            border-color: var(--accent);
+            background: var(--surface-1);
+        }
+
+        .devtools-semi {
+            color: var(--text-muted);
+        }
+
+        .editor-panes {
+            display: flex;
+            flex-direction: column;
+            gap: .5rem;
+            flex-grow: 1;
+            min-block-size: 0;
+            overflow-y: auto;
+            animation: fadeInTab .2s ease;
+        }
+
+        @keyframes fadeInTab {
+            from {
+                opacity: 0;
+                transform: translateY(.2rem);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .error-msg {
+            color: var(--control);
+            font-size: .75rem;
+            min-block-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: .3rem;
+        }
+
+        /* Quick Export Cards (Inline-Grid) */
+        .export-box {
+            background: var(--surface-1);
+            border: .0625rem solid var(--border-subtle);
+            border-radius: var(--radius-s);
+            corner-shape: squircle;
+            padding: .35rem .5rem;
+            display: inline-grid;
+            grid-template-columns: 1fr auto;
+            align-items: center;
+            gap: .5rem;
+            inline-size: 100%;
+            box-sizing: border-box;
+        }
+
+        .export-code {
+            font-family: ui-monospace, monospace;
+            font-size: .75rem;
+            background: var(--surface-code);
+            padding: .4rem .6rem;
+            border-radius: .2rem;
+            corner-shape: squircle;
+            border: .0625rem solid var(--border-subtle);
+            color: var(--text-1);
+            white-space: nowrap;
+            overflow-x: auto;
+            min-inline-size: 0;
+            user-select: all;
+        }
+
+
+        /* Canvas / Viewport Section (Middle Panel) */
+        .viewport-panel {
+            background: var(--surface-2);
+            border-radius: var(--radius-m);
+            corner-shape: squircle;
+            border: .0625rem solid var(--border-subtle);
+            padding: clamp(.6rem, 2cqi, 1rem);
+            display: flex;
+            flex-direction: column;
+            gap: .75rem;
+            max-block-size: calc(100vh - 6.5rem);
+            overflow: hidden;
+            min-inline-size: 0;
+            container-type: inline-size;
+            flex-grow: 1;
+        }
+
+        .viewport-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: .5rem;
+        }
+
+        .coord-readout {
+            font-family: ui-monospace, monospace;
+            font-size: .75rem;
+            background: var(--surface-code);
+            padding: .25rem .6rem;
+            border-radius: var(--radius-s);
+            corner-shape: squircle;
+            border: .0625rem solid var(--border-subtle);
+            color: var(--anchor);
+            display: inline-flex;
+            align-items: center;
+            gap: .6rem;
+        }
+
+        .canvas-container {
+            position: relative;
+            inline-size: 100%;
+            flex-grow: 1;
+            min-block-size: 17.5rem;
+            aspect-ratio: 1;
+            border-radius: var(--radius-m);
+            corner-shape: squircle;
+            border: .0625rem solid var(--border-subtle);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--surface-code);
+        }
+
+        /* Live Clipped Surface Elements */
+        .clipped-surface {
+            position: absolute;
+            inset: 5%;
+            border-radius: 0;
+            transition: clip-path .05s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+        }
+
+        /* Surface Themes */
+        .surface-white-tab {
+            background: oklch(.96 0 0);
+            box-shadow: 0 .5rem 2rem oklch(0 0 0 / .6);
+            /* Matching user attachment 4 */
+        }
+
+        .surface-gradient {
+            background: linear-gradient(135deg in oklab, oklch(.75 .18 45) 0%, oklch(.65 .2 320) 50%, oklch(.55 .2 240) 100%);
+            box-shadow: 0 .625rem 2.5rem oklch(0 0 0 / .5);
+        }
+
+        .surface-card {
+            background: color-mix(in oklch, var(--surface-3) 90%, var(--anchor) 10%);
+            border: .0625rem solid var(--border-subtle);
+            corner-shape: squircle;
+            color: var(--text-1);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: .5rem;
+            font-size: .875rem;
+        }
+
+        .surface-card h4 {
+            margin: 0;
+            color: var(--accent);
+        }
+
+        .surface-checkerboard {
+            background-image: repeating-conic-gradient(oklch(.3 0 0) 0% 25%, oklch(.2 0 0) 0% 50%);
+            background-size: 1.25rem 1.25rem;
+        }
+
+        /* SVG Overlay Canvas */
+        svg.interactive-svg {
+            position: absolute;
+            inset: 0;
+            inline-size: 100%;
+            block-size: 100%;
+            touch-action: none;
+            z-index: 10;
+        }
+
+        .draggable-vertex {
+            cursor: grab;
+            stroke: #fff;
+            stroke-width: .2;
+            transition: r .1s ease, fill .1s ease;
+        }
+
+        .draggable-vertex:hover {
+            r: 2;
+            stroke-width: .35;
+            cursor: grabbing;
+        }
+
+        .vertex-anchor {
+            fill: var(--anchor);
+        }
+
+        .vertex-control {
+            fill: var(--control);
+        }
+
+        .edge-line {
+            stroke: var(--anchor);
+            stroke-width: .4;
+            stroke-linejoin: round;
+            stroke-linecap: round;
+            cursor: pointer;
+        }
+
+        .edge-line:hover {
+            stroke: var(--accent);
+            stroke-width: .8;
+        }
+
+        /* Tools Footer Bar */
+        .tools-bar {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            background: var(--surface-1);
+            padding: min(.65rem, 1.5cqi) min(.85rem, 2cqi);
+            border-radius: var(--radius-s);
+            corner-shape: squircle;
+            border: .0625rem solid var(--border-subtle);
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+
+        .tool-group {
+            display: flex;
+            align-items: center;
+            gap: .4rem;
+            font-size: .75rem;
+            color: var(--text-2);
+        }
+
+        .tool-group input[type="range"] {
+            inline-size: min(6.25rem, 20cqi);
+        }
+
+        .canvas-thumbnail-wrap {
+            margin-inline-start: auto;
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            font-size: .75rem;
+            color: var(--text-2);
+        }
+
+        canvas#faviconCanvas {
+            border: .0625rem solid var(--border-subtle);
+            border-radius: .2rem;
+            corner-shape: squircle;
+            background: transparent;
+            display: block;
+        }
+
+        .toast {
+            position: fixed;
+            inset-block-end: 1.5rem;
+            inset-inline-end: 1.5rem;
+            background: var(--accent);
+            color: #000;
+            font-weight: 600;
+            font-size: .875rem;
+            padding: .5rem 1rem;
+            border-radius: var(--radius-s);
+            corner-shape: squircle;
+            box-shadow: 0 .25rem .75rem oklch(0 0 0 / .3);
+            pointer-events: none;
+            opacity: 0;
+            transform: translateY(.5rem);
+            transition: all .2s ease;
+            z-index: 100;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @container (max-width: 25rem) {
+            .export-box {
+                grid-template-columns: 1fr;
+            }
+            .tools-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- App Header -->
+    <header class="app-header">
+        <div class="brand-wrap">
+            <svg class="brand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5" />
+                <line x1="12" y1="22" x2="12" y2="15.5" />
+                <polyline points="22 8.5 12 15.5 2 8.5" />
+            </svg>
+            <div>
+                <h1 class="brand-title">Shape &amp; Path Workbench</h1>
+                <p class="brand-subtitle">DevTools CSS clip-path (W3C Spec), SVG Path (d), &amp; Favicon Editor</p>
+            </div>
+        </div>
+
+        <!-- Accessible & Animated Tab Navigation -->
+        <nav class="tabs" role="tablist" aria-label="Editor Modes" id="tabBar">
+            <div class="tab-indicator" id="tabIndicator" aria-hidden="true"></div>
+            <button class="tab-btn active" role="tab" id="tab-clip-path" aria-selected="true"
+                aria-controls="panel-clip-path" tabindex="0">
+                <span class="tab-glyph">✦</span> CSS clip-path
+            </button>
+            <button class="tab-btn" role="tab" id="tab-svg-path" aria-selected="false" aria-controls="panel-svg-path"
+                tabindex="-1">
+                <span class="tab-glyph">⬡</span> SVG Path (d)
+            </button>
+            <button class="tab-btn" role="tab" id="tab-favicon" aria-selected="false" aria-controls="panel-favicon"
+                tabindex="-1">
+                <span class="tab-glyph">⛭</span> Favicon 32×32
+            </button>
+        </nav>
+
+        <div class="header-actions">
+            <button id="globalCopyBtn" class="btn btn-primary" title="Copy ready-to-use code">Copy</button>
+        </div>
+    </header>
+
+    <!-- 2-Column Resizable Workspace (Left: Canvas Viewport, Right: Control Panel) -->
+    <main class="workspace" id="workspaceGrid">
+        <!-- 1. Interactive Viewport & Canvas (Minimal, Front-and-Center) -->
+        <section class="viewport-panel" aria-label="Shape Viewport">
+            <div class="viewport-toolbar">
+                <!-- Surface Theme Switcher -->
+                <div class="pill-group" role="group" aria-label="Surface theme">
+                    <button class="pill-btn active" data-surface="surface-white-tab"
+                        title="White Tab on dark (Attachment 4)">White Tab</button>
+                    <button class="pill-btn" data-surface="surface-gradient"
+                        title="Vibrant OKLCH Gradient">Gradient</button>
+                    <button class="pill-btn" data-surface="surface-card" title="UI Component Card">Card</button>
+                    <button class="pill-btn" data-surface="surface-checkerboard" title="Checkerboard">Check</button>
+                </div>
+
+                <!-- Coordinate readout badge -->
+                <div class="coord-readout" id="coordReadout" aria-live="polite">
+                    <span>Handle: <strong id="readoutIdx">0</strong></span>
+                    <span>X: <strong id="readoutX">0%</strong></span>
+                    <span>Y: <strong id="readoutY">0%</strong></span>
+                    <span style="color: var(--text-muted); font-size: .75rem; border-inline-start: .0625rem solid var(--border-subtle); padding-inline-start: .5rem;" title="Interaction guide">Click: add &bull; Alt-click: remove</span>
+                </div>
+            </div>
+
+            <!-- Canvas Viewport -->
+            <div class="canvas-container" id="canvasContainer">
+                <!-- Real Clipped Element Preview -->
+                <div id="clippedSurface" class="clipped-surface surface-white-tab" aria-hidden="true">
+                    <div id="clippedSurfaceContent"
+                        style="display: none; inline-size: 100%; block-size: 100%; align-items: center; justify-content: center; text-align: center;">
+                        <h3 style="margin: 0; font-size: 1rem; color: #fff;">Interactive UI Surface</h3>
+                    </div>
+                </div>
+
+                <!-- Interactive SVG Overlay Layer -->
+                <svg id="visualizer" class="interactive-svg" viewBox="-2 -2 104 104">
+                    <!-- Reference Underlay Image -->
+                    <image id="underlayImage" x="0" y="0" width="100" height="100" opacity=".5"
+                        preserveAspectRatio="xMidYMid meet" href="" style="display: none; pointer-events: none;" />
+
+                    <!-- Coordinate Grid Layer -->
+                    <g id="gridLayer"></g>
+
+                    <!-- Checkpoint Diff Layer -->
+                    <path id="diffPath" fill="none" stroke="var(--anchor)" stroke-width=".5" stroke-linecap="round"
+                        stroke-linejoin="round" stroke-dasharray="1 1" style="display: none; pointer-events: none;" />
+
+                    <!-- Active Shape Render Layer -->
+                    <polygon id="svgPolygon" fill="var(--anchor-alpha)" stroke="var(--anchor)" stroke-width=".5"
+                        style="display: none;" />
+                    <circle id="svgCircle" fill="var(--anchor-alpha)" stroke="var(--anchor)" stroke-width=".5"
+                        style="display: none;" />
+                    <ellipse id="svgEllipse" fill="var(--anchor-alpha)" stroke="var(--anchor)" stroke-width=".5"
+                        style="display: none;" />
+                    <rect id="svgRect" fill="var(--anchor-alpha)" stroke="var(--anchor)" stroke-width=".5"
+                        style="display: none;" />
+                    <path id="mainPath" fill="var(--accent-alpha)" stroke="var(--accent)" stroke-width=".6"
+                        stroke-linecap="round" stroke-linejoin="round" />
+
+                    <!-- Bézier / Radius Tangent Handles Layer -->
+                    <g id="handlesLayer" stroke="var(--control)" stroke-width=".3" stroke-dasharray=".8 .8"></g>
+
+                    <!-- Draggable Points Layer -->
+                    <g id="pointsLayer"></g>
+                </svg>
+            </div>
+        </section>
+
+        <!-- Resizer Divider -->
+        <div class="resizer" id="resizerDivider" data-resize="middle" role="separator" aria-orientation="vertical"
+            aria-label="Resize control panel"></div>
+
+        <!-- 2. Control Panel (Collapsible Tool Groups, Checkpoints at Top) -->
+        <section class="panel" id="controlPanel" aria-label="Control Panel">
+            <!-- Checkpoints (Top of Control Panel, Collapsed by Default) -->
+            <details class="control-group checkpoints-group" id="checkpointsDetails">
+                <summary class="control-group-summary">
+                    <span class="control-group-title">
+                        <span class="details-chevron" aria-hidden="true">▶</span>
+                        Checkpoints
+                        <span class="checkpoint-count-badge" id="checkpointCount">0</span>
+                    </span>
+                    <div class="summary-actions">
+                        <button id="addCheckpointBtn" class="btn btn-sm" type="button" title="Save current snapshot">Save</button>
+                    </div>
+                </summary>
+                <div class="control-group-content">
+                    <p style="margin: 0; font-size: .75rem; color: var(--text-muted);">Click snapshot to diff/restore</p>
+                    <div class="history-list" id="historyListItems" role="list"></div>
+                </div>
+            </details>
+
+            <!-- Collapsed Quick Select Dropdown (visible when checkpoints is closed) -->
+            <div class="checkpoints-collapsed-view" id="checkpointsCollapsedView">
+                <label for="checkpointQuickSelect" style="font-size: .75rem; color: var(--text-muted);">Quick restore snapshot:</label>
+                <select id="checkpointQuickSelect" class="checkpoints-select" aria-label="Quick restore checkpoint">
+                    <option value="" disabled selected>Jump to checkpoint...</option>
+                </select>
+            </div>
+
+            <!-- Mode 1: CSS clip-path Panel (Full W3C Shapes Spec) -->
+            <div id="panel-clip-path" role="tabpanel" aria-labelledby="tab-clip-path" class="editor-panes">
+                <!-- Group A: Shape & Inspector -->
+                <details class="control-group" open>
+                    <summary class="control-group-summary">
+                        <span class="control-group-title">
+                            <span class="details-chevron" aria-hidden="true">▶</span>
+                            Shape &amp; Inspector
+                        </span>
+                    </summary>
+                    <div class="control-group-content">
+                        <!-- W3C Shape Function Switcher (Customizable Select Dropdown) -->
+                        <div class="controls-subbar">
+                            <span style="font-size: .75rem; color: var(--text-2); font-weight: 600;">Shape:</span>
+                            <div class="shape-dropdown" id="shapeDropdown">
+                                <button type="button" id="shapeDropdownBtn" class="shape-dropdown-btn" aria-haspopup="listbox"
+                                    aria-expanded="false" aria-controls="shapeDropdownMenu"
+                                    aria-label="Select W3C basic shape function">
+                                    <span class="shape-selected-content" id="shapeSelectedContent">
+                                        <span class="shape-selected-icon" id="shapeSelectedIcon">
+                                            <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor"
+                                                stroke-width="1.5" aria-hidden="true">
+                                                <polygon points="8,2 14,6 12,14 4,14 2,6" fill="currentColor"
+                                                    fill-opacity=".15" />
+                                                <circle cx="8" cy="2" r="1.2" fill="currentColor" />
+                                                <circle cx="14" cy="6" r="1.2" fill="currentColor" />
+                                                <circle cx="12" cy="14" r="1.2" fill="currentColor" />
+                                                <circle cx="4" cy="14" r="1.2" fill="currentColor" />
+                                                <circle cx="2" cy="6" r="1.2" fill="currentColor" />
+                                            </svg>
+                                        </span>
+                                        <span id="shapeSelectedLabel">polygon()</span>
+                                    </span>
+                                    <span class="shape-chevron" aria-hidden="true">
+                                        <svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor"
+                                            stroke-width="2">
+                                            <path d="M 3 6 L 8 11 L 13 6" />
+                                        </svg>
+                                    </span>
+                                </button>
+                                <div class="shape-dropdown-menu" id="shapeDropdownMenu" role="listbox"
+                                    aria-label="W3C Basic Shapes">
+                                    <button type="button" role="option" class="shape-option active" data-shape="polygon"
+                                        style="--option-idx: 0;" aria-selected="true">
+                                        <span class="shape-option-left">
+                                            <span class="shape-option-icon" aria-hidden="true">
+                                                <svg viewBox="0 0 16 16" width="14" height="14" fill="none"
+                                                    stroke="currentColor" stroke-width="1.5">
+                                                    <polygon points="8,2 14,6 12,14 4,14 2,6" fill="currentColor"
+                                                        fill-opacity=".15" />
+                                                    <circle cx="8" cy="2" r="1.2" fill="currentColor" />
+                                                    <circle cx="14" cy="6" r="1.2" fill="currentColor" />
+                                                    <circle cx="12" cy="14" r="1.2" fill="currentColor" />
+                                                    <circle cx="4" cy="14" r="1.2" fill="currentColor" />
+                                                    <circle cx="2" cy="6" r="1.2" fill="currentColor" />
+                                                </svg>
+                                            </span>
+                                            <span>polygon()</span>
+                                        </span>
+                                        <span class="shape-check-icon" aria-hidden="true">
+                                            <svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor"
+                                                stroke-width="2">
+                                                <polyline points="3,8 7,12 13,4" />
+                                            </svg>
+                                        </span>
+                                    </button>
+                                    <button type="button" role="option" class="shape-option" data-shape="circle"
+                                        style="--option-idx: 1;" aria-selected="false">
+                                        <span class="shape-option-left">
+                                            <span class="shape-option-icon" aria-hidden="true">
+                                                <svg viewBox="0 0 16 16" width="14" height="14" fill="none"
+                                                    stroke="currentColor" stroke-width="1.5">
+                                                    <circle cx="8" cy="8" r="6" fill="currentColor" fill-opacity=".15" />
+                                                    <circle cx="8" cy="8" r="1.3" fill="currentColor" />
+                                                    <line x1="8" y1="8" x2="14" y2="8" stroke-dasharray="1.5 1" />
+                                                </svg>
+                                            </span>
+                                            <span>circle()</span>
+                                        </span>
+                                        <span class="shape-check-icon" aria-hidden="true">
+                                            <svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor"
+                                                stroke-width="2">
+                                                <polyline points="3,8 7,12 13,4" />
+                                            </svg>
+                                        </span>
+                                    </button>
+                                    <button type="button" role="option" class="shape-option" data-shape="ellipse"
+                                        style="--option-idx: 2;" aria-selected="false">
+                                        <span class="shape-option-left">
+                                            <span class="shape-option-icon" aria-hidden="true">
+                                                <svg viewBox="0 0 16 16" width="14" height="14" fill="none"
+                                                    stroke="currentColor" stroke-width="1.5">
+                                                    <ellipse cx="8" cy="8" rx="6.5" ry="4" fill="currentColor"
+                                                        fill-opacity=".15" />
+                                                    <circle cx="8" cy="8" r="1.3" fill="currentColor" />
+                                                    <line x1="1.5" y1="8" x2="14.5" y2="8" stroke-dasharray="1.5 1"
+                                                        opacity=".6" />
+                                                </svg>
+                                            </span>
+                                            <span>ellipse()</span>
+                                        </span>
+                                        <span class="shape-check-icon" aria-hidden="true">
+                                            <svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor"
+                                                stroke-width="2">
+                                                <polyline points="3,8 7,12 13,4" />
+                                            </svg>
+                                        </span>
+                                    </button>
+                                    <button type="button" role="option" class="shape-option" data-shape="inset"
+                                        style="--option-idx: 3;" aria-selected="false">
+                                        <span class="shape-option-left">
+                                            <span class="shape-option-icon" aria-hidden="true">
+                                                <svg viewBox="0 0 16 16" width="14" height="14" fill="none"
+                                                    stroke="currentColor" stroke-width="1.5">
+                                                    <rect x="1.5" y="1.5" width="13" height="13" rx="1.5"
+                                                        stroke-dasharray="2 1.5" opacity=".5" />
+                                                    <rect x="4.5" y="4.5" width="7" height="7" rx="1.5" fill="currentColor"
+                                                        fill-opacity=".25" stroke="currentColor" stroke-width="1.5" />
+                                                </svg>
+                                            </span>
+                                            <span>inset()</span>
+                                        </span>
+                                        <span class="shape-check-icon" aria-hidden="true">
+                                            <svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor"
+                                                stroke-width="2">
+                                                <polyline points="3,8 7,12 13,4" />
+                                            </svg>
+                                        </span>
+                                    </button>
+                                    <button type="button" role="option" class="shape-option" data-shape="rect"
+                                        style="--option-idx: 4;" aria-selected="false">
+                                        <span class="shape-option-left">
+                                            <span class="shape-option-icon" aria-hidden="true">
+                                                <svg viewBox="0 0 16 16" width="14" height="14" fill="none"
+                                                    stroke="currentColor" stroke-width="1.5">
+                                                    <rect x="2" y="3" width="12" height="10" rx="3.5" fill="currentColor"
+                                                        fill-opacity=".15" />
+                                                </svg>
+                                            </span>
+                                            <span>rect()</span>
+                                        </span>
+                                        <span class="shape-check-icon" aria-hidden="true">
+                                            <svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor"
+                                                stroke-width="2">
+                                                <polyline points="3,8 7,12 13,4" />
+                                            </svg>
+                                        </span>
+                                    </button>
+                                    <button type="button" role="option" class="shape-option" data-shape="xywh"
+                                        style="--option-idx: 5;" aria-selected="false">
+                                        <span class="shape-option-left">
+                                            <span class="shape-option-icon" aria-hidden="true">
+                                                <svg viewBox="0 0 16 16" width="14" height="14" fill="none"
+                                                    stroke="currentColor" stroke-width="1.5">
+                                                    <path d="M 2 2 L 2 14 M 2 14 L 14 14" opacity=".5" />
+                                                    <rect x="5" y="5" width="8" height="7" rx="1.5" fill="currentColor"
+                                                        fill-opacity=".2" />
+                                                </svg>
+                                            </span>
+                                            <span>xywh()</span>
+                                        </span>
+                                        <span class="shape-check-icon" aria-hidden="true">
+                                            <svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor"
+                                                stroke-width="2">
+                                                <polyline points="3,8 7,12 13,4" />
+                                            </svg>
+                                        </span>
+                                    </button>
+                                    <button type="button" role="option" class="shape-option" data-shape="path"
+                                        style="--option-idx: 6;" aria-selected="false">
+                                        <span class="shape-option-left">
+                                            <span class="shape-option-icon" aria-hidden="true">
+                                                <svg viewBox="0 0 16 16" width="14" height="14" fill="none"
+                                                    stroke="currentColor" stroke-width="1.5">
+                                                    <path d="M 2 13 C 2 6, 8 12, 14 3" />
+                                                    <circle cx="2" cy="13" r="1.3" fill="currentColor" />
+                                                    <circle cx="14" cy="3" r="1.3" fill="currentColor" />
+                                                    <line x1="2" y1="13" x2="5" y2="6" stroke="var(--accent)" stroke-width="1"
+                                                        stroke-dasharray="1 1" />
+                                                    <circle cx="5" cy="6" r="1" fill="var(--accent)" />
+                                                </svg>
+                                            </span>
+                                            <span>path()</span>
+                                        </span>
+                                        <span class="shape-check-icon" aria-hidden="true">
+                                            <svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor"
+                                                stroke-width="2">
+                                                <polyline points="3,8 7,12 13,4" />
+                                            </svg>
+                                        </span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="controls-subbar">
+                            <select id="clipPresetSelect" class="preset-select" aria-label="Choose shape preset"></select>
+                            <div class="pill-group" role="group" aria-label="Units switcher">
+                                <button class="pill-btn active" data-unit="%" title="Percentage coordinates">%</button>
+                                <button class="pill-btn" data-unit="px" title="Pixel coordinates">px</button>
+                            </div>
+                        </div>
+
+                        <div id="clipErrorDisplay" class="error-msg"></div>
+
+                        <div class="devtools-inspector">
+                            <div class="devtools-header"><span class="devtools-selector">.clipped-element</span> {</div>
+                            <div class="devtools-declaration">
+                                <input type="checkbox" id="clipPathToggle" checked class="devtools-checkbox"
+                                    title="Toggle clip-path on/off" aria-label="Toggle clip-path" />
+                                <span class="devtools-prop">clip-path</span>:
+                                <button id="shapeEditorToggleBtn" class="shape-icon-btn active"
+                                    title="Toggle interactive shape overlay" aria-label="Toggle shape handles overlay">
+                                    <svg viewBox="0 0 16 16" width="12" height="12" fill="currentColor" aria-hidden="true">
+                                        <polygon points="8,1 15,5 15,11 8,15 1,11 1,5" />
+                                    </svg>
+                                </button>
+                                <div class="devtools-value-wrap">
+                                    <textarea id="clipPathEditor" class="devtools-textarea" spellcheck="false"
+                                        aria-label="clip-path declaration value">polygon(0% 25%, 25% 0%, 70% 0%, 100% 100%, 0% 100%)</textarea>
+                                </div>
+                                <span class="devtools-semi">;</span>
+                            </div>
+                            <div class="devtools-footer">}</div>
+                        </div>
+                    </div>
+                </details>
+
+                <!-- Group B: Web Exports -->
+                <details class="control-group" open>
+                    <summary class="control-group-summary">
+                        <span class="control-group-title">
+                            <span class="details-chevron" aria-hidden="true">▶</span>
+                            Web Exports
+                        </span>
+                    </summary>
+                    <div class="control-group-content">
+                        <div class="export-box">
+                            <code id="cssRulePreview"
+                                class="export-code">clip-path: polygon(0% 25%, 25% 0%, 70% 0%, 100% 100%, 0% 100%);</code>
+                            <button id="copyCssRuleBtn" class="btn btn-sm" aria-label="Copy CSS clip-path rule">Copy</button>
+                        </div>
+                        <div class="export-box">
+                            <code id="clipPathDPreview" class="export-code">d="M 0 25 L 25 0 L 70 0 L 100 100 L 0 100 Z"</code>
+                            <button id="copyClipPathDBtn" class="btn btn-sm"
+                                aria-label="Copy SVG path d attribute">Copy</button>
+                        </div>
+                        <div class="export-box">
+                            <code id="svgClipPreview"
+                                class="export-code">&lt;clipPath id="custom-clip" clipPathUnits="objectBoundingBox"&gt;...&lt;/clipPath&gt;</code>
+                            <button id="copySvgClipBtn" class="btn btn-sm"
+                                aria-label="Copy SVG clipPath definition">Copy</button>
+                        </div>
+                    </div>
+                </details>
+
+                <!-- Group C: Reference Image Tracing -->
+                <details class="control-group">
+                    <summary class="control-group-summary">
+                        <span class="control-group-title">
+                            <span class="details-chevron" aria-hidden="true">▶</span>
+                            Reference Image Tracing
+                        </span>
+                    </summary>
+                    <div class="control-group-content">
+                        <div style="display: flex; gap: .5rem; align-items: center; flex-wrap: wrap;">
+                            <label class="btn btn-sm" style="margin: 0; cursor: pointer;">
+                                Import Image
+                                <input type="file" id="imageUpload" accept="image/*, .svg" style="display: none;">
+                            </label>
+                            <span style="font-size: .75rem; color: var(--text-muted);">Overlay image on canvas to trace</span>
+                        </div>
+                        <div style="display: grid; grid-template-columns: auto 1fr; gap: .5rem .75rem; align-items: center; font-size: .75rem;">
+                            <span>Opacity</span>
+                            <input type="range" id="imageOpacity" min="0" max="100" value="50" aria-label="Underlay opacity">
+                            <span>Scale</span>
+                            <input type="range" id="imageScale" min="10" max="300" value="100" aria-label="Underlay scale">
+                            <span>X</span>
+                            <input type="range" id="imageX" min="-50" max="50" value="0" aria-label="Underlay X offset">
+                            <span>Y</span>
+                            <input type="range" id="imageY" min="-50" max="50" value="0" aria-label="Underlay Y offset">
+                        </div>
+                    </div>
+                </details>
+            </div>
+
+            <!-- Mode 2: SVG Path Panel -->
+            <div id="panel-svg-path" role="tabpanel" aria-labelledby="tab-svg-path" class="editor-panes"
+                style="display: none;">
+                <!-- Group A: Path & Inspector -->
+                <details class="control-group" open>
+                    <summary class="control-group-summary">
+                        <span class="control-group-title">
+                            <span class="details-chevron" aria-hidden="true">▶</span>
+                            Path &amp; Inspector
+                        </span>
+                    </summary>
+                    <div class="control-group-content">
+                        <div class="controls-subbar">
+                            <select id="svgPresetSelect" class="preset-select" aria-label="Choose SVG Path preset">
+                                <option value="tabShape">Preset: Tab Silhouette (Attachment)</option>
+                                <option value="heart">Preset: Heart</option>
+                                <option value="star">Preset: Star</option>
+                                <option value="cloud">Preset: Cloud</option>
+                                <option value="shield">Preset: Shield / Badge</option>
+                                <option value="wave">Preset: Smooth Wave</option>
+                                <option value="speechBubble">Preset: Speech Bubble</option>
+                            </select>
+                            <button id="formatSvgBtn" class="btn btn-sm"
+                                title="Clean and format path coordinates">Format</button>
+                        </div>
+                        <div id="svgErrorDisplay" class="error-msg"></div>
+                        <div class="devtools-inspector">
+                            <div class="devtools-header">&lt;<span class="devtools-tag">path</span></div>
+                            <div class="devtools-declaration">
+                                <span class="devtools-prop">d</span>=<span style="color: var(--text-muted)">"</span>
+                                <div class="devtools-value-wrap">
+                                    <textarea id="svgPathEditor" class="devtools-textarea" spellcheck="false"
+                                        aria-label="SVG path d attribute">M 0 100 L 0 25 C 0 10 10 0 25 0 L 65 0 C 72 0 78 4 82 10 L 100 100 Z</textarea>
+                                </div>
+                                <span style="color: var(--text-muted)">"</span>
+                            </div>
+                            <div class="devtools-footer">/&gt;</div>
+                        </div>
+                    </div>
+                </details>
+
+                <!-- Group B: Web Exports -->
+                <details class="control-group" open>
+                    <summary class="control-group-summary">
+                        <span class="control-group-title">
+                            <span class="details-chevron" aria-hidden="true">▶</span>
+                            Web Exports
+                        </span>
+                    </summary>
+                    <div class="control-group-content">
+                        <div class="export-box">
+                            <code id="svgPathDPreview"
+                                class="export-code">d="M 0 100 L 0 25 C 0 10 10 0 25 0 L 65 0 C 72 0 78 4 82 10 L 100 100 Z"</code>
+                            <button id="copySvgPathDBtn" class="btn btn-sm" aria-label="Copy SVG path d attribute">Copy</button>
+                        </div>
+                        <div class="export-box">
+                            <code id="pathCssPreview" class="export-code">clip-path: path('...');</code>
+                            <button id="copyPathCssBtn" class="btn btn-sm"
+                                aria-label="Copy CSS clip-path declaration">Copy</button>
+                        </div>
+                        <div class="export-box">
+                            <code id="fullSvgPreview"
+                                class="export-code">&lt;svg viewBox="0 0 100 100"&gt;...&lt;/svg&gt;</code>
+                            <button id="copyFullSvgBtn" class="btn btn-sm" aria-label="Copy full SVG markup">Copy</button>
+                        </div>
+                    </div>
+                </details>
+            </div>
+
+            <!-- Mode 3: Favicon 32x32 Panel -->
+            <div id="panel-favicon" role="tabpanel" aria-labelledby="tab-favicon" class="editor-panes"
+                style="display: none;">
+                <!-- Group A: Coordinates Array -->
+                <details class="control-group" open>
+                    <summary class="control-group-summary">
+                        <span class="control-group-title">
+                            <span class="details-chevron" aria-hidden="true">▶</span>
+                            Favicon Coordinates Array
+                        </span>
+                        <div class="summary-actions">
+                            <button id="copyFaviconBtn" class="btn btn-sm" type="button">Copy Array</button>
+                        </div>
+                    </summary>
+                    <div class="control-group-content">
+                        <div id="faviconErrorDisplay" class="error-msg"></div>
+                        <textarea id="faviconCodeEditor" class="devtools-textarea"
+                            style="flex: 1; min-block-size: 12.5rem; background: var(--surface-code);" wrap="off">[
+  [0.5, 0.15],
+  [0.72, 0.15, 0.82, 0.25, 0.82, 0.42],
+  [0.82, 0.45, 0.85, 0.48, 0.85, 0.52],
+  [0.95, 0.55, 0.95, 0.7, 0.95, 0.85],
+  [0.95, 0.93, 0.75, 0.93, 0.75, 0.85],
+  [0.75, 0.75, 0.7, 0.65, 0.7, 0.55],
+  [0.7, 0.42, 0.65, 0.38, 0.5, 0.38],
+  [0.35, 0.38, 0.3, 0.42, 0.3, 0.55],
+  [0.3, 0.65, 0.25, 0.75, 0.25, 0.85],
+  [0.25, 0.93, 0.05, 0.93, 0.05, 0.85],
+  [0.05, 0.7, 0.05, 0.55, 0.15, 0.52],
+  [0.15, 0.48, 0.18, 0.45, 0.18, 0.42],
+  [0.18, 0.25, 0.28, 0.15, 0.5, 0.15]
+]</textarea>
+                    </div>
+                </details>
+
+                <!-- Group B: Live Preview -->
+                <details class="control-group" open>
+                    <summary class="control-group-summary">
+                        <span class="control-group-title">
+                            <span class="details-chevron" aria-hidden="true">▶</span>
+                            32&times;32 Preview
+                        </span>
+                    </summary>
+                    <div class="control-group-content">
+                        <div class="canvas-thumbnail-wrap" id="faviconPreviewWrap" style="display: flex; align-items: center; gap: .75rem;">
+                            <span style="font-size: .75rem; color: var(--text-muted);">Canvas Render:</span>
+                            <canvas id="faviconCanvas" width="32" height="32" style="border: .0625rem solid var(--border-subtle); border-radius: .2rem; background: var(--surface-1);"></canvas>
+                        </div>
+                    </div>
+                </details>
+            </div>
+        </section>
+    </main>
+
+    <div id="toast" class="toast" role="status">Copied to clipboard!</div>
+
+    <script>
+        // --- Self-Contained Shape & Path Algorithms (W3C Spec) ---
+        function formatNumber(num) {
+            if (num === 0) return '0';
+            let s = num.toString();
+            if (s.startsWith('0.')) s = s.slice(1);
+            else if (s.startsWith('-0.')) s = '-' + s.slice(2);
+            return s;
+        }
+
+        function roundPrecision(num, precision = 1) {
+            const factor = Math.pow(10, precision);
+            return Math.round(num * factor) / factor;
+        }
+
+        function parseValUnit(str) {
+            if (!str) return null;
+            const match = str.trim().match(/^(-?\d*\.?\d+)(%|px|rem)?$/);
+            if (!match) return null;
+            const value = parseFloat(match[1]);
+            if (Number.isNaN(value)) return null;
+            return { value, unit: match[2] || '' };
+        }
+
+        function shapeToPathD(shapeData, precision = 1) {
+            if (!shapeData || !shapeData.type) return '';
+
+            if (shapeData.type === 'path') {
+                return shapeData.d || '';
+            }
+
+            if (shapeData.type === 'polygon') {
+                const pts = shapeData.points || [];
+                if (pts.length === 0) return '';
+                const coords = pts.map(p => `${formatNumber(roundPrecision(p.x, precision))} ${formatNumber(roundPrecision(p.y, precision))}`);
+                return `M ${coords.join(' L ')} Z`;
+            }
+
+            if (shapeData.type === 'circle') {
+                const cx = roundPrecision(shapeData.cx ?? 50, precision);
+                const cy = roundPrecision(shapeData.cy ?? 50, precision);
+                const r = roundPrecision(shapeData.r ?? 40, precision);
+                const left = formatNumber(cx - r);
+                const right = formatNumber(cx + r);
+                const top = formatNumber(cy);
+                const rStr = formatNumber(r);
+                return `M ${left} ${top} A ${rStr} ${rStr} 0 1 0 ${right} ${top} A ${rStr} ${rStr} 0 1 0 ${left} ${top} Z`;
+            }
+
+            if (shapeData.type === 'ellipse') {
+                const cx = roundPrecision(shapeData.cx ?? 50, precision);
+                const cy = roundPrecision(shapeData.cy ?? 50, precision);
+                const rx = roundPrecision(shapeData.rx ?? 45, precision);
+                const ry = roundPrecision(shapeData.ry ?? 30, precision);
+                const left = formatNumber(cx - rx);
+                const right = formatNumber(cx + rx);
+                const top = formatNumber(cy);
+                const rxStr = formatNumber(rx);
+                const ryStr = formatNumber(ry);
+                return `M ${left} ${top} A ${rxStr} ${ryStr} 0 1 0 ${right} ${top} A ${rxStr} ${ryStr} 0 1 0 ${left} ${top} Z`;
+            }
+
+            let left = 0, top = 0, right = 100, bottom = 100, roundVal = 0;
+
+            if (shapeData.type === 'inset') {
+                top = roundPrecision(shapeData.top ?? 10, precision);
+                right = roundPrecision(100 - (shapeData.right ?? 10), precision);
+                bottom = roundPrecision(100 - (shapeData.bottom ?? 10), precision);
+                left = roundPrecision(shapeData.left ?? 10, precision);
+                roundVal = shapeData.round ? roundPrecision(shapeData.round, precision) : 0;
+            } else if (shapeData.type === 'rect') {
+                top = roundPrecision(shapeData.top ?? 10, precision);
+                right = roundPrecision(shapeData.right ?? 90, precision);
+                bottom = roundPrecision(shapeData.bottom ?? 90, precision);
+                left = roundPrecision(shapeData.left ?? 10, precision);
+                roundVal = shapeData.round ? roundPrecision(shapeData.round, precision) : 0;
+            } else if (shapeData.type === 'xywh') {
+                left = roundPrecision(shapeData.x ?? 10, precision);
+                top = roundPrecision(shapeData.y ?? 10, precision);
+                const w = roundPrecision(shapeData.width ?? shapeData.w ?? 80, precision);
+                const h = roundPrecision(shapeData.height ?? shapeData.h ?? 80, precision);
+                right = roundPrecision(left + w, precision);
+                bottom = roundPrecision(top + h, precision);
+                roundVal = shapeData.round ? roundPrecision(shapeData.round, precision) : 0;
+            }
+
+            const width = Math.max(0, right - left);
+            const height = Math.max(0, bottom - top);
+            const r = roundVal > 0 ? Math.min(roundVal, width / 2, height / 2) : 0;
+
+            if (r > 0) {
+                const rStr = formatNumber(r);
+                return `M ${formatNumber(left + r)} ${formatNumber(top)} ` +
+                    `L ${formatNumber(right - r)} ${formatNumber(top)} ` +
+                    `A ${rStr} ${rStr} 0 0 1 ${formatNumber(right)} ${formatNumber(top + r)} ` +
+                    `L ${formatNumber(right)} ${formatNumber(bottom - r)} ` +
+                    `A ${rStr} ${rStr} 0 0 1 ${formatNumber(right - r)} ${formatNumber(bottom)} ` +
+                    `L ${formatNumber(left + r)} ${formatNumber(bottom)} ` +
+                    `A ${rStr} ${rStr} 0 0 1 ${formatNumber(left)} ${formatNumber(bottom - r)} ` +
+                    `L ${formatNumber(left)} ${formatNumber(top + r)} ` +
+                    `A ${rStr} ${rStr} 0 0 1 ${formatNumber(left + r)} ${formatNumber(top)} Z`;
+            }
+
+            return `M ${formatNumber(left)} ${formatNumber(top)} ` +
+                `L ${formatNumber(right)} ${formatNumber(top)} ` +
+                `L ${formatNumber(right)} ${formatNumber(bottom)} ` +
+                `L ${formatNumber(left)} ${formatNumber(bottom)} Z`;
+        }
+
+        // --- Presets by Shape Type ---
+        const ALL_W3C_PRESETS = {
+            polygon: [
+                { id: 'tab', name: 'Tab Silhouette (Attachment 4)', val: 'polygon(0% 25%, 25% 0%, 70% 0%, 100% 100%, 0% 100%)' },
+                { id: 'slantedCard', name: 'Slanted Card', val: 'polygon(0% 0%, 90% 0%, 100% 100%, 10% 100%)' },
+                { id: 'chevron', name: 'Chevron', val: 'polygon(100% 0%, 75% 50%, 100% 100%, 25% 100%, 0% 50%, 25% 0%)' },
+                { id: 'hexagon', name: 'Hexagon', val: 'polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)' },
+                { id: 'octagon', name: 'Octagon', val: 'polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%)' },
+                { id: 'star', name: 'Star', val: 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)' },
+                { id: 'messageBubble', name: 'Message Bubble', val: 'polygon(0% 0%, 100% 0%, 100% 75%, 75% 75%, 75% 100%, 50% 75%, 0% 75%)' },
+                { id: 'ticket', name: 'Ticket Cutout', val: 'polygon(0% 0%, 100% 0%, 100% 40%, 90% 50%, 100% 60%, 100% 100%, 0% 100%, 0% 60%, 10% 50%, 0% 40%)' },
+                { id: 'triangle', name: 'Triangle', val: 'polygon(50% 0%, 0% 100%, 100% 100%)' },
+                { id: 'trapezoid', name: 'Trapezoid', val: 'polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%)' },
+                { id: 'pentagon', name: 'Pentagon', val: 'polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%)' },
+                { id: 'rhombus', name: 'Rhombus', val: 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)' }
+            ],
+            circle: [
+                { id: 'circleCenter', name: 'Circle (Center 40%)', val: 'circle(40% at 50% 50%)' },
+                { id: 'circleCorner', name: 'Corner Spotlight', val: 'circle(50% at 0% 0%)' },
+                { id: 'circleBottomArch', name: 'Bottom Arch', val: 'circle(60% at 50% 100%)' }
+            ],
+            ellipse: [
+                { id: 'ellipsePillH', name: 'Horizontal Pill', val: 'ellipse(45% 30% at 50% 50%)' },
+                { id: 'ellipsePillV', name: 'Vertical Pill', val: 'ellipse(30% 45% at 50% 50%)' },
+                { id: 'ellipseWide', name: 'Wide Oval', val: 'ellipse(48% 22% at 50% 50%)' }
+            ],
+            inset: [
+                { id: 'insetCard', name: 'Card (Round 15%)', val: 'inset(10% 15% 10% 15% round 15%)' },
+                { id: 'insetUniform', name: 'Square (Round 25%)', val: 'inset(10% round 25%)' },
+                { id: 'insetSlot', name: 'Capsule Slot', val: 'inset(20% 5% 20% 5% round 40%)' }
+            ],
+            rect: [
+                { id: 'rectFrame', name: 'Rect Frame', val: 'rect(10% 90% 90% 10% round 15%)' },
+                { id: 'rectTopBar', name: 'Top Header Bar', val: 'rect(0% 100% 35% 0% round 10%)' }
+            ],
+            xywh: [
+                { id: 'xywhBox', name: 'XYWH Centered Card', val: 'xywh(10% 10% 80% 80% round 15%)' },
+                { id: 'xywhWide', name: 'XYWH Banner Slot', val: 'xywh(5% 20% 90% 60% round 20%)' }
+            ],
+            path: [
+                { id: 'pathTab', name: 'Tab Silhouette (Attachment)', val: "path('M 0 100 L 0 25 C 0 10 10 0 25 0 L 65 0 C 72 0 78 4 82 10 L 100 100 Z')" },
+                { id: 'pathHeart', name: 'Heart', val: "path('M 50 85 C 20 65 5 45 5 25 C 5 10 18 0 32 0 C 40 0 47 5 50 12 C 53 5 60 0 68 0 C 82 0 95 10 95 25 C 95 45 80 65 50 85 Z')" }
+            ]
+        };
+
+        const SVG_PRESETS = {
+            tabShape: 'M 0 100 L 0 25 C 0 10 10 0 25 0 L 65 0 C 72 0 78 4 82 10 L 100 100 Z',
+            heart: 'M 50 85 C 20 65 5 45 5 25 C 5 10 18 0 32 0 C 40 0 47 5 50 12 C 53 5 60 0 68 0 C 82 0 95 10 95 25 C 95 45 80 65 50 85 Z',
+            star: 'M 50 5 L 63 35 L 95 38 L 71 58 L 78 90 L 50 73 L 22 90 L 29 58 L 5 38 L 37 35 Z',
+            cloud: 'M 25 80 L 75 80 C 88 80 98 70 98 57 C 98 45 89 36 78 35 C 76 20 62 10 47 10 C 34 10 23 18 19 30 C 9 32 2 41 2 52 C 2 67 12 80 25 80 Z',
+            shield: 'M 50 5 L 90 20 L 90 55 C 90 75 72 90 50 98 C 28 90 10 75 10 55 L 10 20 Z',
+            wave: 'M 0 50 C 25 20 25 80 50 50 C 75 20 75 80 100 50 L 100 100 L 0 100 Z',
+            speechBubble: 'M 10 10 L 90 10 C 95 10 98 13 98 18 L 98 62 C 98 67 95 70 90 70 L 40 70 L 20 90 L 25 70 L 10 70 C 5 70 2 67 2 62 L 2 18 C 2 13 5 10 10 10 Z'
+        };
+
+        // --- DOM Elements ---
+        const tabs = document.querySelectorAll('[role="tab"]');
+        const tabIndicator = document.getElementById('tabIndicator');
+        const clipPathEditor = document.getElementById('clipPathEditor');
+        const svgPathEditor = document.getElementById('svgPathEditor');
+        const faviconEditor = document.getElementById('faviconCodeEditor');
+        const clipPathToggle = document.getElementById('clipPathToggle');
+        const shapeEditorToggleBtn = document.getElementById('shapeEditorToggleBtn');
+        const clipErrorDisplay = document.getElementById('clipErrorDisplay');
+        const svgErrorDisplay = document.getElementById('svgErrorDisplay');
+        const faviconErrorDisplay = document.getElementById('faviconErrorDisplay');
+        const cssRulePreview = document.getElementById('cssRulePreview');
+        const clipPathDPreview = document.getElementById('clipPathDPreview');
+        const svgClipPreview = document.getElementById('svgClipPreview');
+        const svgPathDPreview = document.getElementById('svgPathDPreview');
+        const fullSvgPreview = document.getElementById('fullSvgPreview');
+        const pathCssPreview = document.getElementById('pathCssPreview');
+
+        const shapeDropdown = document.getElementById('shapeDropdown');
+        const shapeDropdownBtn = document.getElementById('shapeDropdownBtn');
+        const shapeDropdownMenu = document.getElementById('shapeDropdownMenu');
+        const shapeSelectedIcon = document.getElementById('shapeSelectedIcon');
+        const shapeSelectedLabel = document.getElementById('shapeSelectedLabel');
+
+        const clippedSurface = document.getElementById('clippedSurface');
+        const visualizerSvg = document.getElementById('visualizer');
+        const gridLayer = document.getElementById('gridLayer');
+        const diffPath = document.getElementById('diffPath');
+        const svgPolygon = document.getElementById('svgPolygon');
+        const svgCircle = document.getElementById('svgCircle');
+        const svgEllipse = document.getElementById('svgEllipse');
+        const svgRect = document.getElementById('svgRect');
+        const mainPath = document.getElementById('mainPath');
+        const handlesLayer = document.getElementById('handlesLayer');
+        const pointsLayer = document.getElementById('pointsLayer');
+        const readoutIdx = document.getElementById('readoutIdx');
+        const readoutX = document.getElementById('readoutX');
+        const readoutY = document.getElementById('readoutY');
+
+        const toast = document.getElementById('toast');
+        const globalCopyBtn = document.getElementById('globalCopyBtn');
+        const copyCssRuleBtn = document.getElementById('copyCssRuleBtn');
+        const copyClipPathDBtn = document.getElementById('copyClipPathDBtn');
+        const copySvgClipBtn = document.getElementById('copySvgClipBtn');
+        const copySvgPathDBtn = document.getElementById('copySvgPathDBtn');
+        const copyFullSvgBtn = document.getElementById('copyFullSvgBtn');
+        const copyPathCssBtn = document.getElementById('copyPathCssBtn');
+        const copyFaviconBtn = document.getElementById('copyFaviconBtn');
+        const formatSvgBtn = document.getElementById('formatSvgBtn');
+
+
+        const clipPresetSelect = document.getElementById('clipPresetSelect');
+        const svgPresetSelect = document.getElementById('svgPresetSelect');
+        const historyListItems = document.getElementById('historyListItems');
+        const addCheckpointBtn = document.getElementById('addCheckpointBtn');
+        const checkpointsDetails = document.getElementById('checkpointsDetails');
+        const checkpointsCollapsedView = document.getElementById('checkpointsCollapsedView');
+        const checkpointCount = document.getElementById('checkpointCount');
+        const checkpointQuickSelect = document.getElementById('checkpointQuickSelect');
+
+        const imageUpload = document.getElementById('imageUpload');
+        const underlayImage = document.getElementById('underlayImage');
+        const imageOpacity = document.getElementById('imageOpacity');
+        const imageScale = document.getElementById('imageScale');
+        const imageX = document.getElementById('imageX');
+        const imageY = document.getElementById('imageY');
+
+        const faviconPreviewWrap = document.getElementById('faviconPreviewWrap');
+        const faviconCanvas = document.getElementById('faviconCanvas');
+        const faviconCtx = faviconCanvas.getContext('2d');
+
+        const workspaceGrid = document.getElementById('workspaceGrid');
+        const resizerDivider = document.getElementById('resizerDivider');
+
+        // State
+        let activeTab = 'clip-path';
+        let currentShapeType = 'polygon';
+        let currentClipUnit = '%';
+        let currentClipData = { type: 'polygon', points: [] };
+        let currentSvgCommands = [];
+        let currentFaviconData = [];
+        let showHandles = true;
+        let activePoint = null;
+        let pointerId = null;
+        let checkpoints = [];
+        let activeDiffIndex = -1;
+        let animationFrameId = null;
+
+        // --- Toast Notification ---
+        function showToast(msg = 'Copied to clipboard!') {
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 1800);
+        }
+
+        // --- Grid Rendering ---
+        function renderGrid(size = 100, step = 10) {
+            let gridHTML = '';
+            for (let i = 0; i <= size; i += step) {
+                const isMajor = i % (step * 2) === 0;
+                const strokeColor = isMajor ? 'var(--grid-major)' : 'var(--grid-minor)';
+                const strokeWidth = isMajor ? '.3' : '.15';
+                gridHTML += `<line x1="${i}" y1="0" x2="${i}" y2="${size}" stroke="${strokeColor}" stroke-width="${strokeWidth}" />`;
+                gridHTML += `<line x1="0" y1="${i}" x2="${size}" y2="${i}" stroke="${strokeColor}" stroke-width="${strokeWidth}" />`;
+            }
+            gridLayer.innerHTML = gridHTML;
+        }
+
+        // --- Animated Tab Indicator Logic ---
+        function updateTabIndicator(activeTabElement) {
+            if (!activeTabElement || !tabIndicator) return;
+            const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+            const leftRem = activeTabElement.offsetLeft / rootFontSize;
+            const widthRem = activeTabElement.offsetWidth / rootFontSize;
+            tabIndicator.style.transform = `translateX(${leftRem.toFixed(3)}rem)`;
+            tabIndicator.style.inlineSize = `${widthRem.toFixed(3)}rem`;
+        }
+
+        function switchTab(newTab) {
+            activeTab = newTab;
+            let targetTabEl = null;
+
+            tabs.forEach(tab => {
+                const isCurrent = tab.id === `tab-${newTab}`;
+                tab.classList.toggle('active', isCurrent);
+                tab.setAttribute('aria-selected', isCurrent ? 'true' : 'false');
+                tab.setAttribute('tabindex', isCurrent ? '0' : '-1');
+                if (isCurrent) targetTabEl = tab;
+            });
+
+            updateTabIndicator(targetTabEl);
+
+            document.getElementById('panel-clip-path').style.display = newTab === 'clip-path' ? 'flex' : 'none';
+            document.getElementById('panel-svg-path').style.display = newTab === 'svg-path' ? 'flex' : 'none';
+            document.getElementById('panel-favicon').style.display = newTab === 'favicon' ? 'flex' : 'none';
+
+            clippedSurface.style.display = newTab === 'clip-path' ? 'flex' : 'none';
+            faviconPreviewWrap.style.display = newTab === 'favicon' ? 'flex' : 'none';
+
+            if (newTab === 'clip-path') {
+                globalCopyBtn.textContent = 'Copy CSS';
+                visualizerSvg.setAttribute('viewBox', '-2 -2 104 104');
+                renderGrid(100, 10);
+                parseAndRenderClipPath();
+            } else if (newTab === 'svg-path') {
+                globalCopyBtn.textContent = 'Copy SVG';
+                visualizerSvg.setAttribute('viewBox', '-2 -2 104 104');
+                renderGrid(100, 10);
+                parseAndRenderSvgPath();
+            } else if (newTab === 'favicon') {
+                globalCopyBtn.textContent = 'Copy Array';
+                visualizerSvg.setAttribute('viewBox', '-2 -2 36 36');
+                renderGrid(32, 4);
+                parseAndRenderFavicon();
+            }
+        }
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => switchTab(tab.id.replace('tab-', '')));
+            tab.addEventListener('focus', () => updateTabIndicator(tab));
+            tab.addEventListener('keydown', e => {
+                const tabList = Array.from(tabs);
+                const idx = tabList.indexOf(document.activeElement);
+                if (e.key === 'ArrowRight') {
+                    const next = (idx + 1) % tabList.length;
+                    tabList[next].focus();
+                    tabList[next].click();
+                } else if (e.key === 'ArrowLeft') {
+                    const prev = (idx - 1 + tabList.length) % tabList.length;
+                    tabList[prev].focus();
+                    tabList[prev].click();
+                }
+            });
+        });
+
+        window.addEventListener('resize', () => {
+            const currentTabEl = document.querySelector('.tab-btn.active');
+            updateTabIndicator(currentTabEl);
+        });
+
+        // --- Resizable Panels Logic ---
+        function initResizers() {
+            let isResizing = false;
+
+            function onPointerDown(e) {
+                isResizing = true;
+                resizerDivider.setPointerCapture(e.pointerId);
+                resizerDivider.classList.add('resizing');
+                document.body.style.cursor = 'col-resize';
+            }
+
+            function onPointerMove(e) {
+                if (!isResizing) return;
+                const rect = workspaceGrid.getBoundingClientRect();
+                if (rect.width <= 0) return;
+                const fromRight = rect.right - e.clientX;
+                const cqiVal = (fromRight / rect.width) * 100;
+                const clamped = Math.max(22, Math.min(65, cqiVal));
+                workspaceGrid.style.setProperty('--control-width', `${clamped.toFixed(2)}cqi`);
+            }
+
+            function onPointerUp(e) {
+                if (isResizing) {
+                    resizerDivider.releasePointerCapture(e.pointerId);
+                    resizerDivider.classList.remove('resizing');
+                    isResizing = false;
+                    document.body.style.cursor = '';
+                }
+            }
+
+            if (resizerDivider) {
+                resizerDivider.addEventListener('pointerdown', onPointerDown);
+                resizerDivider.addEventListener('pointermove', onPointerMove);
+                resizerDivider.addEventListener('pointerup', onPointerUp);
+            }
+        }
+
+        initResizers();
+
+        // --- Shape Presets Dropdown Updater ---
+        function updatePresetsDropdown(shapeType) {
+            clipPresetSelect.innerHTML = '';
+            const presets = ALL_W3C_PRESETS[shapeType] || ALL_W3C_PRESETS.polygon;
+            presets.forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p.val;
+                opt.textContent = `Preset: ${p.name}`;
+                clipPresetSelect.appendChild(opt);
+            });
+        }
+
+        // --- Customizable Shape Dropdown Logic ---
+        function updateShapeDropdownSelection(shapeType) {
+            currentShapeType = shapeType;
+            const matchingOption = document.querySelector(`.shape-option[data-shape="${shapeType}"]`);
+            if (!matchingOption) return;
+
+            document.querySelectorAll('.shape-option').forEach(opt => {
+                const isMatch = opt.dataset.shape === shapeType;
+                opt.classList.toggle('active', isMatch);
+                opt.setAttribute('aria-selected', isMatch ? 'true' : 'false');
+            });
+
+            const optIcon = matchingOption.querySelector('.shape-option-icon');
+            if (optIcon && shapeSelectedIcon) {
+                shapeSelectedIcon.innerHTML = optIcon.innerHTML;
+            }
+            if (shapeSelectedLabel) {
+                shapeSelectedLabel.textContent = `${shapeType}()`;
+            }
+        }
+
+        function toggleShapeDropdown(force) {
+            const isOpen = force !== undefined ? force : !shapeDropdown.classList.contains('open');
+            shapeDropdown.classList.toggle('open', isOpen);
+            shapeDropdownBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+            if (isOpen) {
+                const activeOption = shapeDropdownMenu.querySelector('.shape-option.active') || shapeDropdownMenu.firstElementChild;
+                if (activeOption) activeOption.focus();
+            }
+        }
+
+        shapeDropdownBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleShapeDropdown();
+        });
+
+        document.querySelectorAll('.shape-option').forEach(opt => {
+            opt.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const shape = opt.dataset.shape;
+                updateShapeDropdownSelection(shape);
+                toggleShapeDropdown(false);
+                shapeDropdownBtn.focus();
+
+                updatePresetsDropdown(shape);
+                const firstPreset = ALL_W3C_PRESETS[shape] ? ALL_W3C_PRESETS[shape][0] : null;
+                if (firstPreset) {
+                    clipPathEditor.value = firstPreset.val;
+                    parseAndRenderClipPath();
+                    saveCheckpoint(`Clip-Path: ${firstPreset.name}`);
+                }
+            });
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!shapeDropdown.contains(e.target)) {
+                toggleShapeDropdown(false);
+            }
+        });
+
+        // Keyboard navigation for dropdown (WCAG 2.0)
+        shapeDropdown.addEventListener('keydown', (e) => {
+            const options = Array.from(shapeDropdownMenu.querySelectorAll('.shape-option'));
+            const currentIndex = options.indexOf(document.activeElement);
+
+            if (e.key === 'Escape') {
+                toggleShapeDropdown(false);
+                shapeDropdownBtn.focus();
+            } else if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                if (!shapeDropdown.classList.contains('open')) {
+                    toggleShapeDropdown(true);
+                } else {
+                    const nextIndex = (currentIndex + 1) % options.length;
+                    options[nextIndex].focus();
+                }
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                if (!shapeDropdown.classList.contains('open')) {
+                    toggleShapeDropdown(true);
+                } else {
+                    const prevIndex = (currentIndex - 1 + options.length) % options.length;
+                    options[prevIndex].focus();
+                }
+            }
+        });
+
+
+        clipPresetSelect.addEventListener('change', e => {
+            clipPathEditor.value = e.target.value;
+            parseAndRenderClipPath();
+            saveCheckpoint(`Preset selected`);
+        });
+
+        // --- Full W3C CSS clip-path Parsing & Rendering ---
+        function parseAndRenderClipPath() {
+            try {
+                const raw = clipPathEditor.value.trim();
+                clipErrorDisplay.textContent = '';
+                clipPathEditor.style.borderColor = 'transparent';
+
+                if (raw.startsWith('circle')) {
+                    currentShapeType = 'circle';
+                    const cMatch = raw.match(/circle\s*\((.*?)\)/is);
+                    const inner = cMatch ? cMatch[1].trim() : '40% at 50% 50%';
+                    let rStr = '40%', atStr = '50% 50%';
+                    if (inner.includes('at')) {
+                        const parts = inner.split(/\bat\b/i);
+                        rStr = parts[0].trim();
+                        atStr = parts[1].trim();
+                    } else if (inner) {
+                        rStr = inner;
+                    }
+                    const rP = parseValUnit(rStr) || { value: 40, unit: '%' };
+                    const atParts = atStr.split(/\s+/);
+                    const cxP = parseValUnit(atParts[0]) || { value: 50, unit: '%' };
+                    const cyP = parseValUnit(atParts[1]) || { value: 50, unit: '%' };
+                    currentClipData = { type: 'circle', r: rP.value, cx: cxP.value, cy: cyP.value, unit: rP.unit || '%' };
+                } else if (raw.startsWith('ellipse')) {
+                    currentShapeType = 'ellipse';
+                    const eMatch = raw.match(/ellipse\s*\((.*?)\)/is);
+                    const inner = eMatch ? eMatch[1].trim() : '45% 30% at 50% 50%';
+                    let rStr = '45% 30%', atStr = '50% 50%';
+                    if (inner.includes('at')) {
+                        const parts = inner.split(/\bat\b/i);
+                        rStr = parts[0].trim();
+                        atStr = parts[1].trim();
+                    } else if (inner) {
+                        rStr = inner;
+                    }
+                    const rParts = rStr.split(/\s+/);
+                    const rxP = parseValUnit(rParts[0]) || { value: 45, unit: '%' };
+                    const ryP = parseValUnit(rParts[1]) || { value: 30, unit: '%' };
+                    const atParts = atStr.split(/\s+/);
+                    const cxP = parseValUnit(atParts[0]) || { value: 50, unit: '%' };
+                    const cyP = parseValUnit(atParts[1]) || { value: 50, unit: '%' };
+                    currentClipData = { type: 'ellipse', rx: rxP.value, ry: ryP.value, cx: cxP.value, cy: cyP.value, unit: rxP.unit || '%' };
+                } else if (raw.startsWith('inset')) {
+                    currentShapeType = 'inset';
+                    const iMatch = raw.match(/inset\s*\((.*?)\)/is);
+                    const inner = iMatch ? iMatch[1].trim() : '10% 15% 10% 15% round 15%';
+                    let offsetsStr = inner, roundVal = 10;
+                    if (inner.includes('round')) {
+                        const parts = inner.split(/\bround\b/i);
+                        offsetsStr = parts[0].trim();
+                        const rP = parseValUnit(parts[1].trim());
+                        if (rP) roundVal = rP.value;
+                    }
+                    const parts = offsetsStr.split(/\s+/).map(parseValUnit).filter(Boolean);
+                    let top = 10, right = 15, bottom = 10, left = 15;
+                    if (parts.length === 1) top = right = bottom = left = parts[0].value;
+                    else if (parts.length === 2) { top = bottom = parts[0].value; right = left = parts[1].value; }
+                    else if (parts.length >= 4) { top = parts[0].value; right = parts[1].value; bottom = parts[2].value; left = parts[3].value; }
+                    currentClipData = { type: 'inset', top, right, bottom, left, round: roundVal, unit: parts[0]?.unit || '%' };
+                } else if (raw.startsWith('rect')) {
+                    currentShapeType = 'rect';
+                    const rMatch = raw.match(/rect\s*\((.*?)\)/is);
+                    const inner = rMatch ? rMatch[1].trim() : '10% 90% 90% 10% round 15%';
+                    let offsetsStr = inner, roundVal = 10;
+                    if (inner.includes('round')) {
+                        const parts = inner.split(/\bround\b/i);
+                        offsetsStr = parts[0].trim();
+                        const rP = parseValUnit(parts[1].trim());
+                        if (rP) roundVal = rP.value;
+                    }
+                    const parts = offsetsStr.split(/\s+/).map(parseValUnit).filter(Boolean);
+                    currentClipData = {
+                        type: 'rect',
+                        top: parts[0]?.value ?? 10,
+                        right: parts[1]?.value ?? 90,
+                        bottom: parts[2]?.value ?? 90,
+                        left: parts[3]?.value ?? 10,
+                        round: roundVal,
+                        unit: parts[0]?.unit || '%'
+                    };
+                } else if (raw.startsWith('xywh')) {
+                    currentShapeType = 'xywh';
+                    const xMatch = raw.match(/xywh\s*\((.*?)\)/is);
+                    const inner = xMatch ? xMatch[1].trim() : '10% 10% 80% 80% round 15%';
+                    let coordsStr = inner, roundVal = 10;
+                    if (inner.includes('round')) {
+                        const parts = inner.split(/\bround\b/i);
+                        coordsStr = parts[0].trim();
+                        const rP = parseValUnit(parts[1].trim());
+                        if (rP) roundVal = rP.value;
+                    }
+                    const parts = coordsStr.split(/\s+/).map(parseValUnit).filter(Boolean);
+                    currentClipData = {
+                        type: 'xywh',
+                        x: parts[0]?.value ?? 10,
+                        y: parts[1]?.value ?? 10,
+                        w: parts[2]?.value ?? 80,
+                        h: parts[3]?.value ?? 80,
+                        round: roundVal,
+                        unit: parts[0]?.unit || '%'
+                    };
+                } else if (raw.startsWith('path')) {
+                    currentShapeType = 'path';
+                    const pMatch = raw.match(/path\s*\(\s*['"]?(.*?)['"]?\s*\)/is);
+                    currentClipData = { type: 'path', d: pMatch ? pMatch[1] : '' };
+                } else {
+                    currentShapeType = 'polygon';
+                    const pMatch = raw.match(/polygon\s*\((.*?)\)/is);
+                    const inner = pMatch ? pMatch[1].trim() : raw;
+                    const pairs = inner.split(',').map(s => s.trim()).filter(Boolean);
+                    const points = [];
+                    pairs.forEach(pair => {
+                        const parts = pair.split(/\s+/).filter(Boolean);
+                        const p1 = parseValUnit(parts[0]);
+                        const p2 = parseValUnit(parts[1]);
+                        if (p1 && p2) points.push({ x: p1.value, y: p2.value });
+                    });
+                    if (points.length < 3) throw new Error('Polygon requires at least 3 points.');
+                    currentClipData = { type: 'polygon', points, unit: currentClipUnit };
+                }
+
+                // Update shape dropdown display
+                updateShapeDropdownSelection(currentShapeType);
+
+
+                updateClipVisuals();
+                updateClipCodeOutputs();
+            } catch (err) {
+                clipErrorDisplay.textContent = err.message || 'Invalid CSS clip-path syntax.';
+                clipPathEditor.style.borderColor = 'var(--control)';
+            }
+        }
+
+        function buildCurrentClipString() {
+            const d = currentClipData;
+            const u = currentClipUnit;
+            if (d.type === 'circle') {
+                return `circle(${formatNumber(roundPrecision(d.r))}${u} at ${formatNumber(roundPrecision(d.cx))}${u} ${formatNumber(roundPrecision(d.cy))}${u})`;
+            } else if (d.type === 'ellipse') {
+                return `ellipse(${formatNumber(roundPrecision(d.rx))}${u} ${formatNumber(roundPrecision(d.ry))}${u} at ${formatNumber(roundPrecision(d.cx))}${u} ${formatNumber(roundPrecision(d.cy))}${u})`;
+            } else if (d.type === 'inset') {
+                const roundStr = d.round ? ` round ${formatNumber(roundPrecision(d.round))}${u}` : '';
+                return `inset(${formatNumber(roundPrecision(d.top))}${u} ${formatNumber(roundPrecision(d.right))}${u} ${formatNumber(roundPrecision(d.bottom))}${u} ${formatNumber(roundPrecision(d.left))}${u}${roundStr})`;
+            } else if (d.type === 'rect') {
+                const roundStr = d.round ? ` round ${formatNumber(roundPrecision(d.round))}${u}` : '';
+                return `rect(${formatNumber(roundPrecision(d.top))}${u} ${formatNumber(roundPrecision(d.right))}${u} ${formatNumber(roundPrecision(d.bottom))}${u} ${formatNumber(roundPrecision(d.left))}${u}${roundStr})`;
+            } else if (d.type === 'xywh') {
+                const roundStr = d.round ? ` round ${formatNumber(roundPrecision(d.round))}${u}` : '';
+                return `xywh(${formatNumber(roundPrecision(d.x))}${u} ${formatNumber(roundPrecision(d.y))}${u} ${formatNumber(roundPrecision(d.w))}${u} ${formatNumber(roundPrecision(d.h))}${u}${roundStr})`;
+            } else if (d.type === 'path') {
+                return `path('${d.d}')`;
+            } else {
+                const pts = d.points.map(p => `${formatNumber(roundPrecision(p.x))}${u} ${formatNumber(roundPrecision(p.y))}${u}`).join(', ');
+                return `polygon(${pts})`;
+            }
+        }
+
+        function updateClipVisuals() {
+            const clipStr = buildCurrentClipString();
+
+            if (clipPathToggle.checked) {
+                clippedSurface.style.clipPath = clipStr;
+            } else {
+                clippedSurface.style.clipPath = 'none';
+            }
+
+            // Hide all SVG shape elements first
+            svgPolygon.style.display = 'none';
+            svgCircle.style.display = 'none';
+            svgEllipse.style.display = 'none';
+            svgRect.style.display = 'none';
+            mainPath.setAttribute('d', '');
+            handlesLayer.innerHTML = '';
+            pointsLayer.innerHTML = '';
+
+            if (!showHandles) return;
+
+            const d = currentClipData;
+            if (d.type === 'polygon') {
+                const ptsAttr = d.points.map(p => `${p.x},${p.y}`).join(' ');
+                svgPolygon.setAttribute('points', ptsAttr);
+                svgPolygon.style.display = 'block';
+
+                d.points.forEach((pt, idx) => {
+                    const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                    c.setAttribute('class', 'draggable-vertex vertex-anchor');
+                    c.setAttribute('cx', pt.x);
+                    c.setAttribute('cy', pt.y);
+                    c.setAttribute('r', '1.3');
+                    c.dataset.type = 'polygon';
+                    c.dataset.idx = idx;
+                    pointsLayer.appendChild(c);
+                });
+            } else if (d.type === 'circle') {
+                svgCircle.setAttribute('cx', d.cx);
+                svgCircle.setAttribute('cy', d.cy);
+                svgCircle.setAttribute('r', d.r);
+                svgCircle.style.display = 'block';
+
+                // Center handle
+                const centerC = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                centerC.setAttribute('class', 'draggable-vertex vertex-anchor');
+                centerC.setAttribute('cx', d.cx);
+                centerC.setAttribute('cy', d.cy);
+                centerC.setAttribute('r', '1.4');
+                centerC.dataset.type = 'circle-center';
+                pointsLayer.appendChild(centerC);
+
+                // Radius handle on edge
+                const edgeX = d.cx + d.r;
+                const edgeY = d.cy;
+                const radC = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                radC.setAttribute('class', 'draggable-vertex vertex-control');
+                radC.setAttribute('cx', edgeX);
+                radC.setAttribute('cy', edgeY);
+                radC.setAttribute('r', '1.2');
+                radC.dataset.type = 'circle-radius';
+                pointsLayer.appendChild(radC);
+
+                // Radius connector line
+                handlesLayer.innerHTML = `<line x1="${d.cx}" y1="${d.cy}" x2="${edgeX}" y2="${edgeY}" />`;
+            } else if (d.type === 'ellipse') {
+                svgEllipse.setAttribute('cx', d.cx);
+                svgEllipse.setAttribute('cy', d.cy);
+                svgEllipse.setAttribute('rx', d.rx);
+                svgEllipse.setAttribute('ry', d.ry);
+                svgEllipse.style.display = 'block';
+
+                // Center handle
+                const centerC = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                centerC.setAttribute('class', 'draggable-vertex vertex-anchor');
+                centerC.setAttribute('cx', d.cx);
+                centerC.setAttribute('cy', d.cy);
+                centerC.setAttribute('r', '1.4');
+                centerC.dataset.type = 'ellipse-center';
+                pointsLayer.appendChild(centerC);
+
+                // RX handle
+                const rxC = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                rxC.setAttribute('class', 'draggable-vertex vertex-control');
+                rxC.setAttribute('cx', d.cx + d.rx);
+                rxC.setAttribute('cy', d.cy);
+                rxC.setAttribute('r', '1.2');
+                rxC.dataset.type = 'ellipse-rx';
+                pointsLayer.appendChild(rxC);
+
+                // RY handle
+                const ryC = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                ryC.setAttribute('class', 'draggable-vertex vertex-control');
+                ryC.setAttribute('cx', d.cx);
+                ryC.setAttribute('cy', d.cy + d.ry);
+                ryC.setAttribute('r', '1.2');
+                ryC.dataset.type = 'ellipse-ry';
+                pointsLayer.appendChild(ryC);
+
+                handlesLayer.innerHTML = `
+                    <line x1="${d.cx}" y1="${d.cy}" x2="${d.cx + d.rx}" y2="${d.cy}" />
+                    <line x1="${d.cx}" y1="${d.cy}" x2="${d.cx}" y2="${d.cy + d.ry}" />
+                `;
+            } else if (d.type === 'inset') {
+                const x = d.left;
+                const y = d.top;
+                const w = Math.max(0, 100 - d.left - d.right);
+                const h = Math.max(0, 100 - d.top - d.bottom);
+                svgRect.setAttribute('x', x);
+                svgRect.setAttribute('y', y);
+                svgRect.setAttribute('width', w);
+                svgRect.setAttribute('height', h);
+                svgRect.setAttribute('rx', d.round || 0);
+                svgRect.style.display = 'block';
+
+                // Top-Left and Bottom-Right Handles
+                const c1 = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                c1.setAttribute('class', 'draggable-vertex vertex-anchor');
+                c1.setAttribute('cx', x);
+                c1.setAttribute('cy', y);
+                c1.setAttribute('r', '1.3');
+                c1.dataset.type = 'inset-tl';
+                pointsLayer.appendChild(c1);
+
+                const c2 = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                c2.setAttribute('class', 'draggable-vertex vertex-anchor');
+                c2.setAttribute('cx', x + w);
+                c2.setAttribute('cy', y + h);
+                c2.setAttribute('r', '1.3');
+                c2.dataset.type = 'inset-br';
+                pointsLayer.appendChild(c2);
+            } else if (d.type === 'rect') {
+                const x = d.left;
+                const y = d.top;
+                const w = Math.max(0, d.right - d.left);
+                const h = Math.max(0, d.bottom - d.top);
+                svgRect.setAttribute('x', x);
+                svgRect.setAttribute('y', y);
+                svgRect.setAttribute('width', w);
+                svgRect.setAttribute('height', h);
+                svgRect.setAttribute('rx', d.round || 0);
+                svgRect.style.display = 'block';
+
+                const c1 = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                c1.setAttribute('class', 'draggable-vertex vertex-anchor');
+                c1.setAttribute('cx', x);
+                c1.setAttribute('cy', y);
+                c1.setAttribute('r', '1.3');
+                c1.dataset.type = 'rect-tl';
+                pointsLayer.appendChild(c1);
+
+                const c2 = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                c2.setAttribute('class', 'draggable-vertex vertex-anchor');
+                c2.setAttribute('cx', x + w);
+                c2.setAttribute('cy', y + h);
+                c2.setAttribute('r', '1.3');
+                c2.dataset.type = 'rect-br';
+                pointsLayer.appendChild(c2);
+            } else if (d.type === 'xywh') {
+                svgRect.setAttribute('x', d.x);
+                svgRect.setAttribute('y', d.y);
+                svgRect.setAttribute('width', d.w);
+                svgRect.setAttribute('height', d.h);
+                svgRect.setAttribute('rx', d.round || 0);
+                svgRect.style.display = 'block';
+
+                const c1 = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                c1.setAttribute('class', 'draggable-vertex vertex-anchor');
+                c1.setAttribute('cx', d.x);
+                c1.setAttribute('cy', d.y);
+                c1.setAttribute('r', '1.3');
+                c1.dataset.type = 'xywh-tl';
+                pointsLayer.appendChild(c1);
+
+                const c2 = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                c2.setAttribute('class', 'draggable-vertex vertex-anchor');
+                c2.setAttribute('cx', d.x + d.w);
+                c2.setAttribute('cy', d.y + d.h);
+                c2.setAttribute('r', '1.3');
+                c2.dataset.type = 'xywh-br';
+                pointsLayer.appendChild(c2);
+            } else if (d.type === 'path') {
+                mainPath.setAttribute('d', d.d);
+            }
+        }
+
+        function updateClipCodeOutputs() {
+            const clipStr = buildCurrentClipString();
+            cssRulePreview.textContent = `clip-path: ${clipStr};`;
+
+            const pathD = shapeToPathD(currentClipData);
+            if (clipPathDPreview) {
+                clipPathDPreview.textContent = `d="${pathD}"`;
+            }
+
+            if (currentClipData.type === 'polygon') {
+                const ptsStr = currentClipData.points.map(pt => `${formatNumber(roundPrecision(pt.x / 100, 3))},${formatNumber(roundPrecision(pt.y / 100, 3))}`).join(' ');
+                svgClipPreview.textContent = `<clipPath id="custom-clip" clipPathUnits="objectBoundingBox">\n  <polygon points="${ptsStr}" />\n</clipPath>`;
+            } else {
+                svgClipPreview.textContent = `<clipPath id="custom-clip" clipPathUnits="objectBoundingBox">\n  <!-- CSS Basic Shape: ${clipStr} -->\n</clipPath>`;
+            }
+        }
+
+
+        clipPathToggle.addEventListener('change', updateClipVisuals);
+
+        shapeEditorToggleBtn.addEventListener('click', () => {
+            showHandles = !showHandles;
+            shapeEditorToggleBtn.classList.toggle('active', showHandles);
+            updateClipVisuals();
+        });
+
+        clipPathEditor.addEventListener('input', parseAndRenderClipPath);
+
+        // Unit Switcher (%, px)
+        document.querySelectorAll('[data-unit]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('[data-unit]').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentClipUnit = btn.dataset.unit;
+                clipPathEditor.value = buildCurrentClipString();
+                parseAndRenderClipPath();
+                showToast(`Switched coordinates to ${currentClipUnit}`);
+            });
+        });
+
+        // Surface Theme Switcher
+        document.querySelectorAll('[data-surface]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('[data-surface]').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                clippedSurface.className = `clipped-surface ${btn.dataset.surface}`;
+            });
+        });
+
+        // --- SVG Path (d) Mode Logic ---
+        const EXPECTED_ARGS = {
+            M: 2, m: 2, L: 2, l: 2, H: 1, h: 1, V: 1, v: 1,
+            C: 6, c: 6, S: 4, s: 4, Q: 4, q: 4, T: 2, t: 2,
+            A: 7, a: 7, Z: 0, z: 0
+        };
+
+        function parseSvgPathString(d) {
+            if (!d || typeof d !== 'string') return [];
+            const commands = [];
+            const segmentRegex = /([a-df-z])([^a-df-z]*)/gi;
+            const numRegex = /[-+]?(?:\d*\.\d+|\d+)(?:[eE][-+]?\d+)?/g;
+
+            let match;
+            while ((match = segmentRegex.exec(d)) !== null) {
+                let cmd = match[1];
+                const argStr = match[2];
+                const args = [];
+                let numMatch;
+                while ((numMatch = numRegex.exec(argStr)) !== null) {
+                    args.push(parseFloat(numMatch[0]));
+                }
+                const expected = EXPECTED_ARGS[cmd] ?? 0;
+                if (expected === 0) {
+                    commands.push({ command: cmd, args: [] });
+                } else if (args.length === 0) {
+                    commands.push({ command: cmd, args: [] });
+                } else {
+                    let offset = 0;
+                    while (offset < args.length) {
+                        const chunk = args.slice(offset, offset + expected);
+                        commands.push({ command: cmd, args: chunk });
+                        offset += expected;
+                        if (cmd === 'M') cmd = 'L';
+                        else if (cmd === 'm') cmd = 'l';
+                    }
+                }
+            }
+            return commands;
+        }
+
+        function formatSvgPathString(commands, precision = 1) {
+            if (!Array.isArray(commands) || commands.length === 0) return '';
+            const factor = Math.pow(10, precision);
+            return commands.map(item => {
+                if (!item.args || item.args.length === 0) return item.command;
+                const formattedArgs = item.args.map(arg => {
+                    const rounded = Math.round(arg * factor) / factor;
+                    return formatNumber(rounded);
+                });
+                return `${item.command} ${formattedArgs.join(' ')}`;
+            }).join(' ');
+        }
+
+        function extractPathNodes(commands) {
+            const anchors = [];
+            const controls = [];
+            const handles = [];
+            let cx = 0, cy = 0;
+
+            commands.forEach((cmdObj, cmdIndex) => {
+                const cmd = cmdObj.command;
+                const args = cmdObj.args;
+                if (!args || args.length === 0) return;
+                const isRel = cmd === cmd.toLowerCase();
+                const type = cmd.toUpperCase();
+
+                if (type === 'M' || type === 'L') {
+                    const x = isRel ? cx + args[0] : args[0];
+                    const y = isRel ? cy + args[1] : args[1];
+                    anchors.push({ id: `a-${cmdIndex}-0`, cmdIndex, argIndex: 0, x, y, type: 'anchor' });
+                    cx = x; cy = y;
+                } else if (type === 'H') {
+                    const x = isRel ? cx + args[0] : args[0];
+                    anchors.push({ id: `a-${cmdIndex}-0`, cmdIndex, argIndex: 0, x, y: cy, type: 'anchor' });
+                    cx = x;
+                } else if (type === 'V') {
+                    const y = isRel ? cy + args[0] : args[0];
+                    anchors.push({ id: `a-${cmdIndex}-0`, cmdIndex, argIndex: 0, x: cx, y, type: 'anchor' });
+                    cy = y;
+                } else if (type === 'C') {
+                    const cp1x = isRel ? cx + args[0] : args[0];
+                    const cp1y = isRel ? cy + args[1] : args[1];
+                    const cp2x = isRel ? cx + args[2] : args[2];
+                    const cp2y = isRel ? cy + args[3] : args[3];
+                    const ax = isRel ? cx + args[4] : args[4];
+                    const ay = isRel ? cy + args[5] : args[5];
+
+                    controls.push({ id: `c-${cmdIndex}-0`, cmdIndex, argIndex: 0, x: cp1x, y: cp1y, type: 'control' });
+                    handles.push({ x1: cx, y1: cy, x2: cp1x, y2: cp1y });
+
+                    controls.push({ id: `c-${cmdIndex}-2`, cmdIndex, argIndex: 2, x: cp2x, y: cp2y, type: 'control' });
+                    handles.push({ x1: ax, y1: ay, x2: cp2x, y2: cp2y });
+
+                    anchors.push({ id: `a-${cmdIndex}-4`, cmdIndex, argIndex: 4, x: ax, y: ay, type: 'anchor' });
+                    cx = ax; cy = ay;
+                } else if (type === 'S' || type === 'Q') {
+                    const cpx = isRel ? cx + args[0] : args[0];
+                    const cpy = isRel ? cy + args[1] : args[1];
+                    const ax = isRel ? cx + args[2] : args[2];
+                    const ay = isRel ? cy + args[3] : args[3];
+
+                    controls.push({ id: `c-${cmdIndex}-0`, cmdIndex, argIndex: 0, x: cpx, y: cpy, type: 'control' });
+                    handles.push({ x1: cx, y1: cy, x2: cpx, y2: cpy });
+                    handles.push({ x1: ax, y1: ay, x2: cpx, y2: cpy });
+
+                    anchors.push({ id: `a-${cmdIndex}-2`, cmdIndex, argIndex: 2, x: ax, y: ay, type: 'anchor' });
+                    cx = ax; cy = ay;
+                }
+            });
+
+            return { anchors, controls, handles };
+        }
+
+        function parseAndRenderSvgPath() {
+            try {
+                const val = svgPathEditor.value;
+                const commands = parseSvgPathString(val);
+                if (commands.length === 0) throw new Error('Path must contain valid SVG commands.');
+                currentSvgCommands = commands;
+                svgErrorDisplay.textContent = '';
+                svgPathEditor.style.borderColor = 'transparent';
+
+                updateSvgPathVisuals();
+                updateSvgPathOutputs();
+            } catch (err) {
+                svgErrorDisplay.textContent = err.message || 'Invalid SVG path string.';
+                svgPathEditor.style.borderColor = 'var(--control)';
+            }
+        }
+
+        function updateSvgPathVisuals() {
+            const d = formatSvgPathString(currentSvgCommands);
+            svgPolygon.style.display = 'none';
+            svgCircle.style.display = 'none';
+            svgEllipse.style.display = 'none';
+            svgRect.style.display = 'none';
+            mainPath.setAttribute('d', d);
+
+            if (!showHandles) {
+                handlesLayer.innerHTML = '';
+                pointsLayer.innerHTML = '';
+                return;
+            }
+
+            const { anchors, controls, handles } = extractPathNodes(currentSvgCommands);
+
+            let handlesHTML = '';
+            handles.forEach(h => {
+                handlesHTML += `<line x1="${h.x1}" y1="${h.y1}" x2="${h.x2}" y2="${h.y2}" />`;
+            });
+            handlesLayer.innerHTML = handlesHTML;
+
+            let ptsHTML = '';
+            anchors.forEach(a => {
+                ptsHTML += `<circle class="draggable-vertex vertex-anchor" cx="${a.x}" cy="${a.y}" r="1.3" data-type="svg-anchor" data-cmd="${a.cmdIndex}" data-arg="${a.argIndex}" />`;
+            });
+            controls.forEach(c => {
+                ptsHTML += `<circle class="draggable-vertex vertex-control" cx="${c.x}" cy="${c.y}" r="1" data-type="svg-control" data-cmd="${c.cmdIndex}" data-arg="${c.argIndex}" />`;
+            });
+            pointsLayer.innerHTML = ptsHTML;
+        }
+
+        function updateSvgPathOutputs() {
+            const d = formatSvgPathString(currentSvgCommands);
+            if (svgPathDPreview) {
+                svgPathDPreview.textContent = `d="${d}"`;
+            }
+            fullSvgPreview.textContent = `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">\n  <path d="${d}" fill="currentColor" />\n</svg>`;
+            pathCssPreview.textContent = `clip-path: path('${d}');`;
+        }
+
+
+        svgPathEditor.addEventListener('input', parseAndRenderSvgPath);
+
+        svgPresetSelect.addEventListener('change', e => {
+            const presetKey = e.target.value;
+            if (SVG_PRESETS[presetKey]) {
+                svgPathEditor.value = SVG_PRESETS[presetKey];
+                parseAndRenderSvgPath();
+                saveCheckpoint(`SVG Path: ${presetKey}`);
+            }
+        });
+
+        formatSvgBtn.addEventListener('click', () => {
+            svgPathEditor.value = formatSvgPathString(currentSvgCommands, 1);
+            showToast('Formatted SVG path coordinates');
+        });
+
+        // --- Favicon 32x32 Logic ---
+        function parseAndRenderFavicon() {
+            try {
+                const val = faviconEditor.value;
+                const cleanJson = val
+                    .replace(/\/\/.*$/gm, '')
+                    .replace(/\/\*[\s\S]*?\*\//g, '')
+                    .replace(/,(\s*[\]}])/g, '$1');
+                const data = JSON.parse(cleanJson);
+                currentFaviconData = data;
+                faviconErrorDisplay.textContent = '';
+                updateFaviconVisuals();
+            } catch (err) {
+                faviconErrorDisplay.textContent = 'Invalid JSON array formulation.';
+            }
+        }
+
+        function updateFaviconVisuals() {
+            const SIZE = 32;
+            const data = currentFaviconData;
+            if (!Array.isArray(data) || data.length === 0) return;
+
+            svgPolygon.style.display = 'none';
+            svgCircle.style.display = 'none';
+            svgEllipse.style.display = 'none';
+            svgRect.style.display = 'none';
+
+            let pathData = '';
+            let pointsHTML = '';
+            let handlesHTML = '';
+
+            const startX = data[0][0] * SIZE;
+            const startY = data[0][1] * SIZE;
+            pathData += `M ${startX} ${startY} `;
+            pointsHTML += `<circle class="draggable-vertex vertex-anchor" cx="${startX}" cy="${startY}" r=".5" data-type="favicon" data-seg="0" data-val="0" />`;
+
+            let lastAnchorX = startX;
+            let lastAnchorY = startY;
+
+            for (let i = 1; i < data.length; i++) {
+                const seg = data[i];
+                if (seg.length === 6) {
+                    const cp1x = seg[0] * SIZE;
+                    const cp1y = seg[1] * SIZE;
+                    const cp2x = seg[2] * SIZE;
+                    const cp2y = seg[3] * SIZE;
+                    const ax = seg[4] * SIZE;
+                    const ay = seg[5] * SIZE;
+
+                    pathData += `C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${ax} ${ay} `;
+                    handlesHTML += `<line x1="${lastAnchorX}" y1="${lastAnchorY}" x2="${cp1x}" y2="${cp1y}" stroke-width=".1" />`;
+                    handlesHTML += `<line x1="${cp2x}" y1="${cp2y}" x2="${ax}" y2="${ay}" stroke-width=".1" />`;
+
+                    pointsHTML += `<circle class="draggable-vertex vertex-control" cx="${cp1x}" cy="${cp1y}" r=".4" data-type="favicon" data-seg="${i}" data-val="0" />`;
+                    pointsHTML += `<circle class="draggable-vertex vertex-control" cx="${cp2x}" cy="${cp2y}" r=".4" data-type="favicon" data-seg="${i}" data-val="2" />`;
+                    pointsHTML += `<circle class="draggable-vertex vertex-anchor" cx="${ax}" cy="${ay}" r=".5" data-type="favicon" data-seg="${i}" data-val="4" />`;
+
+                    lastAnchorX = ax;
+                    lastAnchorY = ay;
+                }
+            }
+
+            mainPath.setAttribute('d', pathData + ' Z');
+            handlesLayer.innerHTML = handlesHTML;
+            pointsLayer.innerHTML = pointsHTML;
+
+            faviconCtx.clearRect(0, 0, SIZE, SIZE);
+            faviconCtx.strokeStyle = '#f59e0b';
+            faviconCtx.lineWidth = 4;
+            faviconCtx.lineJoin = 'round';
+            faviconCtx.lineCap = 'round';
+            faviconCtx.beginPath();
+            faviconCtx.moveTo(startX, startY);
+            for (let i = 1; i < data.length; i++) {
+                const seg = data[i];
+                if (seg.length === 6) {
+                    faviconCtx.bezierCurveTo(
+                        seg[0] * SIZE, seg[1] * SIZE,
+                        seg[2] * SIZE, seg[3] * SIZE,
+                        seg[4] * SIZE, seg[5] * SIZE
+                    );
+                }
+            }
+            faviconCtx.closePath();
+            faviconCtx.stroke();
+        }
+
+        faviconEditor.addEventListener('input', parseAndRenderFavicon);
+
+        // Helper: distance from point (ptX, ptY) to line segment (x1, y1)-(x2, y2)
+        function distToSegment(ptX, ptY, x1, y1, x2, y2) {
+            const dx = x2 - x1;
+            const dy = y2 - y1;
+            const l2 = dx * dx + dy * dy;
+            if (l2 === 0) return Math.hypot(ptX - x1, ptY - y1);
+            let t = ((ptX - x1) * dx + (ptY - y1) * dy) / l2;
+            t = Math.max(0, Math.min(1, t));
+            return Math.hypot(ptX - (x1 + t * dx), ptY - (y1 + t * dy));
+        }
+
+        // Delete point handler (Alt-click or double-click)
+        function handleDeletePoint(target) {
+            if (activeTab === 'clip-path' && currentClipData.type === 'polygon' && target.dataset.type === 'polygon') {
+                const idx = parseInt(target.dataset.idx);
+                if (currentClipData.points.length > 3) {
+                    currentClipData.points.splice(idx, 1);
+                    clipPathEditor.value = buildCurrentClipString();
+                    updateClipVisuals();
+                    updateClipCodeOutputs();
+                    saveCheckpoint('Deleted Vertex');
+                    showToast('Deleted vertex');
+                } else {
+                    showToast('Polygon requires at least 3 vertices');
+                }
+            } else if (activeTab === 'svg-path' && target.dataset.type === 'svg-anchor') {
+                const cmdIndex = parseInt(target.dataset.cmd);
+                if (currentSvgCommands.length > 1) {
+                    currentSvgCommands.splice(cmdIndex, 1);
+                    if (currentSvgCommands.length > 0) {
+                        const firstCmd = currentSvgCommands[0];
+                        if (firstCmd.command !== 'M' && firstCmd.command !== 'm') {
+                            firstCmd.command = 'M';
+                        }
+                    }
+                    svgPathEditor.value = formatSvgPathString(currentSvgCommands);
+                    updateSvgPathVisuals();
+                    updateSvgPathOutputs();
+                    saveCheckpoint('Deleted SVG Path Node');
+                    showToast('Deleted path point');
+                } else {
+                    showToast('Path requires at least 1 command');
+                }
+            }
+        }
+
+        // Add point on canvas click
+        function handleAddPointOnCanvas(e) {
+            const pt = visualizerSvg.createSVGPoint();
+            pt.x = e.clientX;
+            pt.y = e.clientY;
+            const ctm = visualizerSvg.getScreenCTM();
+            if (!ctm) return;
+            const local = pt.matrixTransform(ctm.inverse());
+
+            const step = e.shiftKey ? .1 : 1;
+            let newX = Math.round(local.x / step) * step;
+            let newY = Math.round(local.y / step) * step;
+            newX = Math.max(0, Math.min(100, newX));
+            newY = Math.max(0, Math.min(100, newY));
+
+            if (activeTab === 'clip-path') {
+                if (currentClipData.type !== 'polygon') {
+                    showToast('Point editing is available on polygon clip-path');
+                    return;
+                }
+                let bestDist = Infinity;
+                let insertIdx = currentClipData.points.length;
+                for (let i = 0; i < currentClipData.points.length; i++) {
+                    const p1 = currentClipData.points[i];
+                    const p2 = currentClipData.points[(i + 1) % currentClipData.points.length];
+                    const d = distToSegment(newX, newY, p1.x, p1.y, p2.x, p2.y);
+                    if (d < bestDist) {
+                        bestDist = d;
+                        insertIdx = i + 1;
+                    }
+                }
+                currentClipData.points.splice(insertIdx, 0, { x: newX, y: newY });
+                clipPathEditor.value = buildCurrentClipString();
+                updateClipVisuals();
+                updateClipCodeOutputs();
+                saveCheckpoint('Added Vertex');
+                showToast(`Added vertex at (${newX}${currentClipUnit}, ${newY}${currentClipUnit})`);
+            } else if (activeTab === 'svg-path') {
+                const { anchors } = extractPathNodes(currentSvgCommands);
+                let insertIdx = currentSvgCommands.length;
+                let minSegDist = Infinity;
+                let bestCmdIdx = -1;
+
+                for (let i = 0; i < anchors.length - 1; i++) {
+                    const a1 = anchors[i];
+                    const a2 = anchors[i + 1];
+                    const d = distToSegment(newX, newY, a1.x, a1.y, a2.x, a2.y);
+                    if (d < minSegDist) {
+                        minSegDist = d;
+                        bestCmdIdx = a2.cmdIndex;
+                    }
+                }
+
+                if (minSegDist <= 12 && bestCmdIdx !== -1) {
+                    insertIdx = bestCmdIdx;
+                } else if (currentSvgCommands.length > 0) {
+                    const lastCmd = currentSvgCommands[currentSvgCommands.length - 1];
+                    if (lastCmd.command.toUpperCase() === 'Z') {
+                        insertIdx = currentSvgCommands.length - 1;
+                    }
+                }
+
+                currentSvgCommands.splice(insertIdx, 0, { command: 'L', args: [newX, newY] });
+                svgPathEditor.value = formatSvgPathString(currentSvgCommands);
+                updateSvgPathVisuals();
+                updateSvgPathOutputs();
+                saveCheckpoint('Added SVG Path Node');
+                showToast(`Added path point (${newX}, ${newY})`);
+            }
+        }
+
+        // --- Interactive Dragging Across All Shapes ---
+        let pointerDownPos = null;
+        let isDraggingPoint = false;
+
+        visualizerSvg.addEventListener('pointerdown', e => {
+            pointerDownPos = { x: e.clientX, y: e.clientY };
+            isDraggingPoint = false;
+
+            if (e.target.tagName === 'circle') {
+                if (e.altKey) {
+                    e.preventDefault();
+                    handleDeletePoint(e.target);
+                    return;
+                }
+
+                e.preventDefault();
+                pointerId = e.pointerId;
+                visualizerSvg.setPointerCapture(pointerId);
+                visualizerSvg.style.cursor = 'grabbing';
+
+                const ds = e.target.dataset;
+                activePoint = {
+                    type: ds.type,
+                    idx: parseInt(ds.idx || '0'),
+                    cmdIndex: parseInt(ds.cmd || '0'),
+                    argIndex: parseInt(ds.arg || '0'),
+                    segIndex: parseInt(ds.seg || '0'),
+                    valIndex: parseInt(ds.val || '0')
+                };
+            }
+        });
+
+        visualizerSvg.addEventListener('pointermove', e => {
+            if (pointerDownPos && Math.hypot(e.clientX - pointerDownPos.x, e.clientY - pointerDownPos.y) > 4) {
+                isDraggingPoint = true;
+            }
+            if (!activePoint) return;
+
+            if (animationFrameId) cancelAnimationFrame(animationFrameId);
+
+            animationFrameId = requestAnimationFrame(() => {
+                const pt = visualizerSvg.createSVGPoint();
+                pt.x = e.clientX;
+                pt.y = e.clientY;
+                const ctm = visualizerSvg.getScreenCTM();
+                if (!ctm) return;
+                const local = pt.matrixTransform(ctm.inverse());
+
+                const step = e.shiftKey ? .1 : 1;
+                let nx = Math.round(local.x / step) * step;
+                let ny = Math.round(local.y / step) * step;
+                nx = Math.max(0, Math.min(100, nx));
+                ny = Math.max(0, Math.min(100, ny));
+
+                if (activeTab === 'clip-path') {
+                    const d = currentClipData;
+                    if (activePoint.type === 'polygon') {
+                        d.points[activePoint.idx].x = nx;
+                        d.points[activePoint.idx].y = ny;
+                        readoutIdx.textContent = `Point #${activePoint.idx}`;
+                    } else if (activePoint.type === 'circle-center') {
+                        d.cx = nx;
+                        d.cy = ny;
+                        readoutIdx.textContent = 'Center';
+                    } else if (activePoint.type === 'circle-radius') {
+                        d.r = Math.max(2, Math.round(Math.hypot(nx - d.cx, ny - d.cy)));
+                        readoutIdx.textContent = 'Radius';
+                    } else if (activePoint.type === 'ellipse-center') {
+                        d.cx = nx;
+                        d.cy = ny;
+                        readoutIdx.textContent = 'Center';
+                    } else if (activePoint.type === 'ellipse-rx') {
+                        d.rx = Math.max(2, Math.abs(nx - d.cx));
+                        readoutIdx.textContent = 'Radius X';
+                    } else if (activePoint.type === 'ellipse-ry') {
+                        d.ry = Math.max(2, Math.abs(ny - d.cy));
+                        readoutIdx.textContent = 'Radius Y';
+                    } else if (activePoint.type === 'inset-tl') {
+                        d.left = nx;
+                        d.top = ny;
+                        readoutIdx.textContent = 'Top-Left';
+                    } else if (activePoint.type === 'inset-br') {
+                        d.right = Math.max(0, 100 - nx);
+                        d.bottom = Math.max(0, 100 - ny);
+                        readoutIdx.textContent = 'Bottom-Right';
+                    } else if (activePoint.type === 'rect-tl') {
+                        d.left = Math.min(nx, d.right - 2);
+                        d.top = Math.min(ny, d.bottom - 2);
+                        readoutIdx.textContent = 'Top-Left';
+                    } else if (activePoint.type === 'rect-br') {
+                        d.right = Math.max(nx, d.left + 2);
+                        d.bottom = Math.max(ny, d.top + 2);
+                        readoutIdx.textContent = 'Bottom-Right';
+                    } else if (activePoint.type === 'xywh-tl') {
+                        const oldRight = d.x + d.w;
+                        const oldBottom = d.y + d.h;
+                        d.x = Math.min(nx, oldRight - 2);
+                        d.y = Math.min(ny, oldBottom - 2);
+                        d.w = oldRight - d.x;
+                        d.h = oldBottom - d.y;
+                        readoutIdx.textContent = 'Position (X, Y)';
+                    } else if (activePoint.type === 'xywh-br') {
+                        d.w = Math.max(2, nx - d.x);
+                        d.h = Math.max(2, ny - d.y);
+                        readoutIdx.textContent = 'Size (W, H)';
+                    }
+
+                    readoutX.textContent = `${nx}${currentClipUnit}`;
+                    readoutY.textContent = `${ny}${currentClipUnit}`;
+
+                    clipPathEditor.value = buildCurrentClipString();
+                    updateClipVisuals();
+                    updateClipCodeOutputs();
+                } else if (activeTab === 'svg-path') {
+                    const cmdObj = currentSvgCommands[activePoint.cmdIndex];
+                    if (cmdObj) {
+                        const cmdType = cmdObj.command.toUpperCase();
+                        if (cmdType === 'H') cmdObj.args[0] = nx;
+                        else if (cmdType === 'V') cmdObj.args[0] = ny;
+                        else {
+                            cmdObj.args[activePoint.argIndex] = nx;
+                            cmdObj.args[activePoint.argIndex + 1] = ny;
+                        }
+                    }
+
+                    readoutIdx.textContent = `${cmdObj.command}`;
+                    readoutX.textContent = nx;
+                    readoutY.textContent = ny;
+
+                    svgPathEditor.value = formatSvgPathString(currentSvgCommands);
+                    updateSvgPathVisuals();
+                    updateSvgPathOutputs();
+                } else if (activeTab === 'favicon' && activePoint.type === 'favicon') {
+                    const SIZE = 32;
+                    let valX = local.x / SIZE;
+                    let valY = local.y / SIZE;
+                    const fstep = e.shiftKey ? .05 : .01;
+                    valX = Math.round(Math.round(valX / fstep) * fstep * 1000) / 1000;
+                    valY = Math.round(Math.round(valY / fstep) * fstep * 1000) / 1000;
+
+                    currentFaviconData[activePoint.segIndex][activePoint.valIndex] = valX;
+                    currentFaviconData[activePoint.segIndex][activePoint.valIndex + 1] = valY;
+
+                    readoutIdx.textContent = activePoint.segIndex;
+                    readoutX.textContent = valX;
+                    readoutY.textContent = valY;
+
+                    updateFaviconVisuals();
+                }
+            });
+        });
+
+        visualizerSvg.addEventListener('pointerup', e => {
+            if (activePoint) {
+                visualizerSvg.releasePointerCapture(pointerId);
+                visualizerSvg.style.cursor = 'default';
+                activePoint = null;
+                if (isDraggingPoint) {
+                    saveCheckpoint(`${activeTab} ${currentShapeType} Drag`);
+                }
+            }
+        });
+
+        // Click on canvas to add point
+        visualizerSvg.addEventListener('click', e => {
+            if (isDraggingPoint) return;
+            if (e.target.tagName === 'circle') return;
+            handleAddPointOnCanvas(e);
+        });
+
+        // Double click on point to delete
+        visualizerSvg.addEventListener('dblclick', e => {
+            if (e.target.tagName === 'circle') {
+                handleDeletePoint(e.target);
+            }
+        });
+
+        // --- History / Checkpoint System ---
+        function saveCheckpoint(reason = 'Manual Save') {
+            const time = new Date().toLocaleTimeString();
+            let text = '';
+            if (activeTab === 'clip-path') text = clipPathEditor.value;
+            else if (activeTab === 'svg-path') text = svgPathEditor.value;
+            else text = faviconEditor.value;
+
+            if (checkpoints.length > 0 && checkpoints[checkpoints.length - 1].text === text) return;
+
+            checkpoints.push({
+                idx: checkpoints.length,
+                mode: activeTab,
+                time,
+                reason,
+                text
+            });
+            renderHistory();
+        }
+
+        function renderHistory() {
+            historyListItems.innerHTML = '';
+            if (checkpointCount) {
+                checkpointCount.textContent = checkpoints.length;
+            }
+
+            if (checkpointQuickSelect) {
+                checkpointQuickSelect.innerHTML = '<option value="" disabled' + (activeDiffIndex === -1 ? ' selected' : '') + '>Jump to checkpoint...</option>';
+            }
+
+            [...checkpoints].reverse().forEach(cp => {
+                const d = document.createElement('div');
+                d.className = 'history-item' + (activeDiffIndex === cp.idx ? ' active' : '');
+                d.innerHTML = `
+                    <div class="history-item-top">
+                        <strong>${cp.reason}</strong>
+                        <span class="history-item-badge">${cp.mode}</span>
+                    </div>
+                    <span class="history-item-time">${cp.time}</span>
+                `;
+                d.onclick = () => restoreCheckpoint(cp);
+                historyListItems.appendChild(d);
+
+                if (checkpointQuickSelect) {
+                    const opt = document.createElement('option');
+                    opt.value = cp.idx;
+                    opt.textContent = `${cp.time} — ${cp.reason} (${cp.mode})`;
+                    if (activeDiffIndex === cp.idx) opt.selected = true;
+                    checkpointQuickSelect.appendChild(opt);
+                }
+            });
+        }
+
+        function restoreCheckpoint(cp) {
+            activeDiffIndex = cp.idx;
+            if (cp.mode !== activeTab) {
+                switchTab(cp.mode);
+            }
+            if (cp.mode === 'clip-path') {
+                clipPathEditor.value = cp.text;
+                parseAndRenderClipPath();
+            } else if (cp.mode === 'svg-path') {
+                svgPathEditor.value = cp.text;
+                parseAndRenderSvgPath();
+            } else {
+                faviconEditor.value = cp.text;
+                parseAndRenderFavicon();
+            }
+            renderHistory();
+            showToast(`Restored snapshot: ${cp.reason}`);
+        }
+
+        addCheckpointBtn.addEventListener('click', e => {
+            e.stopPropagation();
+            saveCheckpoint('Manual Save');
+            showToast('Saved checkpoint');
+        });
+
+        if (checkpointsDetails) {
+            checkpointsDetails.addEventListener('toggle', () => {
+                const isOpen = checkpointsDetails.open;
+                if (checkpointsCollapsedView) {
+                    checkpointsCollapsedView.style.display = isOpen ? 'none' : 'flex';
+                }
+            });
+        }
+
+        if (checkpointQuickSelect) {
+            checkpointQuickSelect.addEventListener('change', e => {
+                const idx = parseInt(e.target.value);
+                const cp = checkpoints.find(c => c.idx === idx);
+                if (cp) restoreCheckpoint(cp);
+            });
+        }
+
+        // --- Clipboard Copy Handlers ---
+        function copyToClipboard(text, message = 'Copied to clipboard!') {
+            navigator.clipboard.writeText(text).then(() => showToast(message));
+        }
+
+        globalCopyBtn.addEventListener('click', () => {
+            if (activeTab === 'clip-path') {
+                copyToClipboard(`clip-path: ${buildCurrentClipString()};`, 'Copied CSS clip-path!');
+            } else if (activeTab === 'svg-path') {
+                copyToClipboard(fullSvgPreview.textContent, 'Copied full SVG markup!');
+            } else {
+                copyToClipboard(faviconEditor.value, 'Copied favicon coordinates array!');
+            }
+        });
+
+        copyCssRuleBtn.addEventListener('click', () => copyToClipboard(cssRulePreview.textContent, 'Copied CSS clip-path rule!'));
+        copyClipPathDBtn.addEventListener('click', () => copyToClipboard(shapeToPathD(currentClipData), "Copied SVG path 'd' attribute!"));
+        copySvgClipBtn.addEventListener('click', () => copyToClipboard(svgClipPreview.textContent, 'Copied SVG <clipPath> definition!'));
+        copySvgPathDBtn.addEventListener('click', () => copyToClipboard(formatSvgPathString(currentSvgCommands), "Copied SVG path 'd' attribute!"));
+        copyPathCssBtn.addEventListener('click', () => copyToClipboard(pathCssPreview.textContent, 'Copied CSS path() declaration!'));
+        copyFullSvgBtn.addEventListener('click', () => copyToClipboard(fullSvgPreview.textContent, 'Copied SVG markup!'));
+        copyFaviconBtn.addEventListener('click', () => copyToClipboard(faviconEditor.value, 'Copied favicon array!'));
+
+
+        // --- Image Underlay Logic ---
+        imageUpload.addEventListener('change', e => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = ev => {
+                underlayImage.setAttribute('href', ev.target.result);
+                underlayImage.style.display = 'block';
+                showToast('Loaded reference underlay image');
+            };
+            reader.readAsDataURL(file);
+        });
+
+        imageOpacity.addEventListener('input', e => {
+            underlayImage.setAttribute('opacity', e.target.value / 100);
+        });
+
+        function updateImageTransform() {
+            const scale = imageScale.value / 100;
+            const x = imageX.value;
+            const y = imageY.value;
+            underlayImage.style.transformOrigin = '50% 50%';
+            underlayImage.style.transform = `translate(${x}%, ${y}%) scale(${scale})`;
+        }
+
+        imageScale.addEventListener('input', updateImageTransform);
+        imageX.addEventListener('input', updateImageTransform);
+        imageY.addEventListener('input', updateImageTransform);
+
+        // --- Initialization ---
+        updatePresetsDropdown('polygon');
+        switchTab('clip-path');
+        saveCheckpoint('Initial State');
+    </script>
+</body>
+
+</html>
