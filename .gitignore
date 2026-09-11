@@ -19,8 +19,14 @@ playwright-report/
 .wrangler/
 .env
 
+# Cloudflare Media Assets (hosted in R2 bucket)
+assets/audio/
+public/data/tracks.json
+
 # Agent temporary workspace
 knowledge.md
 scratchpad.md
 scratch.md
 task.md
+.worktrees/
+

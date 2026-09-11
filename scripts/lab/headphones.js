@@ -40,13 +40,16 @@ const Utils = {
     }
 };
 
+const audioElement = new Audio();
+audioElement.crossOrigin = 'anonymous';
+
 let state = {
     isPlaying: false,
     isFirstInteraction: true,
     audioCtx: null,
     analyser: null,
     dataArray: null,
-    audio: new Audio(),
+    audio: audioElement,
     source: null
 };
 

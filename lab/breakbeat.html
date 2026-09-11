@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="Content-Security-Policy"
-    content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self'; media-src 'self'; object-src 'none'; frame-ancestors 'self'; base-uri 'self';">
+    content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' __MEDIA_CDN__ data:; font-src 'self' data:; connect-src 'self' __MEDIA_CDN__; media-src 'self' __MEDIA_CDN__ blob: data:; object-src 'none'; frame-ancestors 'self'; base-uri 'self';">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>BreakBeat - Technics SL-1210MK2</title>
@@ -1164,7 +1164,7 @@
         <clipPath id="label-clip">
           <circle cx="0" cy="0" r="75" />
         </clipPath>
-        <image id="record-label-image" href="../assets/audio/J. Dilla - Ruff Draft - 2007/cover.svg" x="-75" y="-75"
+        <image id="record-label-image" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100%25' height='100%25' fill='%231a1a1a'/><circle cx='50' cy='50' r='40' fill='%230d0d0d'/><circle cx='50' cy='50' r='15' fill='%23333333'/><circle cx='50' cy='50' r='2' fill='%23ffffff'/></svg>" x="-75" y="-75"
           width="150" height="150" clip-path="url(#label-clip)" />
       </g>
 
@@ -1428,16 +1428,16 @@
 
   <script type="module">
     import { TurntableController } from '../scripts/lab/TurntableController.js';
-    import { audioLibrary } from '../scripts/AudioLibrary.js';
+    import { audioLibrary, resolveMediaUrl } from '../scripts/AudioLibrary.js';
 
     const fallbackCover = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100"><rect width="100%" height="100%" fill="%231a1a1a"/><circle cx="50" cy="50" r="40" fill="%230d0d0d"/><circle cx="50" cy="50" r="15" fill="%23333333"/><circle cx="50" cy="50" r="2" fill="%23ffffff"/></svg>';
 
     const controller = new TurntableController();
 
     const tracks = audioLibrary.tracks;
-    const defaultTrack = tracks.find(t => t.title.includes('Nothing Like This')) || tracks[0];
-    const defaultFile = defaultTrack ? defaultTrack.src : '../assets/audio/J. Dilla - Ruff Draft - 2007/04 - Nothing Like This.mp3';
-    const defaultCover = defaultTrack ? (defaultTrack.albumArt || fallbackCover) : '../assets/audio/J. Dilla - Ruff Draft - 2007/cover.svg';
+    const defaultTrack = tracks.find(t => t.title && t.title.includes('Nothing Like This')) || tracks[0];
+    const defaultFile = defaultTrack ? defaultTrack.src : resolveMediaUrl('audio/J. Dilla - Ruff Draft - 2007/04 - Nothing Like This.mp3');
+    const defaultCover = defaultTrack ? (defaultTrack.albumArt || fallbackCover) : fallbackCover;
 
     controller.initAudio(defaultFile);
 
