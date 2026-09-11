@@ -250,3 +250,16 @@ Standardized text overflow handling for track titles.
 - **Radius**: Large curves (`1.25rem` or `1.5rem`) for a premium "soft" feel using project tokens.
 - **Icons**: Standardized at `24px` for consistency across variants.
 - **Animations**: Standard rotation for rewind is **-25°**.
+
+## Cloudflare Media Delivery Architecture
+
+To eliminate audio asset bloat from the static production bundle and optimize asset delivery performance:
+- **Cloudflare R2 Object Storage**: Audio files, artwork, and track metadata are stored in an R2 bucket (`<r2-bucket-name>`), decoupling media assets and track catalogs from git version control and eliminating egress bandwidth costs.
+- **Cloudflare Worker Streaming (`audio-worker/`)**: A dedicated Edge Worker (`src/index.js`) acts as a high-performance streaming CDN proxy:
+  - **Byte-Range Requests (206 Partial Content)**: Natively parses `Range: bytes=start-end` headers and streams segmented audio chunks with `Content-Range` and `Accept-Ranges: bytes`, ensuring instant scrubbing and smooth seek operations in HTML `<audio>`.
+  - **Aggressive Caching**: Serves media with immutable caching headers and metadata with `ETag` validation for instant `304 Not Modified` responses.
+  - **CORS & Preflight**: Exposes required streaming headers (`Content-Range`, `Accept-Ranges`, `Content-Length`, `ETag`) and answers preflight `OPTIONS` requests.
+  - **Path Traversal Security**: Sanitizes incoming keys and rejects path traversal sequences (`..`, null bytes).
+- **Client Resolution (`AudioLibrary.js`)**: Fetches track catalog directly from Cloudflare R2 CDN (`${MEDIA_BASE_URL}/data/tracks.json`) with local fallback, dynamically resolving all media URLs via `resolveMediaUrl()`.
+- **Sync Tooling (`scripts/upload-audio-r2.js`)**: A CLI synchronization tool to catalog, check, and batch-upload local audio, artwork, and track metadata to Cloudflare R2 with `--dry-run` validation.
+

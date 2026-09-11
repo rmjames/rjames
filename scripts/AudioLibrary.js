@@ -1,34 +1,22 @@
 
-const audioAssets = (typeof import.meta !== 'undefined' && typeof import.meta.glob === 'function')
-    ? import.meta.glob('../assets/audio/**/*', { eager: true, query: '?url', import: 'default' })
-    : {};
+export const MEDIA_BASE_URL = ((typeof import.meta !== 'undefined' && import.meta.env?.VITE_MEDIA_BASE_URL) || '').replace(/\/+$/, '');
 
-const cleanAssetUrl = (url) => typeof url === 'string' ? url.replace(/[?&]import(?:&.*)?$/, '') : url;
-
-// Helper to find asset key robustly
-function findAssetKey(src) {
-    if (!src) return null;
-    if (audioAssets[src]) return src;
-    
-    const keys = Object.keys(audioAssets);
-    const fileName = src.split('/').pop();
-    const lowerFileName = fileName.toLowerCase();
-
-    const match = keys.find(k => 
-        k.endsWith('/' + fileName) || 
-        k === fileName ||
-        k.toLowerCase().endsWith('/' + lowerFileName) || 
-        k.toLowerCase() === lowerFileName
-    );
-    
-    if (match) {
-        console.debug('Fuzzy matched asset:', src, '->', match);
-        return match;
+export const resolveMediaUrl = (url) => {
+    if (!url || typeof url !== 'string') return url;
+    if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:') || url.startsWith('blob:')) {
+        return url;
     }
-    return null;
-}
+    // Strip leading relative indicators '../assets/', 'assets/', './assets/', etc.
+    let clean = url.replace(/^(\.\.\/|\.\/|\/)?(assets\/)?/, '');
+    if (!clean.startsWith('audio/')) {
+        clean = `audio/${clean}`;
+    }
+    // Encode URI path segments while preserving slashes
+    const encodedPath = clean.split('/').map(segment => encodeURIComponent(segment)).join('/');
+    return MEDIA_BASE_URL ? `${MEDIA_BASE_URL}/${encodedPath}` : `/${encodedPath}`;
+};
 
-class AudioLibrary {
+export class AudioLibrary {
     constructor() {
         this._tracks = null;
         this._loadingPromise = null;
@@ -40,29 +28,33 @@ class AudioLibrary {
 
         this._loadingPromise = (async () => {
             try {
-                // Fetch the static track data (PERF-19)
-                const response = await fetch('/data/tracks.json');
+                // Fetch track data: prefer remote R2 CDN when configured, fall back to local /data/tracks.json
+                const cdnUrl = MEDIA_BASE_URL ? `${MEDIA_BASE_URL}/data/tracks.json` : null;
+                const localUrl = (typeof window !== 'undefined' && window.location?.origin && window.location.origin !== 'null')
+                    ? new URL('/data/tracks.json', window.location.origin).href
+                    : '/data/tracks.json';
+
+                let response;
+                if (cdnUrl) {
+                    try {
+                        response = await fetch(cdnUrl);
+                        if (response && typeof response.ok === 'boolean' && !response.ok) {
+                            throw new Error(`CDN status ${response.status}`);
+                        }
+                    } catch {
+                        response = await fetch(localUrl);
+                    }
+                } else {
+                    response = await fetch(localUrl);
+                }
+
                 const rawTracks = await response.json();
 
-                this._tracks = rawTracks.map(track => {
-                    const srcKey = findAssetKey(track.src);
-                    const rawSrc = srcKey ? audioAssets[srcKey] : null;
-                    const srcUrl = cleanAssetUrl(rawSrc);
-
-                    const artKey = findAssetKey(track.albumArt);
-                    const rawArt = artKey ? audioAssets[artKey] : null;
-                    const mappedArt = cleanAssetUrl(rawArt);
-
-                    if (!srcUrl && Object.keys(audioAssets).length > 0) { 
-                        console.warn('Audio asset not found in build:', track.src);
-                    }
-
-                    return {
-                        ...track,
-                        src: srcUrl || track.src,
-                        albumArt: mappedArt || track.albumArt || null
-                    };
-                });
+                this._tracks = rawTracks.map(track => ({
+                    ...track,
+                    src: resolveMediaUrl(track.src),
+                    albumArt: resolveMediaUrl(track.albumArt) || null
+                }));
             } catch (err) {
                 console.error('Failed to load AudioLibrary metadata:', err);
                 this._tracks = [];
@@ -92,5 +84,8 @@ class AudioLibrary {
 
 export const audioLibrary = new AudioLibrary();
 
-// Top-level await for seamless integration in modern browsers/Vite
-await audioLibrary.load();
+// Top-level await for seamless integration in modern browsers/Vite (skipped in test runner)
+const isTestEnv = typeof process !== 'undefined' && process.env?.VITEST;
+if (typeof window !== 'undefined' && !isTestEnv) {
+    await audioLibrary.load();
+}
