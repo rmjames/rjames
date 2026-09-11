@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { ColorExtractor } from '../../../scripts/utils/ColorExtractor.js';
+import { MEDIA_BASE_URL } from '../../../scripts/AudioLibrary.js';
 
 describe('ColorExtractor', () => {
     describe('rgbToOklch', () => {
@@ -97,6 +98,23 @@ describe('ColorExtractor', () => {
 
             const color = await ColorExtractor.getAccentColor('test.jpg');
             // We expect a valid oklch string
+            expect(color).toContain('oklch(');
+            expect(mockContext.drawImage).toHaveBeenCalled();
+        });
+
+        it('should allow trusted media CDN URLs and extract color', async () => {
+            const redPixel = [255, 0, 0, 255];
+            const data = new Uint8ClampedArray(400);
+            for (let i = 0; i < 400; i += 4) {
+                data[i] = redPixel[0];
+                data[i+1] = redPixel[1];
+                data[i+2] = redPixel[2];
+                data[i+3] = redPixel[3];
+            }
+            mockContext.getImageData.mockReturnValue({ data });
+
+            const testUrl = MEDIA_BASE_URL ? `${MEDIA_BASE_URL}/audio/test/Cover.jpg` : 'audio/test/Cover.jpg';
+            const color = await ColorExtractor.getAccentColor(testUrl);
             expect(color).toContain('oklch(');
             expect(mockContext.drawImage).toHaveBeenCalled();
         });

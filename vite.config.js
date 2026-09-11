@@ -1,7 +1,20 @@
-import { defineConfig } from 'vite';
+import { defineConfig, loadEnv } from 'vite';
 import { resolve } from 'path';
 import fs from 'fs';
 import path from 'path';
+
+// Dynamic CSP media plugin for replacing __MEDIA_CDN__ with VITE_MEDIA_BASE_URL
+const cspMediaPlugin = (mediaOrigin = '') => {
+    return {
+        name: 'csp-media-transform',
+        transformIndexHtml(html) {
+            if (mediaOrigin) {
+                return html.replace(/__MEDIA_CDN__/g, mediaOrigin);
+            }
+            return html.replace(/__MEDIA_CDN__\s*/g, '');
+        }
+    };
+};
 
 // Get all HTML files from the lab directory
 const labDir = resolve(__dirname, 'lab');
@@ -53,8 +66,11 @@ const copyStaticFiles = () => {
                 }
             });
 
-            // Add directories to copy
-            const dirsToCopy = ['images', 'fonts', 'styles', 'scripts', 'assets'];
+            // Add directories to copy (media assets now hosted on Cloudflare R2/Worker)
+            const dirsToCopy = ['images', 'fonts', 'styles', 'scripts'];
+            if (process.env.INCLUDE_LOCAL_AUDIO === 'true') {
+                dirsToCopy.push('assets');
+            }
 
             filesToCopy.forEach(({ src, dest }) => {
                 const srcPath = resolve(__dirname, src);
@@ -95,23 +111,28 @@ const copyStaticFiles = () => {
     };
 };
 
-export default defineConfig({
-    plugins: [copyStaticFiles()],
-    build: {
-        target: 'esnext',
-        emptyOutDir: false,
-        rollupOptions: {
-            input: {
-                main: resolve(__dirname, 'index.html'),
-                resume: resolve(__dirname, 'resume.html'),
-                lab: resolve(__dirname, 'lab.html'),
-                patternLibrary: resolve(__dirname, 'pattern-library.html'),
-                ...toolsFiles,
-                ...labFiles
+export default defineConfig(({ mode }) => {
+    const env = loadEnv(mode, process.cwd(), '');
+    const mediaOrigin = (env.VITE_MEDIA_BASE_URL || process.env.VITE_MEDIA_BASE_URL || '').replace(/\/+$/, '');
+
+    return {
+        plugins: [copyStaticFiles(), cspMediaPlugin(mediaOrigin)],
+        build: {
+            target: 'esnext',
+            emptyOutDir: false,
+            rollupOptions: {
+                input: {
+                    main: resolve(__dirname, 'index.html'),
+                    resume: resolve(__dirname, 'resume.html'),
+                    lab: resolve(__dirname, 'lab.html'),
+                    patternLibrary: resolve(__dirname, 'pattern-library.html'),
+                    ...toolsFiles,
+                    ...labFiles
+                },
             },
         },
-    },
-    server: {
-        host: true
-    }
+        server: {
+            host: true
+        }
+    };
 });

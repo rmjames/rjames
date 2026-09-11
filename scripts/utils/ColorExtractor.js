@@ -1,3 +1,5 @@
+import { MEDIA_BASE_URL } from '../AudioLibrary.js';
+
 const colorCache = new Map();
 let sharedCanvas = null;
 let sharedCtx = null;
@@ -50,8 +52,12 @@ export const ColorExtractor = {
 
         if (!imageUrl) return DEFAULT_COLOR;
 
-        // Security check: only allow relative paths (reject schemes like http:, javascript:, data:, etc. and protocol-relative //)
-        if (/^(?:[a-z]+:|\/\/)/i.test(imageUrl)) {
+        // Security check: only allow relative paths or paths from our trusted media CDN.
+        // Reject schemes like javascript:, data:, etc. and untrusted origins or protocol-relative //
+        const isAllowedCdn = typeof MEDIA_BASE_URL === 'string' && MEDIA_BASE_URL && imageUrl.startsWith(MEDIA_BASE_URL);
+        const isRelativePath = !/^(?:[a-z]+:|\/\/)/i.test(imageUrl);
+
+        if (!isAllowedCdn && !isRelativePath) {
             return DEFAULT_COLOR;
         }
 
