@@ -2,6 +2,7 @@ name: Deploy static content to Pages
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  VITE_MEDIA_BASE_URL: ${{ vars.VITE_MEDIA_BASE_URL }}
 
 on:
   # Runs on pushes targeting the default branch
