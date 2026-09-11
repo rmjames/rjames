@@ -6,15 +6,15 @@
   "r2_buckets": [
     {
       "binding": "AUDIO_BUCKET",
-      "bucket_name": "media-bucket"
+      "bucket_name": "rjames-media"
     }
   ],
   "routes": [
     // Configure your custom domain or worker route here (e.g., custom_domain: true, pattern: "media.yourdomain.com")
-    // {
-    //   "pattern": "media.example.com",
-    //   "custom_domain": true
-    // }
+    {
+      "pattern": "media.robertjames.nyc",
+      "custom_domain": true
+    }
   ],
   "observability": {
     "enabled": true
