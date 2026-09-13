@@ -148,4 +148,73 @@ describe('MediaPlayerCore', () => {
         audioElement.dispatchEvent(new Event('play'));
         expect(listener).not.toHaveBeenCalled();
     });
+
+    describe('Model 1: Signed Stream URLs & Range Streaming', () => {
+        it('should detect expired or valid stream URLs with isStreamUrlExpired', async () => {
+            const { isStreamUrlExpired } = await import('../../../scripts/media/MediaPlayerCore.js');
+            const now = Math.floor(Date.now() / 1000);
+            
+            expect(isStreamUrlExpired(null)).toBe(true);
+            expect(isStreamUrlExpired('invalid-url')).toBe(false);
+            expect(isStreamUrlExpired(`https://media.example.com/track.mp3?token=abc&expires=${now - 50}`)).toBe(true);
+            expect(isStreamUrlExpired(`https://media.example.com/track.mp3?token=abc&expires=${now + 3600}`)).toBe(false);
+        });
+
+        it('should fetch signed stream URL via fetchStreamUrl', async () => {
+            const { fetchStreamUrl } = await import('../../../scripts/media/MediaPlayerCore.js');
+            const signedStreamUrl = 'https://media.example.com/audio/ep1.mp3?token=sig123&expires=9999999999';
+            
+            global.fetch = vi.fn().mockResolvedValue({
+                ok: true,
+                json: () => Promise.resolve({ streamUrl: signedStreamUrl })
+            });
+
+            const url = await fetchStreamUrl({ id: 'ep-1', src: 'ep1.mp3' });
+            expect(global.fetch).toHaveBeenCalledWith('/api/episodes/ep-1/stream-url');
+            expect(url).toBe(signedStreamUrl);
+        });
+
+        it('should play episode directly using playEpisode', async () => {
+            const signedStreamUrl = 'https://media.example.com/audio/ep2.mp3?token=sig456&expires=9999999999';
+            global.fetch = vi.fn().mockResolvedValue({
+                ok: true,
+                json: () => Promise.resolve({ streamUrl: signedStreamUrl })
+            });
+
+            mediaPlayer.tracks = [
+                { id: 'ep-2', src: 'audio/ep2.mp3', title: 'Episode 2' }
+            ];
+
+            await mediaPlayer.playEpisode('ep-2');
+            expect(audioElement.src).toBe(signedStreamUrl);
+            expect(audioElement.play).toHaveBeenCalled();
+        });
+
+        it('should fetch range chunks with fetchAudioChunk', async () => {
+            const { fetchAudioChunk } = await import('../../../scripts/media/MediaPlayerCore.js');
+            const mockBuffer = new ArrayBuffer(1024);
+
+            global.fetch = vi.fn().mockResolvedValue({
+                status: 206,
+                arrayBuffer: () => Promise.resolve(mockBuffer)
+            });
+
+            const buffer = await fetchAudioChunk('https://media.example.com/audio/ep1.mp3', 0, 1023);
+            expect(global.fetch).toHaveBeenCalledWith('https://media.example.com/audio/ep1.mp3', {
+                headers: { 'Range': 'bytes=0-1023' }
+            });
+            expect(buffer).toBe(mockBuffer);
+        });
+
+        it('should throw error when fetchAudioChunk receives non-200/206 status', async () => {
+            const { fetchAudioChunk } = await import('../../../scripts/media/MediaPlayerCore.js');
+
+            global.fetch = vi.fn().mockResolvedValue({
+                status: 403
+            });
+
+            await expect(fetchAudioChunk('https://media.example.com/audio/ep1.mp3', 0, 1023))
+                .rejects.toThrow('Failed to load audio chunk: 403');
+        });
+    });
 });

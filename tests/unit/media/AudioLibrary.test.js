@@ -62,6 +62,7 @@ describe('AudioLibrary', () => {
             const lib = new AudioLibrary();
             await lib.load();
 
+            expect(fetchMock).toHaveBeenCalledWith(`${MEDIA_BASE_URL}/data/tracks.json`);
             const prefix = MEDIA_BASE_URL || '';
             const tracks = lib.getAll();
             expect(tracks).toHaveLength(1);
