@@ -10,7 +10,7 @@ body {
     -moz-text-size-adjust: auto;
     min-block-size: 100vh;
     padding: 0 4cqi;
-    font-size: clamp(1rem, calc(1rem + 0.125cqi), 2rem);
+    font-size: clamp(1rem, calc(1rem + .125cqi), 2rem);
 
     @media (prefers-reduced-motion: no-preference) {
         interpolate-size: allow-keywords;
@@ -35,5 +35,5 @@ main {
 }
 
 #main-content {
-    max-width: max(48ch, 64ch);
+    max-inline-size: max(48ch, 64ch);
 }

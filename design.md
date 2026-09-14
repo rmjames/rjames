@@ -41,6 +41,7 @@ styles/
 │   ├── resume.css         # Collapsible details/summary job history
 │   ├── icons.css          # SVG icon sprite integration
 │   ├── skip-link.css      # Accessible keyboard bypass link
+│   ├── content.css        # About copy measure & headline typography
 │   └── pattern-library.css# Design system showcase styles
 └── utilities/
     ├── animations.css     # Keyframes, letter staggering, prefers-reduced-motion
@@ -239,4 +240,4 @@ When `prefers-reduced-motion: reduce` is active:
 
 For live, interactive verification of all design tokens, components, button states, popovers, and motion curves, inspect:
 - **Local File**: [`pattern-library.html`](file:///Users/robertjames/dev/rjames/pattern-library.html)
-- **Production URL**: `https://robertjames.nyc/pattern-library.html`
+- **Production URL**: `https://example.com/pattern-library.html`

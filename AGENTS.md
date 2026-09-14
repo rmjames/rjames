@@ -3,7 +3,7 @@
 - **Modern Standards**: Build with [Baseline 2025](https://web.dev/baseline/2025) features.
 - **Responsive Design**: Use CSS Grid/Flexbox with logical properties and relative units (`rem`, `ch`, `%`). Prefer `inline-size`/`block-size` over `width`/`height`.
 - **Performance**: Optimize assets and load CSS (`media="print"`), JS (`defer`), and images (`loading="lazy"`) asynchronously.
-- **Security**: Protect against CSRF, XSS, SQL injection, and other OWASP vulnerabilities.
+- **Security & Privacy**: Protect against CSRF, XSS, SQL injection, and OWASP vulnerabilities. Always sanitize and obfuscate PII (Personally Identifiable Information — e.g., emails, phone numbers, real credentials, tokens, IP addresses), domain URLs, and cloud service/resource names in logs, tests, mock data, and documentation to prevent target enumeration (`user@example.com`, `https://example.com`, `[REDACTED_SECRET]`, `[REDACTED_CLOUD_RESOURCE]`, `[REDACTED_PII]`).
 
 ## Modern CSS & HTML Standards
 - **Modern Features**: Leverage CSS nesting, cascade layers, view transitions, container queries, scroll-driven animations, `:has()`, and `text-wrap: balance`.

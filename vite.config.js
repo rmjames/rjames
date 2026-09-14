@@ -3,15 +3,21 @@ import { resolve } from 'path';
 import fs from 'fs';
 import path from 'path';
 
-// Dynamic CSP media plugin for replacing __MEDIA_CDN__ with VITE_MEDIA_BASE_URL
-const cspMediaPlugin = (mediaOrigin = '') => {
+// Dynamic HTML transform plugin for replacing __MEDIA_CDN__ and __CONTACT_EMAIL__ placeholders
+const envTransformPlugin = (mediaOrigin = '', contactEmail = '') => {
     return {
-        name: 'csp-media-transform',
+        name: 'env-html-transform',
         transformIndexHtml(html) {
+            let transformed = html;
             if (mediaOrigin) {
-                return html.replace(/__MEDIA_CDN__/g, mediaOrigin);
+                transformed = transformed.replace(/__MEDIA_CDN__/g, mediaOrigin);
+            } else {
+                transformed = transformed.replace(/__MEDIA_CDN__\s*/g, '');
             }
-            return html.replace(/__MEDIA_CDN__\s*/g, '');
+            if (contactEmail) {
+                transformed = transformed.replace(/__CONTACT_EMAIL__/g, contactEmail);
+            }
+            return transformed;
         }
     };
 };
@@ -114,9 +120,10 @@ const copyStaticFiles = () => {
 export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, process.cwd(), '');
     const mediaOrigin = (env.VITE_MEDIA_BASE_URL || process.env.VITE_MEDIA_BASE_URL || '').replace(/\/+$/, '');
+    const contactEmail = env.VITE_CONTACT_EMAIL || process.env.VITE_CONTACT_EMAIL || '';
 
     return {
-        plugins: [copyStaticFiles(), cspMediaPlugin(mediaOrigin)],
+        plugins: [copyStaticFiles(), envTransformPlugin(mediaOrigin, contactEmail)],
         build: {
             target: 'esnext',
             emptyOutDir: false,
