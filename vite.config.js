@@ -22,6 +22,63 @@ const envTransformPlugin = (mediaOrigin = '', contactEmail = '') => {
     };
 };
 
+// Local dev API plugin simulating Cloudflare Pages Functions for /api/stream-url and /api/episodes/:id/stream-url
+const mediaServiceDevPlugin = (mediaOrigin = OBF_DEFAULT_MEDIA, apiKey = '') => {
+    return {
+        name: 'media-service-dev-api',
+        configureServer(server) {
+            server.middlewares.use(async (req, res, next) => {
+                const url = new URL(req.url, `http://${req.headers.host}`);
+                const isEpisodeStream = url.pathname.startsWith('/api/episodes/') && url.pathname.endsWith('/stream-url');
+                const isGenericStream = url.pathname === '/api/stream-url';
+
+                if (!isEpisodeStream && !isGenericStream) {
+                    return next();
+                }
+
+                let path = '';
+                if (isEpisodeStream) {
+                    const match = url.pathname.match(/^\/api\/episodes\/(.+)\/stream-url$/);
+                    path = match ? decodeURIComponent(match[1]) : '';
+                } else {
+                    path = decodeURIComponent(url.searchParams.get('path') || '');
+                }
+
+                if (!path.startsWith('http://') && !path.startsWith('https://')) {
+                    path = path.replace(/^(\.\.\/|\.\/|\/)?(assets\/)?/, '');
+                    if (!path.startsWith('audio/')) {
+                        path = `audio/${path}`;
+                    }
+                }
+
+                res.setHeader('Content-Type', 'application/json');
+                res.setHeader('Cache-Control', 'no-store');
+
+                if (apiKey) {
+                    try {
+                        const signUrl = `${mediaOrigin}/api/v1/sign?path=${encodeURIComponent(path)}&ttl=3600`;
+                        const signRes = await fetch(signUrl, {
+                            headers: { 'Authorization': `Bearer ${apiKey}` }
+                        });
+                        if (signRes.ok) {
+                            const data = await signRes.json();
+                            res.statusCode = 200;
+                            res.end(JSON.stringify({ streamUrl: data.url, path: data.path, expiresAt: data.expiresAt }));
+                            return;
+                        }
+                    } catch (e) {
+                        console.warn('[media-service-dev] Failed to mint signed URL:', e);
+                    }
+                }
+
+                const streamUrl = `${mediaOrigin}/${encodeURI(path)}`;
+                res.statusCode = 200;
+                res.end(JSON.stringify({ streamUrl, path }));
+            });
+        }
+    };
+};
+
 // Get all HTML files from the lab directory
 const labDir = resolve(__dirname, 'lab');
 const labFiles = fs.readdirSync(labDir)

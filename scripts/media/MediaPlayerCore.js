@@ -1,5 +1,88 @@
-import { audioLibrary } from '../AudioLibrary.js';
+import { audioLibrary, resolveMediaUrl } from '../AudioLibrary.js';
 import { mediaSessionService } from './MediaSessionService.js';
+
+/**
+ * Checks if a signed media URL's expiration timestamp has passed or is close to expiring.
+ */
+export function isStreamUrlExpired(url, skewSeconds = 15) {
+    if (!url || typeof url !== 'string') return true;
+    try {
+        const parsed = new URL(url);
+        const expires = parsed.searchParams.get('expires');
+        if (!expires) return false;
+        const expireTime = parseInt(expires, 10);
+        const now = Math.floor(Date.now() / 1000);
+        return expireTime <= (now + skewSeconds);
+    } catch {
+        return false;
+    }
+}
+
+/**
+ * Fetches signed stream URL from application backend (Model 1: Signed Stream URLs).
+ * Falls back to direct track.src if backend signing route is unavailable.
+ */
+export async function fetchStreamUrl(trackOrId) {
+    if (!trackOrId) return '';
+    const track = typeof trackOrId === 'string'
+        ? (audioLibrary.getById(trackOrId) || { id: trackOrId, src: resolveMediaUrl(trackOrId) })
+        : trackOrId;
+
+    if (track.streamUrl && !isStreamUrlExpired(track.streamUrl)) {
+        return track.streamUrl;
+    }
+
+    const episodeId = track.id || track.src;
+
+    // 1. Try episode-specific stream-url route
+    try {
+        const res = await fetch(`/api/episodes/${encodeURIComponent(episodeId)}/stream-url`);
+        if (res.ok) {
+            const data = await res.json();
+            if (data?.streamUrl) {
+                track.streamUrl = data.streamUrl;
+                return data.streamUrl;
+            }
+        }
+    } catch {
+        // Backend route not reachable
+    }
+
+    // 2. Try generic path-based stream-url route
+    try {
+        const path = track.rawSrc || track.src;
+        const res = await fetch(`/api/stream-url?path=${encodeURIComponent(path)}`);
+        if (res.ok) {
+            const data = await res.json();
+            if (data?.streamUrl) {
+                track.streamUrl = data.streamUrl;
+                return data.streamUrl;
+            }
+        }
+    } catch {
+        // Backend route not reachable
+    }
+
+    // Fall back to resolved direct media URL
+    return track.src || '';
+}
+
+/**
+ * Fetch audio chunk using HTTP Range headers for custom buffering or Web Audio API synthesis.
+ */
+export async function fetchAudioChunk(url, startByte, endByte) {
+    const response = await fetch(url, {
+        headers: {
+            'Range': `bytes=${startByte}-${endByte}`
+        }
+    });
+
+    if (response.status !== 206 && response.status !== 200) {
+        throw new Error(`Failed to load audio chunk: ${response.status}`);
+    }
+
+    return await response.arrayBuffer();
+}
 
 export class MediaPlayerCore {
     constructor(audioElement, options = {}) {
@@ -8,6 +91,7 @@ export class MediaPlayerCore {
         this.tracks = audioLibrary.getAll();
         this.currentIndex = 0;
         this.listeners = new Set();
+        this._resolveStreamPromise = null;
 
         this._initAudioEvents();
 
@@ -40,12 +124,46 @@ export class MediaPlayerCore {
         this.currentIndex = index;
         const track = this.tracks[this.currentIndex];
 
-        if (!this.audio.src.endsWith(track.src)) {
-            this.audio.src = track.src;
+        const initialSrc = track.streamUrl || track.src;
+        if (!this.audio.src.endsWith(initialSrc) && this.audio.src !== initialSrc) {
+            this.audio.src = initialSrc;
         }
+
+        // Asynchronously resolve/refresh signed stream URL (Model 1)
+        this._resolveStreamPromise = (async () => {
+            try {
+                const streamUrl = await fetchStreamUrl(track);
+                if (streamUrl && this.audio.src !== streamUrl) {
+                    const wasPlaying = !this.audio.paused && this.audio.currentTime > 0;
+                    const currentTime = this.audio.currentTime;
+                    this.audio.src = streamUrl;
+                    if (wasPlaying) {
+                        this.audio.currentTime = currentTime;
+                        this.audio.play().catch(() => {});
+                    }
+                }
+                return streamUrl;
+            } catch (err) {
+                console.warn('Failed to resolve signed stream URL:', err);
+                return track.src;
+            }
+        })();
 
         this.notify('trackChanged', track);
         return track;
+    }
+
+    async playEpisode(episodeId) {
+        let index = this.tracks.findIndex(t => t.id === episodeId);
+        if (index === -1) {
+            this.tracks.push({ id: episodeId, src: resolveMediaUrl(episodeId) });
+            index = this.tracks.length - 1;
+        }
+        this.loadTrack(index);
+        if (this._resolveStreamPromise) {
+            await this._resolveStreamPromise;
+        }
+        return this.play();
     }
 
     play() {
