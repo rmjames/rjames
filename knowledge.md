@@ -6,3 +6,15 @@
 **Context:** Updating `lab/MEDIA-PLAYER.md` to specify standard component guidelines.
 **Learning:** All media player components must act as container queries (`container-type: inline-size`) to ensure responsive adaptability. They must also strictly use project tokens (CSS variables) for gaps, spacing, and border radius.
 **Action:** When creating or updating media player components, ensure the root element defines `container-type: inline-size`, and use existing OKLCH or sizing tokens. Additionally, strictly keep icons at `24px` to ensure cross-variant consistency.
+
+## 2026-09-11 - Progressive Streaming and Token Authentication in Edge Workers and Object Storage
+- **Context**: Creating an object-storage-backed media delivery service (`[REDACTED_CLOUD_RESOURCE]`) based on edge worker supporting progressive streaming, hotlink prevention, and authorization.
+- **Learning**: HTML `<audio>`, `<video>`, and `<img>` tags cannot pass custom HTTP request headers (e.g., `Authorization: Bearer`). Enforcing header-only authentication forces clients to fetch media into in-memory JavaScript `Blob`s, breaking progressive streaming, Range seeking, and exhausting device RAM. Employing HMAC-SHA256 URL signing (`?token=...&expires=...`) allows browsers and native players (`AVPlayer`, `ExoPlayer`) to stream progressively using native HTTP 206 Partial Content. Furthermore, Edge Worker Cache API (`caches.default`) rejects 206 Range responses, so Range requests must stream directly from object storage while full GET requests benefit from normalized cache keys. In TypeScript, `R2Range` is a union of `{ suffix: number }` and `{ offset?: number; length?: number }`, requiring narrowing before arithmetic.
+- **Action**: When designing media delivery workers, use URL query token signing with Web Crypto HMAC for client playback and preserve Range headers for object storage. Keep header API tokens for server-to-server minting and administrative routes.
+
+## 2026-09-14 - Design Spec Parity and Multi-Screen Token Auditing
+- **Context**: Comprehensive audit of screens (`index.html`, `resume.html`, `lab.html`, `pattern-library.html`) and cascade layers against `design.md`.
+- **Learning**: Visual parity audits across multiple pages must compare not only CSS token variables but also document-level asset delivery (such as variable font preloading via `<link rel="preload">`), logical layout properties (`max-inline-size` vs physical `max-width`), living pattern library completeness (ensuring all scale tokens like `--xxxl` are exposed), and documentation sync (`content.css` in cascade layer maps).
+- **Action**: When auditing design systems or updating stylesheets, check each HTML entry point's head preloads, verify the pattern library showcases the full token array, and update the architectural diagrams in `design.md` alongside codebase changes.
+
+

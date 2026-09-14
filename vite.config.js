@@ -3,20 +3,21 @@ import { resolve } from 'path';
 import fs from 'fs';
 import path from 'path';
 
-// Obfuscated default media origin fallback for public repository
-const OBF_DEFAULT_MEDIA = typeof Buffer !== 'undefined'
-    ? Buffer.from('aHR0cHM6Ly9tZWRpYS5yb2JlcnRqYW1lcy5ueWM=', 'base64').toString('utf-8')
-    : '';
-
-// Dynamic CSP media plugin for replacing __MEDIA_CDN__ with VITE_MEDIA_BASE_URL
-const cspMediaPlugin = (mediaOrigin = OBF_DEFAULT_MEDIA) => {
+// Dynamic HTML transform plugin for replacing __MEDIA_CDN__ and __CONTACT_EMAIL__ placeholders
+const envTransformPlugin = (mediaOrigin = '', contactEmail = '') => {
     return {
-        name: 'csp-media-transform',
+        name: 'env-html-transform',
         transformIndexHtml(html) {
+            let transformed = html;
             if (mediaOrigin) {
-                return html.replace(/__MEDIA_CDN__/g, mediaOrigin);
+                transformed = transformed.replace(/__MEDIA_CDN__/g, mediaOrigin);
+            } else {
+                transformed = transformed.replace(/__MEDIA_CDN__\s*/g, '');
             }
-            return html.replace(/__MEDIA_CDN__\s*/g, '');
+            if (contactEmail) {
+                transformed = transformed.replace(/__CONTACT_EMAIL__/g, contactEmail);
+            }
+            return transformed;
         }
     };
 };
@@ -175,12 +176,11 @@ const copyStaticFiles = () => {
 
 export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, process.cwd(), '');
-    const defaultMediaOrigin = OBF_DEFAULT_MEDIA;
-    const mediaOrigin = (env.VITE_MEDIA_BASE_URL || process.env.VITE_MEDIA_BASE_URL || defaultMediaOrigin).replace(/\/+$/, '');
-    const apiKey = env.MEDIA_SERVICE_API_KEY || process.env.MEDIA_SERVICE_API_KEY || '';
+    const mediaOrigin = (env.VITE_MEDIA_BASE_URL || process.env.VITE_MEDIA_BASE_URL || '').replace(/\/+$/, '');
+    const contactEmail = env.VITE_CONTACT_EMAIL || process.env.VITE_CONTACT_EMAIL || '';
 
     return {
-        plugins: [copyStaticFiles(), cspMediaPlugin(mediaOrigin), mediaServiceDevPlugin(mediaOrigin, apiKey)],
+        plugins: [copyStaticFiles(), envTransformPlugin(mediaOrigin, contactEmail)],
         build: {
             target: 'esnext',
             emptyOutDir: false,
