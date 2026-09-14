@@ -23,7 +23,7 @@ const envTransformPlugin = (mediaOrigin = '', contactEmail = '') => {
 };
 
 // Local dev API plugin simulating Cloudflare Pages Functions for /api/stream-url and /api/episodes/:id/stream-url
-const mediaServiceDevPlugin = (mediaOrigin = OBF_DEFAULT_MEDIA, apiKey = '') => {
+const mediaServiceDevPlugin = (mediaOrigin = '', apiKey = '') => {
     return {
         name: 'media-service-dev-api',
         configureServer(server) {
