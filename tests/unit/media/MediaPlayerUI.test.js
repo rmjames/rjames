@@ -405,5 +405,56 @@ describe('MediaPlayerUI', () => {
             expect(onLongPress).not.toHaveBeenCalled();
             expect(onShortPress).not.toHaveBeenCalled();
         });
+
+        it('should bind elements using a CSS selector string', () => {
+            button.className = 'test-selector-btn';
+            const cleanup = UI.setupLongPress('.test-selector-btn', { onShortPress, onLongPress, delay: 300 });
+
+            button.dispatchEvent(new Event('pointerdown'));
+            vi.advanceTimersByTime(300);
+
+            expect(onLongPress).toHaveBeenCalledTimes(1);
+            cleanup();
+        });
+
+        it('should bind an array or NodeList of elements and pass (e, button) to callbacks', () => {
+            const btn2 = document.createElement('button');
+            document.body.appendChild(btn2);
+
+            const shortArgs = [];
+            const longArgs = [];
+
+            const cleanup = UI.setupLongPress([button, btn2], {
+                onShortPress: (e, el) => shortArgs.push(el),
+                onLongPress: (e, el) => longArgs.push(el),
+                delay: 400
+            });
+
+            // Short press on button 1
+            button.dispatchEvent(new MouseEvent('click'));
+            expect(shortArgs).toEqual([button]);
+
+            // Long press on button 2
+            btn2.dispatchEvent(new Event('pointerdown'));
+            vi.advanceTimersByTime(400);
+            expect(longArgs).toEqual([btn2]);
+
+            cleanup();
+            btn2.remove();
+        });
+
+        it('should gracefully handle invalid or non-matching selectors without errors', () => {
+            const cleanup1 = UI.setupLongPress('.non-existent-class', { onLongPress });
+            expect(typeof cleanup1).toBe('function');
+            expect(() => cleanup1()).not.toThrow();
+
+            const cleanup2 = UI.setupLongPress(':::invalid-selector', { onLongPress });
+            expect(typeof cleanup2).toBe('function');
+            expect(() => cleanup2()).not.toThrow();
+
+            const cleanup3 = UI.setupLongPress(null, { onLongPress });
+            expect(typeof cleanup3).toBe('function');
+            expect(() => cleanup3()).not.toThrow();
+        });
     });
 });

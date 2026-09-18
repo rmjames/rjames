@@ -255,45 +255,36 @@
         });
 
         // --- Presets & Popover ---
-        let pressTimer;
-        let isLongPress = false;
-
-        const handlePresetPressStart = (e) => {
-            const btn = e.target.closest('.media-player__presets__preset');
-            if (!btn) return;
-            isLongPress = false;
-            pressTimer = setTimeout(() => {
-                isLongPress = true;
-                const track = audioLibrary.getById(btn.dataset.id);
-                UI.showPopover(popoverEl, btn, track);
-                activeAnchorBtn = btn;
-            }, 500);
-        };
-
-        const handlePresetPressEnd = () => {
-            clearTimeout(pressTimer);
-            if (isLongPress) {
-                setTimeout(() => UI.hidePopover(popoverEl, activeAnchorBtn), 1500);
-            }
-        };
-
-        presetsContainer.addEventListener('mousedown', handlePresetPressStart);
-        presetsContainer.addEventListener('mouseup', handlePresetPressEnd);
-        presetsContainer.addEventListener('mouseleave', handlePresetPressEnd);
-
-        presetsContainer.addEventListener('click', (e) => {
-            if (isLongPress) return;
-            const btn = e.target.closest('.media-player__presets__preset');
-            if (!btn) return;
-            const track = audioLibrary.getById(btn.dataset.id);
-            if (track) {
-                if (audio.src.endsWith(track.src) && !audio.paused) {
-                    core.pause();
-                } else {
-                    core.loadTrack(core.tracks.indexOf(track));
-                    core.play();
+        let popoverHideTimer = null;
+        UI.setupLongPress('.media-player__presets__preset', {
+            onShortPress: (e, btn) => {
+                const targetBtn = btn || e.currentTarget;
+                if (!targetBtn) return;
+                const track = audioLibrary.getById(targetBtn.dataset.id);
+                if (track) {
+                    if (audio.src.endsWith(track.src) && !audio.paused) {
+                        core.pause();
+                    } else {
+                        core.loadTrack(core.tracks.indexOf(track));
+                        core.play();
+                    }
                 }
-            }
+            },
+            onLongPress: (e, btn) => {
+                const targetBtn = btn || e.currentTarget;
+                if (!targetBtn) return;
+                const track = audioLibrary.getById(targetBtn.dataset.id);
+                if (track) {
+                    UI.showPopover(popoverEl, targetBtn, track);
+                    activeAnchorBtn = targetBtn;
+                    if (popoverHideTimer) clearTimeout(popoverHideTimer);
+                    popoverHideTimer = setTimeout(() => {
+                        UI.hidePopover(popoverEl, activeAnchorBtn);
+                        popoverHideTimer = null;
+                    }, 1500);
+                }
+            },
+            delay: 500
         });
 
         equalizerContainer.addEventListener('eq-closed', () => {

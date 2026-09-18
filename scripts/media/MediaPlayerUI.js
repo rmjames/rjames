@@ -198,136 +198,190 @@ export const UI = {
         element.style.setProperty(cssVarName, color);
     },
 
-    setupLongPress(button, { onShortPress, onLongPress, delay = 500, moveThreshold = 10 } = {}) {
-        if (!button || !(button instanceof Element)) return () => {};
+    setupLongPress(target, { onShortPress, onLongPress, delay = 500, moveThreshold = 10 } = {}) {
+        if (!target) return () => {};
 
-        let longPressTimer = null;
-        let longPressTriggered = false;
-        let suppressClick = false;
-        let startX = 0;
-        let startY = 0;
-        let isPressed = false;
-        let lastPointerDownTime = 0;
-
-        const startPress = (clientX, clientY, e) => {
-            longPressTriggered = false;
-            suppressClick = false;
-            isPressed = true;
-            startX = clientX || 0;
-            startY = clientY || 0;
-
-            if (longPressTimer) {
-                clearTimeout(longPressTimer);
-                longPressTimer = null;
+        let elements = [];
+        if (typeof target === 'string') {
+            try {
+                elements = Array.from(document.querySelectorAll(target));
+            } catch {
+                return () => {};
             }
+        } else if (target instanceof Element) {
+            elements = [target];
+        } else if (target instanceof NodeList || Array.isArray(target) || (typeof target === 'object' && target !== null && Symbol.iterator in target)) {
+            elements = Array.from(target).filter(el => el instanceof Element);
+        }
 
-            longPressTimer = setTimeout(() => {
-                longPressTriggered = true;
-                suppressClick = true;
-                if (onLongPress) onLongPress(e);
-                longPressTimer = null;
-            }, delay);
-        };
+        if (elements.length === 0) return () => {};
 
-        const cancelPress = () => {
-            if (longPressTimer) {
-                clearTimeout(longPressTimer);
-                longPressTimer = null;
-            }
-            isPressed = false;
-        };
+        const cleanups = elements.map(button => {
+            let longPressTimer = null;
+            let longPressTriggered = false;
+            let suppressClick = false;
+            let startX = 0;
+            let startY = 0;
+            let isPressed = false;
+            let lastPointerDownTime = 0;
+            let activePointerId = null;
 
-        const handlePointerDown = (e) => {
-            // Only accept primary button
-            if (e.button !== undefined && e.button !== 0) return;
-            lastPointerDownTime = Date.now();
-            startPress(e.clientX, e.clientY, e);
-        };
+            const removeActivePointerListeners = () => {
+                button.removeEventListener('pointermove', handlePointerMove);
+                button.removeEventListener('pointerup', handlePointerUp);
+                button.removeEventListener('pointercancel', handlePointerUp);
+                button.removeEventListener('mouseup', handlePointerUp);
+                button.removeEventListener('mouseleave', handlePointerUp);
+            };
 
-        const handleMouseDown = (e) => {
-            if (e.button !== undefined && e.button !== 0) return;
-            // Suppress synthetic/duplicate mouse events triggered right after pointerdown
-            if (Date.now() - lastPointerDownTime < 100) return;
-            startPress(e.clientX, e.clientY, e);
-        };
+            const cancelPress = () => {
+                if (longPressTimer) {
+                    clearTimeout(longPressTimer);
+                    longPressTimer = null;
+                }
+                if (isPressed) {
+                    isPressed = false;
+                    removeActivePointerListeners();
+                    if (activePointerId !== null && button.releasePointerCapture) {
+                        try {
+                            if (button.hasPointerCapture && button.hasPointerCapture(activePointerId)) {
+                                button.releasePointerCapture(activePointerId);
+                            }
+                        } catch (err) {
+                            void err;
+                        }
+                    }
+                    activePointerId = null;
+                }
+            };
 
-        const handlePointerMove = (e) => {
-            if (!isPressed) return;
-            const dist = Math.hypot(e.clientX - startX, e.clientY - startY);
-            if (dist > moveThreshold) {
-                cancelPress();
-            }
-        };
-
-        const handlePointerUp = () => {
-            cancelPress();
-        };
-
-        const handleClick = (e) => {
-            if (suppressClick || longPressTriggered) {
-                e.preventDefault();
-                e.stopImmediatePropagation();
-                suppressClick = false;
+            const startPress = (clientX, clientY, e) => {
                 longPressTriggered = false;
-                return;
-            }
+                suppressClick = false;
+                isPressed = true;
+                startX = clientX || 0;
+                startY = clientY || 0;
 
-            if (onShortPress) {
-                onShortPress(e);
-            }
-        };
+                if (longPressTimer) {
+                    clearTimeout(longPressTimer);
+                    longPressTimer = null;
+                }
 
-        // Keyboard accessibility (WCAG 2.0 Compliance)
-        let isKeyDown = false;
-        const handleKeyDown = (e) => {
-            if (e.key !== 'Enter' && e.key !== ' ') return;
-            if (e.repeat) return; // Prevent key repeat oscillation
-            isKeyDown = true;
-            startPress(0, 0, e);
-        };
+                longPressTimer = setTimeout(() => {
+                    longPressTriggered = true;
+                    suppressClick = true;
+                    if (onLongPress) onLongPress(e, button);
+                    longPressTimer = null;
+                }, delay);
+            };
 
-        const handleKeyUp = (e) => {
-            if (e.key !== 'Enter' && e.key !== ' ') return;
-            if (!isKeyDown) return;
-            isKeyDown = false;
-            cancelPress();
-        };
+            const handlePointerMove = (e) => {
+                if (!isPressed) return;
+                const dist = Math.hypot(e.clientX - startX, e.clientY - startY);
+                if (dist > moveThreshold) {
+                    cancelPress();
+                }
+            };
 
-        const handleContextMenu = (e) => {
-            e.preventDefault();
-        };
+            const handlePointerUp = () => {
+                cancelPress();
+            };
 
-        // Optimize touch behavior and prevent callout menus
-        button.style.touchAction = 'manipulation';
-        button.style.webkitUserSelect = 'none';
-        button.style.userSelect = 'none';
+            const addActivePointerListeners = () => {
+                button.addEventListener('pointermove', handlePointerMove);
+                button.addEventListener('pointerup', handlePointerUp);
+                button.addEventListener('pointercancel', handlePointerUp);
+                button.addEventListener('mouseup', handlePointerUp);
+                button.addEventListener('mouseleave', handlePointerUp);
+            };
 
-        button.addEventListener('pointerdown', handlePointerDown);
-        button.addEventListener('pointermove', handlePointerMove);
-        button.addEventListener('pointerup', handlePointerUp);
-        button.addEventListener('pointercancel', handlePointerUp);
-        button.addEventListener('mousedown', handleMouseDown);
-        button.addEventListener('mouseup', handlePointerUp);
-        button.addEventListener('mouseleave', handlePointerUp);
-        button.addEventListener('click', handleClick);
-        button.addEventListener('keydown', handleKeyDown);
-        button.addEventListener('keyup', handleKeyUp);
-        button.addEventListener('contextmenu', handleContextMenu);
+            const handlePointerDown = (e) => {
+                // Only accept primary button
+                if (e.button !== undefined && e.button !== 0) return;
+                lastPointerDownTime = Date.now();
+                if (e.pointerId !== undefined) {
+                    activePointerId = e.pointerId;
+                    if (button.setPointerCapture) {
+                        try {
+                            button.setPointerCapture(e.pointerId);
+                        } catch (err) {
+                            void err;
+                        }
+                    }
+                }
+                addActivePointerListeners();
+                startPress(e.clientX, e.clientY, e);
+            };
 
-        // Cleanup function
+            const handleMouseDown = (e) => {
+                if (e.button !== undefined && e.button !== 0) return;
+                // Suppress synthetic/duplicate mouse events triggered right after pointerdown
+                if (Date.now() - lastPointerDownTime < 100) return;
+                addActivePointerListeners();
+                startPress(e.clientX, e.clientY, e);
+            };
+
+            const handleClick = (e) => {
+                if (suppressClick || longPressTriggered) {
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
+                    suppressClick = false;
+                    longPressTriggered = false;
+                    return;
+                }
+
+                if (onShortPress) {
+                    onShortPress(e, button);
+                }
+            };
+
+            // Keyboard accessibility (WCAG 2.0 Compliance)
+            let isKeyDown = false;
+            const handleKeyDown = (e) => {
+                if (e.key !== 'Enter' && e.key !== ' ') return;
+                if (e.repeat) return; // Prevent key repeat oscillation
+                isKeyDown = true;
+                startPress(0, 0, e);
+            };
+
+            const handleKeyUp = (e) => {
+                if (e.key !== 'Enter' && e.key !== ' ') return;
+                if (!isKeyDown) return;
+                isKeyDown = false;
+                cancelPress();
+            };
+
+            const handleContextMenu = (e) => {
+                e.preventDefault();
+            };
+
+            // Optimize touch behavior and prevent callout menus
+            button.style.touchAction = 'manipulation';
+            button.style.webkitUserSelect = 'none';
+            button.style.userSelect = 'none';
+
+            button.addEventListener('pointerdown', handlePointerDown);
+            button.addEventListener('mousedown', handleMouseDown);
+            button.addEventListener('click', handleClick);
+            button.addEventListener('keydown', handleKeyDown);
+            button.addEventListener('keyup', handleKeyUp);
+            button.addEventListener('contextmenu', handleContextMenu);
+
+            // Cleanup function
+            return () => {
+                cancelPress();
+                removeActivePointerListeners();
+                button.removeEventListener('pointerdown', handlePointerDown);
+                button.removeEventListener('mousedown', handleMouseDown);
+                button.removeEventListener('click', handleClick);
+                button.removeEventListener('keydown', handleKeyDown);
+                button.removeEventListener('keyup', handleKeyUp);
+                button.removeEventListener('contextmenu', handleContextMenu);
+            };
+        });
+
         return () => {
-            cancelPress();
-            button.removeEventListener('pointerdown', handlePointerDown);
-            button.removeEventListener('pointermove', handlePointerMove);
-            button.removeEventListener('pointerup', handlePointerUp);
-            button.removeEventListener('pointercancel', handlePointerUp);
-            button.removeEventListener('mousedown', handleMouseDown);
-            button.removeEventListener('mouseup', handlePointerUp);
-            button.removeEventListener('mouseleave', handlePointerUp);
-            button.removeEventListener('click', handleClick);
-            button.removeEventListener('keydown', handleKeyDown);
-            button.removeEventListener('keyup', handleKeyUp);
-            button.removeEventListener('contextmenu', handleContextMenu);
+            cleanups.forEach(cleanup => cleanup());
         };
     }
 };

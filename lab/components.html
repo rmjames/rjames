@@ -613,8 +613,15 @@
                     </svg>`;
             }
 
-            btn.addEventListener('click', () => {
-                const trackIndex = core.tracks.findIndex(t => t.id === track.id);
+            fragment.appendChild(btn);
+        });
+        presetsContainer.appendChild(fragment);
+
+        UI.setupLongPress('.media-player__presets .media-player__presets__preset', {
+            onShortPress: (e, btn) => {
+                const targetBtn = btn || e.currentTarget;
+                if (!targetBtn) return;
+                const trackIndex = core.tracks.findIndex(t => t.id === targetBtn.dataset.id);
                 if (trackIndex !== -1) {
                     if (core.currentTrackIndex === trackIndex && !audio.paused) {
                         core.togglePlay();
@@ -623,11 +630,15 @@
                         core.togglePlay();
                     }
                 }
-            });
-
-            fragment.appendChild(btn);
+            },
+            onLongPress: (e, btn) => {
+                const targetBtn = btn || e.currentTarget;
+                if (!targetBtn) return;
+                targetBtn.classList.add('pulse');
+                setTimeout(() => targetBtn.classList.remove('pulse'), 300);
+            },
+            delay: 500
         });
-        presetsContainer.appendChild(fragment);
 
         // --- Configuration Controls Setup ---
         const componentWrappers = document.querySelectorAll('.component-wrapper');
