@@ -68,7 +68,10 @@ describe('MediaPlayerUI', () => {
         it('should update album art if present', () => {
             UI.updateTrackInfo(elements, track);
             expect(elements.artBtn.classList.contains('has-art')).toBe(true);
-            expect(elements.artBtn.innerHTML).toContain('<img src="art.jpg"');
+            const img = elements.artBtn.querySelector('img');
+            expect(img).not.toBeNull();
+            expect(img.getAttribute('src')).toBe('art.jpg');
+            expect(img.getAttribute('crossorigin')).toBe('anonymous');
         });
 
         it('should show placeholder if no album art', () => {

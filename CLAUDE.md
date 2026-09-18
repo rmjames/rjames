@@ -19,28 +19,48 @@ This is a personal portfolio website for Robert James, a UX Engineer. The site i
 - **E2E headed mode**: `npx playwright test --headed`
 - **Update visual snapshots**: `npx playwright test --update-snapshots`
 
-## Architecture
+## Architecture & Codebase Map
 
-### HTML Pages
-- `index.html` - Homepage with about section and brand interaction popovers
-- `resume.html` - Resume page
-- `lab.html` - Experimental/lab page
-- `pattern-library.html` - Component pattern library
+### Curated Structural Map (Depth 2-3)
+```
+├── [Root HTML & Worker]
+│   ├── index.html                       # Homepage (bio, brand interaction popovers)
+│   ├── resume.html                      # Resume and professional history
+│   ├── lab.html                         # Interactive lab experiments hub
+│   ├── pattern-library.html             # Component & design token catalog
+│   └── sw.js                            # Service worker (offline cache & network-first strategy)
+├── styles/                              # Modular CSS (oklch, CSS nesting, layers)
+│   ├── main.css                         # Stylesheet entry point (imports base, layout, components)
+│   ├── base/                            # reset.css, typography.css, variables.css
+│   ├── layout/                          # structure.css, header.css, footer.css
+│   ├── components/                      # buttons, popovers, media-player, icons, skip-link
+│   ├── lab/                             # Specific experiment styles (loaders, checkouts, logos)
+│   └── utilities/                       # animations.css, mpa.css (view transitions)
+├── scripts/                             # Client-side ESNext modules
+│   ├── index.js                         # Core client boot & service worker registration
+│   ├── analytics.js                     # GA event tracking (navigation, popovers, visibility)
+│   ├── AudioLibrary.js                  # Audio metadata catalog and playlist management
+│   ├── media/                           # Modular audio engine (MediaPlayerCore, Equalizer, UI)
+│   ├── lab/                             # Interactive animation & experiment controllers
+│   ├── utils/                           # Shared utilities (ColorExtractor, splitText, labNav)
+│   └── test/                            # Unit tests for client scripts
+├── functions/api/                       # Cloudflare Pages / Workers serverless API routes
+│   └── episodes/[episodeId]/stream-url.js # Streaming audio URL resolution
+├── lab/                                 # Prototype HTML pages, case study markdown, and widgets
+├── tools/                               # Developer visual tools & test harness (point-visualizer)
+├── tests/                               # Vitest unit test suites (tests/unit/media)
+├── tests-e2e/                           # Playwright E2E suites (analytics, media, visual, ux)
+└── evals/                               # Performance & security audit harness and fixtures
+```
 
-### JavaScript Modules
-- **`scripts/analytics.js`** - Google Analytics event tracking (header/footer nav, section visibility, brand interactions, popover engagement)
-- **`scripts/nav-transitions.js`** - Navigation state management with View Transitions API for page transitions and animated border effects
-- **`scripts/index.js`** - Service worker registration and View Transitions setup
-- **`sw.js`** - Service worker for offline caching with network-first strategy
-
-### CSS
-- **`styles/main.css`** - Main stylesheet (async loaded with media="print" trick)
-- **`styles/mpa.css`** - Multi-page application specific styles (async loaded)
-
-### Testing
-- **Unit tests**: Vitest with jsdom for testing analytics event tracking and navigation logic
-- **E2E tests**: Playwright configured for multiple devices/viewports (desktop, tablet, mobile)
-- **Visual regression**: Screenshot comparisons for all pages across different device configurations
+### Key Modules & Responsibilities
+- **HTML Pages**: `index.html` (main portfolio & popovers), `resume.html`, `lab.html` (experiments), `pattern-library.html`.
+- **CSS Architecture**: Modular stylesheets under `styles/` imported into `styles/main.css`. Follows cascade layers, CSS nesting, and `oklch()` color tokens.
+- **Audio Engine**: `scripts/media/` contains `MediaPlayerCore.js`, `Equalizer.js`, and `MediaPlayerUI.js` backed by Cloudflare Worker API routes in `functions/api/`.
+- **Testing**:
+  - Unit tests in `tests/` and `scripts/test/` (Vitest with jsdom).
+  - End-to-end and visual regression in `tests-e2e/` (Playwright across mobile, tablet, desktop viewports).
+  - Security and performance evaluations in `evals/`.
 
 ### Modern Web Features Used
 - **View Transitions API**: For smooth page transitions between index/work/resume pages with custom nav link animations

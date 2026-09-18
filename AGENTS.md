@@ -41,6 +41,41 @@
 - **Clarity**: Be direct, casual, and concise. State conclusions early.
 - **Objectivity**: Minimize use of first-person ("I") in technical responses.
 
+## Codebase Architecture & File Tree
+Curated structural map for zero-turn agent navigation (depth 2-3):
+```
+├── [Root HTML & Worker]
+│   ├── index.html                       # Homepage (bio, brand interaction popovers)
+│   ├── resume.html                      # Resume and professional history
+│   ├── lab.html                         # Interactive lab experiments hub
+│   ├── pattern-library.html             # Component & design token catalog
+│   └── sw.js                            # Service worker (offline cache & network-first strategy)
+├── styles/                              # Modular CSS (oklch, CSS nesting, layers)
+│   ├── main.css                         # Stylesheet entry point (imports base, layout, components)
+│   ├── base/                            # reset.css, typography.css, variables.css
+│   ├── layout/                          # structure.css, header.css, footer.css
+│   ├── components/                      # buttons, popovers, media-player, icons, skip-link
+│   ├── lab/                             # Specific experiment styles (loaders, checkouts, logos)
+│   └── utilities/                       # animations.css, mpa.css (view transitions)
+├── scripts/                             # Client-side ESNext modules
+│   ├── index.js                         # Core client boot & service worker registration
+│   ├── analytics.js                     # GA event tracking (navigation, popovers, visibility)
+│   ├── AudioLibrary.js                  # Audio metadata catalog and playlist management
+│   ├── media/                           # Modular audio engine (MediaPlayerCore, Equalizer, UI)
+│   ├── lab/                             # Interactive animation & experiment controllers
+│   ├── utils/                           # Shared utilities (ColorExtractor, splitText, labNav)
+│   └── test/                            # Unit tests for client scripts
+├── functions/api/                       # Cloudflare Pages / Workers serverless API routes
+│   └── episodes/[episodeId]/stream-url.js # Streaming audio URL resolution
+├── lab/                                 # Prototype HTML pages, case study markdown, and widgets
+├── tools/                               # Developer visual tools & test harness (point-visualizer)
+├── tests/                               # Vitest unit test suites (tests/unit/media)
+├── tests-e2e/                           # Playwright E2E suites (analytics, media, visual, ux)
+└── evals/                               # Performance & security audit harness and fixtures
+```
+*Navigation Rule*: Use this structural map for immediate orientation. Use `find_by_name` or `grep_search` to pinpoint leaf files without recursive directory scans.
+
 ## References
 - [Baseline 2025](https://web.dev/baseline/2025) | [Webstatus.dev](https://webstatus.dev/)
 - [WCAG 2.0](https://www.w3.org/TR/WCAG20/) | [Web.dev](https://web.dev/) | [MDN](https://developer.mozilla.org/en-US/)
+

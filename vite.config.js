@@ -39,15 +39,15 @@ const mediaServiceDevPlugin = (mediaOrigin = '', apiKey = '') => {
                 let path;
                 if (isEpisodeStream) {
                     const match = url.pathname.match(/^\/api\/episodes\/(.+)\/stream-url$/);
-                    path = match ? decodeURIComponent(match[1]) : '';
+                    targetPath = match ? decodeURIComponent(match[1]) : '';
                 } else {
-                    path = decodeURIComponent(url.searchParams.get('path') || '');
+                    targetPath = decodeURIComponent(url.searchParams.get('path') || '');
                 }
 
-                if (!path.startsWith('http://') && !path.startsWith('https://')) {
-                    path = path.replace(/^(\.\.\/|\.\/|\/)?(assets\/)?/, '');
-                    if (!path.startsWith('audio/')) {
-                        path = `audio/${path}`;
+                if (!targetPath.startsWith('http://') && !targetPath.startsWith('https://')) {
+                    targetPath = targetPath.replace(/^(\.\.\/|\.\/|\/)?(assets\/)?/, '');
+                    if (!targetPath.startsWith('audio/')) {
+                        targetPath = `audio/${targetPath}`;
                     }
                 }
 
@@ -56,7 +56,7 @@ const mediaServiceDevPlugin = (mediaOrigin = '', apiKey = '') => {
 
                 if (apiKey) {
                     try {
-                        const signUrl = `${mediaOrigin}/api/v1/sign?path=${encodeURIComponent(path)}&ttl=3600`;
+                        const signUrl = `${mediaOrigin}/api/v1/sign?path=${encodeURIComponent(targetPath)}&ttl=3600`;
                         const signRes = await fetch(signUrl, {
                             headers: { 'Authorization': `Bearer ${apiKey}` }
                         });
@@ -71,9 +71,9 @@ const mediaServiceDevPlugin = (mediaOrigin = '', apiKey = '') => {
                     }
                 }
 
-                const streamUrl = `${mediaOrigin}/${encodeURI(path)}`;
+                const streamUrl = `${mediaOrigin}/${encodeURI(targetPath)}`;
                 res.statusCode = 200;
-                res.end(JSON.stringify({ streamUrl, path }));
+                res.end(JSON.stringify({ streamUrl, path: targetPath }));
             });
         }
     };
@@ -179,6 +179,7 @@ export default defineConfig(({ mode }) => {
     const mediaOrigin = (env.VITE_MEDIA_BASE_URL || process.env.VITE_MEDIA_BASE_URL || '').replace(/\/+$/, '');
     const apiKey = env.MEDIA_SERVICE_API_KEY || process.env.MEDIA_SERVICE_API_KEY || '';
     const contactEmail = env.VITE_CONTACT_EMAIL || process.env.VITE_CONTACT_EMAIL || '';
+    const apiKey = env.MEDIA_SIGNING_KEY || process.env.MEDIA_SIGNING_KEY || '';
 
     return {
         plugins: [

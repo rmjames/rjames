@@ -104,7 +104,14 @@ export class MediaPlayerCore {
         this.audio.addEventListener('play', () => this.notify('play'));
         this.audio.addEventListener('pause', () => this.notify('pause'));
         this.audio.addEventListener('ended', () => this.notify('ended'));
-        this.audio.addEventListener('error', (e) => this.notify('error', e));
+        this.audio.addEventListener('error', (e) => {
+            const currentSrc = this.audio.src || '';
+            if (currentSrc && !currentSrc.includes('/media/audio/coffee_shop.ogg') && !currentSrc.includes('/media/audio/fire.ogg')) {
+                this.audio.src = '/media/audio/coffee_shop.ogg';
+                this.audio.play().catch(() => {});
+            }
+            this.notify('error', e);
+        });
         this.audio.addEventListener('timeupdate', () => this.notify('timeupdate'));
     }
 
@@ -135,7 +142,11 @@ export class MediaPlayerCore {
         this._resolveStreamPromise = (async () => {
             try {
                 const streamUrl = await fetchStreamUrl(track);
-                if (streamUrl && this.audio.src !== streamUrl) {
+                const isDifferentSrc = streamUrl &&
+                    this.audio.src !== streamUrl &&
+                    !this.audio.src.endsWith(streamUrl);
+
+                if (isDifferentSrc) {
                     const wasPlaying = !this.audio.paused && this.audio.currentTime > 0;
                     const currentTime = this.audio.currentTime;
                     this.audio.src = streamUrl;
@@ -170,12 +181,26 @@ export class MediaPlayerCore {
 
     play() {
         if (this.options.mediaSession !== false) {
-            mediaSessionService.connect(this);
+            try {
+                mediaSessionService.connect(this);
+            } catch {
+                // Media session unsupported or error
+            }
+        }
+        if (!this.tracks || this.tracks.length === 0) {
+            this.tracks = audioLibrary.getAll();
         }
         if (!this.audio.src && this.tracks.length > 0) {
             this.loadTrack(0);
         }
-        return this.audio.play();
+        const promise = this.audio.play();
+        if (promise && typeof promise.catch === 'function') {
+            promise.catch(err => {
+                console.warn('Playback prevented or failed:', err);
+                this.notify('pause');
+            });
+        }
+        return promise;
     }
 
     pause() {

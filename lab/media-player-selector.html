@@ -3,11 +3,13 @@
 
 <head>
     <meta http-equiv="Content-Security-Policy"
-        content="default-src 'self'; script-src 'self' https://www.googletagmanager.com https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' data:; img-src 'self' https://assets.codepen.io __MEDIA_CDN__ data:; media-src 'self' __MEDIA_CDN__ blob: data:; font-src 'self'; connect-src 'self' https://robertjames.nyc __MEDIA_CDN__ https://www.google-analytics.com https://analytics.google.com https://cloudflareinsights.com https://static.cloudflareinsights.com; object-src 'none'; frame-src 'self'; base-uri 'self';" />
+        content="default-src 'self'; script-src 'self' https://www.googletagmanager.com https://static.cloudflareinsights.com 'unsafe-inline'; style-src 'self' 'unsafe-inline' data:; img-src 'self' https://assets.codepen.io __MEDIA_CDN__ data:; media-src 'self' __MEDIA_CDN__ blob: data:; font-src 'self'; connect-src 'self' https://robertjames.nyc __MEDIA_CDN__ https://www.google-analytics.com https://analytics.google.com https://cloudflareinsights.com https://static.cloudflareinsights.com; object-src 'none'; frame-src 'self'; base-uri 'self';" />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Media Player Selector - Labs</title>
+    <link rel="stylesheet" href="../styles/components/media-player.css">
+    <link rel="stylesheet" href="../styles/components/media-player-inline.css">
     <style>
         :root {
             --bg-color: oklch(from #333 l c h);
@@ -16,6 +18,11 @@
             --text-main: oklch(from #fff l c h / .8);
             --text-muted: oklch(.7 0 0);
             --ease-premium: cubic-bezier(.23, 1, .32, 1);
+        }
+
+        /* View Transitions Isolation */
+        :root {
+            view-transition-name: none;
         }
 
         body {
@@ -28,12 +35,15 @@
             font-family: 'Inter', system-ui, -apple-system, sans-serif;
             min-block-size: 100dvh;
             overflow: hidden;
-            timeline-scope: --card-0, --card-1, --card-2, --card-3;
         }
 
         .header {
             position: fixed;
             inset-block-start: 2rem;
+            inset-inline: 0;
+            margin-inline: auto;
+            inline-size: fit-content;
+            max-inline-size: min(90vw, 60rem);
             text-align: center;
             z-index: 10;
 
@@ -49,57 +59,333 @@
 
             & p {
                 color: var(--text-muted);
-                margin-top: 0.5rem;
+                margin-top: .5rem;
             }
         }
 
-        .carousel-view {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            inline-size: 100vw;
-            block-size: 100dvh;
-            overflow-x: auto;
-            overflow-y: hidden;
-            scroll-snap-type: x mandatory;
-            scroll-behavior: smooth;
-            gap: 1rem;
-            padding-inline: calc(50vw - 42.5vw); /* Centers an 85vw card perfectly */
-            box-sizing: border-box;
-            cursor: grab;
-
-            &:active {
-                cursor: grabbing;
-            }
-
-            &::-webkit-scrollbar {
-                display: none;
-            }
-        }
-
-        .player-card {
-            display: flex;
-            flex-direction: column;
-            flex: 0 0 85vw;
+        /* Single Carousel Container */
+        .carousel-stage {
+            display: grid;
             position: relative;
-            block-size: 65dvh;
+            inline-size: min(85vw, 68rem);
+            block-size: min(65dvh, 48rem);
             border-radius: 3rem;
             corner-shape: squircle;
             overflow: hidden;
-            scroll-snap-align: center;
-            scroll-snap-stop: always;
-            view-timeline-name: --card-self;
-            view-timeline-axis: inline;
-            animation-timeline: --card-self;
-            animation-range: cover 0% cover 100%;
+            background-color: var(--card-bg);
+            box-shadow: 0 25px 50px -12px oklch(from rgba(0, 0, 0, .5) l c h);
             transform-style: preserve-3d;
-            box-shadow: 0 25px 50px -12px oklch(from rgba(0, 0, 0, 0.5) l c h);
+            contain: layout paint;
+        }
 
-            & .player-frame {
-                flex: 1;
+        /* Individual Player Slide */
+        .player-slide {
+            position: absolute;
+            inset: 0;
+            inline-size: 100%;
+            block-size: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            visibility: hidden;
+            pointer-events: none;
+            z-index: 0;
+
+            &.active {
+                visibility: visible;
+                pointer-events: auto;
+                z-index: 1;
+                view-transition-name: active-player;
+            }
+        }
+
+        .player-mount {
+            display: grid;
+            place-items: center;
+            inline-size: 100%;
+            block-size: 100%;
+            padding: 2rem;
+            box-sizing: border-box;
+            margin-block-start: 1.5rem;
+        }
+
+        /* Scoped Variant 1: Main Media Player */
+        .player-variant--main .media-player {
+            inline-size: 16.5rem;
+            max-inline-size: 16.875rem;
+            gap: .25rem;
+            padding: .75rem;
+
+            .media-player__controls {
+                grid-column: 1 / -1;
+                grid-template-columns: repeat(5, minmax(0, 1fr));
+                padding: .75rem;
+            }
+
+            .media-player__presets {
+                grid-column: 1 / -1;
+                display: grid;
+                grid-auto-flow: column;
+                grid-auto-columns: calc((100% - 2rem) / 5);
+                overflow-x: auto;
+                scroll-snap-type: x mandatory;
+                scroll-padding-left: .75rem;
+                padding: .75rem;
+                border-radius: 1.25rem;
+                background: oklch(from #333 l c h);
+                gap: .5rem;
+                scrollbar-width: none;
+            }
+
+            .media-player__controls__play {
+                grid-column: 5;
+            }
+
+            .media-player__controls__option {
+                grid-column: 4;
+            }
+
+            .media-player__meta {
+                grid-column: 2 / 4;
+                padding: 0 .5rem;
+            }
+        }
+
+        /* Scoped Variant 2: Inline Player */
+        .player-variant--inline .player-container {
+            inline-size: 100%;
+            max-inline-size: 34rem;
+            display: flex;
+            justify-content: center;
+        }
+
+        /* Scoped Variant 3: Lock Screen Player */
+        .player-variant--lock-screen .media-player-grid {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: .5rem;
+            padding: .5rem;
+            inline-size: 20rem;
+            block-size: 9.4rem;
+            background: linear-gradient(oklch(from #2a2a2a l c h / .8), oklch(from #2a2a2a l c h / .8)), var(--bg-image, none);
+            background-size: cover;
+            background-position: center;
+            backdrop-filter: blur(10px);
+            border-radius: 1.5rem;
+            border: 1px solid oklch(from #444 l c h / .5);
+            box-shadow: 0 8px 32px oklch(from rgba(0, 0, 0, .4) l c h);
+            overflow: clip;
+
+            .media-player-grid__row {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: .5rem;
                 inline-size: 100%;
-                block-size: 100%;
+            }
+
+            button {
+                background: transparent;
                 border: none;
+                border-radius: .75rem;
+                color: oklch(from white l c h);
+                padding: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                inline-size: 2rem;
+                block-size: 2rem;
+                width: 2rem;
+                height: 2rem;
+                flex-shrink: 0;
+            }
+
+            svg {
+                inline-size: 1.25rem;
+                block-size: 1.25rem;
+                width: 1.25rem;
+                height: 1.25rem;
+                max-inline-size: 100%;
+                max-block-size: 100%;
+                fill: currentColor;
+                flex-shrink: 0;
+                display: block;
+            }
+
+            .grid-item--eq,
+            .grid-item--phone {
+                inline-size: 1.5rem;
+                block-size: 1.5rem;
+                width: 1.5rem;
+                height: 1.5rem;
+
+                svg {
+                    inline-size: 1rem;
+                    block-size: 1rem;
+                    width: 1rem;
+                    height: 1rem;
+                    fill: oklch(from #fff l c h / .8);
+                }
+            }
+
+            .themed-background {
+                background: var(--themed-background, oklch(from #007bff l c h));
+                border-radius: 1rem;
+            }
+
+            .media-player__meta {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                gap: .125rem;
+                padding-inline-start: .25rem;
+                min-inline-size: 0;
+                overflow: hidden;
+            }
+
+            .media-player__meta__title {
+                font-size: .875rem;
+                font-weight: 600;
+                color: oklch(from #fff l c h);
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            .media-player__meta__artist {
+                font-size: .75rem;
+                color: oklch(from #aaa l c h);
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            .media-player__play-pause {
+                inline-size: 2.5rem;
+                block-size: 2rem;
+                width: 2.5rem;
+                height: 2rem;
+                border-radius: .75rem;
+                transition: transform .3s cubic-bezier(.34, 1.56, .64, 1);
+
+                svg {
+                    inline-size: 1.5rem;
+                    block-size: 1.5rem;
+                    width: 1.5rem;
+                    height: 1.5rem;
+                }
+
+                &:active {
+                    transform: scale(1.1);
+                }
+            }
+
+            .media-player__progress {
+                flex: 1;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                min-inline-size: 0;
+            }
+
+            .progress-slider {
+                -webkit-appearance: none;
+                appearance: none;
+                inline-size: 100%;
+                background: transparent;
+                outline: none;
+                cursor: pointer;
+                block-size: 1rem;
+                display: flex;
+                align-items: center;
+                margin: 0;
+            }
+
+            .progress-slider::-webkit-slider-runnable-track {
+                inline-size: 100%;
+                block-size: .25rem;
+                background: oklch(from #444 l c h);
+                border-radius: .125rem;
+                border: none;
+            }
+
+            .progress-slider::-webkit-slider-thumb {
+                -webkit-appearance: none;
+                appearance: none;
+                inline-size: .25rem;
+                block-size: 1rem;
+                background: oklch(from #fff l c h / .8);
+                border-radius: .125rem;
+                cursor: pointer;
+                margin-top: -.375rem;
+                border: none;
+            }
+
+            .progress-slider::-moz-range-track {
+                inline-size: 100%;
+                block-size: .25rem;
+                background: oklch(from #444 l c h);
+                border-radius: .125rem;
+                border: none;
+            }
+
+            .progress-slider::-moz-range-thumb {
+                inline-size: .25rem;
+                block-size: 1rem;
+                background: oklch(from #fff l c h / .8);
+                border-radius: .125rem;
+                cursor: pointer;
+                border: none;
+            }
+        }
+
+        /* Scoped Variant 4: Widget Player */
+        .player-variant--widget .media-player {
+            grid-template-columns: auto 1fr;
+            grid-template-rows: .5rem 1.75rem;
+            gap: .5rem;
+            padding: .75rem;
+            padding-inline-start: 0;
+            inline-size: 18.5rem;
+            border-radius: .75rem;
+            align-items: center;
+            overflow: clip;
+
+            .media-player__controls {
+                grid-column: 2;
+                grid-template-columns: repeat(5, 1fr);
+                gap: .125rem;
+                inline-size: 15rem;
+                background: transparent;
+
+                button {
+                    outline: none;
+                    background: transparent;
+                    padding: 0;
+                }
+            }
+
+            .media-player__current {
+                grid-column: 1;
+                grid-row: span 2;
+                inline-size: 3rem;
+                block-size: 4.5rem;
+                padding: 0;
+            }
+
+            .media-player__meta {
+                grid-column: 2 / -1;
+                grid-row: 1;
+                flex-direction: row;
+                justify-content: start;
+                gap: .5rem;
+                padding-inline-start: .75rem;
+                inline-size: 100%;
+                overflow: clip;
             }
         }
 
@@ -121,48 +407,166 @@
                 margin: 0;
                 font-size: 1.5rem;
                 color: var(--text-main);
-                text-shadow: 0 2px 10px oklch(from rgba(0, 0, 0, 0.8) l c h);
+                text-shadow: 0 2px 10px oklch(from rgba(0, 0, 0, .8) l c h);
                 font-weight: 600;
                 letter-spacing: -0.01em;
             }
         }
 
+        /* Navigation Controls */
         .nav-controls {
             position: fixed;
-            inset-block-end: 4rem;
+            inset-block-end: 2.5rem;
+            inset-inline: 0;
+            margin-inline: auto;
+            inline-size: fit-content;
+            max-inline-size: calc(100vw - 2rem);
+            box-sizing: border-box;
             display: flex;
-            gap: 2rem;
+            gap: 1.25rem;
             align-items: center;
+            justify-content: center;
             z-index: 10;
+            padding: .5rem 1rem;
+            background: oklch(.12 0 0 / .6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 2rem;
+            border: 1px solid oklch(1 0 0 / .08);
+        }
+
+        .nav-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            inline-size: 2.5rem;
+            block-size: 2.5rem;
+            border-radius: 50%;
+            border: none;
+            background: oklch(1 0 0 / .08);
+            color: var(--text-main);
+            cursor: pointer;
+            transition: background .2s ease, transform .2s ease;
+            flex-shrink: 0;
+
+            & svg {
+                inline-size: 1.5rem;
+                block-size: 1.5rem;
+                display: block;
+                flex-shrink: 0;
+            }
+
+            &:hover {
+                background: oklch(1 0 0 / .16);
+                transform: scale(1.05);
+            }
+
+            &:active {
+                transform: scale(.95);
+            }
+
+            &:focus-visible {
+                outline: 2px solid var(--accent-color);
+                outline-offset: 2px;
+            }
         }
 
         .pagination {
             display: flex;
-            gap: 0.75rem;
+            align-items: center;
+            gap: .75rem;
         }
 
         .dot {
-            inline-size: 0.5rem;
-            block-size: 0.5rem;
+            inline-size: .625rem;
+            block-size: .625rem;
+            padding: 0;
             border-radius: 50%;
-            background: oklch(1 0 0 / .2);
+            border: none;
+            background: oklch(1 0 0 / .25);
             cursor: pointer;
-            transition: all 0.3s ease;
-            animation: dot-highlight linear both;
-            animation-range: cover 20% cover 80%;
-        }
+            transition: background .3s ease, transform .3s var(--ease-premium), inline-size .3s var(--ease-premium);
 
-        @keyframes dot-highlight {
-
-            0%,
-            100% {
-                background: oklch(1 0 0 / .2);
-                transform: scale(1);
+            &:hover {
+                background: oklch(1 0 0 / .5);
             }
 
-            50% {
+            &.active,
+            &[aria-selected="true"] {
+                inline-size: 1.5rem;
+                border-radius: 1rem;
                 background: var(--accent-color);
-                transform: scale(1.3);
+            }
+
+            &:focus-visible {
+                outline: 2px solid var(--accent-color);
+                outline-offset: 2px;
+            }
+        }
+
+        /* View Transitions Animation Specs (Cross-fade only) */
+        ::view-transition-group(active-player) {
+            overflow: hidden;
+            border-radius: 3rem;
+            animation-duration: .4s;
+            animation-timing-function: var(--ease-premium);
+        }
+
+        ::view-transition-old(active-player) {
+            animation: .4s var(--ease-premium) both fade-out;
+        }
+
+        ::view-transition-new(active-player) {
+            animation: .4s var(--ease-premium) both fade-in;
+        }
+
+        @keyframes fade-out {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 0;
+            }
+        }
+
+        @keyframes fade-in {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Staggered Component Entry Animation via sibling-index() */
+        .player-slide.active .media-player > *,
+        .player-slide.active .media-player-inline > *,
+        .player-slide.active .media-player-grid > *,
+        .player-slide.active .stagger-child {
+            animation: stagger-in .4s var(--ease-premium) both;
+            animation-delay: calc(var(--stagger-step, sibling-index()) * 60ms);
+        }
+
+        @keyframes stagger-in {
+            from {
+                opacity: 0;
+                transform: translateY(.75rem);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            ::view-transition-group(active-player),
+            ::view-transition-old(active-player),
+            ::view-transition-new(active-player),
+            .player-slide.active .media-player > *,
+            .player-slide.active .media-player-inline > *,
+            .player-slide.active .media-player-grid > *,
+            .player-slide.active .stagger-child {
+                animation: none;
             }
         }
     </style>
@@ -177,15 +581,34 @@
 </head>
 
 <body>
-    <main class="carousel-view" id="carousel">
+    <header class="header">
+        <h1>Media Players</h1>
+        <p>Explore interactive media player components</p>
+    </header>
+
+    <main class="carousel-stage" id="carousel" aria-roledescription="carousel" aria-label="Media Player Selector">
         <!-- Rendered by JS -->
     </main>
 
-    <nav class="nav-controls">
-        <div class="pagination" id="pagination">
+    <nav class="nav-controls" aria-label="Media player navigation">
+        <button class="nav-btn nav-btn--prev" id="prev-btn" aria-label="Previous Player" title="Previous Player">
+            <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+        </button>
+
+        <div class="pagination" id="pagination" role="tablist" aria-label="Select Player">
             <!-- Rendered by JS -->
         </div>
+
+        <button class="nav-btn nav-btn--next" id="next-btn" aria-label="Next Player" title="Next Player">
+            <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+        </button>
     </nav>
+
+    <audio id="audio-player" crossorigin="anonymous" preload="metadata"></audio>
 
     <script type="module" src="../scripts/media/MediaPlayerSelector.js"></script>
 </body>
