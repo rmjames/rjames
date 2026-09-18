@@ -88,8 +88,10 @@ export const UI = {
                 let img = artBtn.querySelector('img');
                 if (!img) {
                     img = document.createElement('img');
+                    img.crossOrigin = 'anonymous';
                     artBtn.replaceChildren(img);
                 }
+                img.crossOrigin = 'anonymous';
                 img.src = track.albumArt;
                 img.alt = track.title;
             } else {

@@ -1,0 +1,22 @@
+[
+  {
+    "id": "coffee-shop",
+    "title": "Coffee Shop Ambience",
+    "artist": "Ambient Soundscape",
+    "album": "Focus & Relax",
+    "genre": "Ambient",
+    "duration": 120,
+    "src": "/media/audio/coffee_shop.ogg",
+    "albumArt": "/media/images/cover1.jpg"
+  },
+  {
+    "id": "campfire",
+    "title": "Campfire by the Lake",
+    "artist": "Nature Sounds",
+    "album": "Focus & Relax",
+    "genre": "Ambient",
+    "duration": 180,
+    "src": "/media/audio/fire.ogg",
+    "albumArt": "/media/images/cover2.jpg"
+  }
+]
