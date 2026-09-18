@@ -207,10 +207,12 @@
             if (currentMode === 'shuffle') {
                 path.setAttribute('d', SHUFFLE_PATH);
                 optionBtn.title = 'Shuffle';
+                optionBtn.setAttribute('aria-label', 'Shuffle');
                 if (isShuffle) optionBtn.classList.add('is-active');
             } else {
                 path.setAttribute('d', isLiked ? SVG_PATHS.LIKE_FILLED : SVG_PATHS.LIKE);
                 optionBtn.title = 'Like';
+                optionBtn.setAttribute('aria-label', 'Like');
                 if (isLiked) optionBtn.classList.add('is-liked');
             }
         };
@@ -248,6 +250,8 @@
             },
             delay: LONG_PRESS_MS
         });
+
+        updateOptionVisuals();
     </script>
 </body>
 

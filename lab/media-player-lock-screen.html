@@ -523,36 +523,27 @@
         });
 
         // Option Button Logic
-        let optionTimer;
-        let isLongPress = false;
-
-        optionBtn.addEventListener('mousedown', () => {
-            isLongPress = false;
-            optionTimer = setTimeout(() => {
-                isLongPress = true;
+        UI.setupLongPress(optionBtn, {
+            onShortPress: () => {
+                if (currentMode === 'random') {
+                    isRandom = !isRandom;
+                    if (isRandom) core.shuffle();
+                    else if (core.currentTrack) core.loadTrack(core.tracks.indexOf(core.currentTrack)); // Reset to linear
+                } else if (core.currentTrack) {
+                    const trackId = core.currentTrack.id;
+                    if (likedTracks.has(trackId)) likedTracks.delete(trackId);
+                    else likedTracks.add(trackId);
+                }
+                updateOptionUI();
+            },
+            onLongPress: () => {
                 currentMode = currentMode === 'random' ? 'like' : 'random';
                 optionBtn.classList.add('animate-outline', 'pulse');
                 if (navigator.vibrate) navigator.vibrate(50);
                 updateOptionUI();
                 setTimeout(() => optionBtn.classList.remove('animate-outline', 'pulse'), 320);
-            }, 500);
-        });
-
-        const cancelOptionPress = () => clearTimeout(optionTimer);
-        ['mouseup', 'mouseleave', 'touchend'].forEach(evt => optionBtn.addEventListener(evt, cancelOptionPress));
-
-        optionBtn.addEventListener('click', () => {
-            if (isLongPress) return;
-            if (currentMode === 'random') {
-                isRandom = !isRandom;
-                if (isRandom) core.shuffle();
-                else core.loadTrack(core.tracks.indexOf(core.currentTrack)); // Reset to linear
-            } else {
-                const trackId = core.currentTrack.id;
-                if (likedTracks.has(trackId)) likedTracks.delete(trackId);
-                else likedTracks.add(trackId);
-            }
-            updateOptionUI();
+            },
+            delay: 500
         });
 
         core.loadTrack(0);

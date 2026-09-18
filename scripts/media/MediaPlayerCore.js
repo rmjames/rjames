@@ -118,14 +118,16 @@ export class MediaPlayerCore {
     }
 
     loadTrack(index) {
+        if (!this.tracks || this.tracks.length === 0) return null;
         if (index < 0) index = this.tracks.length - 1;
         if (index >= this.tracks.length) index = 0;
 
         this.currentIndex = index;
         const track = this.tracks[this.currentIndex];
+        if (!track) return null;
 
         const initialSrc = track.streamUrl || track.src;
-        if (!this.audio.src.endsWith(initialSrc) && this.audio.src !== initialSrc) {
+        if (initialSrc && !this.audio.src.endsWith(initialSrc) && this.audio.src !== initialSrc) {
             this.audio.src = initialSrc;
         }
 
@@ -201,7 +203,7 @@ export class MediaPlayerCore {
     }
 
     get currentTrack() {
-        return this.tracks[this.currentIndex];
+        return (this.tracks && this.tracks.length > 0) ? this.tracks[this.currentIndex] : null;
     }
 
     shuffle() {

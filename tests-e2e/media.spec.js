@@ -63,3 +63,45 @@ test('Media Components Lab page loads and components are interactive', async ({ 
   await page.mouse.up();
   await expect(longClickOutput).toHaveText('Action: LONG Press Triggered!');
 });
+
+test('Media Player Option button toggles mode on long press', async ({ page }) => {
+  await page.goto('/lab/media-player.html');
+
+  const optionBtn = page.locator('.media-player__controls__option');
+  await expect(optionBtn).toHaveAttribute('title', 'Mode: LIKE');
+
+  await optionBtn.hover();
+  await page.mouse.down();
+  await page.waitForTimeout(600);
+  await page.mouse.up();
+
+  await expect(optionBtn).toHaveAttribute('title', 'Mode: EQUALIZER');
+});
+
+test('Inline Media Player Option button toggles mode on long press', async ({ page }) => {
+  await page.goto('/lab/media-player-inline.html');
+
+  const optionBtn = page.locator('.media-player-inline__option');
+  await expect(optionBtn).toHaveAttribute('title', 'Shuffle');
+
+  await optionBtn.hover();
+  await page.mouse.down();
+  await page.waitForTimeout(600);
+  await page.mouse.up();
+
+  await expect(optionBtn).toHaveAttribute('title', 'Like');
+});
+
+test('Lock Screen Media Player Option button toggles mode on long press', async ({ page }) => {
+  await page.goto('/lab/media-player-lock-screen.html');
+
+  const optionBtn = page.locator('.media-player__option');
+  await expect(optionBtn).toHaveAttribute('title', 'Random (Mode)');
+
+  await optionBtn.hover();
+  await page.mouse.down();
+  await page.waitForTimeout(600);
+  await page.mouse.up();
+
+  await expect(optionBtn).toHaveAttribute('title', 'Like (Mode)');
+});

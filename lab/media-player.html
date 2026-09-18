@@ -214,6 +214,8 @@
             if (mode === 'equalizer') optionIconPath.setAttribute('d', ICON_PATHS.equalizer);
             else if (mode === 'rewind') optionIconPath.setAttribute('d', ICON_PATHS.rewind);
             else optionIconPath.setAttribute('d', liked ? ICON_PATHS.likeFilled : ICON_PATHS.like);
+            optionButton.title = `Mode: ${mode.toUpperCase()}`;
+            optionButton.setAttribute('aria-label', `Options Mode: ${mode.toUpperCase()}`);
         };
 
         const toggleMode = () => {
@@ -246,6 +248,7 @@
             },
             onLongPress: () => {
                 optionButton.classList.add('animate-outline');
+                setTimeout(() => optionButton.classList.remove('animate-outline'), 320);
                 toggleMode();
             },
             delay: 500
