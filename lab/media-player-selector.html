@@ -40,6 +40,10 @@
         .header {
             position: fixed;
             inset-block-start: 2rem;
+            inset-inline: 0;
+            margin-inline: auto;
+            inline-size: fit-content;
+            max-inline-size: min(90vw, 60rem);
             text-align: center;
             z-index: 10;
 
@@ -413,6 +417,11 @@
         .nav-controls {
             position: fixed;
             inset-block-end: 2.5rem;
+            inset-inline: 0;
+            margin-inline: auto;
+            inline-size: fit-content;
+            max-inline-size: calc(100vw - 2rem);
+            box-sizing: border-box;
             display: flex;
             gap: 1.25rem;
             align-items: center;
@@ -438,6 +447,14 @@
             color: var(--text-main);
             cursor: pointer;
             transition: background .2s ease, transform .2s ease;
+            flex-shrink: 0;
+
+            & svg {
+                inline-size: 1.5rem;
+                block-size: 1.5rem;
+                display: block;
+                flex-shrink: 0;
+            }
 
             &:hover {
                 background: oklch(1 0 0 / .16);
