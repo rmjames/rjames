@@ -36,7 +36,7 @@ const mediaServiceDevPlugin = (mediaOrigin = '', apiKey = '') => {
                     return next();
                 }
 
-                let path = '';
+                let path;
                 if (isEpisodeStream) {
                     const match = url.pathname.match(/^\/api\/episodes\/(.+)\/stream-url$/);
                     path = match ? decodeURIComponent(match[1]) : '';
@@ -180,7 +180,7 @@ export default defineConfig(({ mode }) => {
     const contactEmail = env.VITE_CONTACT_EMAIL || process.env.VITE_CONTACT_EMAIL || '';
 
     return {
-        plugins: [copyStaticFiles(), envTransformPlugin(mediaOrigin, contactEmail)],
+        plugins: [copyStaticFiles(), envTransformPlugin(mediaOrigin, contactEmail), mediaServiceDevPlugin(mediaOrigin)],
         build: {
             target: 'esnext',
             emptyOutDir: false,

@@ -7,10 +7,42 @@ const _OBF_MEDIA_ENDPOINT = typeof atob === 'function'
 export const DEFAULT_MEDIA_BASE_URL = _OBF_MEDIA_ENDPOINT;
 export const MEDIA_BASE_URL = ((typeof import.meta !== 'undefined' && import.meta.env?.VITE_MEDIA_BASE_URL) || DEFAULT_MEDIA_BASE_URL).replace(/\/+$/, '');
 
+export const DEFAULT_FALLBACK_TRACKS = [
+    {
+        id: 'coffee-shop',
+        title: 'Coffee Shop Ambience',
+        artist: 'Ambient Soundscape',
+        album: 'Focus & Relax',
+        genre: 'Ambient',
+        duration: 120,
+        src: '/media/audio/coffee_shop.ogg',
+        rawSrc: '/media/audio/coffee_shop.ogg',
+        albumArt: '/media/images/cover1.jpg'
+    },
+    {
+        id: 'campfire',
+        title: 'Campfire by the Lake',
+        artist: 'Nature Sounds',
+        album: 'Focus & Relax',
+        genre: 'Ambient',
+        duration: 180,
+        src: '/media/audio/fire.ogg',
+        rawSrc: '/media/audio/fire.ogg',
+        albumArt: '/media/images/cover2.jpg'
+    }
+];
+
 export const resolveMediaUrl = (url) => {
     if (!url || typeof url !== 'string') return url;
     if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:') || url.startsWith('blob:')) {
         return url;
+    }
+    // Direct local root paths like /media/ or /public/media/
+    if (url.startsWith('/media/') || url.startsWith('/public/media/')) {
+        return url;
+    }
+    if (url.startsWith('./media/')) {
+        return url.slice(1);
     }
     // Strip leading relative indicators '../assets/', 'assets/', './assets/', etc.
     let clean = url.replace(/^(\.\.\/|\.\/|\/)?(assets\/)?/, '');
@@ -59,8 +91,8 @@ export class AudioLibrary {
                     albumArt: resolveMediaUrl(track.albumArt) || null
                 }));
             } catch (err) {
-                console.error('Failed to load AudioLibrary metadata:', err);
-                this._tracks = [];
+                console.warn('Failed to load AudioLibrary metadata, using local fallbacks:', err);
+                this._tracks = [...DEFAULT_FALLBACK_TRACKS];
             }
         })();
 
@@ -69,10 +101,9 @@ export class AudioLibrary {
 
     get tracks() { 
         if (!this._tracks) {
-            console.warn('AudioLibrary tracks accessed before load. Returning empty array.');
-            return [];
+            return DEFAULT_FALLBACK_TRACKS;
         }
-        return this._tracks; 
+        return this._tracks.length > 0 ? this._tracks : DEFAULT_FALLBACK_TRACKS; 
     }
     getAll() { 
         return this.tracks; 
