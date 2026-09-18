@@ -36,7 +36,7 @@ const mediaServiceDevPlugin = (mediaOrigin = '', apiKey = '') => {
                     return next();
                 }
 
-                let targetPath;
+                let path;
                 if (isEpisodeStream) {
                     const match = url.pathname.match(/^\/api\/episodes\/(.+)\/stream-url$/);
                     targetPath = match ? decodeURIComponent(match[1]) : '';
@@ -177,6 +177,7 @@ const copyStaticFiles = () => {
 export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, process.cwd(), '');
     const mediaOrigin = (env.VITE_MEDIA_BASE_URL || process.env.VITE_MEDIA_BASE_URL || '').replace(/\/+$/, '');
+    const apiKey = env.MEDIA_SERVICE_API_KEY || process.env.MEDIA_SERVICE_API_KEY || '';
     const contactEmail = env.VITE_CONTACT_EMAIL || process.env.VITE_CONTACT_EMAIL || '';
     const apiKey = env.MEDIA_SIGNING_KEY || process.env.MEDIA_SIGNING_KEY || '';
 

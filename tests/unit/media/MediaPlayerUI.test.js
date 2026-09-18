@@ -289,4 +289,175 @@ describe('MediaPlayerUI', () => {
             expect(spy).toHaveBeenCalledTimes(2);
         });
     });
+
+    describe('setupLongPress', () => {
+        let button;
+        let onShortPress;
+        let onLongPress;
+
+        beforeEach(() => {
+            vi.useFakeTimers();
+            button = document.createElement('button');
+            document.body.appendChild(button);
+            onShortPress = vi.fn();
+            onLongPress = vi.fn();
+        });
+
+        afterEach(() => {
+            vi.useRealTimers();
+            button.remove();
+        });
+
+        it('should trigger onShortPress on normal pointer click', () => {
+            UI.setupLongPress(button, { onShortPress, onLongPress, delay: 500 });
+
+            button.dispatchEvent(new Event('pointerdown'));
+            vi.advanceTimersByTime(100);
+            button.dispatchEvent(new Event('pointerup'));
+            button.dispatchEvent(new MouseEvent('click'));
+
+            expect(onShortPress).toHaveBeenCalledTimes(1);
+            expect(onLongPress).not.toHaveBeenCalled();
+        });
+
+        it('should trigger onLongPress when held for delay and suppress subsequent short press', () => {
+            UI.setupLongPress(button, { onShortPress, onLongPress, delay: 500 });
+
+            button.dispatchEvent(new Event('pointerdown'));
+            vi.advanceTimersByTime(500);
+
+            expect(onLongPress).toHaveBeenCalledTimes(1);
+
+            // User releases pointer and browser fires synthetic click
+            button.dispatchEvent(new Event('pointerup'));
+            button.dispatchEvent(new MouseEvent('click', { cancelable: true }));
+
+            expect(onShortPress).not.toHaveBeenCalled();
+        });
+
+        it('should cancel long press if pointer moves beyond tolerance threshold', () => {
+            UI.setupLongPress(button, { onShortPress, onLongPress, delay: 500 });
+
+            const downEvent = new Event('pointerdown');
+            downEvent.clientX = 10;
+            downEvent.clientY = 10;
+            button.dispatchEvent(downEvent);
+
+            // Large move > 10px
+            const moveEvent = new Event('pointermove');
+            moveEvent.clientX = 50;
+            moveEvent.clientY = 50;
+            button.dispatchEvent(moveEvent);
+
+            vi.advanceTimersByTime(500);
+            expect(onLongPress).not.toHaveBeenCalled();
+        });
+
+        it('should NOT cancel long press if pointer moves within jitter tolerance (<= 10px)', () => {
+            UI.setupLongPress(button, { onShortPress, onLongPress, delay: 500 });
+
+            const downEvent = new Event('pointerdown');
+            downEvent.clientX = 10;
+            downEvent.clientY = 10;
+            button.dispatchEvent(downEvent);
+
+            // Micro move (2px)
+            const moveEvent = new Event('pointermove');
+            moveEvent.clientX = 12;
+            moveEvent.clientY = 11;
+            button.dispatchEvent(moveEvent);
+
+            vi.advanceTimersByTime(500);
+            expect(onLongPress).toHaveBeenCalledTimes(1);
+        });
+
+        it('should support keyboard accessibility with Space and Enter', () => {
+            UI.setupLongPress(button, { onShortPress, onLongPress, delay: 500 });
+
+            // Keyboard tap with Enter
+            button.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' }));
+            vi.advanceTimersByTime(50);
+            button.dispatchEvent(new KeyboardEvent('keyup', { key: 'Enter' }));
+            button.dispatchEvent(new MouseEvent('click'));
+
+            expect(onShortPress).toHaveBeenCalledTimes(1);
+            expect(onLongPress).not.toHaveBeenCalled();
+
+            // Keyboard hold with Space
+            button.dispatchEvent(new KeyboardEvent('keydown', { key: ' ' }));
+            vi.advanceTimersByTime(500);
+
+            expect(onLongPress).toHaveBeenCalledTimes(1);
+
+            button.dispatchEvent(new KeyboardEvent('keyup', { key: ' ' }));
+            button.dispatchEvent(new MouseEvent('click', { cancelable: true }));
+
+            // Still only 1 short press from earlier tap
+            expect(onShortPress).toHaveBeenCalledTimes(1);
+        });
+
+        it('should clean up event listeners on teardown', () => {
+            const cleanup = UI.setupLongPress(button, { onShortPress, onLongPress, delay: 500 });
+            cleanup();
+
+            button.dispatchEvent(new Event('pointerdown'));
+            vi.advanceTimersByTime(600);
+            button.dispatchEvent(new Event('pointerup'));
+            button.dispatchEvent(new MouseEvent('click'));
+
+            expect(onLongPress).not.toHaveBeenCalled();
+            expect(onShortPress).not.toHaveBeenCalled();
+        });
+
+        it('should bind elements using a CSS selector string', () => {
+            button.className = 'test-selector-btn';
+            const cleanup = UI.setupLongPress('.test-selector-btn', { onShortPress, onLongPress, delay: 300 });
+
+            button.dispatchEvent(new Event('pointerdown'));
+            vi.advanceTimersByTime(300);
+
+            expect(onLongPress).toHaveBeenCalledTimes(1);
+            cleanup();
+        });
+
+        it('should bind an array or NodeList of elements and pass (e, button) to callbacks', () => {
+            const btn2 = document.createElement('button');
+            document.body.appendChild(btn2);
+
+            const shortArgs = [];
+            const longArgs = [];
+
+            const cleanup = UI.setupLongPress([button, btn2], {
+                onShortPress: (e, el) => shortArgs.push(el),
+                onLongPress: (e, el) => longArgs.push(el),
+                delay: 400
+            });
+
+            // Short press on button 1
+            button.dispatchEvent(new MouseEvent('click'));
+            expect(shortArgs).toEqual([button]);
+
+            // Long press on button 2
+            btn2.dispatchEvent(new Event('pointerdown'));
+            vi.advanceTimersByTime(400);
+            expect(longArgs).toEqual([btn2]);
+
+            cleanup();
+            btn2.remove();
+        });
+
+        it('should gracefully handle invalid or non-matching selectors without errors', () => {
+            const cleanup1 = UI.setupLongPress('.non-existent-class', { onLongPress });
+            expect(typeof cleanup1).toBe('function');
+            expect(() => cleanup1()).not.toThrow();
+
+            const cleanup2 = UI.setupLongPress(':::invalid-selector', { onLongPress });
+            expect(typeof cleanup2).toBe('function');
+            expect(() => cleanup2()).not.toThrow();
+
+            const cleanup3 = UI.setupLongPress(null, { onLongPress });
+            expect(typeof cleanup3).toBe('function');
+            expect(() => cleanup3()).not.toThrow();
+        });
+    });
 });

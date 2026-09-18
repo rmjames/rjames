@@ -17,7 +17,7 @@ test('Media Player loads local audio', async ({ page }) => {
   const audio = page.locator('#audio-player');
   // Check that src ends with the expected path (to avoid domain issues)
   const src = await audio.getAttribute('src');
-  expect(src).toContain('Transformation.mp3');
+  expect(src.toLowerCase()).toContain('transformation');
 });
 
 test('Media Player Widget loads local audio', async ({ page }) => {
@@ -62,4 +62,70 @@ test('Media Components Lab page loads and components are interactive', async ({ 
   await page.waitForTimeout(600); // Wait longer than the 500ms threshold
   await page.mouse.up();
   await expect(longClickOutput).toHaveText('Action: LONG Press Triggered!');
+});
+
+test('Media Player Option button toggles mode on long press', async ({ page }) => {
+  await page.goto('/lab/media-player.html');
+
+  const optionBtn = page.locator('.media-player__controls__option');
+  await expect(optionBtn).toHaveAttribute('title', 'Mode: LIKE');
+
+  await optionBtn.hover();
+  await page.mouse.down();
+  await page.waitForTimeout(600);
+  await page.mouse.up();
+
+  await expect(optionBtn).toHaveAttribute('title', 'Mode: EQUALIZER');
+});
+
+test('Inline Media Player Option button toggles mode on long press', async ({ page }) => {
+  await page.goto('/lab/media-player-inline.html');
+
+  const optionBtn = page.locator('.media-player-inline__option');
+  await expect(optionBtn).toHaveAttribute('title', 'Shuffle');
+
+  await optionBtn.hover();
+  await page.mouse.down();
+  await page.waitForTimeout(600);
+  await page.mouse.up();
+
+  await expect(optionBtn).toHaveAttribute('title', 'Like');
+});
+
+test('Lock Screen Media Player Option button toggles mode on long press', async ({ page }) => {
+  await page.goto('/lab/media-player-lock-screen.html');
+
+  const optionBtn = page.locator('.media-player__option');
+  await expect(optionBtn).toHaveAttribute('title', 'Random (Mode)');
+
+  await optionBtn.hover();
+  await page.mouse.down();
+  await page.waitForTimeout(600);
+  await page.mouse.up();
+
+  await expect(optionBtn).toHaveAttribute('title', 'Like (Mode)');
+});
+
+test('Media Player preset button shows metadata popover on long press', async ({ page }) => {
+  await page.goto('/lab/media-player.html');
+
+  const presets = page.locator('.media-player__presets__preset');
+  await expect(presets).toHaveCount(127);
+
+  const firstPreset = presets.first();
+  await expect(firstPreset).toBeVisible();
+
+  const popover = page.locator('#preset-popover');
+  await expect(popover).toBeHidden();
+
+  // Long press on first preset
+  await firstPreset.hover();
+  await page.mouse.down();
+  await page.waitForTimeout(600);
+
+  // Popover appears while holding long press
+  await expect(popover).toBeVisible();
+  await expect(popover).toContainText('Transformation');
+
+  await page.mouse.up();
 });

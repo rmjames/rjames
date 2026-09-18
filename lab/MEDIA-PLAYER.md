@@ -170,9 +170,10 @@ Standardized multi-mode control with state persistence and kinetic feedback.
   </button>
   ```
 - **Interactions**:
-  - **Long-Press (500ms)**: Cycles between modes (e.g., Random, Like). Includes `animate-outline` and `pulse` animations.
-  - **Tap**: Executes current mode action.
-  - **Visuals**: Requires dynamic `viewBox` switching if icons have different coordinate systems (e.g., 24x24 vs 960x960).
+  - **Long-Press (500ms)**: Cycles between modes (e.g., Random, Like). Includes `animate-outline` and `pulse` animations. Handled via unified Pointer Events (`UI.setupLongPress`) with a 10px movement threshold for touch jitter tolerance and automatic synthetic click suppression.
+  - **Tap / Short Press**: Executes current mode action.
+  - **Keyboard Accessibility (WCAG 2.0)**: Supports keyboard activation via `Enter` or `Space` (tap/short-press executes mode action; holding key past 500ms activates long-press mode switch).
+  - **Visuals**: Requires dynamic `viewBox` switching if icons have different coordinate systems (e.g., 24x24 vs 960x960). Title and `aria-label` dynamically synchronize with the active mode.
 
 ### 8. `MediaRewind` (NEW)
 Standardized skip-back control with distinct kinetic feedback.
