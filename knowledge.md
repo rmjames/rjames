@@ -61,4 +61,12 @@
   3. Responsive container queries (`@container (max-width: 15rem)`) require the mount container to have defined inline dimensions (`inline-size: 100%`) to prevent unintended collapsing of controls.
   4. Decoupling audio state events, using `AbortController` cleanup in `destroy()` methods, and enforcing zero-sink DOM creation (`textContent`, SVG DOM elements) eliminates layout thrashing, memory leaks, and XSS risks across all media player variants.
 - **Action**: Always use shared modular component factories for variant-based widgets so that standalone lab demos and multi-widget composite selectors mount identical DOM structures, share common lifecycle methods (`destroy`), and retain full feature parity.
+## 2026-09-19 - Hardening Web Audio Pipelines, CORS Taint Prevention, and Stale Async Resolution in Media Player Core
+- **Context**: Performing security and performance hardening across `MediaPlayerCore.js`, `Equalizer.js`, and `EqualizerUI.js`.
+- **Learning**: 
+  1. Connecting an HTML `<audio>` element to a Web Audio `MediaElementAudioSourceNode` (`createMediaElementSource(audio)`) taints the audio graph and silences all output buffers (returning zeros) if cross-origin audio from CDNs or signed stream URLs lacks `crossOrigin = "anonymous"`. Setting `audio.crossOrigin` must occur before any `src` is loaded to prevent browser pipeline resets.
+  2. In the Web Audio API, calling `createMediaElementSource(audio)` more than once on the same `HTMLMediaElement` throws a fatal `InvalidStateError`. Using a `WeakMap<HTMLMediaElement, ...>` registry caches and reuses the active source node across component recreations without leaking audio contexts.
+  3. Rapid track switching during asynchronous URL resolution (e.g. Model 1 signed URLs) introduces a race condition where late-resolving promises from earlier tracks overwrite active playback. Tagging loads with a monotonic generation ID (`_loadId`) allows stale resolutions to be dropped before mutating `audio.src`.
+  4. Instantaneous parameter changes on BiquadFilter gains produce audible zipper noise / click artifacts; smoothing parameter changes using `filter.gain.setTargetAtTime(target, audioCtx.currentTime, 0.015)` eliminates audio glitches.
+- **Action**: Always configure `audio.crossOrigin = 'anonymous'` before assigning sources, cache and reuse `MediaElementAudioSourceNode` instances per media element, discard asynchronous loads using monotonic generation IDs, and apply audio parameter ramping for slider adjustments.
 

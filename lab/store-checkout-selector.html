@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self' https://www.googletagmanager.com https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com data:; img-src 'self' https://assets.codepen.io data:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://robertjames.nyc https://www.google-analytics.com https://analytics.google.com https://cloudflareinsights.com https://static.cloudflareinsights.com; object-src 'none'; frame-src 'self'; form-action 'none'; base-uri 'self';" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Store Checkout Carousel - Labs</title>
+    <link rel="stylesheet" href="../styles/lab/store-checkout-selector.css">
+    <link rel="apple-touch-icon" href="../images/icon-ios.svg" />
+    <link rel="icon" type="image/svg+xml" sizes="any" href="../images/icon.svg" id="favicon-svg" />
+    <link rel="icon" type="image/png" href="../favicon_144.png" sizes="144x144" />
+    <link rel="icon" type="image/png" href="../favicon_512.png" sizes="512x512" />
+    <link rel="icon" type="image/png" href="../favicon_192.png" sizes="192x192" />
+    <link rel="manifest" href="../manifest.json" />
+    <link rel="modulepreload" href="../scripts/favicon-animator.js">
+    <script type="module" src="../scripts/favicon-animator.js" async></script>
+</head>
+
+<body>
+    <a href="../lab.html" class="back-link" aria-label="Back to Labs">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+        <span>Back</span>
+    </a>
+
+    <header class="header">
+        <h1>Google Store Checkout</h1>
+        <p>Explore the evolution of checkout timeline components</p>
+    </header>
+
+    <main class="carousel-stage" id="carousel" aria-roledescription="carousel" aria-label="Store Checkout Selector">
+        <!-- Rendered natively by JS -->
+    </main>
+
+    <nav class="nav-controls" aria-label="Checkout component navigation">
+        <button class="nav-btn nav-btn--prev" id="prev-btn" aria-label="Previous Variant" title="Previous Variant">
+            <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+        </button>
+
+        <div class="pagination" id="pagination" role="tablist" aria-label="Select Variant">
+            <!-- Rendered by JS -->
+        </div>
+
+        <button class="nav-btn nav-btn--next" id="next-btn" aria-label="Next Variant" title="Next Variant">
+            <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+        </button>
+    </nav>
+
+    <script type="module" src="../scripts/lab/StoreCheckoutSelector.js"></script>
+</body>
+
+</html>

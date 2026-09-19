@@ -1,0 +1,143 @@
+:root {
+    color-scheme: light dark;
+    --bg-color: light-dark(oklch(from #f8f9fa l c h), oklch(from #202124 l c h));
+    --card-bg: light-dark(oklch(from #ffffff l c h), oklch(from #303134 l c h));
+    --system-color: light-dark(oklch(from #202124 l c h), oklch(from #e8eaed l c h));
+    --checkbox-bg-color: oklch(from #1a73e8 l c h);
+    --border-color: light-dark(oklch(from #dadce0 l c h), oklch(from #5f6368 l c h / .5));
+    --ease-premium: cubic-bezier(.23, 1, .32, 1);
+}
+
+body {
+    display: grid;
+    place-items: center;
+    min-block-size: 100dvh;
+    margin: 0;
+    padding: 1.5rem;
+    background-color: var(--bg-color);
+    color: var(--system-color);
+    font-family: 'Google Sans', system-ui, -apple-system, sans-serif;
+    box-sizing: border-box;
+}
+
+.timeline-container {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 1.25rem;
+    padding: 2.5rem 2rem;
+    box-shadow: 0 12px 32px oklch(0 0 0 / .15);
+    inline-size: 100%;
+    max-inline-size: 32rem;
+    box-sizing: border-box;
+}
+
+.timeline-title {
+    margin: 0 0 2rem;
+    font-size: 1.25rem;
+    font-weight: 700;
+    text-align: center;
+}
+
+.form-checkout {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(2rem, 1fr));
+    align-items: center;
+    gap: .5rem;
+    inline-size: 100%;
+    box-sizing: border-box;
+}
+
+.check {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: .5rem;
+    font-size: .9rem;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: center;
+}
+
+input[type="checkbox"] {
+    display: grid;
+    place-content: center;
+    appearance: none;
+    background-color: transparent;
+    margin: 0;
+    font: inherit;
+    color: currentColor;
+    inline-size: 1.35rem;
+    block-size: 1.35rem;
+    border: 2px solid var(--border-color);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: border-color .2s ease, background-color .2s ease;
+}
+
+input[type="checkbox"]::before {
+    content: '';
+    inline-size: .65rem;
+    block-size: .35rem;
+    background-color: transparent;
+    border-inline-start: 2px solid oklch(from #fff l c h);
+    border-block-end: 2px solid oklch(from #fff l c h);
+    transform: rotate(-45deg) scale(0);
+    transition: 200ms transform cubic-bezier(0.4, 0.0, 0.2, 1);
+    transform-origin: bottom left;
+}
+
+input[type="checkbox"]:checked {
+    background-color: var(--checkbox-bg-color);
+    border-color: var(--checkbox-bg-color);
+}
+
+input[type="checkbox"]:checked::before {
+    transform: rotate(-45deg) scale(1) translate(1px, 2px);
+}
+
+input[type="checkbox"]:focus-visible {
+    outline: 2px solid var(--checkbox-bg-color);
+    outline-offset: 2px;
+}
+
+.line {
+    block-size: 2px;
+    inline-size: 100%;
+    background: linear-gradient(to right, var(--checkbox-bg-color) 50%, var(--border-color) 0%) no-repeat;
+    background-size: 200% 100%;
+    background-position: 100% 100%;
+    animation: progress .25s linear forwards;
+    animation-play-state: paused;
+    align-self: center;
+    margin-block-start: -1.25rem;
+}
+
+/* Pure CSS :has() Cascading Animations */
+.form-checkout:has([name="prepare"]:checked) .l-prep-js,
+.form-checkout:has([name="ship"]:checked) .l-prep-js,
+.form-checkout:has([name="ship"]:checked) .l-ship-js,
+.form-checkout:has([name="arrive"]:checked) .l-prep-js,
+.form-checkout:has([name="arrive"]:checked) .l-ship-js,
+.form-checkout:has([name="arrive"]:checked) .l-arrv-js {
+    animation-play-state: running;
+}
+
+@keyframes progress {
+    to {
+        background-position: 0% 100%;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .line {
+        animation: none;
+    }
+    .form-checkout:has([name="prepare"]:checked) .l-prep-js,
+    .form-checkout:has([name="ship"]:checked) .l-prep-js,
+    .form-checkout:has([name="ship"]:checked) .l-ship-js,
+    .form-checkout:has([name="arrive"]:checked) .l-prep-js,
+    .form-checkout:has([name="arrive"]:checked) .l-ship-js,
+    .form-checkout:has([name="arrive"]:checked) .l-arrv-js {
+        background-position: 0% 100%;
+    }
+}

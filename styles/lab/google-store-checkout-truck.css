@@ -1,0 +1,188 @@
+@property --truck-position {
+    syntax: "<length>";
+    inherits: true;
+    initial-value: 1ch;
+}
+
+:root {
+    color-scheme: light dark;
+    --bg-color: light-dark(oklch(from #f8f9fa l c h), oklch(from #202124 l c h));
+    --card-bg: light-dark(oklch(from #ffffff l c h), oklch(from #303134 l c h));
+    --system-color: light-dark(oklch(from #202124 l c h), oklch(from #e8eaed l c h));
+    --checkbox-bg-color: oklch(from #1a73e8 l c h);
+    --border-color: light-dark(oklch(from #dadce0 l c h), oklch(from #5f6368 l c h / .5));
+    --truck-speed: .76s;
+}
+
+body {
+    display: grid;
+    place-items: center;
+    min-block-size: 100dvh;
+    margin: 0;
+    padding: 1.5rem;
+    background-color: var(--bg-color);
+    color: var(--system-color);
+    font-family: 'Google Sans', system-ui, -apple-system, sans-serif;
+    box-sizing: border-box;
+}
+
+.truck-container {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 1.25rem;
+    padding: 3rem 2rem 2.5rem;
+    box-shadow: 0 12px 32px oklch(0 0 0 / .15);
+    inline-size: 100%;
+    max-inline-size: 32rem;
+    box-sizing: border-box;
+    position: relative;
+}
+
+.truck-title {
+    margin: 0 0 2rem;
+    font-size: 1.25rem;
+    font-weight: 700;
+    text-align: center;
+}
+
+.form-checkout {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(2rem, 1fr));
+    align-items: center;
+    gap: .5rem;
+    inline-size: 100%;
+    box-sizing: border-box;
+    position: relative;
+}
+
+.check {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: .5rem;
+    font-size: .9rem;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: center;
+    position: relative;
+}
+
+input[type="checkbox"] {
+    display: grid;
+    place-content: center;
+    appearance: none;
+    background-color: transparent;
+    margin: 0;
+    font: inherit;
+    color: currentColor;
+    inline-size: 1.35rem;
+    block-size: 1.35rem;
+    border: 2px solid var(--border-color);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: border-color .2s ease, background-color .2s ease;
+}
+
+input[type="checkbox"]::before {
+    content: '';
+    inline-size: .65rem;
+    block-size: .35rem;
+    background-color: transparent;
+    border-inline-start: 2px solid oklch(from #fff l c h);
+    border-block-end: 2px solid oklch(from #fff l c h);
+    transform: rotate(-45deg) scale(0);
+    transition: 200ms transform cubic-bezier(0.4, 0.0, 0.2, 1);
+    transform-origin: bottom left;
+}
+
+input[type="checkbox"]:checked {
+    background-color: var(--checkbox-bg-color);
+    border-color: var(--checkbox-bg-color);
+}
+
+input[type="checkbox"]:checked::before {
+    transform: rotate(-45deg) scale(1) translate(1px, 2px);
+}
+
+input[type="checkbox"]:focus-visible {
+    outline: 2px solid var(--checkbox-bg-color);
+    outline-offset: 2px;
+}
+
+.line {
+    block-size: 2px;
+    inline-size: 100%;
+    background-color: var(--border-color);
+    position: relative;
+    margin-block-start: -1.25rem;
+}
+
+.line::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    inline-size: 0%;
+    background-color: var(--checkbox-bg-color);
+    transition: inline-size .3s ease;
+}
+
+.form-checkout:has([name="prepare"]:checked) .l-prep-js::after,
+.form-checkout:has([name="ship"]:checked) .l-prep-js::after,
+.form-checkout:has([name="ship"]:checked) .l-ship-js::after,
+.form-checkout:has([name="arrive"]:checked) .l-prep-js::after,
+.form-checkout:has([name="arrive"]:checked) .l-ship-js::after,
+.form-checkout:has([name="arrive"]:checked) .l-arrv-js::after {
+    inline-size: 100%;
+}
+
+.icon-wrapper--truck {
+    position: absolute;
+    inset-block-end: 2.25rem;
+    inset-inline-start: 50%;
+    transform: translateX(-50%) translateY(100%);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity .5s ease,
+                transform var(--truck-speed) cubic-bezier(0.68, -0.55, 0.265, 1.55),
+                visibility .5s;
+    color: var(--checkbox-bg-color);
+    inline-size: 1.5rem;
+    block-size: 1.5rem;
+}
+
+.icon-wrapper--truck svg {
+    inline-size: 100%;
+    block-size: 100%;
+    fill: currentColor;
+}
+
+input[name="prepare"]:checked ~ .icon-wrapper--truck {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateX(calc(-50% + var(--truck-offset, 0px))) translateY(-1.75rem);
+}
+
+.form-checkout:has(input[name="ship"]:checked) .icon-wrapper--truck {
+    --truck-offset: 7.5rem;
+}
+
+.form-checkout:has(input[name="arrive"]:checked) .icon-wrapper--truck {
+    --truck-offset: 15rem;
+}
+
+@starting-style {
+    .icon-wrapper--truck {
+        opacity: 0;
+        visibility: hidden;
+        transform: translateX(-50%) translateY(100%) scale(0);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .icon-wrapper--truck,
+    .line::after {
+        transition: none !important;
+    }
+}

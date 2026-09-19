@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self' https://www.googletagmanager.com https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com data:; img-src 'self' https://assets.codepen.io data:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://robertjames.nyc https://www.google-analytics.com https://analytics.google.com https://cloudflareinsights.com https://static.cloudflareinsights.com; object-src 'none'; frame-src 'self'; form-action 'none'; base-uri 'self';" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Store Checkout Timeline - Labs</title>
+    <link rel="stylesheet" href="../styles/lab-shared.css">
+    <link rel="stylesheet" href="../styles/lab/google-store-checkout-timeline.css">
+    <link rel="apple-touch-icon" href="../images/icon-ios.svg" />
+    <link rel="icon" type="image/svg+xml" sizes="any" href="../images/icon.svg" id="favicon-svg" />
+    <link rel="icon" type="image/png" href="../favicon_144.png" sizes="144x144" />
+    <link rel="icon" type="image/png" href="../favicon_512.png" sizes="512x512" />
+    <link rel="icon" type="image/png" href="../favicon_192.png" sizes="192x192" />
+    <link rel="manifest" href="../manifest.json" />
+    <link rel="modulepreload" href="../scripts/favicon-animator.js">
+    <script type="module" src="../scripts/favicon-animator.js" async></script>
+    <script type="module" src="../scripts/utils/labNavigation.js"></script>
+</head>
+
+<body>
+    <a href="../lab.html" class="back-link" aria-label="Back to Labs">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+        <span>Back</span>
+    </a>
+
+    <main class="timeline-container">
+        <h1 class="timeline-title">Google Store Order Timeline</h1>
+        <form class="form-checkout">
+            <label class="check">
+                <input name="order" type="checkbox" checked aria-label="Order placed">
+                <span>Ordered</span>
+            </label>
+            <div class="line l-prep-js" aria-hidden="true"></div>
+            <label class="check">
+                <input name="prepare" type="checkbox" aria-label="Preparing shipment">
+                <span>Preparing</span>
+            </label>
+            <div class="line l-ship-js" aria-hidden="true"></div>
+            <label class="check">
+                <input name="ship" type="checkbox" aria-label="Order shipped">
+                <span>Shipping</span>
+            </label>
+            <div class="line l-arrv-js" aria-hidden="true"></div>
+            <label class="check">
+                <input name="arrive" type="checkbox" aria-label="Order delivered">
+                <span>Arriving</span>
+            </label>
+        </form>
+    </main>
+
+    <script type="module" src="../scripts/lab/google-store-checkout-timeline.js"></script>
+</body>
+
+</html>
