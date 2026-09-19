@@ -74,6 +74,7 @@ Curated structural map for zero-turn agent navigation (depth 2-3):
 └── evals/                               # Performance & security audit harness and fixtures
 ```
 *Navigation Rule*: Use this structural map for immediate orientation. Use `find_by_name` or `grep_search` to pinpoint leaf files without recursive directory scans.
+* If project file structure changes update `Codebase Architecture & File Tree` 
 
 ## References
 - [Baseline 2025](https://web.dev/baseline/2025) | [Webstatus.dev](https://webstatus.dev/)
