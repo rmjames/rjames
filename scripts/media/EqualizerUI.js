@@ -163,6 +163,10 @@ export class EqualizerUI {
 
     // Allows external triggers to init audio context (e.g. on play)
     initAudio() {
-        this.eq.init();
+        try {
+            this.eq?.init();
+        } catch {
+            // Web Audio API uninitialized or unsupported in current environment
+        }
     }
 }

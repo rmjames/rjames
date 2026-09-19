@@ -52,3 +52,13 @@
   3. In HTML5 `<audio>`, assigning `audio.src` to a relative string causes the browser DOM property `audio.src` to return the resolved absolute URL. Comparing `this.audio.src !== streamUrl` directly without `endsWith()` or URL normalization causes spurious re-assignments that interrupt active buffering and abort playback.
   4. Audio playback promises (`audio.play()`) must always include rejection handlers (`.catch()`) to prevent unhandled promise rejections and update UI state when autoplay policies or network failures occur.
 - **Action**: Always equip media libraries with resilient local fallback assets, prevent duplicate URL mutations for `/media/` paths, normalize URL equality checks when evaluating `audio.src`, and handle play rejections gracefully.
+
+## 2026-09-19 - Modular Component Architecture for Media Player Variant Parity
+- **Context**: Ensuring complete parity, security, and performance between standalone media player pages (`lab/media-player*.html`) and carousel selector (`lab/media-player-selector.html`).
+- **Learning**:
+  1. Standalone pages previously diverged from the selector carousel because only `LockScreenPlayer.js` was modularized, while `MainMediaPlayer`, `InlinePlayer`, and `WidgetPlayer` were copy-pasted and partially reimplemented in `MediaPlayerSelector.js`. This led to significant feature drift: the carousel main player lacked the Equalizer overlay, `.is-eq-open` state, preset popover hint, and long-press option switching.
+  2. Extracting dedicated modular factories (`scripts/media/MainMediaPlayer.js`, `scripts/media/InlinePlayer.js`, `scripts/media/WidgetPlayer.js`, `scripts/media/LockScreenPlayer.js`) ensures exact component and DOM parity across both standalone and multi-variant carousel environments.
+  3. Responsive container queries (`@container (max-width: 15rem)`) require the mount container to have defined inline dimensions (`inline-size: 100%`) to prevent unintended collapsing of controls.
+  4. Decoupling audio state events, using `AbortController` cleanup in `destroy()` methods, and enforcing zero-sink DOM creation (`textContent`, SVG DOM elements) eliminates layout thrashing, memory leaks, and XSS risks across all media player variants.
+- **Action**: Always use shared modular component factories for variant-based widgets so that standalone lab demos and multi-widget composite selectors mount identical DOM structures, share common lifecycle methods (`destroy`), and retain full feature parity.
+

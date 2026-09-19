@@ -19,6 +19,7 @@ export const UI = {
 
     _initResizeObserver() {
         if (this._resizeObserver) return;
+        if (typeof ResizeObserver === 'undefined') return;
         this._resizeObserver = new ResizeObserver(entries => {
             // PERF-42: Buffer entries directly into the batched queue using the precomputed
             // contentRect dimensions without re-observing targets or triggering nested rAF loops.
@@ -65,7 +66,7 @@ export const UI = {
     updateMarquee(el) {
         if (!el) return;
         this._initResizeObserver();
-        if (!this._observedElements.has(el)) {
+        if (this._resizeObserver && !this._observedElements.has(el)) {
             this._observedElements.add(el);
             this._resizeObserver.observe(el);
         }

@@ -21,12 +21,16 @@ To ensure a single source of truth for platform media notifications and OS hardw
 
 ### Component Sharing Strategy
 
-To share common HTML components (like MediaControls, MediaMeta) across the various media player HTML files within this vanilla JS/ES Modules architecture, we utilize **JS Factory Functions (DOM Generation)**.
+To share common media player components across the various HTML files within this vanilla JS/ES Modules architecture, we utilize **Dedicated Modular Component Factories (DOM Generation)**:
+- `buildMainPlayer(mount, core, doc)` in `scripts/media/MainMediaPlayer.js`
+- `buildInlinePlayer(mount, core, doc)` in `scripts/media/InlinePlayer.js`
+- `buildLockScreenPlayer(mount, core, doc)` in `scripts/media/LockScreenPlayer.js`
+- `buildWidgetPlayer(mount, core, doc)` in `scripts/media/WidgetPlayer.js`
 
-- **Approach**: Dedicated factory functions (e.g., `createMediaControls()`) are exported from a shared module (such as `MediaPlayerUI.js` or a new component factory module). 
-- **Implementation**: These functions use standard DOM APIs (`document.createElement` or `insertAdjacentHTML`) to build the required HTML structure, attach necessary event listeners, and return the DOM node.
-- **Usage**: The consumer HTML files simply define an empty container and append the generated DOM node.
-- **Benefits**: This approach fits natively into the existing ES Module pattern, eliminates repetitive HTML boilerplates across the different player variants, and makes it straightforward to pass the `MediaPlayerCore` instance into the factories for immediate event binding.
+- **Approach**: Dedicated component factories are exported from separate modules.
+- **Implementation**: These functions construct the complete required DOM tree using standard DOM APIs (`document.createElement`), bind event listeners, wire subscriptions to `MediaPlayerCore`, and return a controller object containing `{ section, destroy() }`.
+- **Usage**: Both standalone consumer HTML files (`lab/media-player*.html`) and carousel selector slides (`lab/media-player-selector.html` via `scripts/media/MediaPlayerSelector.js`) define an empty `<main id="player-mount"></main>` container and invoke the exact same component factory function.
+- **Benefits**: Guarantees 100% component and DOM parity between standalone lab pages and the carousel selector, eliminates code drift and maintenance divergence, and provides structured lifecycle management with `destroy()`.
 
 ## Maintenance & Future Updates
 
@@ -43,16 +47,18 @@ To share common HTML components (like MediaControls, MediaMeta) across the vario
 
 ### 1. Main Media Player (`media-player.html`)
 The comprehensive implementation featuring advanced audio controls.
+- **Component Module**: Built via `scripts/media/MainMediaPlayer.js` (`buildMainPlayer(mount, core, doc)`), ensuring complete component parity between `lab/media-player.html` and Slide 1 in `lab/media-player-selector.html`.
 - **Layout**: 5-column grid layout.
 - **Key Features**:
   - Horizontal preset scroll with snapped alignment.
   - 5-band Equalizer with gain controls (-12dB to +12dB).
   - EQ power toggle, preset save/load (Local Storage).
-  - Option button with mode cycling (Like, Equalizer, Rewind) on long-press.
-  - Metadata popover on preset long-press.
+  - Option button with mode cycling (Like, Equalizer, Rewind) on long-press (500ms).
+  - Metadata popover on preset long-press using CSS Anchor Positioning (`#preset-popover`).
 
 ### 2. Media Player Widget (`media-player-widget.html`)
 A compact, persistent-style widget optimized for sidebar or dashboard use.
+- **Component Module**: Built via `scripts/media/WidgetPlayer.js` (`buildWidgetPlayer(mount, core, doc)`), ensuring complete component parity between `lab/media-player-widget.html` and Slide 4 in `lab/media-player-selector.html`.
 - **Layout**: 2-row grid. Top row for metadata, bottom row for playback controls.
 - **Key Features**:
   - Persistent track info (Title/Artist) in a condensed header.
@@ -61,7 +67,7 @@ A compact, persistent-style widget optimized for sidebar or dashboard use.
 
 ### 3. Lock Screen Player (`media-player-lock-screen.html`)
 A premium, OS-level inspired player with rich aesthetics.
-- **Component Module**: Built via `scripts/media/LockScreenPlayer.js` (`buildLockScreenPlayer(mount, core, doc)`), ensuring complete component parity and identical DOM markup between the standalone `lab/media-player-lock-screen.html` and the interactive carousel in `lab/media-player-selector.html`.
+- **Component Module**: Built via `scripts/media/LockScreenPlayer.js` (`buildLockScreenPlayer(mount, core, doc)`), ensuring complete component parity and identical DOM markup between the standalone `lab/media-player-lock-screen.html` and Slide 3 in `lab/media-player-selector.html`.
 - **Stylesheet**: `styles/components/media-player-lock-screen.css` provides the shared 8-column CSS Grid layout, equalizer overlay, slider controls, and animations.
 - **Design Patterns**:
   - `backdrop-filter: blur(10px)` for refined depth and frosted glass effect.
@@ -77,6 +83,7 @@ A premium, OS-level inspired player with rich aesthetics.
 
 ### 4. Inline Media Player (`media-player-inline.html`)
 A compact inline player optimized for embedding within lists or tight spaces.
+- **Component Module**: Built via `scripts/media/InlinePlayer.js` (`buildInlinePlayer(mount, core, doc)`), ensuring complete component parity between `lab/media-player-inline.html` and Slide 2 in `lab/media-player-selector.html`.
 - **Layout**: Horizontal flex-based layout.
 - **Key Features**:
   - **Decoupled Time Updates**: Listens for `timeupdate` directly on the `<audio>` element rather than through `MediaPlayerCore` notifications for improved performance.
