@@ -1,4 +1,4 @@
-const cacheName = 'v22'; // Bumped to v22 to include point-visualizer.html
+const cacheName = 'v24'; // Bumped to v24 for checkout variants and security hardening
 
 const assetsToCache = [
   '/index.html',
@@ -21,9 +21,15 @@ const assetsToCache = [
   '/lab/media-player-widget.html',
   '/lab/google-store-checkout.html',
   '/lab/checkout-tracking-card.html',
+  '/lab/google-store-checkout-timeline.html',
+  '/lab/google-store-checkout-truck.html',
+  '/lab/store-checkout-selector.html',
   '/lab/microsoft-logo.html',
   '/styles/main.css',
   '/styles/lab-shared.css',
+  '/styles/lab/store-checkout-selector.css',
+  '/styles/lab/google-store-checkout-timeline.css',
+  '/styles/lab/google-store-checkout-truck.css',
   '/styles/lab/headphones.css',
   '/styles/lab/framer-flows.css',
   '/styles/lab/framer-loaders.css',
@@ -55,7 +61,11 @@ const assetsToCache = [
   '/scripts/media/MediaPlayerUI.js',
   '/scripts/lab/headphones.js',
   '/scripts/lab/framer-flows.js',
-  '/scripts/lab/framer-loaders.js'
+  '/scripts/lab/framer-loaders.js',
+  '/scripts/lab/StoreCheckoutSelector.js',
+  '/scripts/lab/google-store-checkout-timeline.js',
+  '/scripts/lab/google-store-checkout-truck.js',
+  '/scripts/lab/checkout-tracking-card.js'
 ];
 
 self.addEventListener('install', event => {
