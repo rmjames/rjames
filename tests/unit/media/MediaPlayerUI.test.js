@@ -335,6 +335,24 @@ describe('MediaPlayerUI', () => {
             expect(onShortPress).not.toHaveBeenCalled();
         });
 
+        it('should suppress synthetic mousedown and click following pointer long press', () => {
+            UI.setupLongPress(button, { onShortPress, onLongPress, delay: 500 });
+
+            button.dispatchEvent(new Event('pointerdown'));
+            vi.advanceTimersByTime(500);
+
+            expect(onLongPress).toHaveBeenCalledTimes(1);
+
+            // User releases pointer
+            button.dispatchEvent(new Event('pointerup'));
+            // Synthetic mouse events emitted by browser after touch release
+            button.dispatchEvent(new MouseEvent('mousedown', { button: 0 }));
+            button.dispatchEvent(new MouseEvent('mouseup', { button: 0 }));
+            button.dispatchEvent(new MouseEvent('click', { cancelable: true }));
+
+            expect(onShortPress).not.toHaveBeenCalled();
+        });
+
         it('should cancel long press if pointer moves beyond tolerance threshold', () => {
             UI.setupLongPress(button, { onShortPress, onLongPress, delay: 500 });
 

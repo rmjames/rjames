@@ -56,7 +56,7 @@ A compact, persistent-style widget optimized for sidebar or dashboard use.
 - **Layout**: 2-row grid. Top row for metadata, bottom row for playback controls.
 - **Key Features**:
   - Persistent track info (Title/Artist) in a condensed header.
-  - Direct Dislike/Like buttons.
+  - Direct Dislike/Like buttons using authentic Material Symbols iconography (`SVG_PATHS.DISLIKE` and `SVG_PATHS.DISLIKE_FILLED`) without rotation transforms. Mutually exclusive toggling ensures activating dislike clears like and vice versa.
   - Centered playback controls (Prev, Play, Next).
 
 ### 3. Lock Screen Player (`media-player-lock-screen.html`)
@@ -170,7 +170,7 @@ Standardized multi-mode control with state persistence and kinetic feedback.
   </button>
   ```
 - **Interactions**:
-  - **Long-Press (500ms)**: Cycles between modes (e.g., Random, Like). Includes `animate-outline` and `pulse` animations. Handled via unified Pointer Events (`UI.setupLongPress`) with a 10px movement threshold for touch jitter tolerance and automatic synthetic click suppression.
+  - **Long-Press (500ms)**: Cycles between modes (e.g., Random, Like, Equalizer, Rewind). Includes `animate-outline` and `pulse` animations. Handled via unified Pointer Events (`UI.setupLongPress`) with a 10px movement threshold for touch jitter tolerance. Cancels via movement threshold rather than premature `mouseleave` on small 24px buttons, and rigorously suppresses synthetic `mousedown` / `click` duplicates on mobile and emulated touch devices. Fully wired across both standalone players and `MediaPlayerSelector` carousel slides.
   - **Tap / Short Press**: Executes current mode action.
   - **Keyboard Accessibility (WCAG 2.0)**: Supports keyboard activation via `Enter` or `Space` (tap/short-press executes mode action; holding key past 500ms activates long-press mode switch).
   - **Visuals**: Requires dynamic `viewBox` switching if icons have different coordinate systems (e.g., 24x24 vs 960x960). Title and `aria-label` dynamically synchronize with the active mode.
