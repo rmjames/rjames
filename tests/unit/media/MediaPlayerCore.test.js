@@ -216,5 +216,90 @@ describe('MediaPlayerCore', () => {
             await expect(fetchAudioChunk('https://media.example.com/audio/ep1.mp3', 0, 1023))
                 .rejects.toThrow('Failed to load audio chunk: 403');
         });
+
+        it('should validate protocols and byte ranges in fetchAudioChunk (SEC-05)', async () => {
+            const { fetchAudioChunk } = await import('../../../scripts/media/MediaPlayerCore.js');
+
+            await expect(fetchAudioChunk(null, 0, 1023))
+                .rejects.toThrow(TypeError);
+
+            await expect(fetchAudioChunk('ftp://example.com/audio.mp3', 0, 1023))
+                .rejects.toThrow('Unsupported protocol');
+
+            await expect(fetchAudioChunk('https://media.example.com/audio.mp3', -10, 1023))
+                .rejects.toThrow(RangeError);
+
+            await expect(fetchAudioChunk('https://media.example.com/audio.mp3', 1000, 500))
+                .rejects.toThrow(RangeError);
+        });
+
+        it('should reject byte ranges exceeding 10MB safety buffer cap in fetchAudioChunk (SEC-05)', async () => {
+            const { fetchAudioChunk } = await import('../../../scripts/media/MediaPlayerCore.js');
+            const elevenMB = 11 * 1024 * 1024;
+
+            await expect(fetchAudioChunk('https://media.example.com/audio.mp3', 0, elevenMB))
+                .rejects.toThrow('Requested range exceeds maximum buffer limit (10MB)');
+        });
+
+        it('should handle relative URLs and non-finite timestamps in isStreamUrlExpired', async () => {
+            const { isStreamUrlExpired } = await import('../../../scripts/media/MediaPlayerCore.js');
+            const now = Math.floor(Date.now() / 1000);
+
+            // Relative URLs with query params
+            expect(isStreamUrlExpired(`/audio/track.mp3?expires=${now - 50}`)).toBe(true);
+            expect(isStreamUrlExpired(`/audio/track.mp3?expires=${now + 3600}`)).toBe(false);
+
+            // Corrupt non-finite expiry parameter treated as expired
+            expect(isStreamUrlExpired('https://media.example.com/track.mp3?expires=not-a-number')).toBe(true);
+        });
+
+        it('should enforce crossOrigin = anonymous on audio element during initialization (SEC-01)', () => {
+            const audio = document.createElement('audio');
+            new MediaPlayerCore(audio);
+            expect(audio.crossOrigin).toBe('anonymous');
+        });
+
+        it('should discard stale asynchronous stream URL resolution when tracks are switched rapidly (SEC-02)', async () => {
+            let resolveFirst;
+            let resolveSecond;
+
+            global.fetch = vi.fn().mockImplementation((url) => {
+                if (url.includes('track1.mp3')) {
+                    return new Promise((res) => {
+                        resolveFirst = () => res({
+                            ok: true,
+                            json: () => Promise.resolve({ streamUrl: 'https://cdn.example.com/signed-track1.mp3' })
+                        });
+                    });
+                }
+                if (url.includes('track2.mp3')) {
+                    return new Promise((res) => {
+                        resolveSecond = () => res({
+                            ok: true,
+                            json: () => Promise.resolve({ streamUrl: 'https://cdn.example.com/signed-track2.mp3' })
+                        });
+                    });
+                }
+                return Promise.reject(new Error('Unknown track'));
+            });
+
+            // User starts on Track 0, then selects Track 1
+            mediaPlayer.loadTrack(0);
+            // Rapidly selects Track 1
+            mediaPlayer.loadTrack(1);
+
+            // Second track resolves first
+            resolveSecond();
+            await mediaPlayer._resolveStreamPromise;
+            expect(audioElement.src).toContain('signed-track2.mp3');
+
+            // Stale first track resolves later
+            resolveFirst();
+            // Allow event loop ticks
+            await new Promise(r => setTimeout(r, 10));
+
+            // Verify Track 1's stale response was discarded and did NOT overwrite audio.src
+            expect(audioElement.src).toContain('signed-track2.mp3');
+        });
     });
 });

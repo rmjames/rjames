@@ -7,10 +7,14 @@ import { mediaSessionService } from './MediaSessionService.js';
 export function isStreamUrlExpired(url, skewSeconds = 15) {
     if (!url || typeof url !== 'string') return true;
     try {
-        const parsed = new URL(url);
+        const dummyBase = (typeof window !== 'undefined' && window.location?.origin && window.location.origin !== 'null')
+            ? window.location.origin
+            : 'https://localhost';
+        const parsed = new URL(url, dummyBase);
         const expires = parsed.searchParams.get('expires');
         if (!expires) return false;
         const expireTime = parseInt(expires, 10);
+        if (!Number.isFinite(expireTime)) return true;
         const now = Math.floor(Date.now() / 1000);
         return expireTime <= (now + skewSeconds);
     } catch {
@@ -70,11 +74,41 @@ export async function fetchStreamUrl(trackOrId) {
 /**
  * Fetch audio chunk using HTTP Range headers for custom buffering or Web Audio API synthesis.
  */
-export async function fetchAudioChunk(url, startByte, endByte) {
+export async function fetchAudioChunk(url, startByte, endByte, options = {}) {
+    if (!url || typeof url !== 'string') {
+        throw new TypeError('Invalid audio URL');
+    }
+
+    // Validate URL protocol to prevent SSRF and unsafe schemes (SEC-05)
+    try {
+        const dummyBase = (typeof window !== 'undefined' && window.location?.origin && window.location.origin !== 'null')
+            ? window.location.origin
+            : 'https://localhost';
+        const parsed = new URL(url, dummyBase);
+        if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+            throw new Error(`Unsupported protocol for audio chunk fetch: ${parsed.protocol}`);
+        }
+    } catch (err) {
+        if (err.message && err.message.includes('Unsupported protocol')) throw err;
+        throw new TypeError('Invalid audio URL', { cause: err });
+    }
+
+    const start = parseInt(startByte, 10);
+    const end = parseInt(endByte, 10);
+    if (!Number.isFinite(start) || !Number.isFinite(end) || start < 0 || end < start) {
+        throw new RangeError('Invalid byte range parameters');
+    }
+
+    const MAX_CHUNK_BYTES = 10 * 1024 * 1024; // 10MB safety buffer cap (SEC-05)
+    if ((end - start + 1) > MAX_CHUNK_BYTES) {
+        throw new RangeError('Requested range exceeds maximum buffer limit (10MB)');
+    }
+
     const response = await fetch(url, {
         headers: {
-            'Range': `bytes=${startByte}-${endByte}`
-        }
+            'Range': `bytes=${start}-${end}`
+        },
+        signal: options.signal
     });
 
     if (response.status !== 206 && response.status !== 200) {
@@ -88,10 +122,18 @@ export class MediaPlayerCore {
     constructor(audioElement, options = {}) {
         this.audio = audioElement;
         this.options = options;
-        this.tracks = audioLibrary.getAll();
+        // Clone array to prevent mutating shared AudioLibrary singleton (SEC-06)
+        this.tracks = [...audioLibrary.getAll()];
         this.currentIndex = 0;
         this.listeners = new Set();
         this._resolveStreamPromise = null;
+        this._loadId = 0;
+        this._abortController = new AbortController();
+
+        // Enforce CORS safety before loading audio to prevent Web Audio taints (SEC-01)
+        if (this.audio && !this.audio.crossOrigin) {
+            this.audio.crossOrigin = 'anonymous';
+        }
 
         this._initAudioEvents();
 
@@ -101,9 +143,10 @@ export class MediaPlayerCore {
     }
 
     _initAudioEvents() {
-        this.audio.addEventListener('play', () => this.notify('play'));
-        this.audio.addEventListener('pause', () => this.notify('pause'));
-        this.audio.addEventListener('ended', () => this.notify('ended'));
+        const { signal } = this._abortController;
+        this.audio.addEventListener('play', () => this.notify('play'), { signal });
+        this.audio.addEventListener('pause', () => this.notify('pause'), { signal });
+        this.audio.addEventListener('ended', () => this.notify('ended'), { signal });
         this.audio.addEventListener('error', (e) => {
             const currentSrc = this.audio.src || '';
             if (currentSrc && !currentSrc.includes('/media/audio/coffee_shop.ogg') && !currentSrc.includes('/media/audio/fire.ogg')) {
@@ -111,8 +154,8 @@ export class MediaPlayerCore {
                 this.audio.play().catch(() => {});
             }
             this.notify('error', e);
-        });
-        this.audio.addEventListener('timeupdate', () => this.notify('timeupdate'));
+        }, { signal });
+        this.audio.addEventListener('timeupdate', () => this.notify('timeupdate'), { signal });
     }
 
     subscribe(callback) {
@@ -138,10 +181,18 @@ export class MediaPlayerCore {
             this.audio.src = initialSrc;
         }
 
+        // Monotonic load generation counter to eliminate async race conditions (SEC-02)
+        const currentLoadId = ++this._loadId;
+
         // Asynchronously resolve/refresh signed stream URL (Model 1)
         this._resolveStreamPromise = (async () => {
             try {
                 const streamUrl = await fetchStreamUrl(track);
+                // Stale response check: discard late-resolving requests if track changed
+                if (this._loadId !== currentLoadId) {
+                    return streamUrl;
+                }
+
                 const isDifferentSrc = streamUrl &&
                     this.audio.src !== streamUrl &&
                     !this.audio.src.endsWith(streamUrl);
@@ -245,6 +296,9 @@ export class MediaPlayerCore {
     }
 
     destroy() {
+        if (this._abortController) {
+            this._abortController.abort();
+        }
         if (mediaSessionService.activeCore === this) {
             mediaSessionService.disconnect();
         }

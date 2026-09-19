@@ -145,10 +145,13 @@ export const UI = {
         const pct = ((val - min) / (max - min)) * 100;
 
         const wrapper = input.parentElement;
-        const fill = wrapper.querySelector('.eq-slider__fill');
-        const thumb = wrapper.querySelector('.eq-slider__thumb');
+        const fill = wrapper?._cachedFill || wrapper?.querySelector('.eq-slider__fill');
+        const thumb = wrapper?._cachedThumb || wrapper?.querySelector('.eq-slider__thumb');
 
         if (!fill || !thumb) return;
+
+        input.setAttribute('aria-valuenow', String(val));
+        input.setAttribute('aria-valuetext', `${val > 0 ? '+' : ''}${val} dB`);
 
         const topPos = 100 - pct;
         thumb.style.top = `${topPos}%`;
