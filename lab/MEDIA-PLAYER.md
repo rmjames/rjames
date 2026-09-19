@@ -61,14 +61,18 @@ A compact, persistent-style widget optimized for sidebar or dashboard use.
 
 ### 3. Lock Screen Player (`media-player-lock-screen.html`)
 A premium, OS-level inspired player with rich aesthetics.
-- **Layout**: Fluid Flex/Grid with glassmorphism effects.
+- **Component Module**: Built via `scripts/media/LockScreenPlayer.js` (`buildLockScreenPlayer(mount, core, doc)`), ensuring complete component parity and identical DOM markup between the standalone `lab/media-player-lock-screen.html` and the interactive carousel in `lab/media-player-selector.html`.
+- **Stylesheet**: `styles/components/media-player-lock-screen.css` provides the shared 8-column CSS Grid layout, equalizer overlay, slider controls, and animations.
 - **Design Patterns**:
-  - `backdrop-filter: blur(10px)` for refined depth.
-  - Dynamically updated background art based on the current track.
-  - Accent color propagation (applying track-derived colors to buttons).
+  - `backdrop-filter: blur(10px)` for refined depth and frosted glass effect.
+  - Dynamically updated background art based on the current track using single-encoded URI normalized via `UI.updateBackgroundArt`.
+  - Accent color propagation (applying track-derived colors from `ColorExtractor` to controls and borders).
 - **Key Features**:
-  - Integrated range-based progress slider.
-  - Source selection icons (YT Music / Phone icons).
+  - 8-column CSS Grid layout (`media-player-grid`).
+  - Integrated range-based progress slider with current and remaining time readouts.
+  - Equalizer modal overlay toggle and phone source indicator button.
+  - Option button with interactive mode cycling (Like, Equalizer, Rewind) on long-press.
+  - Rewind 10-second button.
   - Prominent themed Play/Pause button.
 
 ### 4. Inline Media Player (`media-player-inline.html`)
