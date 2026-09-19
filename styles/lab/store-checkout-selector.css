@@ -1,0 +1,932 @@
+@property --truck-offset {
+    syntax: "<length>";
+    inherits: true;
+    initial-value: 0px;
+}
+
+:root {
+    --bg-color: oklch(from #1a1a1c l c h);
+    --stage-bg: oklch(from #222326 l c h);
+    --accent-blue: oklch(from #1a73e8 l c h);
+    --accent-blue-hover: oklch(from #1557b0 l c h);
+    --text-main: oklch(from #fff l c h / .92);
+    --text-muted: oklch(from #9aa0a6 l c h);
+    --card-surface: oklch(from #303134 l c h);
+    --card-border: oklch(from #5f6368 l c h / .35);
+    --ease-premium: cubic-bezier(.23, 1, .32, 1);
+    --truck-speed: .76s;
+    view-transition-name: none;
+}
+
+body {
+    display: grid;
+    place-items: center;
+    margin: 0;
+    padding: 0;
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    font-family: 'Google Sans', 'Inter', system-ui, -apple-system, sans-serif;
+    min-block-size: 100dvh;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+/* Back Link */
+.back-link {
+    position: fixed;
+    inset-block-start: 1.5rem;
+    inset-inline-start: 1.5rem;
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    color: var(--text-main);
+    text-decoration: none;
+    font-size: .9rem;
+    font-weight: 500;
+    padding: .5rem .85rem;
+    border-radius: 1.5rem;
+    background: oklch(1 0 0 / .08);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition: background .2s ease, transform .2s ease;
+    z-index: 20;
+
+    &:hover {
+        background: oklch(1 0 0 / .16);
+        transform: translateX(-2px);
+    }
+}
+
+/* Page Header */
+.header {
+    position: fixed;
+    inset-block-start: 1.5rem;
+    inset-inline: 0;
+    margin-inline: auto;
+    inline-size: fit-content;
+    max-inline-size: min(90vw, 55rem);
+    text-align: center;
+    z-index: 10;
+    pointer-events: none;
+
+    & h1 {
+        font-size: 2.25rem;
+        font-weight: 800;
+        margin: 0;
+        letter-spacing: -0.02em;
+        background: linear-gradient(in oklab to right, var(--text-main), var(--accent-blue));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    & p {
+        color: var(--text-muted);
+        margin: .35rem 0 0;
+        font-size: .95rem;
+    }
+}
+
+/* Carousel Container Stage */
+.carousel-stage {
+    display: grid;
+    position: relative;
+    inline-size: min(90vw, 68rem);
+    block-size: min(74dvh, 50rem);
+    border-radius: 2.5rem;
+    corner-shape: squircle;
+    overflow: hidden;
+    background-color: var(--stage-bg);
+    border: 1px solid oklch(1 0 0 / .08);
+    box-shadow: 0 25px 50px -12px oklch(0 0 0 / .5);
+    contain: layout paint;
+    margin-block-start: 2rem;
+}
+
+/* Slide Panels */
+.checkout-slide {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    visibility: hidden;
+    pointer-events: none;
+    z-index: 0;
+    box-sizing: border-box;
+    contain: layout style;
+
+    &.active {
+        visibility: visible;
+        pointer-events: auto;
+        z-index: 1;
+        view-transition-name: active-checkout;
+        will-change: transform, opacity;
+    }
+}
+
+/* Slide Header Bar */
+.card-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline: 0;
+    padding: 1.5rem 1rem 1rem;
+    box-sizing: border-box;
+    z-index: 5;
+    pointer-events: none;
+    background: linear-gradient(in oklab to bottom, oklch(0 0 0 / .6) 0%, transparent 100%);
+
+    & h2 {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--text-main);
+        letter-spacing: -0.01em;
+    }
+
+    & .card-subtitle {
+        margin: .25rem 0 0;
+        font-size: .8rem;
+        color: var(--text-muted);
+        font-weight: 500;
+    }
+}
+
+/* Slide Mount */
+.checkout-mount {
+    display: grid;
+    place-items: center;
+    inline-size: 100%;
+    block-size: 100%;
+    padding: 3rem 1.5rem 1.5rem;
+    box-sizing: border-box;
+    overflow-y: auto;
+    contain: layout style;
+}
+
+/* Navigation Controls Bar */
+.nav-controls {
+    position: fixed;
+    inset-block-end: 2rem;
+    inset-inline: 0;
+    margin-inline: auto;
+    inline-size: fit-content;
+    max-inline-size: calc(100vw - 2rem);
+    display: flex;
+    gap: 1.25rem;
+    align-items: center;
+    justify-content: center;
+    z-index: 15;
+    padding: .5rem 1rem;
+    background: oklch(.12 0 0 / .75);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-radius: 2rem;
+    border: 1px solid oklch(1 0 0 / .08);
+    box-shadow: 0 8px 24px oklch(0 0 0 / .3);
+}
+
+.nav-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 2.5rem;
+    block-size: 2.5rem;
+    border-radius: 50%;
+    border: none;
+    background: oklch(1 0 0 / .08);
+    color: var(--text-main);
+    cursor: pointer;
+    transition: background .2s ease, transform .2s ease;
+    flex-shrink: 0;
+
+    & svg {
+        inline-size: 1.5rem;
+        block-size: 1.5rem;
+        display: block;
+    }
+
+    &:hover {
+        background: oklch(1 0 0 / .18);
+        transform: scale(1.05);
+    }
+
+    &:active {
+        transform: scale(.95);
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--accent-blue);
+        outline-offset: 2px;
+    }
+}
+
+.pagination {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+}
+
+.dot {
+    inline-size: .625rem;
+    block-size: .625rem;
+    padding: 0;
+    border-radius: 50%;
+    border: none;
+    background: oklch(1 0 0 / .25);
+    cursor: pointer;
+    transition: background .3s ease, inline-size .3s var(--ease-premium), border-radius .3s var(--ease-premium);
+
+    &:hover {
+        background: oklch(1 0 0 / .5);
+    }
+
+    &.active,
+    &[aria-selected="true"] {
+        inline-size: 1.5rem;
+        border-radius: 1rem;
+        background: var(--accent-blue);
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--accent-blue);
+        outline-offset: 2px;
+    }
+}
+
+/* ==========================================================================
+   Common & Scoped Styles for Checkout Variants
+   ========================================================================== */
+
+/* Universal Checkbox Styling */
+.form-checkout input[type="checkbox"] {
+    display: grid;
+    place-content: center;
+    appearance: none;
+    background-color: transparent;
+    margin: 0;
+    font: inherit;
+    color: currentColor;
+    inline-size: 1.35rem;
+    block-size: 1.35rem;
+    border: 2px solid oklch(from #757575 l c h);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: border-color .2s ease, background-color .2s ease;
+}
+
+.form-checkout input[type="checkbox"]::before {
+    content: '';
+    inline-size: .65rem;
+    block-size: .35rem;
+    background-color: transparent;
+    border-inline-start: 2px solid oklch(from #fff l c h);
+    border-block-end: 2px solid oklch(from #fff l c h);
+    transform: rotate(-45deg) scale(0);
+    transition: 200ms transform cubic-bezier(0.4, 0.0, 0.2, 1);
+    transform-origin: bottom left;
+}
+
+.form-checkout input[type="checkbox"]:checked {
+    background-color: var(--accent-blue);
+    border-color: var(--accent-blue);
+}
+
+.form-checkout input[type="checkbox"]:checked::before {
+    transform: rotate(-45deg) scale(1) translate(1px, 2px);
+}
+
+.form-checkout input[type="checkbox"]:focus-visible {
+    outline: 2px solid var(--accent-blue);
+    outline-offset: 2px;
+}
+
+/* Variant 1: Pure CSS :has() Timeline */
+.checkout-variant--v1 {
+    .form-checkout--v1 {
+        display: grid;
+        grid-template-columns: repeat(7, minmax(2.5rem, 1fr));
+        align-items: center;
+        gap: .5rem;
+        inline-size: 100%;
+        max-inline-size: 28rem;
+        padding: 2rem;
+        border-radius: 1rem;
+        background-color: var(--card-surface);
+        border: 1px solid var(--card-border);
+        box-shadow: 0 8px 24px oklch(0 0 0 / .2);
+    }
+
+    .check {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: .5rem;
+        font-size: .9rem;
+        font-weight: 500;
+        cursor: pointer;
+        color: var(--text-main);
+    }
+
+    .line {
+        block-size: 2px;
+        inline-size: 100%;
+        background: linear-gradient(to right, var(--accent-blue) 50%, oklch(from #555 l c h) 0%) no-repeat;
+        background-size: 200% 100%;
+        background-position: 100% 100%;
+        animation: progress .25s linear forwards;
+        animation-play-state: paused;
+        align-self: center;
+        margin-block-start: -1.25rem;
+    }
+
+    /* Cascade animation-play-state when checked */
+    .form-checkout--v1:has([name="prepare"]:checked) .l-prep-js,
+    .form-checkout--v1:has([name="ship"]:checked) .l-prep-js,
+    .form-checkout--v1:has([name="ship"]:checked) .l-ship-js,
+    .form-checkout--v1:has([name="arrive"]:checked) .l-prep-js,
+    .form-checkout--v1:has([name="arrive"]:checked) .l-ship-js,
+    .form-checkout--v1:has([name="arrive"]:checked) .l-arrv-js {
+        animation-play-state: running;
+    }
+}
+
+@keyframes progress {
+    to {
+        background-position: 0% 100%;
+    }
+}
+
+/* Variant 2: Micro-Interaction with Truck Motion */
+.checkout-variant--v2 {
+    .wrapper-v2 {
+        display: flex;
+        justify-content: center;
+        inline-size: 100%;
+        position: relative;
+    }
+
+    .form-checkout--v2 {
+        display: grid;
+        grid-template-columns: repeat(7, minmax(2.5rem, 1fr));
+        align-items: center;
+        gap: .5rem;
+        inline-size: 100%;
+        max-inline-size: 28rem;
+        padding: 3rem 2rem 2rem;
+        border-radius: 1rem;
+        background-color: var(--card-surface);
+        border: 1px solid var(--card-border);
+        box-shadow: 0 8px 24px oklch(0 0 0 / .2);
+        position: relative;
+    }
+
+    .check {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: .5rem;
+        font-size: .9rem;
+        font-weight: 500;
+        cursor: pointer;
+        position: relative;
+        color: var(--text-main);
+    }
+
+    .line {
+        block-size: 2px;
+        inline-size: 100%;
+        background-color: oklch(from #555 l c h);
+        position: relative;
+        margin-block-start: -1.25rem;
+    }
+
+    .line::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        inline-size: 0%;
+        background-color: var(--accent-blue);
+        transition: inline-size .3s ease;
+    }
+
+    .form-checkout--v2:has([name="prepare"]:checked) .l-prep-js::after,
+    .form-checkout--v2:has([name="ship"]:checked) .l-prep-js::after,
+    .form-checkout--v2:has([name="ship"]:checked) .l-ship-js::after,
+    .form-checkout--v2:has([name="arrive"]:checked) .l-prep-js::after,
+    .form-checkout--v2:has([name="arrive"]:checked) .l-ship-js::after,
+    .form-checkout--v2:has([name="arrive"]:checked) .l-arrv-js::after {
+        inline-size: 100%;
+    }
+
+    .icon-wrapper--truck {
+        position: absolute;
+        inset-block-end: 2.25rem;
+        inset-inline-start: 50%;
+        transform: translateX(-50%) translateY(100%);
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        transition: opacity .5s ease,
+                    transform var(--truck-speed) cubic-bezier(0.68, -0.55, 0.265, 1.55),
+                    visibility .5s;
+        color: var(--accent-blue);
+        inline-size: 1.5rem;
+        block-size: 1.5rem;
+    }
+
+    .icon-wrapper--truck svg {
+        inline-size: 100%;
+        block-size: 100%;
+        fill: currentColor;
+    }
+
+    input[name="prepare"]:checked ~ .icon-wrapper--truck {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+        transform: translateX(calc(-50% + var(--truck-offset, 0px))) translateY(-1.75rem);
+    }
+
+    .form-checkout--v2:has(input[name="ship"]:checked) .icon-wrapper--truck {
+        --truck-offset: 7.25rem;
+    }
+
+    .form-checkout--v2:has(input[name="arrive"]:checked) .icon-wrapper--truck {
+        --truck-offset: 14.5rem;
+    }
+}
+
+/* Variant 3: Standalone Tracking Card */
+.checkout-variant--card {
+    .tracking-card {
+        background-color: var(--card-surface);
+        border: 1px solid var(--card-border);
+        border-radius: 1rem;
+        overflow: hidden;
+        inline-size: 100%;
+        max-inline-size: 28rem;
+        box-shadow: 0 12px 32px oklch(0 0 0 / .3);
+        position: relative;
+        padding-block-end: 1rem;
+    }
+
+    .card-header {
+        position: static;
+        background: transparent;
+        padding: 1.25rem 1.5rem .5rem;
+        align-items: flex-start;
+
+        & h2 {
+            font-size: 1.1rem;
+            color: var(--text-main);
+        }
+    }
+
+    .tracking-visual {
+        padding: 1.5rem;
+    }
+
+    .form-checkout--card {
+        display: grid;
+        grid-template-columns: repeat(7, minmax(1.5rem, 1fr));
+        align-items: start;
+        gap: 0;
+        inline-size: 100%;
+    }
+
+    .check {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: .35rem;
+        font-size: .8rem;
+        font-weight: 500;
+        text-align: center;
+        position: relative;
+        cursor: pointer;
+        z-index: 2;
+        color: var(--text-main);
+    }
+
+    .step-label {
+        font-size: .8rem;
+        line-height: 1.2;
+    }
+
+    .step-date {
+        font-size: .75rem;
+        color: var(--text-muted);
+    }
+
+    .line {
+        block-size: 2px;
+        background-color: oklch(from #555 l c h);
+        inline-size: 100%;
+        margin-block-start: .625rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .line::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        inline-size: 0%;
+        background-color: var(--accent-blue);
+        transition: inline-size .3s ease;
+    }
+
+    .form-checkout--card:has([name="prepare"]:checked) .l-prep-js::after,
+    .form-checkout--card:has([name="ship"]:checked) .l-prep-js::after,
+    .form-checkout--card:has([name="ship"]:checked) .l-ship-js::after,
+    .form-checkout--card:has([name="arrive"]:checked) .l-prep-js::after,
+    .form-checkout--card:has([name="arrive"]:checked) .l-ship-js::after,
+    .form-checkout--card:has([name="arrive"]:checked) .l-arrv-js::after {
+        inline-size: 100%;
+    }
+
+    .icon-wrapper--truck {
+        position: absolute;
+        inset-block-end: 2.25rem;
+        inset-inline-start: 50%;
+        transform: translateX(-50%) translateY(100%);
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        transition: opacity .5s ease,
+                    transform var(--truck-speed) cubic-bezier(0.68, -0.55, 0.265, 1.55),
+                    visibility .5s;
+        color: var(--accent-blue);
+        inline-size: 1.5rem;
+        block-size: 1.5rem;
+    }
+
+    .icon-wrapper--truck svg {
+        inline-size: 100%;
+        block-size: 100%;
+        fill: currentColor;
+    }
+
+    input[name="prepare"]:checked ~ .icon-wrapper--truck {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+        transform: translateX(calc(-50% + var(--truck-offset, 0px))) translateY(-1.75rem);
+    }
+
+    .form-checkout--card:has(input[name="ship"]:checked) .icon-wrapper--truck {
+        --truck-offset: 6rem;
+    }
+
+    .form-checkout--card:has(input[name="arrive"]:checked) .icon-wrapper--truck {
+        --truck-offset: 12rem;
+    }
+
+    .reset-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-inline-start: 1.5rem;
+        margin-block-start: .5rem;
+        inline-size: 2.25rem;
+        block-size: 2.25rem;
+        border-radius: 50%;
+        border: 1px solid var(--card-border);
+        background: oklch(1 0 0 / .08);
+        color: var(--text-main);
+        cursor: pointer;
+        transition: background .2s ease, transform .2s ease;
+
+        &:hover {
+            background: oklch(1 0 0 / .16);
+            transform: rotate(-45deg);
+        }
+
+        & svg {
+            inline-size: 1.15rem;
+            block-size: 1.15rem;
+        }
+    }
+}
+
+/* Variant 4: Gmail Order Confirmation Mockup */
+.checkout-variant--email {
+    .email-client-wrapper {
+        inline-size: 100%;
+        max-inline-size: 42rem;
+        border-radius: 1rem;
+        overflow: hidden;
+        border: 1px solid var(--card-border);
+        background-color: oklch(from #202124 l c h);
+        box-shadow: 0 16px 40px oklch(0 0 0 / .35);
+        display: flex;
+        flex-direction: column;
+        max-block-size: calc(min(74dvh, 50rem) - 4rem);
+    }
+
+    .ec-appbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: .6rem 1rem;
+        background-color: oklch(from #303134 l c h);
+        border-block-end: 1px solid var(--card-border);
+        gap: 1rem;
+    }
+
+    .ec-appbar-left {
+        display: flex;
+        align-items: center;
+        gap: .75rem;
+    }
+
+    .ec-hamburger {
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        padding: 4px;
+
+        & span {
+            inline-size: 14px;
+            block-size: 2px;
+            background-color: var(--text-muted);
+            border-radius: 1px;
+        }
+    }
+
+    .ec-brand {
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--text-main);
+    }
+
+    .ec-search {
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        background-color: oklch(from #202124 l c h);
+        padding: .4rem .75rem;
+        border-radius: 1.5rem;
+        flex: 1;
+        max-inline-size: 18rem;
+
+        & input {
+            background: transparent;
+            border: none;
+            color: var(--text-main);
+            outline: none;
+            font-size: .85rem;
+            inline-size: 100%;
+        }
+
+        & svg {
+            color: var(--text-muted);
+        }
+    }
+
+    .ec-avatar {
+        inline-size: 1.75rem;
+        block-size: 1.75rem;
+        border-radius: 50%;
+        background-color: oklch(from #8ab4f8 l c h);
+        color: oklch(from #202124 l c h);
+        display: grid;
+        place-items: center;
+        font-weight: 700;
+        font-size: .8rem;
+    }
+
+    .ec-body {
+        overflow-y: auto;
+        padding: 1rem;
+        background-color: oklch(from #1f1f1f l c h);
+    }
+
+    .ec-msg-subject {
+        margin: 0 0 .5rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--text-main);
+    }
+
+    .ec-msg-meta-row {
+        display: flex;
+        align-items: center;
+        gap: .75rem;
+        font-size: .8rem;
+        color: var(--text-muted);
+        margin-block-end: 1rem;
+    }
+
+    .ec-sender-avatar {
+        inline-size: 1.5rem;
+        block-size: 1.5rem;
+        border-radius: 50%;
+        background: oklch(from #ea4335 l c h);
+        color: white;
+        display: grid;
+        place-items: center;
+        font-weight: 700;
+        font-size: .75rem;
+    }
+
+    .page-wrapper {
+        background-color: oklch(from #28292c l c h);
+        border-radius: .75rem;
+        padding: 1.25rem;
+        border: 1px solid var(--card-border);
+    }
+
+    .site-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-block-end: 1rem;
+
+        & .logo-wrapper {
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            font-size: 1rem;
+            font-weight: 700;
+        }
+
+        & .theme-toggle-btn {
+            background: transparent;
+            border: 1px solid var(--card-border);
+            color: var(--text-main);
+            border-radius: 50%;
+            inline-size: 2rem;
+            block-size: 2rem;
+            cursor: pointer;
+            display: grid;
+            place-items: center;
+        }
+    }
+
+    .hero-title {
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin: 0 0 .75rem;
+
+        & mark {
+            background: transparent;
+            color: var(--accent-blue);
+        }
+    }
+
+    .shipment-status-box {
+        display: flex;
+        gap: .75rem;
+        align-items: flex-start;
+        padding: .75rem;
+        background-color: oklch(1 0 0 / .05);
+        border-radius: .5rem;
+        margin-block-end: 1rem;
+
+        & .status-icon {
+            color: var(--accent-blue);
+            margin-block-start: 2px;
+        }
+
+        & p {
+            margin: 0;
+            font-size: .85rem;
+        }
+
+        & .secondary-text {
+            color: var(--text-muted);
+            font-size: .75rem;
+            margin-block-start: .2rem;
+        }
+    }
+
+    .email-tracking-section {
+        margin-block-end: 1rem;
+
+        .tracking-card {
+            background: transparent;
+            border: 1px solid var(--card-border);
+            box-shadow: none;
+            border-radius: .5rem;
+        }
+
+        .card-header {
+            display: none;
+        }
+
+        .form-checkout--card {
+            display: grid;
+            grid-template-columns: repeat(7, minmax(1.25rem, 1fr));
+            gap: 0;
+        }
+
+        .check {
+            color: var(--text-main);
+        }
+
+        .reset-btn {
+            display: none;
+        }
+    }
+
+    .product-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding-block-start: 1rem;
+        border-block-start: 1px solid var(--card-border);
+
+        & .product-details h4 {
+            margin: 0;
+            font-size: .85rem;
+            font-weight: 600;
+        }
+
+        & .brand-highlight {
+            color: var(--accent-blue);
+        }
+
+        & .qty {
+            font-size: .75rem;
+            color: var(--text-muted);
+        }
+
+        & .product-pricing {
+            margin-inline-start: auto;
+            font-weight: 700;
+            font-size: .95rem;
+        }
+    }
+}
+
+/* ==========================================================================
+   View Transitions & Stagger Animation
+   ========================================================================== */
+::view-transition-group(active-checkout) {
+    overflow: hidden;
+    border-radius: 2.5rem;
+    animation-duration: .4s;
+    animation-timing-function: var(--ease-premium);
+}
+
+::view-transition-old(active-checkout) {
+    animation: .4s var(--ease-premium) both fade-out;
+}
+
+::view-transition-new(active-checkout) {
+    animation: .4s var(--ease-premium) both fade-in;
+}
+
+@keyframes fade-out {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+@keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.checkout-slide.active .form-checkout > *,
+.checkout-slide.active .product-item,
+.checkout-slide.active .shipment-status-box {
+    animation: stagger-in .4s var(--ease-premium) both;
+    animation-delay: calc(var(--stagger-step, sibling-index()) * 50ms);
+}
+
+@keyframes stagger-in {
+    from {
+        opacity: 0;
+        transform: translateY(.75rem);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    ::view-transition-group(active-checkout),
+    ::view-transition-old(active-checkout),
+    ::view-transition-new(active-checkout),
+    .checkout-slide.active .form-checkout > *,
+    .checkout-slide.active .product-item,
+    .checkout-slide.active .shipment-status-box {
+        animation: none !important;
+        transition: none !important;
+    }
+}

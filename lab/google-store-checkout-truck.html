@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self' https://www.googletagmanager.com https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com data:; img-src 'self' https://assets.codepen.io data:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://robertjames.nyc https://www.google-analytics.com https://analytics.google.com https://cloudflareinsights.com https://static.cloudflareinsights.com; object-src 'none'; frame-src 'self'; form-action 'none'; base-uri 'self';" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Store Checkout Truck - Labs</title>
+    <link rel="stylesheet" href="../styles/lab-shared.css">
+    <link rel="stylesheet" href="../styles/lab/google-store-checkout-truck.css">
+    <link rel="apple-touch-icon" href="../images/icon-ios.svg" />
+    <link rel="icon" type="image/svg+xml" sizes="any" href="../images/icon.svg" id="favicon-svg" />
+    <link rel="icon" type="image/png" href="../favicon_144.png" sizes="144x144" />
+    <link rel="icon" type="image/png" href="../favicon_512.png" sizes="512x512" />
+    <link rel="icon" type="image/png" href="../favicon_192.png" sizes="192x192" />
+    <link rel="manifest" href="../manifest.json" />
+    <link rel="modulepreload" href="../scripts/favicon-animator.js">
+    <script type="module" src="../scripts/favicon-animator.js" async></script>
+    <script type="module" src="../scripts/utils/labNavigation.js"></script>
+</head>
+
+<body>
+    <a href="../lab.html" class="back-link" aria-label="Back to Labs">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+        <span>Back</span>
+    </a>
+
+    <main class="truck-container">
+        <h1 class="truck-title">Google Store Order Tracking</h1>
+        <form class="form-checkout">
+            <label class="check">
+                <input name="order" type="checkbox" checked aria-label="Order placed">
+                <span>Ordered</span>
+            </label>
+            <div class="line l-prep-js" aria-hidden="true"></div>
+            <label class="check">
+                <input name="prepare" type="checkbox" aria-label="Preparing shipment">
+                <span>Preparing</span>
+                <div class="icon-wrapper--truck" aria-hidden="true">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24" fill="currentColor">
+                        <path d="M160-120q-33 0-56.5-23.5T80-200v-440q0-33 23.5-56.5T160-720h520v120h160l80 120v280q0 33-23.5 56.5T840-120h-45q-13-37-44.5-58.5T680-200q-38 0-69.5 21.5T566-120H394q-13-37-44.5-58.5T280-200q-38 0-69.5 21.5T165-120h-5Zm120-80q17 0 28.5-11.5T320-240q0-17-11.5-28.5T280-280q-17 0-28.5 11.5T240-240q0 17 11.5 28.5T280-200Zm400 0q17 0 28.5-11.5T720-240q0-17-11.5-28.5T680-280q-17 0-28.5 11.5T640-240q0 17 11.5 28.5T680-200ZM160-640v360h33q13-37 44.5-58.5T308-360h344q13 37 44.5 58.5T741-280h19v-160h-85l-75-110v-90H160Zm0 0v440-440Z"/>
+                    </svg>
+                </div>
+            </label>
+            <div class="line l-ship-js" aria-hidden="true"></div>
+            <label class="check">
+                <input name="ship" type="checkbox" aria-label="Order shipped">
+                <span>Shipping</span>
+            </label>
+            <div class="line l-arrv-js" aria-hidden="true"></div>
+            <label class="check">
+                <input name="arrive" type="checkbox" aria-label="Order delivered">
+                <span>Arriving</span>
+            </label>
+        </form>
+    </main>
+
+    <script type="module" src="../scripts/lab/google-store-checkout-truck.js"></script>
+</body>
+
+</html>
