@@ -303,7 +303,7 @@ export function buildLockScreenPlayer(mount, core, doc = document) {
             core.audio?.removeEventListener('timeupdate', handleTimeUpdate);
             UI.unobserveMarquee?.(titleEl);
             UI.unobserveMarquee?.(artistEl);
-            section.remove();
+            section?.remove?.();
         }
     };
 }

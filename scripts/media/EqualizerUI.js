@@ -240,7 +240,11 @@ export class EqualizerUI {
     }
 
     initAudio() {
-        this.eq.init();
+        try {
+            this.eq?.init();
+        } catch {
+            // Web Audio API uninitialized or unsupported in current environment
+        }
     }
 
     destroy() {

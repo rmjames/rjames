@@ -90,9 +90,21 @@ class MockElement {
         newChildren.forEach(child => this.appendChild(child));
     }
 
+    remove() {
+        if (this.parentElement && Array.isArray(this.parentElement.children)) {
+            this.parentElement.children = this.parentElement.children.filter(c => c !== this);
+        }
+    }
+
     addEventListener(event, fn) {
         if (!this.eventListeners[event]) this.eventListeners[event] = [];
         this.eventListeners[event].push(fn);
+    }
+
+    removeEventListener(event, fn) {
+        if (this.eventListeners[event]) {
+            this.eventListeners[event] = this.eventListeners[event].filter(f => f !== fn);
+        }
     }
 
     dispatchEvent(event) {
@@ -106,15 +118,13 @@ class MockElement {
             return this.children.find(c => c.classList.contains('player-slide') && String(c.dataset.index) === String(index)) || null;
         }
         const search = (el) => {
+            if (selector.startsWith('.') && el.classList.contains(selector.slice(1))) return el;
             if (selector === 'iframe' && el.tagName === 'IFRAME') return el;
             if (selector === 'svg' && el.tagName === 'SVG') return el;
             if (selector === 'svg path' && el.tagName === 'PATH') return el;
             if (selector === 'path' && el.tagName === 'PATH') return el;
             if (selector === 'img' && el.tagName === 'IMG') return el;
             if (selector === 'span' && el.tagName === 'SPAN') return el;
-            if (selector === '.media-player' && el.classList.contains('media-player')) return el;
-            if (selector === '.media-player-inline' && el.classList.contains('media-player-inline')) return el;
-            if (selector === '.media-player-grid' && el.classList.contains('media-player-grid')) return el;
             for (const child of el.children) {
                 const found = search(child);
                 if (found) return found;
@@ -298,6 +308,19 @@ describe('MediaPlayerSelector Component (Approach B Native DOM)', () => {
 
         assert.equal(carousel.children[1].classList.contains('active'), true);
         assert.equal(controller.getCurrentIndex(), 1);
+    });
+
+    it('should mount all 4 shared component controllers with complete feature parity', () => {
+        const controllers = controller.getControllers();
+        assert.equal(controllers.length, 4, 'Should initialize 4 player controllers');
+        assert.ok(controllers[0].section.querySelector('.media-player__presets'), 'Main player slide must have presets');
+        assert.ok(controllers[0].section.querySelector('.media-player__equalizer'), 'Main player slide must have equalizer overlay');
+        assert.ok(controllers[1].section.querySelector('.media-player-inline__slider'), 'Inline player slide must have slider');
+        assert.ok(controllers[2].section.querySelector('.grid-item--eq'), 'Lock screen slide must have EQ button');
+        assert.ok(controllers[3].section.querySelector('.media-player__dislike'), 'Widget slide must have dislike button');
+
+        // Test destroy cleanup
+        controller.destroy();
     });
 });
 
