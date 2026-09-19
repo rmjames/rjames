@@ -116,12 +116,51 @@ function buildMainPlayer(mount, core, doc) {
 
     // Event Bindings
     playBtn.addEventListener('click', () => core.togglePlay());
+    let optionMode = 'like';
     let isLiked = false;
-    optionBtn.addEventListener('click', () => {
-        isLiked = !isLiked;
+    const updateMainOptionUI = () => {
         const path = optionBtn.querySelector('path');
-        if (path) path.setAttribute('d', isLiked ? SVG_PATHS.LIKE_FILLED : SVG_PATHS.LIKE);
+        if (!path) return;
+        if (optionMode === 'like') {
+            path.setAttribute('d', isLiked ? SVG_PATHS.LIKE_FILLED : SVG_PATHS.LIKE);
+            optionBtn.title = 'Mode: LIKE';
+            optionBtn.setAttribute('aria-label', 'Options Mode: LIKE');
+        } else if (optionMode === 'equalizer') {
+            path.setAttribute('d', ICONS.EQ);
+            optionBtn.title = 'Mode: EQUALIZER';
+            optionBtn.setAttribute('aria-label', 'Options Mode: EQUALIZER');
+        } else if (optionMode === 'rewind') {
+            path.setAttribute('d', ICONS.REWIND);
+            optionBtn.title = 'Mode: REWIND';
+            optionBtn.setAttribute('aria-label', 'Options Mode: REWIND');
+        }
+    };
+
+    UI.setupLongPress(optionBtn, {
+        onShortPress: () => {
+            if (optionMode === 'like') {
+                isLiked = !isLiked;
+                updateMainOptionUI();
+            } else if (optionMode === 'rewind') {
+                if (core.audio) core.audio.currentTime = Math.max(0, core.audio.currentTime - 10);
+            } else if (optionMode === 'equalizer') {
+                optionBtn.classList.add('pulse');
+                setTimeout(() => optionBtn.classList.remove('pulse'), 300);
+            }
+        },
+        onLongPress: () => {
+            if (optionMode === 'like') optionMode = 'equalizer';
+            else if (optionMode === 'equalizer') optionMode = 'rewind';
+            else optionMode = 'like';
+
+            optionBtn.classList.add('animate-outline', 'pulse');
+            if (typeof navigator !== 'undefined' && navigator.vibrate) navigator.vibrate(50);
+            updateMainOptionUI();
+            setTimeout(() => optionBtn.classList.remove('animate-outline', 'pulse'), 320);
+        },
+        delay: 500
     });
+    updateMainOptionUI();
 
     // Subscriptions
     core.subscribe((event, data) => {
@@ -230,6 +269,42 @@ function buildInlinePlayer(mount, core, doc) {
             core.audio.currentTime = (slider.value / 100) * core.audio.duration;
         }
     });
+
+    let inlineMode = 'shuffle';
+    let isLikedInline = false;
+    const updateInlineOptionUI = () => {
+        const path = optBtn.querySelector('path');
+        if (!path) return;
+        if (inlineMode === 'shuffle') {
+            path.setAttribute('d', ICONS.SHUFFLE);
+            optBtn.title = 'Shuffle';
+            optBtn.setAttribute('aria-label', 'Shuffle');
+        } else {
+            path.setAttribute('d', isLikedInline ? SVG_PATHS.LIKE_FILLED : SVG_PATHS.LIKE);
+            optBtn.title = isLikedInline ? 'Liked' : 'Like';
+            optBtn.setAttribute('aria-label', 'Like');
+        }
+    };
+
+    UI.setupLongPress(optBtn, {
+        onShortPress: () => {
+            if (inlineMode === 'shuffle') {
+                core.shuffle();
+            } else {
+                isLikedInline = !isLikedInline;
+                updateInlineOptionUI();
+            }
+        },
+        onLongPress: () => {
+            inlineMode = inlineMode === 'shuffle' ? 'like' : 'shuffle';
+            optBtn.classList.add('mode-switching', 'pulse');
+            if (typeof navigator !== 'undefined' && navigator.vibrate) navigator.vibrate(50);
+            updateInlineOptionUI();
+            setTimeout(() => optBtn.classList.remove('mode-switching', 'pulse'), 300);
+        },
+        delay: 500
+    });
+    updateInlineOptionUI();
 
     // Subscriptions
     core.subscribe((event, data) => {
@@ -355,6 +430,45 @@ function buildLockScreenPlayer(mount, core, doc) {
         }
     });
 
+    let lockScreenMode = 'random';
+    let isRandom = false;
+    let isLikedLock = false;
+    const updateLockOptionUI = () => {
+        const path = optBtn.querySelector('path');
+        if (!path) return;
+        if (lockScreenMode === 'random') {
+            path.setAttribute('d', ICONS.SHUFFLE);
+            optBtn.title = 'Random (Mode)';
+            optBtn.setAttribute('aria-label', 'Random (Mode)');
+        } else {
+            path.setAttribute('d', isLikedLock ? SVG_PATHS.LIKE_FILLED : SVG_PATHS.LIKE);
+            optBtn.title = isLikedLock ? 'Liked (Mode)' : 'Like (Mode)';
+            optBtn.setAttribute('aria-label', 'Like (Mode)');
+        }
+    };
+
+    UI.setupLongPress(optBtn, {
+        onShortPress: () => {
+            if (lockScreenMode === 'random') {
+                isRandom = !isRandom;
+                if (isRandom) core.shuffle();
+                else if (core.currentTrack) core.loadTrack(core.tracks.indexOf(core.currentTrack));
+            } else {
+                isLikedLock = !isLikedLock;
+                updateLockOptionUI();
+            }
+        },
+        onLongPress: () => {
+            lockScreenMode = lockScreenMode === 'random' ? 'like' : 'random';
+            optBtn.classList.add('animate-outline', 'pulse');
+            if (typeof navigator !== 'undefined' && navigator.vibrate) navigator.vibrate(50);
+            updateLockOptionUI();
+            setTimeout(() => optBtn.classList.remove('animate-outline', 'pulse'), 320);
+        },
+        delay: 500
+    });
+    updateLockOptionUI();
+
     // Subscriptions
     core.subscribe((event, data) => {
         if (event === 'play' || event === 'pause' || event === 'ended') {
@@ -409,7 +523,7 @@ function buildWidgetPlayer(mount, core, doc) {
     const dislikeBtn = doc.createElement('button');
     dislikeBtn.className = 'media-player__dislike';
     dislikeBtn.setAttribute('aria-label', 'Dislike');
-    dislikeBtn.appendChild(createSvg(doc, SVG_PATHS.LIKE));
+    dislikeBtn.appendChild(createSvg(doc, SVG_PATHS.DISLIKE));
     controls.appendChild(dislikeBtn);
 
     const prevBtn = doc.createElement('button');
@@ -452,7 +566,7 @@ function buildWidgetPlayer(mount, core, doc) {
         const likePath = likeBtn.querySelector('path');
         const dislikePath = dislikeBtn.querySelector('path');
         if (likePath) likePath.setAttribute('d', isLiked ? SVG_PATHS.LIKE_FILLED : SVG_PATHS.LIKE);
-        if (dislikePath) dislikePath.setAttribute('d', SVG_PATHS.LIKE);
+        if (dislikePath) dislikePath.setAttribute('d', SVG_PATHS.DISLIKE);
     });
 
     dislikeBtn.addEventListener('click', () => {
@@ -460,7 +574,7 @@ function buildWidgetPlayer(mount, core, doc) {
         if (isDisliked) isLiked = false;
         const likePath = likeBtn.querySelector('path');
         const dislikePath = dislikeBtn.querySelector('path');
-        if (dislikePath) dislikePath.setAttribute('d', isDisliked ? SVG_PATHS.LIKE_FILLED : SVG_PATHS.LIKE);
+        if (dislikePath) dislikePath.setAttribute('d', isDisliked ? SVG_PATHS.DISLIKE_FILLED : SVG_PATHS.DISLIKE);
         if (likePath) likePath.setAttribute('d', SVG_PATHS.LIKE);
     });
 

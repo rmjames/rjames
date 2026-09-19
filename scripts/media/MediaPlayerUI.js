@@ -233,7 +233,6 @@ export const UI = {
                 button.removeEventListener('pointerup', handlePointerUp);
                 button.removeEventListener('pointercancel', handlePointerUp);
                 button.removeEventListener('mouseup', handlePointerUp);
-                button.removeEventListener('mouseleave', handlePointerUp);
             };
 
             const cancelPress = () => {
@@ -294,7 +293,6 @@ export const UI = {
                 button.addEventListener('pointerup', handlePointerUp);
                 button.addEventListener('pointercancel', handlePointerUp);
                 button.addEventListener('mouseup', handlePointerUp);
-                button.addEventListener('mouseleave', handlePointerUp);
             };
 
             const handlePointerDown = (e) => {
@@ -317,8 +315,10 @@ export const UI = {
 
             const handleMouseDown = (e) => {
                 if (e.button !== undefined && e.button !== 0) return;
-                // Suppress synthetic/duplicate mouse events triggered right after pointerdown
-                if (Date.now() - lastPointerDownTime < 100) return;
+                // Suppress synthetic/duplicate mouse events triggered following pointerdown
+                if (isPressed || suppressClick || longPressTriggered || (lastPointerDownTime && Date.now() - lastPointerDownTime < 1500)) {
+                    return;
+                }
                 addActivePointerListeners();
                 startPress(e.clientX, e.clientY, e);
             };
@@ -329,6 +329,7 @@ export const UI = {
                     e.stopImmediatePropagation();
                     suppressClick = false;
                     longPressTriggered = false;
+                    lastPointerDownTime = 0;
                     return;
                 }
 
