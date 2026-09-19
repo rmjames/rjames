@@ -21,6 +21,11 @@ vi.stubGlobal('ResizeObserver', class {
 });
 
 describe('MediaPlayerUI', () => {
+    beforeEach(() => {
+        UI._isMarqueeBatchScheduled = false;
+        UI._marqueeElements.clear();
+    });
+
     describe('updatePlayIcon', () => {
         it('should update icon to play when paused', () => {
             const button = document.createElement('button');
@@ -171,6 +176,55 @@ describe('MediaPlayerUI', () => {
             UI.updateBackgroundArt(element, track);
             expect(element.style.getPropertyValue('--bg-image')).toBe('none');
         });
+
+        it('should preserve already percent-encoded URLs without double-encoding', () => {
+            const element = document.createElement('div');
+            const track = { albumArt: 'https://media.example.com/audio/Album%20Name/Cover.jpg' };
+
+            UI.updateBackgroundArt(element, track);
+            expect(element.style.getPropertyValue('--bg-image')).toBe('url("https://media.example.com/audio/Album%20Name/Cover.jpg")');
+        });
+
+        it('should encode URLs with unencoded spaces and strip quotes/parentheses', () => {
+            const element = document.createElement('div');
+            const track = { albumArt: 'https://media.example.com/audio/Album Name/Cover"test().jpg' };
+
+            UI.updateBackgroundArt(element, track);
+            expect(element.style.getPropertyValue('--bg-image')).toBe('url("https://media.example.com/audio/Album%20Name/Covertest.jpg")');
+        });
+
+        it('should reject dangerous schemes like javascript:, data:, and blob:', () => {
+            const element = document.createElement('div');
+            
+            UI.updateBackgroundArt(element, { albumArt: 'javascript:alert(1)' });
+            expect(element.style.getPropertyValue('--bg-image')).toBe('none');
+
+            UI.updateBackgroundArt(element, { albumArt: 'data:image/svg+xml;base64,PHN2Zz48L3N2Zz4=' });
+            expect(element.style.getPropertyValue('--bg-image')).toBe('none');
+
+            UI.updateBackgroundArt(element, { albumArt: 'blob:https://example.com/uuid' });
+            expect(element.style.getPropertyValue('--bg-image')).toBe('none');
+        });
+
+        it('should reject URLs containing control characters, backslashes, or unescaped delimiters', () => {
+            const element = document.createElement('div');
+
+            UI.updateBackgroundArt(element, { albumArt: 'https://media.example.com/art\\22.jpg' });
+            expect(element.style.getPropertyValue('--bg-image')).toBe('none');
+
+            UI.updateBackgroundArt(element, { albumArt: 'https://media.example.com/art\nnewline.jpg' });
+            expect(element.style.getPropertyValue('--bg-image')).toBe('none');
+
+            UI.updateBackgroundArt(element, { albumArt: 'https://media.example.com/art;pwned.jpg' });
+            expect(element.style.getPropertyValue('--bg-image')).toBe('none');
+        });
+
+        it('should reject unsupported schemes like ftp: or file:', () => {
+            const element = document.createElement('div');
+
+            UI.updateBackgroundArt(element, { albumArt: 'ftp://example.com/art.jpg' });
+            expect(element.style.getPropertyValue('--bg-image')).toBe('none');
+        });
     });
 
     describe('applyAccentColor', () => {
@@ -182,6 +236,17 @@ describe('MediaPlayerUI', () => {
 
             expect(ColorExtractor.getAccentColor).toHaveBeenCalledWith('test.jpg');
             expect(element.style.getPropertyValue('--accent-color')).toBe('oklch(0.5 0.5 180)');
+        });
+
+        it('should reject invalid CSS custom property names', async () => {
+            const element = document.createElement('div');
+            const track = { albumArt: 'test.jpg' };
+
+            await UI.applyAccentColor(element, track, 'color');
+            expect(element.style.getPropertyValue('color')).toBe('');
+
+            await UI.applyAccentColor(element, track, '--invalid;property');
+            expect(element.style.getPropertyValue('--invalid;property')).toBe('');
         });
     });
 
@@ -260,6 +325,36 @@ describe('MediaPlayerUI', () => {
             expect(observeSpy).not.toHaveBeenCalled();
             expect(el.classList.contains('is-marquee')).toBe(true);
             expect(el.style.getPropertyValue('--marquee-width')).toBe('150px');
+        });
+
+        it('should unobserve element and remove cached widths via unobserveMarquee', () => {
+            const el = document.createElement('div');
+            UI._initResizeObserver();
+            const unobserveSpy = vi.spyOn(UI._resizeObserver, 'unobserve');
+
+            UI.updateMarquee(el);
+            UI._parentWidths.set(el, 120);
+
+            UI.unobserveMarquee(el);
+            expect(unobserveSpy).toHaveBeenCalledWith(el);
+            expect(UI._parentWidths.get(el)).toBeUndefined();
+        });
+
+        it('should throttle multiple rAF requests to a single batch per frame', () => {
+            const el1 = document.createElement('div');
+            const el2 = document.createElement('div');
+
+            let rafCount = 0;
+            vi.stubGlobal('requestAnimationFrame', () => {
+                rafCount++;
+                // simulate pending callback without executing immediately
+            });
+
+            UI._isMarqueeBatchScheduled = false;
+            UI.updateMarquee(el1);
+            UI.updateMarquee(el2);
+
+            expect(rafCount).toBe(1);
         });
     });
 

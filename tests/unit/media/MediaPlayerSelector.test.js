@@ -107,6 +107,7 @@ class MockElement {
         }
         const search = (el) => {
             if (selector === 'iframe' && el.tagName === 'IFRAME') return el;
+            if (selector === 'svg' && el.tagName === 'SVG') return el;
             if (selector === 'svg path' && el.tagName === 'PATH') return el;
             if (selector === 'path' && el.tagName === 'PATH') return el;
             if (selector === 'img' && el.tagName === 'IMG') return el;

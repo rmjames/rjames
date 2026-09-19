@@ -1,5 +1,6 @@
 import { SVG_PATHS } from './Constants.js';
 import { ColorExtractor } from '../utils/ColorExtractor.js';
+import { MEDIA_BASE_URL } from '../AudioLibrary.js';
 
 export const UI = {
     updatePlayIcon(button, isPaused) {
@@ -14,6 +15,7 @@ export const UI = {
     _resizeObserver: null,
     _observedElements: new WeakSet(),
     _marqueeElements: new Set(),
+    _isMarqueeBatchScheduled: false,
 
     _initResizeObserver() {
         if (this._resizeObserver) return;
@@ -24,7 +26,16 @@ export const UI = {
                 this._parentWidths.set(entry.target, entry.contentRect.width);
                 this._marqueeElements.add(entry.target);
             }
-            requestAnimationFrame(() => this._processMarqueeBatch());
+            this._scheduleMarqueeBatch();
+        });
+    },
+
+    _scheduleMarqueeBatch() {
+        if (this._isMarqueeBatchScheduled) return;
+        this._isMarqueeBatchScheduled = true;
+        requestAnimationFrame(() => {
+            this._isMarqueeBatchScheduled = false;
+            this._processMarqueeBatch();
         });
     },
 
@@ -60,7 +71,20 @@ export const UI = {
         }
 
         this._marqueeElements.add(el);
-        requestAnimationFrame(() => this._processMarqueeBatch());
+        this._scheduleMarqueeBatch();
+    },
+
+    unobserveMarquee(el) {
+        if (!el) return;
+        if (this._resizeObserver) {
+            try {
+                this._resizeObserver.unobserve(el);
+            } catch {
+                // Ignore if not observed
+            }
+        }
+        this._marqueeElements.delete(el);
+        this._parentWidths.delete(el);
     },
 
     updateTrackInfo(elements, track) {
@@ -89,18 +113,27 @@ export const UI = {
                 if (!img) {
                     img = document.createElement('img');
                     img.crossOrigin = 'anonymous';
+                    img.decoding = 'async';
+                    img.width = 48;
+                    img.height = 48;
                     artBtn.replaceChildren(img);
                 }
                 img.crossOrigin = 'anonymous';
+                img.decoding = 'async';
                 img.src = track.albumArt;
-                img.alt = track.title;
+                img.alt = track.title || 'Track Art';
             } else {
                 artBtn.classList.remove('has-art');
-                artBtn.innerHTML = `
-                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
-                        <path d="M360-400h400L622-580l-92 120-62-80-108 140Zm-40 160q-33 0-56.5-23.5T240-320v-480q0-33 23.5-56.5T320-880h480q33 0 56.5 23.5T880-800v480q0 33-23.5 56.5T800-240H320Zm0-80h480v-480H320v480ZM160-80q-33 0-56.5-23.5T80-160v-560h80v560h560v80H160Zm160-720v480-480Z" />
-                    </svg>
-                `;
+                const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                svg.setAttribute('height', '24px');
+                svg.setAttribute('viewBox', '0 -960 960 960');
+                svg.setAttribute('width', '24px');
+                svg.setAttribute('fill', '#e3e3e3');
+                svg.setAttribute('aria-hidden', 'true');
+                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                path.setAttribute('d', 'M360-400h400L622-580l-92 120-62-80-108 140Zm-40 160q-33 0-56.5-23.5T240-320v-480q0-33 23.5-56.5T320-880h480q33 0 56.5 23.5T880-800v480q0 33-23.5 56.5T800-240H320Zm0-80h480v-480H320v480ZM160-80q-33 0-56.5-23.5T80-160v-560h80v560h560v80H160Zm160-720v480-480Z');
+                svg.appendChild(path);
+                artBtn.replaceChildren(svg);
             }
         }
     },
@@ -183,11 +216,45 @@ export const UI = {
 
     updateBackgroundArt(element, track) {
         if (!element || !track) return;
-        // SEC-7: Sanitize URL to prevent CSS injection
+        // SEC-01: Sanitize URL to prevent CSS injection & data exfiltration
         const rawArtUrl = track.albumArt || '';
-        if (rawArtUrl) {
-            // Remove characters that could break out of url("") and then encode
-            const sanitizedUrl = encodeURI(rawArtUrl.replace(/["'()]/g, ''));
+        if (rawArtUrl && typeof rawArtUrl === 'string') {
+            const cleanUrl = rawArtUrl.replace(/["'()]/g, '').trim();
+            if (!cleanUrl) {
+                element.style.setProperty('--bg-image', 'none');
+                return;
+            }
+
+            // Reject control characters, newlines, tabs, null bytes, backslashes, and unescaped delimiters
+            if (/[\r\n\t\0\\<>;]/.test(cleanUrl)) {
+                element.style.setProperty('--bg-image', 'none');
+                return;
+            }
+
+            // Security check: only allow relative paths, trusted media CDN, or safe HTTP/HTTPS URLs
+            const isAllowedCdn = typeof MEDIA_BASE_URL === 'string' && MEDIA_BASE_URL && cleanUrl.startsWith(MEDIA_BASE_URL);
+            const isRelativePath = !/^(?:[a-z]+:|\/\/)/i.test(cleanUrl);
+            const isHttpUrl = /^https?:\/\//i.test(cleanUrl);
+
+            // Explicitly reject dangerous schemes
+            if (/^(?:javascript|data|blob|vbscript):/i.test(cleanUrl)) {
+                element.style.setProperty('--bg-image', 'none');
+                return;
+            }
+
+            if (!isAllowedCdn && !isRelativePath && !isHttpUrl) {
+                element.style.setProperty('--bg-image', 'none');
+                return;
+            }
+
+            // Prevent double-encoding of already-encoded URL sequences (e.g. %20 -> %2520)
+            let decoded = cleanUrl;
+            try {
+                decoded = decodeURI(cleanUrl);
+            } catch {
+                // Fallback to cleanUrl if decodeURI fails
+            }
+            const sanitizedUrl = encodeURI(decoded);
             element.style.setProperty('--bg-image', `url("${sanitizedUrl}")`);
         } else {
             element.style.setProperty('--bg-image', 'none');
@@ -196,6 +263,8 @@ export const UI = {
 
     async applyAccentColor(element, track, cssVarName) {
         if (!element || !track || !cssVarName) return;
+        // SEC-02: Enforce valid CSS custom property identifier format
+        if (typeof cssVarName !== 'string' || !/^--[a-zA-Z0-9_-]+$/.test(cssVarName)) return;
         const color = await ColorExtractor.getAccentColor(track.albumArt);
         element.style.setProperty(cssVarName, color);
     },
@@ -278,8 +347,10 @@ export const UI = {
 
             const handlePointerMove = (e) => {
                 if (!isPressed) return;
-                const dist = Math.hypot(e.clientX - startX, e.clientY - startY);
-                if (dist > moveThreshold) {
+                const dx = Math.abs(e.clientX - startX);
+                const dy = Math.abs(e.clientY - startY);
+                // PERF-04: Fast Manhattan check before computing hypotenuse
+                if (dx > moveThreshold || dy > moveThreshold || Math.hypot(dx, dy) > moveThreshold) {
                     cancelPress();
                 }
             };
@@ -289,10 +360,10 @@ export const UI = {
             };
 
             const addActivePointerListeners = () => {
-                button.addEventListener('pointermove', handlePointerMove);
-                button.addEventListener('pointerup', handlePointerUp);
-                button.addEventListener('pointercancel', handlePointerUp);
-                button.addEventListener('mouseup', handlePointerUp);
+                button.addEventListener('pointermove', handlePointerMove, { passive: true });
+                button.addEventListener('pointerup', handlePointerUp, { passive: true });
+                button.addEventListener('pointercancel', handlePointerUp, { passive: true });
+                button.addEventListener('mouseup', handlePointerUp, { passive: true });
             };
 
             const handlePointerDown = (e) => {
@@ -363,7 +434,7 @@ export const UI = {
             button.style.webkitUserSelect = 'none';
             button.style.userSelect = 'none';
 
-            button.addEventListener('pointerdown', handlePointerDown);
+            button.addEventListener('pointerdown', handlePointerDown, { passive: true });
             button.addEventListener('mousedown', handleMouseDown);
             button.addEventListener('click', handleClick);
             button.addEventListener('keydown', handleKeyDown);

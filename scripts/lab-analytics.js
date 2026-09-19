@@ -10,6 +10,7 @@ function trackEvent(category, action, label, extra = {}) {
 }
 
 export function initLabAnalytics() {
+    if (typeof document === 'undefined') return;
     const iframes = document.querySelectorAll(".demo-examples iframe");
 
     const attachIframeListener = (iframe) => {
