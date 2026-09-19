@@ -10,13 +10,26 @@ export class EqualizerUI {
         this.eq = new Equalizer(audioElement);
         this.isEqOn = true;
         this.isActive = false;
+        this._abortController = new AbortController();
 
         this._render();
         this._bindEvents();
+    }
 
-        if (this.type === 'full') {
-            this._loadSettings();
+    _getSavedSettings() {
+        if (this.type !== 'full') return [];
+        try {
+            const raw = localStorage.getItem('rj-eq-settings');
+            if (raw) {
+                const parsed = JSON.parse(raw);
+                if (Array.isArray(parsed)) {
+                    return parsed;
+                }
+            }
+        } catch {
+            // Storage access blocked or JSON syntax error (SEC-04)
         }
+        return [];
     }
 
     _render() {
@@ -45,7 +58,7 @@ export class EqualizerUI {
             this.container.innerHTML = `
                 <div class="eq-header">
                     <h3>Equalizer</h3>
-                    <button class="eq-close" id="eq-close-btn" title="Close" data-analytics-element="Close">
+                    <button class="eq-close" id="eq-close-btn" title="Close" aria-label="Close Equalizer" data-analytics-element="Close">
                         <svg viewBox="0 -960 960 960">
                             <path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z" />
                         </svg>
@@ -56,20 +69,65 @@ export class EqualizerUI {
         }
 
         const eqGrid = this.container.querySelector('.eq-grid');
+        const savedSettings = this._getSavedSettings();
 
-        EQ_CONFIG.forEach((config) => {
+        EQ_CONFIG.forEach((config, index) => {
             const sliderWrapper = document.createElement('div');
             sliderWrapper.className = 'media-player__equalizer__slider';
-            sliderWrapper.innerHTML = `
-                <div class="eq-slider__wrapper">
-                    <div class="eq-slider__track"></div>
-                    <div class="eq-slider__fill"></div>
-                    <div class="eq-slider__thumb"></div>
-                    <input type="range" min="-20" max="20" value="0" step=".1" aria-label="${config.label}">
-                </div>
-                <span class="eq-slider__label">${config.label}</span>
-            `;
+
+            const sliderContainer = document.createElement('div');
+            sliderContainer.className = 'eq-slider__wrapper';
+
+            const track = document.createElement('div');
+            track.className = 'eq-slider__track';
+
+            const fill = document.createElement('div');
+            fill.className = 'eq-slider__fill';
+
+            const thumb = document.createElement('div');
+            thumb.className = 'eq-slider__thumb';
+
+            // Cache fill and thumb references to avoid layout thrashing during input events (PERF-04)
+            sliderContainer._cachedFill = fill;
+            sliderContainer._cachedThumb = thumb;
+
+            const input = document.createElement('input');
+            input.type = 'range';
+            input.min = '-20';
+            input.max = '20';
+            input.step = '.1';
+
+            // Pre-load saved value to eliminate redundant second-pass reflow (PERF-07)
+            let initialVal = 0;
+            if (savedSettings[index] !== undefined) {
+                const parsedVal = parseFloat(savedSettings[index]);
+                if (Number.isFinite(parsedVal)) {
+                    initialVal = Math.max(-20, Math.min(20, parsedVal));
+                }
+            }
+            input.value = String(initialVal);
+
+            // Accessibility attributes (A11Y-01)
+            input.setAttribute('aria-label', config.label);
+            input.setAttribute('aria-orientation', 'vertical');
+            input.setAttribute('aria-valuemin', '-20');
+            input.setAttribute('aria-valuemax', '20');
+            input.setAttribute('aria-valuenow', String(initialVal));
+            input.setAttribute('aria-valuetext', `${initialVal > 0 ? '+' : ''}${initialVal} dB`);
+
+            sliderContainer.append(track, fill, thumb, input);
+
+            // Safe DOM text assignment to close DOM XSS sink (SEC-03)
+            const labelSpan = document.createElement('span');
+            labelSpan.className = 'eq-slider__label';
+            labelSpan.textContent = config.label;
+
+            sliderWrapper.append(sliderContainer, labelSpan);
             eqGrid.appendChild(sliderWrapper);
+
+            if (initialVal !== 0 && this.isEqOn) {
+                this.eq.setGain(index, initialVal);
+            }
         });
 
         this.inputs = this.container.querySelectorAll('input[type="range"]');
@@ -79,20 +137,26 @@ export class EqualizerUI {
     }
 
     _bindEvents() {
+        const { signal } = this._abortController;
+
         this.inputs.forEach((input, index) => {
             input.addEventListener('input', (e) => {
                 UI.updateSliderVisuals(e.target);
-                if (this.isEqOn) this.eq.setGain(index, parseFloat(e.target.value));
-            });
+                if (this.isEqOn) {
+                    const gainVal = parseFloat(e.target.value);
+                    if (Number.isFinite(gainVal)) {
+                        this.eq.setGain(index, gainVal);
+                    }
+                }
+            }, { signal });
         });
 
         const closeBtn = this.container.querySelector('#eq-close-btn');
         if (closeBtn) {
             closeBtn.addEventListener('click', () => {
                 this.hide();
-                // Dispatch custom event for the parent component to handle local states if needed
                 this.container.dispatchEvent(new CustomEvent('eq-closed', { bubbles: true }));
-            });
+            }, { signal });
         }
 
         if (this.type === 'full') {
@@ -100,42 +164,56 @@ export class EqualizerUI {
             const saveBtn = this.container.querySelector('#eq-save-btn');
             const loadBtn = this.container.querySelector('#eq-load-btn');
 
-            powerBtn.addEventListener('click', () => {
-                this.isEqOn = !this.isEqOn;
-                powerBtn.classList.toggle('active', this.isEqOn);
-                this.container.classList.toggle('disabled', !this.isEqOn);
-                this.inputs.forEach((input, index) => {
-                    this.eq.setGain(index, this.isEqOn ? parseFloat(input.value) : 0);
-                });
-            });
+            if (powerBtn) {
+                powerBtn.addEventListener('click', () => {
+                    this.isEqOn = !this.isEqOn;
+                    powerBtn.classList.toggle('active', this.isEqOn);
+                    this.container.classList.toggle('disabled', !this.isEqOn);
+                    this.eq.setEnabled(this.isEqOn);
+                    this.inputs.forEach((input, index) => {
+                        const val = parseFloat(input.value);
+                        this.eq.setGain(index, this.isEqOn && Number.isFinite(val) ? val : 0);
+                    });
+                }, { signal });
+            }
 
-            saveBtn.addEventListener('click', () => {
-                const settings = Array.from(this.inputs).map(i => i.value);
-                localStorage.setItem('rj-eq-settings', JSON.stringify(settings));
-                saveBtn.classList.add('active');
-                setTimeout(() => saveBtn.classList.remove('active'), 1000);
-            });
+            if (saveBtn) {
+                saveBtn.addEventListener('click', () => {
+                    try {
+                        const settings = Array.from(this.inputs).map(i => {
+                            const val = parseFloat(i.value);
+                            return Number.isFinite(val) ? Math.max(-20, Math.min(20, val)) : 0;
+                        });
+                        localStorage.setItem('rj-eq-settings', JSON.stringify(settings));
+                        saveBtn.classList.add('active');
+                        setTimeout(() => saveBtn.classList.remove('active'), 1000);
+                    } catch (err) {
+                        console.warn('Failed to save EQ settings to localStorage:', err);
+                    }
+                }, { signal });
+            }
 
-            loadBtn.addEventListener('click', () => {
-                this._loadSettings();
-                loadBtn.classList.add('active');
-                setTimeout(() => loadBtn.classList.remove('active'), 1000);
-            });
+            if (loadBtn) {
+                loadBtn.addEventListener('click', () => {
+                    this._loadSettings();
+                    loadBtn.classList.add('active');
+                    setTimeout(() => loadBtn.classList.remove('active'), 1000);
+                }, { signal });
+            }
         }
     }
 
     _loadSettings() {
-        let savedSettings = [];
-        try {
-            savedSettings = JSON.parse(localStorage.getItem('rj-eq-settings') || '[]');
-        } catch {
-            savedSettings = [];
-        }
+        const savedSettings = this._getSavedSettings();
         this.inputs.forEach((input, index) => {
             if (savedSettings[index] !== undefined) {
-                input.value = savedSettings[index];
-                UI.updateSliderVisuals(input);
-                if (this.isEqOn) this.eq.setGain(index, parseFloat(input.value));
+                const parsedVal = parseFloat(savedSettings[index]);
+                if (Number.isFinite(parsedVal)) {
+                    const clamped = Math.max(-20, Math.min(20, parsedVal));
+                    input.value = String(clamped);
+                    UI.updateSliderVisuals(input);
+                    if (this.isEqOn) this.eq.setGain(index, clamped);
+                }
             }
         });
     }
@@ -161,8 +239,20 @@ export class EqualizerUI {
         return this.isActive;
     }
 
-    // Allows external triggers to init audio context (e.g. on play)
     initAudio() {
         this.eq.init();
     }
+
+    destroy() {
+        if (this._abortController) {
+            this._abortController.abort();
+        }
+        if (this.eq) {
+            this.eq.destroy();
+        }
+        this.container.innerHTML = '';
+        this.container.classList.remove('media-player__equalizer', 'active', 'disabled');
+        this.inputs = [];
+    }
 }
+
