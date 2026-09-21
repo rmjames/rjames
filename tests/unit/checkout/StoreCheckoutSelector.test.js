@@ -123,11 +123,8 @@ class MockElement {
         }
         const search = (el) => {
             if (selector === 'iframe' && el.tagName === 'IFRAME') return el;
-            if (selector === '.theme-toggle-btn' && el.classList.contains('theme-toggle-btn')) return el;
-            if (selector === '.reset-btn' && el.classList.contains('reset-btn')) return el;
+            if (selector.startsWith('.') && el.classList.contains(selector.slice(1))) return el;
             if (selector === 'form' && el.tagName === 'FORM') return el;
-            if (selector === '.form-checkout' && el.classList.contains('form-checkout')) return el;
-            if (selector === '.email-client-wrapper' && el.classList.contains('email-client-wrapper')) return el;
             for (const child of el.children) {
                 const found = search(child);
                 if (found) return found;
@@ -393,6 +390,17 @@ describe('StoreCheckoutSelector Component', () => {
         assert.equal(emailWrapper.classList.contains('dark-mode'), false);
     });
 
+    it('should configure email order confirmation as an accessible, keyboard-scrollable region', () => {
+        const mount = new MockElement('div');
+        const { emailWrapper } = buildEmailClient(mount, mockDocument);
+
+        const body = emailWrapper.querySelector('.ec-body');
+        assert.ok(body, 'ec-body must exist in email client');
+        assert.equal(body.getAttribute('tabindex'), '0', 'ec-body must be keyboard focusable');
+        assert.equal(body.getAttribute('role'), 'region', 'ec-body must have role="region"');
+        assert.equal(body.getAttribute('aria-label'), 'Order confirmation email content', 'ec-body must have accessible aria-label');
+    });
+
     it('should reset checkboxes on tracking card when reset button is clicked', () => {
         const mount = new MockElement('div');
         const { inputs, resetBtn } = buildTrackingCard(mount, mockDocument);
@@ -476,6 +484,19 @@ describe('Store Checkout Lab Pages & Security Specs', () => {
         const stageMatch = css.match(/\.carousel-stage\s*\{([^}]+)\}/);
         assert.ok(stageMatch, '.carousel-stage rule must exist');
         assert.equal(stageMatch[1].includes('backdrop-filter'), false, '.carousel-stage must not apply redundant backdrop-filter');
+    });
+
+    it('should verify email order confirmation CSS defines scrollable flex layout', async () => {
+        const fs = await import('node:fs/promises');
+        const path = await import('node:path');
+        const css = await fs.readFile(path.resolve('styles/lab/store-checkout-selector.css'), 'utf-8');
+
+        // Verify .checkout-variant--email contains scrollable layout properties
+        assert.ok(css.includes('.checkout-variant--email'), 'CSS must define .checkout-variant--email');
+        assert.ok(css.includes('.email-client {'), 'CSS must define .email-client flex column');
+        assert.ok(css.includes('.ec-body {'), 'CSS must define .ec-body');
+        assert.ok(css.includes('overflow-y: auto;'), 'CSS must specify overflow-y: auto for scrolling');
+        assert.ok(css.includes('min-block-size: 0;'), 'CSS must specify min-block-size: 0 to allow flex items to shrink and scroll');
     });
 
     it('should verify all checkout assets and variants are registered in sw.js cache', async () => {

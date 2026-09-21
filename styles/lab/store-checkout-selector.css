@@ -618,9 +618,16 @@ body {
 
 /* Variant 4: Gmail Order Confirmation Mockup */
 .checkout-variant--email {
+    align-items: center;
+    justify-items: center;
+    grid-template-rows: minmax(0, 1fr);
+
     .email-client-wrapper {
         inline-size: 100%;
         max-inline-size: 42rem;
+        block-size: 100%;
+        max-block-size: 100%;
+        min-block-size: 0;
         border-radius: 1rem;
         overflow: hidden;
         border: 1px solid var(--card-border);
@@ -628,10 +635,20 @@ body {
         box-shadow: 0 16px 40px oklch(0 0 0 / .35);
         display: flex;
         flex-direction: column;
-        max-block-size: calc(min(74dvh, 50rem) - 4rem);
+    }
+
+    .email-client {
+        display: flex;
+        flex-direction: column;
+        inline-size: 100%;
+        block-size: 100%;
+        min-block-size: 0;
+        flex: 1 1 auto;
+        overflow: hidden;
     }
 
     .ec-appbar {
+        flex-shrink: 0;
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -710,9 +727,20 @@ body {
     }
 
     .ec-body {
+        flex: 1 1 auto;
+        min-block-size: 0;
         overflow-y: auto;
+        overscroll-behavior-y: contain;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+        scrollbar-color: var(--card-border) transparent;
         padding: 1rem;
         background-color: oklch(from #1f1f1f l c h);
+
+        &:focus-visible {
+            outline: 2px solid var(--accent-blue);
+            outline-offset: -2px;
+        }
     }
 
     .ec-msg-subject {

@@ -376,6 +376,9 @@ export function buildEmailClient(mount, doc, signal) {
     // 2. Email Body
     const body = doc.createElement('div');
     body.className = 'ec-body';
+    body.setAttribute('tabindex', '0');
+    body.setAttribute('role', 'region');
+    body.setAttribute('aria-label', 'Order confirmation email content');
 
     const pane = doc.createElement('div');
     pane.className = 'ec-message-pane';
