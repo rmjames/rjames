@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Media Player Track Metadata",
+  "description": "Metadata sub-component presenting track title and artist with automated marquee scroll on overflow.",
+  "selector": ".media-player__meta",
+  "requiredTag": "div",
+  "targetFiles": [
+    "lab/media-player.html",
+    "lab/media-player-selector.html",
+    "lab/components.html"
+  ],
+  "requiredChildren": [
+    ".media-player__meta__title",
+    ".media-player__meta__artist"
+  ],
+  "modifiers": [
+    "is-marquee"
+  ],
+  "cssProps": {
+    "--marquee-width": { "type": "length", "description": "Computed by ResizeObserver for overflow marquee" },
+    "white-space": "nowrap",
+    "overflow": "hidden"
+  }
+}

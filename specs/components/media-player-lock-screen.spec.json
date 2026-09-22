@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Lock Screen Media Player",
+  "description": "Lock screen styled audio player card component featuring album art backdrop blur and glassmorphism.",
+  "selector": ".media-player-grid",
+  "requiredTag": "div",
+  "targetFiles": [
+    "lab/media-player-lock-screen.html",
+    "lab/components.html"
+  ],
+  "requiredChildren": [
+    ".progress-slider",
+    ".media-player__equalizer"
+  ],
+  "cssProps": {
+    "--widget-width": "20rem",
+    "--widget-height": "9.4rem",
+    "border-radius": "1.5rem",
+    "backdrop-filter": "blur(10px)"
+  }
+}

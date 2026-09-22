@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Main Media Player",
+  "description": "Primary modular media player container hosting controls bar, scrollable presets, and 5-band graphic equalizer.",
+  "selector": "section.media-player",
+  "requiredTag": "section",
+  "targetFiles": [
+    "lab/media-player.html",
+    "lab/media-player-selector.html",
+    "lab/components.html"
+  ],
+  "requiredChildren": [
+    ".media-player__controls",
+    ".media-player__presets",
+    ".media-player__equalizer"
+  ],
+  "stateClasses": [
+    "is-eq-open"
+  ],
+  "cssProps": {
+    "container-type": "inline-size",
+    "border-radius": "2rem",
+    "background": "oklch(from #2a2a2a l c h)"
+  },
+  "a11y": {
+    "role": "region",
+    "requiresAccessibleName": false
+  }
+}

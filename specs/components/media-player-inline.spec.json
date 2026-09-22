@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Inline Media Player",
+  "description": "Compact inline and floating media player component with responsive container query controls.",
+  "selector": ".media-player-inline",
+  "requiredTag": "section|div",
+  "targetFiles": [
+    "lab/media-player-inline.html",
+    "lab/components.html"
+  ],
+  "requiredChildren": [
+    ".media-player-inline__play"
+  ],
+  "containerQueries": {
+    "compact": "< 15rem",
+    "standard": "15rem - 25rem",
+    "expanded": "> 30rem"
+  },
+  "cssProps": {
+    "--player-bg": { "type": "color", "default": "oklch(0.2 0.05 240 / 0.85)" },
+    "--player-border": { "type": "color", "default": "oklch(0.4 0.05 240 / 0.3)" },
+    "--player-accent": { "type": "color", "default": "oklch(0.6 0.15 240)" },
+    "--player-text": { "type": "color", "default": "oklch(0.9 0.02 240)" }
+  },
+  "a11y": {
+    "role": "region",
+    "requiresAccessibleName": false
+  }
+}
