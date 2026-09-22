@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Resume Job Accordion",
+  "description": "Native details/summary accordion with exclusive disclosure behavior via the name attribute.",
+  "targetFiles": ["resume.html"],
+  "selector": "details.job",
+  "requiredTag": "details",
+  "requiredAttributes": {
+    "name": "^job$"
+  },
+  "requiredChildren": [
+    "summary",
+    ".job-title",
+    "ul"
+  ],
+  "a11y": {
+    "requiresSummaryHeading": true
+  }
+}

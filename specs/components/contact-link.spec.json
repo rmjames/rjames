@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Depth-Layered Contact Link",
+  "description": "Multi-tiered letterpress/neon ink effect link with smooth box-shadow transitions.",
+  "selector": "a.link-contact",
+  "requiredTag": "a",
+  "requiredAttributes": {
+    "href": ".+",
+    "data-analytics-link": ".+"
+  },
+  "variants": [
+    "lab",
+    "lab-link-anchor"
+  ],
+  "cssProps": {
+    "font-weight": 550,
+    "--recursive-CRSV": 1,
+    "transition-duration": "var(--link-timing)",
+    "transition-timing-function": "var(--link-ease)"
+  },
+  "a11y": {
+    "requiresAccessibleName": true,
+    "minInlineSize": "44px",
+    "minBlockSize": "44px"
+  }
+}

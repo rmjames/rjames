@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Media Player Equalizer",
+  "description": "5-band graphic audio equalizer panel sub-component with preset toggles and decibel frequency sliders.",
+  "selector": ".media-player__equalizer",
+  "requiredTag": "div",
+  "targetFiles": [
+    "lab/media-player.html",
+    "lab/media-player-selector.html",
+    "lab/components.html",
+    "lab/media-player-lock-screen.html"
+  ],
+  "stateClasses": [
+    "active"
+  ],
+  "cssProps": {
+    "border-radius": "inherit",
+    "backdrop-filter": "blur(20px)",
+    "transition-duration": "0.3s"
+  }
+}

@@ -68,6 +68,9 @@ Curated structural map for zero-turn agent navigation (depth 2-3):
 ├── functions/api/                       # Cloudflare Pages / Workers serverless API routes
 │   └── episodes/[episodeId]/stream-url.js # Streaming audio URL resolution
 ├── lab/                                 # Prototype HTML pages, case study markdown, and widgets
+├── specs/                               # Machine-readable component & token specification schemas
+│   ├── tokens.json                      # W3C DTCG design tokens (colors, typography, spacing)
+│   └── components/                      # UI component prop contracts (buttons, popovers, media players)
 ├── tools/                               # Developer visual tools & test harness (point-visualizer)
 ├── tests/                               # Vitest unit test suites (tests/unit/media)
 ├── tests-e2e/                           # Playwright E2E suites (analytics, media, visual, ux)

@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Media Player Progress Bar",
+  "description": "Progress bar sub-component featuring an accessible range slider track with thumb seeker.",
+  "selector": ".media-player__progress",
+  "requiredTag": "div",
+  "targetFiles": [
+    "lab/media-player.html",
+    "lab/media-player-selector.html",
+    "lab/components.html",
+    "lab/media-player-lock-screen.html"
+  ],
+  "requiredChildren": [
+    "input.progress-slider"
+  ],
+  "controls": {
+    "slider": {
+      "selector": "input.progress-slider",
+      "requiredAttributes": {
+        "type": "range",
+        "min": "0",
+        "max": "100"
+      }
+    }
+  },
+  "cssProps": {
+    "background": "oklch(from #333 l c h)",
+    "border-radius": "1rem",
+    "padding": "1rem"
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Popover Dialog",
+  "description": "Native HTML Popover dialog displaying company overview and roles, centered with backdrop blur.",
+  "selector": ".popover",
+  "requiredTag": "div",
+  "requiredAttributes": {
+    "popover": "^(|auto)$",
+    "id": "^[a-z0-9-]+$",
+    "role": "dialog",
+    "aria-label": ".+"
+  },
+  "requiredChildren": [
+    ".company-description",
+    ".work-summary",
+    ".roles"
+  ],
+  "cssProps": {
+    "border-radius": "var(--border-radius)",
+    "padding": "var(--m)",
+    "transition-duration": "var(--link-timing)",
+    "transition-timing-function": "var(--link-ease)"
+  },
+  "a11y": {
+    "role": "dialog",
+    "requiresAccessibleName": true
+  }
+}

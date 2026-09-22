@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Media Player Controls Bar",
+  "description": "Primary controls sub-component housing current track art, metadata display, options toggle, and playback controls.",
+  "selector": ".media-player__controls",
+  "requiredTag": "div",
+  "targetFiles": [
+    "lab/media-player.html",
+    "lab/media-player-selector.html",
+    "lab/components.html"
+  ],
+  "requiredChildren": [
+    "button.media-player__controls__current",
+    ".media-player__meta",
+    "button.media-player__controls__option",
+    "button.media-player__controls__play"
+  ],
+  "controls": {
+    "current": {
+      "selector": "button.media-player__controls__current",
+      "requiredAttributes": { "aria-label": "Current Track" }
+    },
+    "option": {
+      "selector": "button.media-player__controls__option",
+      "requiredAttributes": { "aria-label": ".+" }
+    },
+    "play": {
+      "selector": "button.media-player__controls__play",
+      "requiredAttributes": { "aria-label": "Play or Pause" }
+    }
+  },
+  "cssProps": {
+    "border-radius": "1.25rem",
+    "background": "oklch(from #333 l c h)",
+    "gap": "0.5rem"
+  }
+}

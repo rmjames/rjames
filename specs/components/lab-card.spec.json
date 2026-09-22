@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Lab Experiment Card",
+  "description": "Lab card container with squircle border radius, responsive iframe preview, and demo launch link.",
+  "targetFiles": ["lab.html"],
+  "selector": "section.demo-examples article",
+  "requiredTag": "article",
+  "requiredAttributes": {
+    "tabindex": "0",
+    "aria-label": ".+"
+  },
+  "requiredChildren": [
+    "a.demo-link",
+    "iframe"
+  ],
+  "a11y": {
+    "requiresAccessibleName": true
+  }
+}

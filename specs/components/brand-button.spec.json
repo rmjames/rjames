@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Brand Button",
+  "description": "Interactive brand trigger button opening native popovers with Recursive font bolding and amber focus ring.",
+  "selector": "button.brand",
+  "requiredTag": "button",
+  "requiredAttributes": {
+    "type": "button",
+    "popovertarget": "^[a-z0-9-]+$"
+  },
+  "cssProps": {
+    "--recursive-wght": { "default": 700, "hover": 800 },
+    "--recursive-CRSV": { "default": 1 },
+    "color": { "default": "var(--gray-2)" },
+    "outline-color": { "hover": "var(--orange-2)" }
+  },
+  "a11y": {
+    "requiresAccessibleName": true,
+    "minInlineSize": "44px",
+    "minBlockSize": "44px"
+  }
+}
