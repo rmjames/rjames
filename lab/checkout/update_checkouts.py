@@ -77,13 +77,13 @@ def update_file(filename):
 
     .check input::before {
         content: '';
-        width: 0.7rem;
-        height: 0.35rem;
+        width: .65rem;
+        height: .35rem;
         background-color: transparent;
         border-left: 2px solid light-dark(#fff, #000);
-        border-bottom: 2px solid light-dark(#fff, #000);
+        border-bottom: 1px solid light-dark(#fff, #000);
         transform: rotate(-45deg) scale(0);
-        transition: 200ms transform cubic-bezier(0.4, 0.0, 0.2, 1);
+        transition: 200ms transform cubic-bezier(.4, 0, .2, 1);
         transform-origin: bottom left;
     }
 
@@ -93,7 +93,7 @@ def update_file(filename):
     }
 
     .check input:checked::before {
-        transform: rotate(-45deg) scale(1) translate(1px, 4.5px);
+        transform: rotate(-45deg) scale(1) translate(2px, 4px);
     }
 
     .step-label {

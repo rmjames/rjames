@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Animated Checkmark",
+  "atomicType": "atom",
+  "description": "Atomic interactive checkbox input featuring an animated checkmark pseudo-element with optical centering translate offset.",
+  "selector": "label.check input[type=\"checkbox\"]",
+  "requiredTag": "input",
+  "requiredAttributes": {
+    "type": "checkbox"
+  },
+  "targetFiles": [
+    "lab/checkout-tracking-card.html",
+    "lab/google-store-checkout.html",
+    "lab/google-store-checkout-timeline.html",
+    "lab/google-store-checkout-truck.html",
+    "lab/store-checkout-selector.html"
+  ],
+  "cssProps": {
+    "inline-size": ".65rem",
+    "block-size": ".35rem",
+    "background-color": "transparent",
+    "border-inline-start": "2px solid oklch(from #fff l c h)",
+    "border-block-end": "1px solid oklch(from #fff l c h)",
+    "transform": "rotate(-45deg) scale(0)",
+    "transform-origin": "bottom left",
+    "transition": "200ms transform cubic-bezier(.4, 0, .2, 1)",
+    "checked-transform": "rotate(-45deg) scale(1) translate(2px, 4px)"
+  },
+  "a11y": {
+    "requiresAccessibleName": true
+  }
+}

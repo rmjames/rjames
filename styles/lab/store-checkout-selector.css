@@ -287,9 +287,9 @@ body {
     block-size: .35rem;
     background-color: transparent;
     border-inline-start: 2px solid oklch(from #fff l c h);
-    border-block-end: 2px solid oklch(from #fff l c h);
+    border-block-end: 1px solid oklch(from #fff l c h);
     transform: rotate(-45deg) scale(0);
-    transition: 200ms transform cubic-bezier(0.4, 0.0, 0.2, 1);
+    transition: 200ms transform cubic-bezier(.4, 0, .2, 1);
     transform-origin: bottom left;
 }
 
@@ -299,7 +299,7 @@ body {
 }
 
 .form-checkout input[type="checkbox"]:checked::before {
-    transform: rotate(-45deg) scale(1) translate(1px, 2px);
+    transform: rotate(-45deg) scale(1) translate(2px, 4px);
 }
 
 .form-checkout input[type="checkbox"]:focus-visible {

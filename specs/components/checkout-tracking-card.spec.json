@@ -1,53 +1,33 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "name": "Checkout Tracking Card",
-  "description": "Card component containing shipment badge header, responsive container-query-driven delivery timeline visual, and optional product item summary.",
+  "atomicType": "molecule",
+  "description": "Molecular shipment tracking card composed of atomic animated checkmarks, timeline progression lines, and delivery truck indicators.",
   "selector": ".tracking-card",
-  "requiredTag": "section",
+  "requiredTag": "article",
   "targetFiles": [
     "lab/checkout-tracking-card.html",
-    "lab/google-store-checkout.html",
     "lab/store-checkout-selector.html",
-    "lab/checkout-components.html"
+    "lab/google-store-checkout.html"
   ],
   "requiredChildren": [
-    ".card-header",
-    ".tracking-visual"
+    ".form-checkout",
+    "label.check",
+    "input[type=\"checkbox\"]"
   ],
-  "optionalChildren": [
-    "article.product-item"
-  ],
-  "interactionStates": {
-    "starting": {
-      "description": "Static card container rendering initial shipment header and baseline progress.",
-      "styles": {
-        "background-color": "var(--card-bg)",
-        "border": "1px solid var(--border-color)",
-        "border-radius": "8px",
-        "overflow": "hidden"
-      }
-    },
-    "interaction": {
-      "description": "Container-query-based layout adjustments when container width shrinks below 450px.",
-      "containerQuery": "@container tracking (max-width: 450px)",
-      "changes": {
-        "padding": "var(--space-md) var(--space-md) var(--space-sm)",
-        "formCheckout": "grid-template-columns: repeat(7, minmax(.5rem, 1fr))"
-      }
-    },
-    "completed": {
-      "description": "Card state when all shipment milestones are fulfilled.",
-      "headerText": "Shipment 1 of 1"
+  "subComponents": [
+    {
+      "name": "Animated Checkmark",
+      "atomicType": "atom",
+      "$ref": "specs/components/animated-checkmark.spec.json",
+      "selector": "label.check input[type=\"checkbox\"]"
     }
-  },
+  ],
   "cssProps": {
-    "background-color": "var(--card-bg)",
-    "border-radius": "8px",
-    "border": "1px solid var(--border-color)",
-    "overflow": "hidden"
+    "border-radius": ".5rem",
+    "border": "1px solid var(--card-border)"
   },
   "a11y": {
-    "role": "region",
-    "requiresAccessibleHeading": true
+    "requiresAccessibleName": true
   }
 }
