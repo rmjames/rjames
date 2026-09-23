@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Email Order Summary & Billing Grid",
+  "description": "Multi-column transactional receipt detailing ordered timestamp, merchant address, destination shipping address, payment method, and complete financial accounting breakdown.",
+  "selector": "section.order-summary",
+  "requiredTag": "section",
+  "targetFiles": [
+    "lab/google-store-checkout.html",
+    "lab/store-checkout-selector.html"
+  ],
+  "requiredChildren": [
+    ".summary-col",
+    ".totals-col",
+    ".final-total"
+  ],
+  "interactionStates": {
+    "starting": {
+      "description": "Desktop 4-column layout distributing order timing, origin address, destination address, and monetary totals.",
+      "styles": {
+        "display": "grid",
+        "grid-template-columns": "repeat(2, 1fr) 1fr 1fr",
+        "gap": "var(--space-lg)",
+        "border": "1px solid var(--border-color)",
+        "border-radius": "8px",
+        "padding": "var(--space-lg)",
+        "background-color": "var(--card-bg)"
+      }
+    },
+    "interaction": {
+      "description": "Responsive layout transition under 600px collapsing 4 columns into a single vertical column.",
+      "mediaQuery": "@media (max-width: 600px)",
+      "styles": {
+        "grid-template-columns": "1fr"
+      },
+      "totalsStyles": {
+        "grid-column": "1",
+        "border-block-start": "1px solid var(--border-color)",
+        "padding-top": "var(--space-md)",
+        "margin-top": "var(--space-sm)"
+      }
+    },
+    "completed": {
+      "description": "Verified billing reconciliation displaying computed line items and bolded total sum.",
+      "fields": ["Subtotal", "Shipping", "Estimated tax", "Total"]
+    }
+  },
+  "cssProps": {
+    "display": "grid",
+    "border-radius": "8px",
+    "background-color": "var(--card-bg)"
+  },
+  "a11y": {
+    "role": "region",
+    "ariaLabel": "Order summary and billing breakdown"
+  }
+}
