@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Checkout Replay Button",
+  "description": "Floating circular action button providing replay functionality to re-run timeline step sequences.",
+  "selector": "button.reset-btn",
+  "requiredTag": "button",
+  "targetFiles": [
+    "lab/checkout-tracking-card.html",
+    "lab/store-checkout-selector.html",
+    "lab/checkout-components.html"
+  ],
+  "requiredAttributes": {
+    "aria-label": "Replay animation"
+  },
+  "requiredChildren": [
+    "svg"
+  ],
+  "interactionStates": {
+    "starting": {
+      "description": "Resting floating circular button ready for user invocation.",
+      "styles": {
+        "inline-size": "3rem",
+        "block-size": "3rem",
+        "border-radius": "50%",
+        "display": "grid",
+        "place-items": "center",
+        "cursor": "pointer",
+        "transform": "rotate(0deg)"
+      }
+    },
+    "interaction": {
+      "description": "Active click or hover state initiating sequence replay.",
+      "trigger": ":hover | :active | click",
+      "transform": "rotate(-180deg) scale(0.95)",
+      "transition": "transform 0.3s ease, background-color 0.2s ease",
+      "action": "Unchecks and re-checks milestone checkboxes in timed intervals (e.g. 800ms) with automated cascade"
+    },
+    "completed": {
+      "description": "Returned resting state after timeline replay execution completes.",
+      "transform": "rotate(-360deg)"
+    }
+  },
+  "cssProps": {
+    "border-radius": "50%",
+    "cursor": "pointer"
+  },
+  "a11y": {
+    "requiresAccessibleName": true,
+    "minInlineSize": "44px",
+    "minBlockSize": "44px"
+  }
+}

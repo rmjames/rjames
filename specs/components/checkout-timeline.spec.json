@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Checkout Delivery Timeline",
+  "description": "Multi-stage order tracking progress timeline with 7-column responsive grid, progressive line connectors, and CSS :has() cascading logic.",
+  "selector": ".form-checkout",
+  "requiredTag": "form",
+  "targetFiles": [
+    "lab/google-store-checkout-timeline.html",
+    "lab/google-store-checkout-truck.html",
+    "lab/checkout-tracking-card.html",
+    "lab/google-store-checkout.html",
+    "lab/store-checkout-selector.html",
+    "lab/checkout-components.html"
+  ],
+  "requiredChildren": [
+    "label.check",
+    ".line.l-prep-js",
+    ".line.l-ship-js",
+    ".line.l-arrv-js"
+  ],
+  "interactionStates": {
+    "starting": {
+      "description": "Initial state with 'Ordered' milestone checked and all subsequent connector lines empty.",
+      "lineStyle": {
+        "block-size": "2px",
+        "background-color": "var(--border-color)",
+        "position": "relative"
+      },
+      "lineFill": {
+        "pseudo": "::after",
+        "inline-size": "0%",
+        "background-color": "var(--checkbox-bg-color, oklch(from blue l c h))"
+      },
+      "activeMilestones": ["order"]
+    },
+    "interaction": {
+      "description": "Dynamic state where connecting lines animate inline-size or background gradient fill in response to milestone selection.",
+      "trigger": ".form-checkout:has(#prepare:checked), :has(#ship:checked), :has(#arrive:checked)",
+      "transition": {
+        "inline-size": "0.2s ease",
+        "keyframes": "progress .25s linear forwards"
+      },
+      "cascadeRules": [
+        "Preparing checked -> Fills .l-prep-js line",
+        "Shipping checked -> Fills .l-prep-js and .l-ship-js lines",
+        "Arriving checked -> Fills .l-prep-js, .l-ship-js, and .l-arrv-js lines"
+      ]
+    },
+    "completed": {
+      "description": "Final delivered state where all 4 checkpoints are checked and all 3 connector lines are 100% illuminated.",
+      "lineFill": {
+        "pseudo": "::after",
+        "inline-size": "100%"
+      },
+      "activeMilestones": ["order", "prepare", "ship", "arrive"]
+    }
+  },
+  "cssProps": {
+    "display": "grid",
+    "grid-template-columns": "repeat(7, minmax(2rem, 1fr))",
+    "align-items": "start",
+    "gap": "0",
+    "inline-size": "100%"
+  },
+  "containerQueries": {
+    "@container tracking (max-width: 450px)": {
+      "grid-template-columns": "repeat(7, minmax(.5rem, 1fr))"
+    }
+  },
+  "a11y": {
+    "role": "group",
+    "ariaLabel": "Order shipment progress timeline",
+    "prefersReducedMotion": {
+      "animation": "none",
+      "transition": "none"
+    }
+  }
+}

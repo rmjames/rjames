@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Delivery Truck Micro-Interaction",
+  "description": "Animated SVG delivery truck micro-interaction responding to timeline progress with CSS @starting-style entry, custom property offsets, and spring easing curves.",
+  "selector": ".icon-wrapper--truck",
+  "requiredTag": "div",
+  "targetFiles": [
+    "lab/google-store-checkout-truck.html",
+    "lab/checkout-tracking-card.html",
+    "lab/google-store-checkout.html",
+    "lab/store-checkout-selector.html",
+    "lab/checkout-components.html"
+  ],
+  "requiredChildren": [
+    "svg"
+  ],
+  "customProperties": {
+    "--truck-speed": ".76s",
+    "--truck-offset": "0px"
+  },
+  "interactionStates": {
+    "starting": {
+      "description": "Initial entrance state prior to activation or during element mount via CSS @starting-style.",
+      "styles": {
+        "opacity": 0,
+        "visibility": "hidden",
+        "pointer-events": "none",
+        "transform": "translateX(-50%) translateY(100%) scale(0)"
+      },
+      "startingStyle": {
+        "opacity": 0,
+        "visibility": "hidden",
+        "transform": "translateX(-50%) translateY(100%) scale(0)"
+      }
+    },
+    "interaction": {
+      "description": "Transit state between milestone checkpoints with spring-physics easing.",
+      "trigger": "input[name=\"prepare\"]:checked, input[name=\"ship\"]:checked, input[name=\"arrive\"]:checked",
+      "transition": {
+        "opacity": "1s .28s",
+        "transform": "var(--truck-speed) cubic-bezier(0.68, -0.24, 0.265, 1.24)",
+        "visibility": "0s"
+      },
+      "offsetCalculation": {
+        "prepare": "--truck-offset: 0px",
+        "ship": "--truck-offset: calc(100cqw / 7 * 2) or 7.5rem",
+        "arrive": "--truck-offset: calc(100cqw / 7 * 4) or 15rem"
+      }
+    },
+    "completed": {
+      "description": "Resting state at active milestone checkpoint.",
+      "styles": {
+        "opacity": 1,
+        "visibility": "visible",
+        "pointer-events": "auto",
+        "transform": "translateX(calc(-50% + var(--truck-offset, 0px))) translateY(-3rem) scale(1.25)"
+      }
+    }
+  },
+  "cssProps": {
+    "position": "absolute",
+    "inset-block-end": "2.5rem",
+    "left": "50%",
+    "inline-size": "24px",
+    "block-size": "24px",
+    "color": "oklch(from blue l c h)",
+    "z-index": 10
+  },
+  "a11y": {
+    "ariaHidden": true,
+    "prefersReducedMotion": {
+      "transition": "none !important"
+    }
+  }
+}

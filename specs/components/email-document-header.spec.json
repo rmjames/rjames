@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Email Document Header",
+  "description": "Header within the email canvas housing the Google Store multi-color brand logo and light/dark theme toggle.",
+  "selector": "header.site-header",
+  "requiredTag": "header",
+  "targetFiles": [
+    "lab/google-store-checkout.html",
+    "lab/store-checkout-selector.html",
+    "lab/checkout-components.html"
+  ],
+  "requiredChildren": [
+    ".logo-wrapper",
+    "button#theme-toggle"
+  ],
+  "controls": {
+    "themeToggle": {
+      "selector": "button#theme-toggle",
+      "requiredAttributes": {
+        "aria-label": "Toggle Dark Mode"
+      }
+    }
+  },
+  "interactionStates": {
+    "starting": {
+      "description": "Default theme state inheriting system or saved color scheme preference.",
+      "styles": {
+        "display": "flex",
+        "justify-content": "space-between",
+        "align-items": "center",
+        "padding-block": "var(--space-md)",
+        "border-block-end": "1px solid var(--border-color)"
+      }
+    },
+    "interaction": {
+      "description": "Clicking theme toggle button flips data-theme attribute on document root or toggles .theme-dark class.",
+      "trigger": "click on #theme-toggle",
+      "transition": "background-color 0.3s ease, color 0.3s ease",
+      "buttonFeedback": {
+        "transform": "scale(0.92)",
+        "transition": "transform 0.15s ease"
+      }
+    },
+    "completed": {
+      "description": "Theme successfully toggled between light and dark modes with color tokens updated.",
+      "themeState": "light | dark"
+    }
+  },
+  "cssProps": {
+    "display": "flex",
+    "justify-content": "space-between",
+    "align-items": "center"
+  },
+  "a11y": {
+    "requiresAccessibleName": true,
+    "minInlineSize": "44px",
+    "minBlockSize": "44px"
+  }
+}

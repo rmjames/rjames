@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Email Hero & Shipment Status Banner",
+  "description": "Hero section introducing order confirmation with branded headline, shipment status card, order identification number, and primary action button.",
+  "selector": "section.hero-section",
+  "requiredTag": "section",
+  "targetFiles": [
+    "lab/google-store-checkout.html",
+    "lab/store-checkout-selector.html",
+    "lab/checkout-components.html"
+  ],
+  "requiredChildren": [
+    "h1.hero-title",
+    ".shipment-status-box",
+    ".order-meta"
+  ],
+  "controls": {
+    "ctaButton": {
+      "selector": "button.btn-primary",
+      "requiredText": "View order details"
+    }
+  },
+  "interactionStates": {
+    "starting": {
+      "description": "Static display of order headline, package icon, shipment quantity, order number, and resting primary CTA.",
+      "ctaStyle": {
+        "background-color": "oklch(from #1a73e8 l c h)",
+        "color": "oklch(1 0 0)",
+        "border-radius": "4px",
+        "padding": "var(--space-sm) var(--space-lg)",
+        "cursor": "pointer"
+      }
+    },
+    "interaction": {
+      "description": "User interacts with primary CTA or highlights text.",
+      "ctaHover": {
+        "background-color": "oklch(from #1557b0 l c h)",
+        "box-shadow": "0 1px 3px rgba(0, 0, 0, 0.2)"
+      },
+      "ctaActive": {
+        "transform": "scale(0.98)"
+      },
+      "ctaFocus": {
+        "outline": "2px solid var(--accent-blue)",
+        "outline-offset": "2px"
+      }
+    },
+    "completed": {
+      "description": "Action acknowledged upon click or keypress.",
+      "action": "Navigates to authenticated order management portal"
+    }
+  },
+  "cssProps": {
+    "margin-block-end": "var(--space-xl)"
+  },
+  "a11y": {
+    "role": "region",
+    "requiresAccessibleHeading": true,
+    "minCtaInlineSize": "44px",
+    "minCtaBlockSize": "44px"
+  }
+}

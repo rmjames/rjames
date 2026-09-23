@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Email Product Item Summary",
+  "description": "Product summary row displaying thumbnail artwork, brand-highlighted item title, unit price, and purchased quantity.",
+  "selector": "article.product-item",
+  "requiredTag": "article",
+  "targetFiles": [
+    "lab/google-store-checkout.html",
+    "lab/store-checkout-selector.html",
+    "lab/checkout-components.html"
+  ],
+  "requiredChildren": [
+    "figure.product-media",
+    ".product-details",
+    ".product-pricing"
+  ],
+  "interactionStates": {
+    "starting": {
+      "description": "Desktop 3-column grid layout aligning media thumbnail, item title, and price/quantity block.",
+      "styles": {
+        "display": "grid",
+        "grid-template-columns": "auto 1fr auto",
+        "gap": "var(--space-md)",
+        "padding": "var(--space-lg)",
+        "align-items": "center",
+        "border-block-start": "1px solid var(--border-color)"
+      }
+    },
+    "interaction": {
+      "description": "Responsive layout transition under 600px viewport width.",
+      "mediaQuery": "@media (max-width: 600px)",
+      "styles": {
+        "grid-template-columns": "auto 1fr",
+        "grid-template-rows": "auto auto"
+      },
+      "pricingStyles": {
+        "grid-column": "2",
+        "text-align": "left",
+        "flex-direction": "row",
+        "gap": "1rem",
+        "align-items": "baseline"
+      }
+    },
+    "completed": {
+      "description": "Static receipt row confirming purchased hardware specification and pricing.",
+      "renderedItem": "Google Pixel Watch"
+    }
+  },
+  "cssProps": {
+    "display": "grid",
+    "border-block-start": "1px solid var(--border-color)",
+    "background-color": "var(--card-bg)"
+  },
+  "a11y": {
+    "requiresAccessibleHeading": true,
+    "mediaAriaLabel": "Pixel Watch black"
+  }
+}

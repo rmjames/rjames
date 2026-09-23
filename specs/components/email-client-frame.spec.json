@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Email Client Mockup Frame",
+  "description": "Realistic Gmail web client chrome encapsulating application top appbar, search input, message navigation toolbar, message metadata row, and bottom reply actions.",
+  "selector": ".email-client",
+  "requiredTag": "div",
+  "targetFiles": [
+    "lab/google-store-checkout.html",
+    "lab/store-checkout-selector.html",
+    "lab/checkout-components.html"
+  ],
+  "requiredChildren": [
+    ".ec-appbar",
+    ".ec-body",
+    ".ec-msg-toolbar",
+    ".ec-msg-meta",
+    ".ec-reply-bar"
+  ],
+  "controls": {
+    "search": {
+      "selector": ".ec-search input[type=\"search\"]",
+      "requiredAttributes": {
+        "placeholder": "Search mail",
+        "aria-label": "Search mail"
+      }
+    },
+    "backButton": {
+      "selector": ".ec-icon-btn[aria-label=\"Back to inbox\"]"
+    },
+    "replyButton": {
+      "selector": ".ec-reply-btn"
+    }
+  },
+  "interactionStates": {
+    "starting": {
+      "description": "Default email viewing state inside the client inbox.",
+      "styles": {
+        "display": "flex",
+        "flex-direction": "column",
+        "background-color": "var(--client-bg)",
+        "color": "var(--text-primary)"
+      }
+    },
+    "interaction": {
+      "description": "User interacts with appbar search, action icon buttons, or reply/forward pills.",
+      "searchFocus": {
+        "background-color": "var(--card-bg)",
+        "box-shadow": "0 1px 3px rgba(0, 0, 0, 0.2)"
+      },
+      "iconButtonHover": {
+        "background-color": "oklch(from var(--text-primary) l c h / .1)",
+        "border-radius": "50%"
+      },
+      "replyButtonHover": {
+        "background-color": "oklch(from var(--text-primary) l c h / .08)"
+      }
+    },
+    "completed": {
+      "description": "Message rendered and confirmed in inbox view with 1 of 47 pagination position.",
+      "breadcrumb": "Inbox",
+      "count": "1 of 47"
+    }
+  },
+  "cssProps": {
+    "min-block-size": "100vh",
+    "background-color": "var(--client-bg)"
+  },
+  "a11y": {
+    "role": "region",
+    "ariaLabel": "Gmail client interface",
+    "requiresAccessibleControls": true
+  }
+}

@@ -1,0 +1,125 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Checkout Checkmark Interactive Step",
+  "description": "Progress milestone checkbox with custom circular indicator and animating SVG/pseudo-element tick glyph.",
+  "selector": "label.check",
+  "requiredTag": "label",
+  "targetFiles": [
+    "lab/google-store-checkout-timeline.html",
+    "lab/google-store-checkout-truck.html",
+    "lab/checkout-tracking-card.html",
+    "lab/google-store-checkout.html",
+    "lab/store-checkout-selector.html",
+    "lab/checkout-components.html"
+  ],
+  "requiredChildren": [
+    "input[type=\"checkbox\"]",
+    ".step-label"
+  ],
+  "requiredAttributes": {
+    "class": "check"
+  },
+  "controls": {
+    "checkbox": {
+      "selector": "input[type=\"checkbox\"]",
+      "requiredAttributes": {
+        "type": "checkbox",
+        "name": "^(order|prepare|ship|arrive)$"
+      }
+    }
+  },
+  "interactionStates": {
+    "starting": {
+      "description": "Unchecked idle or initial checkpoint state prior to user interaction or cascade activation.",
+      "styles": {
+        "appearance": "none",
+        "inline-size": "1.5rem",
+        "block-size": "1.5rem",
+        "border": "2px solid var(--border-color)",
+        "border-radius": "50%",
+        "background-color": "var(--card-bg)",
+        "cursor": "pointer"
+      },
+      "glyph": {
+        "pseudo": "::before",
+        "inline-size": "0.7rem",
+        "block-size": "0.35rem",
+        "border-inline-start": "2px solid oklch(from white l c h)",
+        "border-block-end": "2px solid oklch(from white l c h)",
+        "transform": "rotate(-45deg) scale(0)",
+        "transform-origin": "bottom left",
+        "opacity": 0
+      },
+      "accessibility": {
+        "aria-checked": "false",
+        "focusable": true
+      }
+    },
+    "interaction": {
+      "description": "Active transitioning state during tap, click, keyboard invocation, or programmatic cascade execution.",
+      "trigger": "click | change | keydown (Space/Enter) | programmatic cascade",
+      "transition": {
+        "transform": "200ms transform cubic-bezier(0.4, 0.0, 0.2, 1)",
+        "background-color": "0.2s ease",
+        "border-color": "0.2s ease"
+      },
+      "behavior": "Dispatches change event; triggers forward fill of preceding milestones or backward uncheck of subsequent steps; initiates connecting line progress animation.",
+      "focusVisible": {
+        "outline": "2px solid var(--checkbox-bg-color, oklch(from #1a73e8 l c h))",
+        "outline-offset": "2px"
+      }
+    },
+    "completed": {
+      "description": "Checked / fulfilled checkpoint state with visible tick mark and filled circle.",
+      "selector": "input[type=\"checkbox\"]:checked",
+      "styles": {
+        "background-color": "var(--checkbox-bg-color, oklch(from blue l c h))",
+        "border-color": "var(--checkbox-bg-color, oklch(from blue l c h))"
+      },
+      "glyph": {
+        "pseudo": "::before",
+        "transform": "rotate(-45deg) scale(1) translate(1px, 4.5px)",
+        "opacity": 1
+      },
+      "accessibility": {
+        "aria-checked": "true"
+      },
+      "effects": {
+        "activatesLine": "Triggers .line::after inline-size: 100% fill via :has(:checked)",
+        "advancesTruck": "Updates --truck-offset or --truck-position to checkpoint milestone"
+      }
+    }
+  },
+  "cssProps": {
+    "display": "flex",
+    "flex-direction": "column",
+    "align-items": "center",
+    "font-size": "0.85rem",
+    "font-weight": 500,
+    "position": "relative",
+    "z-index": 2
+  },
+  "containerQueries": {
+    "@container tracking (max-width: 450px)": {
+      "input": {
+        "inline-size": "1.25rem",
+        "block-size": "1.25rem"
+      },
+      "input::before": {
+        "inline-size": "0.6rem",
+        "block-size": "0.3rem",
+        "margin-top": "-0.15rem"
+      },
+      ".step-label": {
+        "font-size": "0.75rem"
+      }
+    }
+  },
+  "a11y": {
+    "role": "checkbox",
+    "requiresAccessibleName": true,
+    "minInlineSize": "44px",
+    "minBlockSize": "44px",
+    "keyboardNavigation": "Space/Enter to toggle checkmark state"
+  }
+}
