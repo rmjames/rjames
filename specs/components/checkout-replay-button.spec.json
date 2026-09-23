@@ -6,7 +6,8 @@
   "requiredTag": "button",
   "targetFiles": [
     "lab/checkout-tracking-card.html",
-    "lab/store-checkout-selector.html"
+    "lab/store-checkout-selector.html",
+    "lab/checkout-components.html"
   ],
   "requiredAttributes": {
     "aria-label": "Replay animation"

@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="color-scheme" content="dark light">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Store Checkout &amp; Email Confirmation Pattern Library</title>
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="stylesheet" href="../styles/lab-shared.css">
+    <link rel="stylesheet" href="../styles/lab/checkout-tracking-card.css">
+    <link rel="stylesheet" href="checkout/checkout-shared.css">
+    <link rel="stylesheet" href="../styles/lab/google-store-checkout-timeline.css">
+    <link rel="stylesheet" href="../styles/lab/google-store-checkout-truck.css">
+    <style>
+        body {
+            padding: 2rem;
+            min-height: 100vh;
+            background-color: var(--app-bg, #202124);
+            color: var(--theme-text, #e8eaed);
+            font-family: 'Google Sans', Roboto, Arial, sans-serif;
+        }
+
+        .header-title {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .header-title h1 {
+            font-size: 2rem;
+            margin: 0 0 .5rem 0;
+            color: var(--theme-text, #e8eaed);
+        }
+
+        .header-title p {
+            color: var(--theme-text-muted, #9aa0a6);
+            margin: 0;
+            font-size: 1rem;
+        }
+
+        .components-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+            gap: 2rem;
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        .component-wrapper {
+            background: var(--card-bg, oklch(from #303134 l c h));
+            padding: 1.5rem;
+            border-radius: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, .2);
+            container-type: inline-size;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            border: 1px solid var(--border-color, oklch(from #5f6368 l c h / .5));
+            overflow: hidden;
+            position: relative;
+            transition: outline .2s ease, opacity .3s ease, filter .3s ease;
+        }
+
+        @media (prefers-color-scheme: light) {
+            body {
+                background-color: #f8f9fa;
+                color: #202124;
+            }
+            .component-wrapper {
+                background: #ffffff;
+                border: 1px solid #dadce0;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, .05);
+            }
+        }
+
+        .component-wrapper h3 {
+            margin: 0;
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: var(--theme-text, #e8eaed);
+            border-bottom: 1px solid oklch(from var(--white-1) l c h / .1);
+            padding-bottom: .5rem;
+        }
+
+        .component-wrapper.is-configuring {
+            outline: 2px solid var(--orange-3);
+        }
+
+        .components-grid.has-active-config .component-wrapper:not(.is-configuring) {
+            opacity: .4;
+            filter: blur(4px);
+            pointer-events: none;
+        }
+
+        /* Config Button & Popover */
+        .config-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: transparent;
+            border: none;
+            color: var(--theme-text, #e8eaed);
+            cursor: pointer;
+            padding: .25rem;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            opacity: .6;
+            transition: opacity .2s ease, background .2s ease;
+            z-index: 10;
+        }
+
+        .config-btn:hover {
+            opacity: 1;
+            background: oklch(1 0 0 / .1);
+        }
+
+        .config-popover {
+            padding: 1.5rem;
+            border-radius: 1rem;
+            background: var(--surface-dark-1, #202124);
+            border: 1px solid oklch(1 0 0 / .15);
+            color: var(--text-primary, #e8eaed);
+            box-shadow: 0 8px 24px oklch(0 0 0 / .4);
+            margin: auto;
+            max-width: 90vw;
+            min-width: 380px;
+        }
+
+        .config-popover::backdrop {
+            background: oklch(0 0 0 / .5);
+            backdrop-filter: blur(2px);
+        }
+
+        .config-popover-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.25rem;
+            padding-bottom: .5rem;
+            border-bottom: 1px solid oklch(1 0 0 / .1);
+        }
+
+        .config-popover-header h4 {
+            margin: 0;
+            font-size: 1.1rem;
+        }
+
+        .config-popover-close {
+            background: transparent;
+            border: none;
+            color: inherit;
+            cursor: pointer;
+            padding: .25rem;
+            display: grid;
+            place-items: center;
+            border-radius: 50%;
+        }
+
+        .config-control-group {
+            display: grid;
+            grid-template-columns: 1.5fr 2fr 1fr;
+            gap: 1rem;
+            align-items: center;
+            margin-bottom: .75rem;
+            font-family: inherit;
+        }
+
+        .config-control-group label {
+            font-size: .85rem;
+            opacity: .9;
+        }
+
+        .config-control-value {
+            font-size: .85rem;
+            font-family: monospace;
+            color: var(--accent-blue, #1a73e8);
+            text-align: right;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .config-control-group input[type="range"] {
+            width: 100%;
+        }
+
+        .config-control-group select,
+        .config-control-group input[type="text"] {
+            width: 100%;
+            padding: .25rem .5rem;
+            border-radius: .25rem;
+            border: 1px solid oklch(1 0 0 / .2);
+            background: oklch(0 0 0 / .3);
+            color: inherit;
+            font-family: inherit;
+            font-size: .85rem;
+        }
+
+        /* Checkmark Showcase Specifics */
+        .checkmark-states-row {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+            justify-content: space-around;
+            padding: 1rem;
+            background: oklch(from var(--black-3) l c h / .3);
+            border-radius: 1rem;
+        }
+
+        .checkmark-state-col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: .5rem;
+            text-align: center;
+            font-size: .85rem;
+        }
+
+        /* Truck Animation Box Scoped */
+        .truck-demo-box {
+            position: relative;
+            min-block-size: 80px;
+            padding: 1rem 0;
+            overflow: hidden;
+        }
+
+        /* Reset Button Showcase */
+        .replay-demo-box {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1.5rem;
+            padding: 1rem;
+        }
+
+        /* Email Components */
+        .email-demo-wrapper {
+            background: var(--surface-light-1, #f8f9fa);
+            border-radius: 8px;
+            overflow: hidden;
+            color: #202124;
+            border: 1px solid #dadce0;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .email-demo-wrapper {
+                background: var(--surface-dark-2, #303134);
+                color: #e8eaed;
+                border-color: #5f6368;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="header-title">
+        <h1>Store Checkout &amp; Email Confirmation Pattern Library</h1>
+        <p>Living component specification catalog for the Google Store checkout progression and transactional messaging suite</p>
+    </header>
+
+    <main class="components-grid">
+
+        <!-- 1. Milestone Checkmark -->
+        <article class="component-wrapper" data-component="checkout-checkmark">
+            <h3>1. Milestone Checkmark (<code class="token-code">label.check</code>)</h3>
+            <div class="checkmark-states-row">
+                <div class="checkmark-state-col">
+                    <label class="check" aria-label="Unchecked milestone demo">
+                        <input type="checkbox" aria-label="Unchecked milestone">
+                        <span class="step-label">Ordered</span>
+                    </label>
+                    <span>Starting State (Unchecked)</span>
+                </div>
+                <div class="checkmark-state-col">
+                    <label class="check" aria-label="Interactive milestone demo">
+                        <input type="checkbox" id="interactive-chk" aria-label="Click to toggle checkmark">
+                        <span class="step-label">Preparing</span>
+                    </label>
+                    <span>Interactive (Click to Toggle)</span>
+                </div>
+                <div class="checkmark-state-col">
+                    <label class="check" aria-label="Completed milestone demo">
+                        <input type="checkbox" checked disabled aria-label="Completed order milestone">
+                        <span class="step-label">Delivered</span>
+                    </label>
+                    <span>Completed (Checked)</span>
+                </div>
+            </div>
+        </article>
+
+        <!-- 2. Replay Action Button -->
+        <article class="component-wrapper" data-component="checkout-replay-button">
+            <h3>2. Replay Action Button (<code class="token-code">button.reset-btn</code>)</h3>
+            <div class="replay-demo-box">
+                <button type="button" class="reset-btn" id="demo-replay-btn" aria-label="Replay animation" title="Replay Sequence">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">
+                        <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+                    </svg>
+                </button>
+                <span id="replay-status" style="font-size: .9rem; color: var(--theme-text-muted);">Click button to trigger replay sequence</span>
+            </div>
+        </article>
+
+        <!-- 3. Delivery Progress Timeline -->
+        <article class="component-wrapper" data-component="checkout-timeline">
+            <h3>3. Delivery Progress Timeline (<code class="token-code">.form-checkout</code>)</h3>
+            <form class="form-checkout" id="timeline-demo-form" onsubmit="event.preventDefault()">
+                <label class="check" for="demo-tl-order">
+                    <input type="checkbox" id="demo-tl-order" name="order" checked disabled aria-label="Ordered step">
+                    <span class="step-label">Ordered</span>
+                    <span class="step-date">Mon, Oct 5</span>
+                </label>
+                <div class="line l-prep-js"></div>
+                <label class="check" for="demo-tl-prepare">
+                    <input type="checkbox" id="demo-tl-prepare" name="prepare" checked aria-label="Preparing step">
+                    <span class="step-label">Preparing</span>
+                    <span class="step-date">Wed, Oct 7</span>
+                </label>
+                <div class="line l-ship-js"></div>
+                <label class="check" for="demo-tl-ship">
+                    <input type="checkbox" id="demo-tl-ship" name="ship" aria-label="Shipped step">
+                    <span class="step-label">Shipped</span>
+                    <span class="step-date">Fri, Oct 9</span>
+                </label>
+                <div class="line l-arrv-js"></div>
+                <label class="check" for="demo-tl-arrive">
+                    <input type="checkbox" id="demo-tl-arrive" name="arrive" aria-label="Delivered step">
+                    <span class="step-label">Delivered</span>
+                    <span class="step-date">Oct 14-15</span>
+                </label>
+            </form>
+        </article>
+
+        <!-- 4. Delivery Truck Animation -->
+        <article class="component-wrapper" data-component="checkout-truck-animation">
+            <h3>4. Delivery Truck Micro-Interaction (<code class="token-code">.icon-wrapper--truck</code>)</h3>
+            <div class="truck-demo-box">
+                <div class="icon-wrapper--truck" aria-hidden="true" style="position: relative; inline-size: 24px; block-size: 24px; color: var(--accent-blue);">
+                    <svg viewBox="0 -960 960 960" width="24" height="24" fill="currentColor">
+                        <path d="M160-120q-33 0-56.5-23.5T80-200v-440q0-33 23.5-56.5T160-720h520v120h160l80 120v280q0 33-23.5 56.5T840-120h-45q-13-37-44.5-58.5T680-200q-38 0-69.5 21.5T566-120H394q-13-37-44.5-58.5T280-200q-38 0-69.5 21.5T165-120h-5Zm120-80q17 0 28.5-11.5T320-240q0-17-11.5-28.5T280-280q-17 0-28.5 11.5T240-240q0 17 11.5 28.5T280-200Zm400 0q17 0 28.5-11.5T720-240q0-17-11.5-28.5T680-280q-17 0-28.5 11.5T640-240q0 17 11.5 28.5T680-200ZM160-640v360h33q13-37 44.5-58.5T308-360h344q13 37 44.5 58.5T741-280h19v-160h-85l-75-110v-90H160Zm0 0v440-440Z" />
+                    </svg>
+                </div>
+                <div style="margin-block-start: 1rem; display: flex; gap: .5rem;">
+                    <button type="button" id="truck-move-btn" style="padding: .4rem .8rem; border-radius: 4px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-primary); cursor: pointer;">Advance Truck</button>
+                    <button type="button" id="truck-reset-btn" style="padding: .4rem .8rem; border-radius: 4px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-primary); cursor: pointer;">Reset Truck</button>
+                </div>
+            </div>
+        </article>
+
+        <!-- 5. Checkout Tracking Card -->
+        <article class="component-wrapper" data-component="checkout-tracking-card">
+            <h3>5. Checkout Tracking Card (<code class="token-code">.tracking-card</code>)</h3>
+            <section class="tracking-card" role="region" aria-label="Shipment Tracking Card">
+                <div class="card-header">
+                    <h2>Package 1 of 1</h2>
+                </div>
+                <div class="tracking-visual">
+                    <form class="form-checkout" id="tracking-card-form" onsubmit="event.preventDefault()">
+                        <label class="check" for="card-order">
+                            <input type="checkbox" id="card-order" name="order" checked disabled aria-label="Ordered step">
+                            <span class="step-label">Ordered</span>
+                            <span class="step-date">Mon, Oct 5</span>
+                        </label>
+                        <div class="line l-prep-js"></div>
+                        <label class="check" for="card-prepare">
+                            <input type="checkbox" id="card-prepare" name="prepare" checked aria-label="Preparing step">
+                            <span class="step-label">Preparing</span>
+                            <span class="step-date">Wed, Oct 7</span>
+                        </label>
+                        <div class="line l-ship-js"></div>
+                        <label class="check" for="card-ship">
+                            <input type="checkbox" id="card-ship" name="ship" checked aria-label="Shipped step">
+                            <span class="step-label">Shipped</span>
+                            <span class="step-date">Fri, Oct 9</span>
+                        </label>
+                        <div class="line l-arrv-js"></div>
+                        <label class="check" for="card-arrive">
+                            <input type="checkbox" id="card-arrive" name="arrive" aria-label="Delivered step">
+                            <span class="step-label">Delivered</span>
+                            <span class="step-date">Oct 14-15</span>
+                        </label>
+                    </form>
+                </div>
+            </section>
+        </article>
+
+        <!-- 6. Email Document Header -->
+        <article class="component-wrapper" data-component="email-document-header">
+            <h3>6. Email Document Header (<code class="token-code">header.site-header</code>)</h3>
+            <div class="email-demo-wrapper">
+                <header class="site-header" style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.5rem; border-bottom: 1px solid var(--border-color);">
+                    <div class="logo-wrapper" style="display: flex; align-items: center; gap: .75rem;">
+                        <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="google-logo">
+                            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="oklch(from #4285F4 l c h)"/>
+                            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="oklch(from #34A853 l c h)"/>
+                            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.21-1.19-2.21z" fill="oklch(from #FBBC05 l c h)"/>
+                            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="oklch(from #EA4335 l c h)"/>
+                        </svg>
+                        <span class="logo-text" style="font-weight: 700; font-size: 1.1rem; letter-spacing: -.02em;">Google Store</span>
+                    </div>
+                    <button type="button" id="theme-toggle" class="icon-btn" aria-label="Toggle Dark Mode" style="background: transparent; border: 1px solid var(--border-color); border-radius: 4px; padding: .35rem .65rem; color: inherit; cursor: pointer; font-size: .8rem;">
+                        Toggle Theme
+                    </button>
+                </header>
+            </div>
+        </article>
+
+        <!-- 7. Email Hero Delivery Status -->
+        <article class="component-wrapper" data-component="email-hero-status">
+            <h3>7. Email Hero Status (<code class="token-code">section.hero-section</code>)</h3>
+            <div class="email-demo-wrapper">
+                <section class="hero-section" style="padding: 1.5rem; text-align: left;">
+                    <h1 class="hero-title" style="margin: 0 0 .5rem 0; font-size: 1.35rem; color: var(--accent-blue);">Good things come in packages</h1>
+                    <div class="shipment-status-box" style="margin: .75rem 0; padding: .75rem; background: var(--surface-dark-1, #202124); border-radius: 4px; border: 1px solid var(--border-color);">
+                        <div class="status-text">Your order will arrive in 1 shipment.</div>
+                    </div>
+                    <div class="order-meta" style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; margin-top: 1rem;">
+                        <div class="meta-info">
+                            <p style="margin: 0; font-size: .85rem; color: var(--theme-text-muted);">Order number: GS.7581-0044-7119</p>
+                        </div>
+                        <button type="button" class="btn-primary" style="padding: .5rem 1rem; background: var(--accent-blue, #1a73e8); color: white; border: none; border-radius: 4px; font-weight: 500; font-size: .9rem; cursor: pointer;">View order details</button>
+                    </div>
+                </section>
+            </div>
+        </article>
+
+        <!-- 8. Email Product Item -->
+        <article class="component-wrapper" data-component="email-product-item">
+            <h3>8. Email Product Item (<code class="token-code">article.product-item</code>)</h3>
+            <div class="email-demo-wrapper">
+                <article class="product-item" style="display: flex; gap: 1rem; padding: 1.25rem; align-items: center;">
+                    <figure class="product-media" style="inline-size: 56px; block-size: 56px; border-radius: 8px; background: oklch(0 0 0 / .1); display: grid; place-items: center; font-size: 1.75rem; flex-shrink: 0; margin: 0;">
+                        📱
+                    </figure>
+                    <div class="product-details" style="flex: 1;">
+                        <div style="font-weight: 600; font-size: .95rem; margin-bottom: .25rem;">
+                            Pixel 9 Pro <span class="highlight-brand" style="background: var(--highlight-yellow-bg, #ffd966); color: #202124; padding: 2px 6px; border-radius: 3px; font-size: .8rem; font-weight: bold;">Obsidian 256GB</span>
+                        </div>
+                        <div style="font-size: .85rem; color: var(--theme-text-muted);">Qty: 1 &bull; Unlocked 5G</div>
+                    </div>
+                    <div class="product-pricing" style="font-weight: 700; font-size: 1rem;">
+                        $999.00
+                    </div>
+                </article>
+            </div>
+        </article>
+
+        <!-- 9. Email Order Summary -->
+        <article class="component-wrapper" data-component="email-order-summary">
+            <h3>9. Email Order Summary (<code class="token-code">section.order-summary</code>)</h3>
+            <div class="email-demo-wrapper">
+                <section class="order-summary" style="padding: 1.25rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem; font-size: .85rem;">
+                    <div class="summary-col">
+                        <strong style="display: block; margin-bottom: .25rem;">Order Date</strong>
+                        <span style="color: var(--theme-text-muted);">October 5, 2026</span>
+                    </div>
+                    <div class="summary-col">
+                        <strong style="display: block; margin-bottom: .25rem;">Merchant</strong>
+                        <span style="color: var(--theme-text-muted);">Google Store US</span>
+                    </div>
+                    <div class="summary-col">
+                        <strong style="display: block; margin-bottom: .25rem;">Shipping Address</strong>
+                        <span style="color: var(--theme-text-muted);">111 8th Ave, New York, NY</span>
+                    </div>
+                    <div class="summary-col totals-col">
+                        <strong style="display: block; margin-bottom: .25rem;">Payment Method</strong>
+                        <span style="color: var(--theme-text-muted);">Google Pay &bull;&bull;&bull;&bull; 4242</span>
+                        <div class="total-row final-total" style="margin-top: .5rem; font-weight: 700;">
+                            <span>Total: $999.00</span>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </article>
+
+        <!-- 10. Email Client Frame -->
+        <article class="component-wrapper" data-component="email-client-frame">
+            <h3>10. Email Client Chrome Frame (<code class="token-code">.email-client</code>)</h3>
+            <div class="email-client" style="border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; font-size: .85rem;">
+                <div class="ec-appbar" style="display: flex; align-items: center; justify-content: space-between; padding: .6rem 1rem; background: var(--surface-dark-1, #202124); border-bottom: 1px solid var(--border-color);">
+                    <div style="display: flex; align-items: center; gap: .75rem;">
+                        <span style="font-size: 1.1rem;">✉️</span>
+                        <strong style="color: var(--text-primary);">Gmail Web Client</strong>
+                    </div>
+                    <div class="ec-appbar-actions" style="display: flex; gap: .5rem; align-items: center;">
+                        <span style="background: var(--surface-dark-2); padding: .2rem .5rem; border-radius: 4px; font-size: .75rem;">Inbox (1)</span>
+                    </div>
+                </div>
+                <div class="ec-body" style="padding: 1rem; background: var(--surface-dark-3, #292a2d);">
+                    <div class="ec-msg-toolbar" style="display: flex; gap: .5rem; align-items: center; margin-bottom: .5rem; font-size: .8rem; color: var(--theme-text-muted);">
+                        <span>← Back</span>
+                        <span>Archive</span>
+                        <span>Report spam</span>
+                    </div>
+                    <div class="ec-msg-meta" style="margin-bottom: .75rem;">
+                        <div style="font-weight: 600; margin-bottom: .25rem;">Google Store &lt;google-store-noreply@google.com&gt;</div>
+                        <div style="font-size: .8rem; color: var(--theme-text-muted);">Subject: Your Google Store order #GS-98214 has shipped</div>
+                    </div>
+                    <div style="padding: .75rem; background: var(--card-bg); border-radius: 4px; border: 1px dashed var(--border-color);">
+                        [Transactional message pane container]
+                    </div>
+                    <div class="ec-reply-bar" style="margin-top: .75rem; display: flex; gap: .5rem;">
+                        <button type="button" class="ec-reply-btn" style="padding: .35rem .75rem; border-radius: 4px; border: 1px solid var(--border-color); background: var(--surface-dark-1); color: inherit; cursor: pointer; font-size: .8rem;">Reply</button>
+                        <button type="button" class="ec-reply-btn" style="padding: .35rem .75rem; border-radius: 4px; border: 1px solid var(--border-color); background: var(--surface-dark-1); color: inherit; cursor: pointer; font-size: .8rem;">Forward</button>
+                    </div>
+                </div>
+            </div>
+        </article>
+
+    </main>
+
+    <script type="module">
+        import { ConfigPanelManager } from '../scripts/utils/ConfigPanelManager.js';
+
+        // --- Interactive Checkmark Demo ---
+        const interactiveChk = document.getElementById('interactive-chk');
+        if (interactiveChk) {
+            interactiveChk.addEventListener('change', (e) => {
+                console.log(`Checkmark state toggled: ${e.target.checked}`);
+            });
+        }
+
+        // --- Interactive Replay Sequence ---
+        const replayBtn = document.getElementById('demo-replay-btn');
+        const replayStatus = document.getElementById('replay-status');
+        const timelineInputs = [
+            document.getElementById('demo-tl-prepare'),
+            document.getElementById('demo-tl-ship'),
+            document.getElementById('demo-tl-arrive')
+        ];
+
+        if (replayBtn) {
+            replayBtn.addEventListener('click', () => {
+                replayStatus.textContent = 'Running replay sequence...';
+                replayBtn.style.transform = 'rotate(360deg)';
+                replayBtn.style.transition = 'transform .6s ease';
+
+                // Reset
+                timelineInputs.forEach(input => { if (input) input.checked = false; });
+
+                setTimeout(() => {
+                    if (timelineInputs[0]) timelineInputs[0].checked = true;
+                    replayStatus.textContent = 'Stage 2: Preparing...';
+                }, 400);
+
+                setTimeout(() => {
+                    if (timelineInputs[1]) timelineInputs[1].checked = true;
+                    replayStatus.textContent = 'Stage 3: Shipped...';
+                }, 800);
+
+                setTimeout(() => {
+                    if (timelineInputs[2]) timelineInputs[2].checked = true;
+                    replayStatus.textContent = 'Stage 4: Delivered! Sequence complete.';
+                    replayBtn.style.transform = '';
+                    replayBtn.style.transition = '';
+                }, 1200);
+            });
+        }
+
+        // --- Truck Advance Demo ---
+        const truckIcon = document.querySelector('.icon-wrapper--truck');
+        const truckMoveBtn = document.getElementById('truck-move-btn');
+        const truckResetBtn = document.getElementById('truck-reset-btn');
+        let truckStep = 0;
+
+        if (truckMoveBtn && truckIcon) {
+            truckMoveBtn.addEventListener('click', () => {
+                truckStep = (truckStep + 1) % 4;
+                const offset = truckStep * 80;
+                truckIcon.style.transform = `translateX(${offset}px)`;
+                truckIcon.style.transition = 'transform .6s cubic-bezier(.68, -.24, .265, 1.24)';
+            });
+        }
+
+        if (truckResetBtn && truckIcon) {
+            truckResetBtn.addEventListener('click', () => {
+                truckStep = 0;
+                truckIcon.style.transform = 'translateX(0)';
+                truckIcon.style.transition = 'transform .4s ease';
+            });
+        }
+
+        // --- ConfigPanelManager Setup ---
+        const componentWrappers = document.querySelectorAll('.component-wrapper');
+
+        const controlSchema = [
+            {
+                label: 'Inline Size (Width)',
+                type: 'range',
+                property: 'width',
+                min: 200, max: 800,
+                value: (target) => target.offsetWidth,
+                unit: 'px',
+                onChange: (val, target) => target.style.width = `${val}px`
+            },
+            {
+                label: 'Block Size (Height)',
+                type: 'range',
+                property: 'height',
+                min: 100, max: 700,
+                value: (target) => target.offsetHeight,
+                unit: 'px',
+                onChange: (val, target) => target.style.height = `${val}px`
+            },
+            {
+                label: 'Border Radius',
+                type: 'range',
+                property: 'borderRadius',
+                min: 0, max: 48, value: 24, unit: 'px',
+                onChange: (val, target) => target.style.borderRadius = `${val}px`
+            },
+            {
+                label: 'Padding',
+                type: 'range',
+                property: 'padding',
+                min: 0, max: 48, value: 24, unit: 'px',
+                onChange: (val, target) => target.style.padding = `${val}px`
+            },
+            {
+                label: 'Background Color',
+                type: 'select',
+                property: 'backgroundColor',
+                options: ['Default', 'var(--surface-dark-1)', 'var(--surface-dark-2)', 'var(--surface-dark-3)', 'var(--white-1)', 'var(--surface-light-1)', 'var(--black-3)'],
+                onChange: (val, target) => target.style.background = val === 'Default' ? '' : val
+            },
+            {
+                label: 'Text Color',
+                type: 'select',
+                property: 'color',
+                options: ['Default', 'var(--white-1)', 'var(--text-primary)', 'var(--text-secondary)', 'var(--blue-google)', 'var(--green-google)'],
+                onChange: (val, target) => target.style.color = val === 'Default' ? '' : val
+            }
+        ];
+
+        componentWrappers.forEach((wrapper) => {
+            new ConfigPanelManager({
+                target: wrapper,
+                schema: controlSchema
+            });
+
+            wrapper.addEventListener('config-open', () => {
+                const grid = wrapper.closest('.components-grid');
+                wrapper.classList.add('is-configuring');
+                if (grid) grid.classList.add('has-active-config');
+            });
+
+            wrapper.addEventListener('config-close', () => {
+                const grid = wrapper.closest('.components-grid');
+                wrapper.classList.remove('is-configuring');
+                if (grid && !document.querySelector('.is-configuring')) {
+                    grid.classList.remove('has-active-config');
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

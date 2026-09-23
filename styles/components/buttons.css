@@ -18,7 +18,7 @@
 
     &:where(:hover, :focus, :active, :target, :focus-within) {
         --recursive-wght: 800;
-        opacity: 0.5;
+        opacity: .5;
         outline: 1px solid var(--orange-2);
         border-radius: var(--border-radius);
     }
@@ -43,18 +43,18 @@
     cursor: pointer;
     box-shadow:
         inset 0 -1px 0 0 oklch(from #4a98bf l c h),
-        inset 0 -2px 0 0 oklch(from rgba(74, 152, 191, 0.76) l c h),
-        inset 0 -6px 0 0 oklch(from rgba(74, 152, 191, 0.52) l c h),
-        inset 0 -10px 0 0 oklch(from rgba(74, 152, 191, 0.28) l c h);
+        inset 0 -2px 0 0 oklch(from rgba(74, 152, 191, .76) l c h),
+        inset 0 -6px 0 0 oklch(from rgba(74, 152, 191, .52) l c h),
+        inset 0 -10px 0 0 oklch(from rgba(74, 152, 191, .28) l c h);
     transition: box-shadow var(--link-ease) var(--link-timing);
     --recursive-CRSV: 1;
 }
 
 .link-contact:is(:hover, :focus, :focus-within) {
-    opacity: 0.76;
+    opacity: .76;
     box-shadow:
-        inset 0 -2px 0 0 oklch(from rgba(74, 152, 191, 0.96) l c h),
-        inset 0 -4px 0 0 oklch(from rgba(74, 152, 191, 0.72) l c h),
-        inset 0 -8px 0 0 oklch(from rgba(74, 152, 191, 0.48) l c h),
-        inset 0 -12px 0 0 oklch(from rgba(74, 152, 191, 0.24) l c h);
+        inset 0 -2px 0 0 oklch(from rgba(74, 152, 191, .96) l c h),
+        inset 0 -4px 0 0 oklch(from rgba(74, 152, 191, .72) l c h),
+        inset 0 -8px 0 0 oklch(from rgba(74, 152, 191, .48) l c h),
+        inset 0 -12px 0 0 oklch(from rgba(74, 152, 191, .24) l c h);
 }

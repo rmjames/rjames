@@ -6,7 +6,8 @@
   "requiredTag": "div",
   "targetFiles": [
     "lab/google-store-checkout.html",
-    "lab/store-checkout-selector.html"
+    "lab/store-checkout-selector.html",
+    "lab/checkout-components.html"
   ],
   "requiredChildren": [
     ".ec-appbar",

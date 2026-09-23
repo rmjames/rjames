@@ -22,10 +22,46 @@
     --blue-2: hsl(201 44% 43%);
     --blue-3: hsl(204 100% 51%);
     --blue-4: hsl(203 89.2% 52.9%);
-    --orange-1: hsla(30 60.7% 58% / 0.66);
+    --orange-1: hsla(30 60.7% 58% / .66);
     --orange-2: hsl(38.8 100% 50%);
     --orange-3: hsl(13.9 95.2% 67.1%);
     --orange-4: #777;
+    --green-google: #34a853;
+    --green-dark: #137333;
+    --blue-google: #1a73e8;
+    --blue-light: #e8f0fe;
+    --yellow-google: #fbbc04;
+    --red-google: #ea4335;
+    --gray-border-light: #dadce0;
+    --gray-border-dark: #5f6368;
+    --gray-text-light: #5f6368;
+    --gray-text-dark: #9aa0a6;
+    --surface-dark-1: #202124;
+    --surface-dark-2: #303134;
+    --surface-dark-3: #292a2d;
+    --surface-light-1: #f8f9fa;
+    --surface-light-ec: #f6f8fc;
+    --surface-dark-ec: #18191a;
+    --checkout-accent-blue: var(--blue-google);
+    --checkout-border-color: light-dark(var(--gray-border-light), oklch(from var(--gray-border-dark) l c h / .5));
+    --checkout-card-bg: light-dark(var(--white-1), var(--surface-dark-2));
+    --checkout-text-primary: light-dark(var(--surface-dark-1), oklch(from #e8eaed l c h));
+    --checkout-text-secondary: light-dark(var(--gray-text-light), var(--gray-text-dark));
+    --checkout-highlight-bg: light-dark(#ffd966, var(--yellow-google));
+    --ec-app-bg: light-dark(var(--surface-light-ec), var(--surface-dark-ec));
+    --ec-surface: light-dark(var(--white-1), #242526);
+    --ec-border: light-dark(#e0e0e0, #3a3b3c);
+    --ec-active-bg: light-dark(oklch(91% .08 260), oklch(35% .18 260 / .2));
+    --ec-active-color: light-dark(oklch(35% .18 260), oklch(85% .15 260));
+    --checkout-card-radius: 8px;
+    --timeline-container-radius: 1.25rem;
+    --truck-speed: 760ms;
+    --check-transition: 200ms;
+    --line-progress: 250ms;
+    --truck-spring: cubic-bezier(.68, -.24, .265, 1.24);
+    --truck-entrance: cubic-bezier(.68, -.55, .265, 1.55);
+    --check-ease: cubic-bezier(.4, 0, .2, 1);
+    --premium-ease: cubic-bezier(.23, 1, .32, 1);
     --bkgnd: var(--black-3);
     --border-radius: var(--s);
     --color-brand: var(--gray-1);
@@ -34,8 +70,8 @@
     --text-shadow: var(--white-1);
     --text-shadow-subtle: drop-shadow(0 0 .125px var(--text-shadow));
     --link-color: var(--blue-2);
-    --link-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
-    --ease-3: cubic-bezier(0.25, 0, 0.3, 1);
+    --link-ease: cubic-bezier(.2, .8, .2, 1);
+    --ease-3: cubic-bezier(.25, 0, .3, 1);
     --link-timing: 444ms;
     --font-stack:
         "Recursive", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
@@ -47,7 +83,7 @@
     /* Monospace    */
     --recursive-slnt: 0;
     /* Upright      */
-    --recursive-CRSV: 0.5;
+    --recursive-CRSV: .5;
     --selection-color: var(--gray-1);
     color-scheme: light dark;
     --asset-theme: ;
@@ -66,10 +102,26 @@
         --blue-2: oklch(from hsl(201 44% 43%) l c h);
         --blue-3: oklch(from hsl(204 100% 51%) l c h);
         --blue-4: oklch(from hsl(203 89.2% 52.9%) l c h);
-        --orange-1: oklch(from hsla(30 60.7% 58% / 0.66) l c h);
+        --orange-1: oklch(from hsla(30 60.7% 58% / .66) l c h);
         --orange-2: oklch(from hsl(38.8 100% 50%) l c h);
         --orange-3: oklch(from hsl(13.9 95.2% 67.1%) l c h);
         --orange-4: oklch(from #777 l c h);
+        --green-google: oklch(from #34a853 l c h);
+        --green-dark: oklch(from #137333 l c h);
+        --blue-google: oklch(from #1a73e8 l c h);
+        --blue-light: oklch(from #e8f0fe l c h);
+        --yellow-google: oklch(from #fbbc04 l c h);
+        --red-google: oklch(from #ea4335 l c h);
+        --gray-border-light: oklch(from #dadce0 l c h);
+        --gray-border-dark: oklch(from #5f6368 l c h);
+        --gray-text-light: oklch(from #5f6368 l c h);
+        --gray-text-dark: oklch(from #9aa0a6 l c h);
+        --surface-dark-1: oklch(from #202124 l c h);
+        --surface-dark-2: oklch(from #303134 l c h);
+        --surface-dark-3: oklch(from #292a2d l c h);
+        --surface-light-1: oklch(from #f8f9fa l c h);
+        --surface-light-ec: oklch(from #f6f8fc l c h);
+        --surface-dark-ec: oklch(from #18191a l c h);
     }
 }
 
