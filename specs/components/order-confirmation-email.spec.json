@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Order Confirmation Email",
+  "atomicType": "organism",
+  "description": "Organism simulating a transactional Gmail client mockup hosting the checkout tracking card molecule, appbar, hero section, and order details.",
+  "selector": ".email-client",
+  "requiredTag": "div",
+  "targetFiles": [
+    "lab/google-store-checkout.html",
+    "lab/store-checkout-selector.html"
+  ],
+  "requiredChildren": [
+    "header.ec-appbar",
+    ".ec-body",
+    ".page-wrapper",
+    ".tracking-card"
+  ],
+  "subComponents": [
+    {
+      "name": "Checkout Tracking Card",
+      "atomicType": "molecule",
+      "$ref": "specs/components/checkout-tracking-card.spec.json",
+      "selector": ".tracking-card"
+    }
+  ],
+  "cssProps": {
+    "border-radius": "1rem",
+    "background-color": "oklch(from #202124 l c h)"
+  },
+  "a11y": {
+    "scrollableRegionRole": "region",
+    "scrollableRegionAriaLabel": "Order confirmation email content",
+    "requiresAccessibleName": true
+  }
+}

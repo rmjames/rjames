@@ -93,13 +93,13 @@ body {
 
         &::before {
             content: '';
-            inline-size: .7rem;
+            inline-size: .65rem;
             block-size: .35rem;
             background-color: transparent;
-            border-inline-start: 2px solid oklch(from white l c h);
-            border-block-end: 2px solid oklch(from white l c h);
+            border-inline-start: 2px solid oklch(from #fff l c h);
+            border-block-end: 1px solid oklch(from #fff l c h);
             transform: rotate(-45deg) scale(0);
-            transition: 200ms transform cubic-bezier(0.4, 0.0, 0.2, 1);
+            transition: 200ms transform cubic-bezier(.4, 0, .2, 1);
             transform-origin: bottom left;
         }
 
@@ -108,7 +108,7 @@ body {
             border-color: var(--accent-blue);
 
             &::before {
-                transform: rotate(-45deg) scale(1) translate(1px, 4.5px);
+                transform: rotate(-45deg) scale(1) translate(2px, 4px);
             }
         }
     }

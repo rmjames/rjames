@@ -499,6 +499,56 @@ describe('Store Checkout Lab Pages & Security Specs', () => {
         assert.ok(css.includes('min-block-size: 0;'), 'CSS must specify min-block-size: 0 to allow flex items to shrink and scroll');
     });
 
+    it('should verify email order confirmation checkmark has centered optical alignment', async () => {
+        const fs = await import('node:fs/promises');
+        const path = await import('node:path');
+        const emailCss = await fs.readFile(path.resolve('styles/lab/google-store-checkout.css'), 'utf-8');
+        const selectorCss = await fs.readFile(path.resolve('styles/lab/store-checkout-selector.css'), 'utf-8');
+        const cardCss = await fs.readFile(path.resolve('styles/lab/checkout-tracking-card.css'), 'utf-8');
+
+        assert.ok(
+            emailCss.includes('transform: rotate(-45deg) scale(1) translate(2px, 4px);'),
+            'google-store-checkout.css checkmark must have centered transform translate(2px, 4px)'
+        );
+        assert.ok(
+            emailCss.includes('border-block-end: 1px solid oklch(from #fff l c h);'),
+            'google-store-checkout.css checkmark must have 1px solid border-block-end'
+        );
+        assert.ok(
+            selectorCss.includes('transform: rotate(-45deg) scale(1) translate(2px, 4px);'),
+            'store-checkout-selector.css checkmark must have centered transform translate(2px, 4px)'
+        );
+        assert.ok(
+            cardCss.includes('transform: rotate(-45deg) scale(1) translate(2px, 4px);'),
+            'checkout-tracking-card.css checkmark must have centered transform translate(2px, 4px)'
+        );
+    });
+
+    it('should verify machine-readable component specifications exist and follow atomic design composition', async () => {
+        const fs = await import('node:fs/promises');
+        const path = await import('node:path');
+        const atomSpec = JSON.parse(await fs.readFile(path.resolve('specs/components/animated-checkmark.spec.json'), 'utf-8'));
+        const moleculeSpec = JSON.parse(await fs.readFile(path.resolve('specs/components/checkout-tracking-card.spec.json'), 'utf-8'));
+        const organismSpec = JSON.parse(await fs.readFile(path.resolve('specs/components/order-confirmation-email.spec.json'), 'utf-8'));
+
+        // Atom assertions
+        assert.equal(atomSpec.name, 'Animated Checkmark');
+        assert.equal(atomSpec.atomicType, 'atom');
+        assert.equal(atomSpec.cssProps['checked-transform'], 'rotate(-45deg) scale(1) translate(2px, 4px)');
+        assert.equal(atomSpec.cssProps['border-block-end'], '1px solid oklch(from #fff l c h)');
+        assert.equal(atomSpec.cssProps['inline-size'], '.65rem');
+
+        // Molecule composition assertions
+        assert.equal(moleculeSpec.name, 'Checkout Tracking Card');
+        assert.equal(moleculeSpec.atomicType, 'molecule');
+        assert.ok(moleculeSpec.subComponents.some(sub => sub.atomicType === 'atom' && sub.$ref.includes('animated-checkmark.spec.json')));
+
+        // Organism composition assertions
+        assert.equal(organismSpec.name, 'Order Confirmation Email');
+        assert.equal(organismSpec.atomicType, 'organism');
+        assert.ok(organismSpec.subComponents.some(sub => sub.atomicType === 'molecule' && sub.$ref.includes('checkout-tracking-card.spec.json')));
+    });
+
     it('should verify all checkout assets and variants are registered in sw.js cache', async () => {
         const fs = await import('node:fs/promises');
         const path = await import('node:path');

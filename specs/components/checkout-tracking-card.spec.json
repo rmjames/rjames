@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Checkout Tracking Card",
+  "atomicType": "molecule",
+  "description": "Molecular shipment tracking card composed of atomic animated checkmarks, timeline progression lines, and delivery truck indicators.",
+  "selector": ".tracking-card",
+  "requiredTag": "article",
+  "targetFiles": [
+    "lab/checkout-tracking-card.html",
+    "lab/store-checkout-selector.html",
+    "lab/google-store-checkout.html"
+  ],
+  "requiredChildren": [
+    ".form-checkout",
+    "label.check",
+    "input[type=\"checkbox\"]"
+  ],
+  "subComponents": [
+    {
+      "name": "Animated Checkmark",
+      "atomicType": "atom",
+      "$ref": "specs/components/animated-checkmark.spec.json",
+      "selector": "label.check input[type=\"checkbox\"]"
+    }
+  ],
+  "cssProps": {
+    "border-radius": ".5rem",
+    "border": "1px solid var(--card-border)"
+  },
+  "a11y": {
+    "requiresAccessibleName": true
+  }
+}
