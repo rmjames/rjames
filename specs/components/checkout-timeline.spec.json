@@ -9,7 +9,8 @@
     "lab/google-store-checkout-truck.html",
     "lab/checkout-tracking-card.html",
     "lab/google-store-checkout.html",
-    "lab/store-checkout-selector.html"
+    "lab/store-checkout-selector.html",
+    "lab/checkout-components.html"
   ],
   "requiredChildren": [
     "label.check",
