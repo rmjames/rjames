@@ -51,48 +51,23 @@ function scrubSecrets(content, apiKeyToRedact = null) {
     return scrubbed;
 }
 
+const {
+    isDuplicateFinding,
+    parseTasksMarkdown,
+    getTypeSafeClient
+} = require('./utils/typesafe-judge.js');
+
 function loadTasks() {
     if (!fs.existsSync(TASKS_FILE)) return [];
     try {
         const content = fs.readFileSync(TASKS_FILE, 'utf-8');
-        const tasks = [];
-        const sections = content.split('##').slice(1);
-
-        sections.forEach(section => {
-            const lines = section.split('\n');
-            for (let i = 1; i < lines.length; i++) {
-                const line = lines[i];
-                // Match the main task line
-                const match = line.match(/- \[([ x])\] \*\*(SEC|PERF)-(\w+)\*\*: (.*?) \(File: (.*?), Line: (.*?)\)/);
-                if (match) {
-                    const task = {
-                        status: match[1] === 'x' ? 'Resolved' : 'Open',
-                        id: `${match[2]}-${match[3]}`,
-                        suggestions: match[4],
-                        file: match[5],
-                        line: match[6],
-                        suggestedFix: null,
-                        agentType: match[2] === 'SEC' ? 'Security' : 'Performance'
-                    };
-
-                    // Look ahead for the fix line
-                    if (i + 1 < lines.length && lines[i + 1].trim().startsWith('- **Fix**:')) {
-                        const fixMatch = lines[i + 1].match(/- \*\*Fix\*\*: (.*)/);
-                        if (fixMatch) {
-                            task.suggestedFix = fixMatch[1];
-                            i++; // Skip the next line since we've processed it
-                        }
-                    }
-                    tasks.push(task);
-                }
-            }
-        });
-        return tasks;
+        return parseTasksMarkdown(content);
     } catch (e) {
         console.error("Error loading tasks.md:", e.message);
         return [];
     }
 }
+
 
 function saveTasks(tasks) {
     let content = "# Project Analysis Tasks\n\n";
@@ -397,17 +372,20 @@ async function scanCodebase(apiKey, codebaseContent, existingTasks) {
     };
 }
 
-function mergeFindings(existingTasks, allReasons) {
+async function mergeFindings(existingTasks, allReasons, client = null) {
     const newTasks = [...existingTasks];
     const addedTasks = [];
 
-    allReasons.forEach(reason => {
-        const existing = existingTasks.find(t => 
-            t.file === reason.file && 
-            t.line === reason.line && 
-            t.agentType === reason.agentType
-        );
-        if (!existing) {
+    for (const reason of allReasons) {
+        let isDuplicate = false;
+        for (const existing of newTasks) {
+            if (await isDuplicateFinding(existing, reason, client)) {
+                isDuplicate = true;
+                break;
+            }
+        }
+
+        if (!isDuplicate) {
             const prefix = reason.agentType === 'Security' ? 'SEC' : 
                           reason.agentType === 'Performance' ? 'PERF' : 'TASK';
             const newTask = {
@@ -422,7 +400,7 @@ function mergeFindings(existingTasks, allReasons) {
             newTasks.push(newTask);
             addedTasks.push(newTask);
         }
-    });
+    }
 
     return { newTasks, addedTasks };
 }
@@ -491,7 +469,7 @@ async function run() {
         printTable(allReasons);
     }
 
-    const { newTasks, addedTasks } = mergeFindings(existingTasks, allReasons);
+    const { newTasks, addedTasks } = await mergeFindings(existingTasks, allReasons, getTypeSafeClient());
 
     if (addedTasks.length > 0) {
         console.log(`\n🆕 Proposed ${addedTasks.length} new task(s) for tasks.md:`);

@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { callGemini, getAgentPrompt } = require('../scripts/judge.js');
+const { verifyThreatFinding } = require('../scripts/utils/typesafe-judge.js');
 
 const MANIFEST_PATH = path.join(__dirname, 'manifest.json');
 const API_KEY = process.env.GEMINI_API_KEY;
@@ -55,14 +56,23 @@ async function runEvals() {
                 testPassed = validation.passed;
                 failureDetail = validation.reason;
             } else {
-                // Detection Eval: Check for expected keywords
-                const foundExpected = test.expectedIssue 
-                    ? response.reasons.some(r => {
-                        const sugg = (r.suggestions || '').toLowerCase();
-                        const exp = test.expectedIssue.toLowerCase();
-                        return sugg.includes(exp) || sugg.replace(/[^a-z0-9]/g, '').includes(exp.replace(/[^a-z0-9]/g, ''));
-                    })
-                    : response.pass === true;
+                // Detection Eval: Verify threat using TypeSafe System One judgment
+                let foundExpected = false;
+                if (!test.expectedIssue) {
+                    foundExpected = response.pass === true;
+                } else if (response.reasons && response.reasons.length > 0) {
+                    for (const r of response.reasons) {
+                        const verified = await verifyThreatFinding(
+                            test.expectedIssue,
+                            test.threatCategory,
+                            r.suggestions
+                        );
+                        if (verified) {
+                            foundExpected = true;
+                            break;
+                        }
+                    }
+                }
 
                 const isFalsePositive = !test.expectedIssue && response.pass === false;
                 testPassed = foundExpected && !isFalsePositive;
