@@ -233,7 +233,7 @@ describe('judge.js', () => {
     });
 
     describe('mergeFindings', () => {
-        it('should not add duplicate tasks', () => {
+        it('should not add duplicate tasks', async () => {
             const existingTasks = [
                 { id: 'SEC-1', file: 'app.js', line: '10', suggestions: 'Issue 1', status: 'Open', agentType: 'Security' }
             ];
@@ -241,12 +241,25 @@ describe('judge.js', () => {
                 { file: 'app.js', line: '10', suggestions: 'Issue 1', agentType: 'Security' }
             ];
 
-            const { newTasks, addedTasks } = mergeFindings(existingTasks, newFindings);
+            const { newTasks, addedTasks } = await mergeFindings(existingTasks, newFindings);
             expect(addedTasks).toHaveLength(0);
             expect(newTasks).toHaveLength(1);
         });
 
-        it('should add new tasks and generate unique IDs', () => {
+        it('should not add duplicate tasks when line drifted slightly', async () => {
+            const existingTasks = [
+                { id: 'SEC-1', file: 'app.js', line: '10', suggestions: 'Reflow hazard: offsetHeight in animation frame', status: 'Open', agentType: 'Performance' }
+            ];
+            const newFindings = [
+                { file: 'app.js', line: '13', suggestions: 'Forced layout reflow accessing offsetHeight inside loop', agentType: 'Performance' }
+            ];
+
+            const { newTasks, addedTasks } = await mergeFindings(existingTasks, newFindings);
+            expect(addedTasks).toHaveLength(0);
+            expect(newTasks).toHaveLength(1);
+        });
+
+        it('should add new tasks and generate unique IDs', async () => {
             const existingTasks = [
                 { id: 'SEC-1', file: 'app.js', line: '10', suggestions: 'Issue 1', status: 'Open' }
             ];
@@ -254,7 +267,7 @@ describe('judge.js', () => {
                 { file: 'other.js', line: '20', suggestions: 'New Issue', agentType: 'Performance' }
             ];
 
-            const { newTasks, addedTasks } = mergeFindings(existingTasks, newFindings);
+            const { newTasks, addedTasks } = await mergeFindings(existingTasks, newFindings);
             expect(addedTasks).toHaveLength(1);
             expect(addedTasks[0].id).toMatch(/PERF-\d+/);
             expect(newTasks).toHaveLength(2);
